@@ -32,6 +32,7 @@ public class ReceiveLatestWorldPosPacket extends SimplePacketBase {
         friendlyByteBuf.writeDouble(latestWorldPos.y);
         friendlyByteBuf.writeDouble(latestWorldPos.z);
     }
+    // Test Push
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
