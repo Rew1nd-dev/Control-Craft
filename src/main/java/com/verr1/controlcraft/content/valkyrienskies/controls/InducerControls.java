@@ -274,4 +274,9 @@ public class InducerControls {
 
     }
 
+
+    public static void flapTickControls(LogicalFlap flap, PhysShipWrapper ship){
+
+    }
+
 }

@@ -4,7 +4,7 @@ import com.simibubi.create.foundation.gui.widget.Label;
 import com.verr1.controlcraft.content.legacy.PeripheralInterfaceBlockEntity_;
 import com.verr1.controlcraft.content.gui.layouts.api.TitleLabelProvider;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
-import com.verr1.controlcraft.foundation.data.PeripheralKey_;
+import com.verr1.controlcraft.content.legacy.PeripheralKey_;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.utils.ParseUtils;
 import net.minecraft.client.Minecraft;

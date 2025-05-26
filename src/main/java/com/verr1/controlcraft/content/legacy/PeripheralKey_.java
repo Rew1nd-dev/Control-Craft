@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.foundation.data;
+package com.verr1.controlcraft.content.legacy;
 
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;

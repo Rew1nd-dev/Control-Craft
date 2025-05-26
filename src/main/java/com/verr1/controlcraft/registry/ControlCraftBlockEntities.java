@@ -7,6 +7,8 @@ import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlockEntity;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlock;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlock;
+import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlock;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity;
 import com.verr1.controlcraft.content.blocks.jet.JetBlock;
@@ -177,6 +179,11 @@ public class ControlCraftBlockEntities {
             .instance(() -> ShaftInstance::new, false)
             .validBlock(ControlCraftBlocks.KINETIC_RESISTOR_BLOCK)
             .renderer(() -> ShaftRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<CompactFlapBlockEntity> COMPACT_FLAP_BLOCKENTITY = REGISTRATE
+            .blockEntity(CompactFlapBlock.ID, CompactFlapBlockEntity::new)
+            .validBlock(ControlCraftBlocks.COMPACT_FLAP_BLOCK)
             .register();
 
     public static void register(){

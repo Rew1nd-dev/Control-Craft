@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlock;
+import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlock;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlock;
 import com.verr1.controlcraft.content.blocks.jet.JetBlock;
 import com.verr1.controlcraft.content.blocks.jet.JetRudderBlock;
@@ -393,6 +394,18 @@ public class ControlCraftBlocks {
             .transform(customItemModel())
             .register();
 
+    public static final BlockEntry<CompactFlapBlock> COMPACT_FLAP_BLOCK = REGISTRATE
+            .block(CompactFlapBlock.ID, CompactFlapBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.explosionResistance(32))
+            .transform(TagGen.pickaxeOnly())
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+            .transform(customItemModel())
+            .register();
 
     public static void register(){
     }

@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.legacy;
 
-import com.verr1.controlcraft.foundation.data.PeripheralKey_;
 import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
