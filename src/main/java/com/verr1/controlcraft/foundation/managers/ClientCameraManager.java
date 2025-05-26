@@ -1,22 +1,38 @@
 package com.verr1.controlcraft.foundation.managers;
 
+import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
+import com.verr1.controlcraft.foundation.executor.executables.ConditionExecutable;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+
 @OnlyIn(Dist.CLIENT)
 public class ClientCameraManager {
     private static BlockPos LinkCameraPos;
+
+
+
+    private static Vec3 QueryPos;
+
+    private static Vec3 latestCameraWorldPos = null;
 
     public static @Nullable CameraBlockEntity getLinkedCamera(){
         return Optional
@@ -38,21 +54,71 @@ public class ClientCameraManager {
         return LinkCameraPos;
     }
 
+    public static @Nullable Vec3 getLinkOrQueryCameraWorldPosition(){
+        return latestCameraWorldPos == null ? QueryPos() : latestCameraWorldPos;
+    }
 
+    public static Vec3 QueryPos() {
+        Level level = Minecraft.getInstance().level;
+        if(level == null || QueryPos == null)return null;
 
-    public static void link(BlockPos cameraPos){
+        return Optional.of(QueryPos)
+                .map(p -> ValkyrienSkies.getShipManagingBlock(Minecraft.getInstance().level, BlockPos.containing(p)))
+                .map(s -> s.getTransform().getShipToWorld())
+                .map(t -> t.transformPosition(toJOML(QueryPos)))
+                .map(ValkyrienSkies::toMinecraft)
+                .orElse(QueryPos);
+
+    }
+
+    public static void linkDirect(BlockPos cameraPos){
         LinkCameraPos = cameraPos;
         Minecraft.getInstance().options.bobView().set(false);
-        if(Minecraft.getInstance().level == null)return;
-        //Minecraft.getInstance().level.getChunkSource().updateViewCenter(cameraPos.getX(), cameraPos.getZ());
+    }
+
+    public static void linkWithAck(BlockPos cameraPos){
+        LocalPlayer player = Minecraft.getInstance().player;
+        if(player == null)return;
+        var p = new BlockBoundServerPacket.builder(cameraPos, RegisteredPacketType.SETTING_0)
+                .withDouble(0)
+                .withDouble(0)
+                .withUtf8(player.getName().getString())
+                .build();
+        ControlCraftPackets.getChannel().sendToServer(p);
+
+
+        QueryPos = cameraPos.getCenter();
+        var task = new ConditionExecutable
+                .builder(() -> linkDirect(cameraPos))
+                .withCondition(() -> BlockEntityGetter.getLevelBlockEntityAt(player.clientLevel, cameraPos, CameraBlockEntity.class).isPresent())
+                .withExpirationTicks(40)
+                .withOrElse(
+                        () -> {
+                            QueryPos = null;
+                            player.sendSystemMessage(Component.literal("Camera Failed To Load"));
+                        }
+                )
+                .build();
+
+        ControlCraftClient.CLIENT_EXECUTOR.execute(task);
     }
 
     public static void deLink(){
         disconnectServerCamera();
         LinkCameraPos = null;
+        QueryPos = null;
         Minecraft.getInstance().options.bobView().set(true);
         Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
         Minecraft.getInstance().levelRenderer.allChanged();
+        setLatest(null);
+    }
+
+    private static void setLatest(Vec3 latest){
+        latestCameraWorldPos = latest;
+    }
+
+    public static Vec3 latestCameraWorldPos() {
+        return latestCameraWorldPos;
     }
 
     public static void disconnectServerCamera(){
@@ -80,12 +146,7 @@ public class ClientCameraManager {
             camera.setPitch(player.getViewXRot(1));
             camera.setYaw(player.getViewYRot(1));
             camera.syncServer(player.getName().getString());
-            // camera.outlineViewClip();
-            // camera.outlineEntityClip();
-            // camera.outlineEntityInView();
-            // if(camera.castRay())camera.outlineClipRay();
-            // camera.outlineShipClip();
-            // camera.outlineAllEntityInView();
+            setLatest(toMinecraft(camera.getCameraPosition()));
         }
 
 

@@ -1,10 +1,8 @@
 package com.verr1.controlcraft.foundation;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;

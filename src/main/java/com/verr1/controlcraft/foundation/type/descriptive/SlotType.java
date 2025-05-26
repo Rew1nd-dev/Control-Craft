@@ -122,6 +122,12 @@ public enum SlotType implements Descriptive<SlotType> {
     ),
     RATIO$1(false),
 
+    IS_ASSEMBLED(true, Component.literal("Is Assembled"),
+            literals(
+                    "If The Bearing Is Assembled"
+            )
+    ),
+
     IS_LOCKED(true, Component.literal("Is Locked"),
             literals(
                     "If The Device Is Locked By Constraint"
@@ -208,9 +214,9 @@ public enum SlotType implements Descriptive<SlotType> {
             )
     ),
 
-    PROTOCOL(false, Component.literal("Protocol"),
+    PROTOCOL(false, Component.literal("protocol"),
             literals(
-                    "Protocol Of Channel",
+                    "protocol Of Channel",
                     " . Number Only"
             )
     ),

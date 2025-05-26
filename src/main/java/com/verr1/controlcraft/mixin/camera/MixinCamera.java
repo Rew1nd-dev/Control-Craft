@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.mixin;
+package com.verr1.controlcraft.mixin.camera;
 
 import com.verr1.controlcraft.mixinducks.ICameraDuck;
 import net.minecraft.client.Camera;

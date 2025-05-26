@@ -3,11 +3,17 @@ package com.verr1.controlcraft.content.blocks.transmitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
-import com.verr1.controlcraft.foundation.data.PeripheralKey;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.content.cctweaked.peripheral.TransmitterPeripheral;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import dan200.computercraft.api.lua.IArguments;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
@@ -17,7 +23,6 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -27,10 +32,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class PeripheralProxyBlockEntity extends SmartBlockEntity {
+
+    // Example executor for the main thread (replace with your actual executor)
 
     private long currentProtocol;
 
@@ -38,19 +46,28 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
     private LazyOptional<IPeripheral> peripheralCap;
 
 
-    private final LoadingCache<BlockPos, Optional<PeripheralInterfaceBlockEntity>> cache = CacheBuilder.newBuilder()
-                    .maximumSize(20)
-                    .expireAfterWrite(2, TimeUnit.SECONDS)
-                    .build(
-                            new CacheLoader<>() {
-                                @Override
-                                public @NotNull Optional<PeripheralInterfaceBlockEntity> load(@NotNull BlockPos pos) throws Exception {
-                                    return Optional.ofNullable(getLevel())
-                                            .map(level -> level.getExistingBlockEntity(pos))
-                                            .filter(te -> te instanceof PeripheralInterfaceBlockEntity)
-                                            .map(te -> (PeripheralInterfaceBlockEntity) te);
-                                }
-                            });
+    private static final LoadingCache<WorldBlockPos, Optional<PeripheralInterfaceBlockEntity>> cache = CacheBuilder.newBuilder()
+        .maximumSize(256)
+        .refreshAfterWrite(2, TimeUnit.SECONDS)
+        .build(
+                new CacheLoader<>() {
+
+                    @Override
+                    public @NotNull ListenableFuture<Optional<PeripheralInterfaceBlockEntity>> reload(WorldBlockPos key, Optional<PeripheralInterfaceBlockEntity> oldValue) throws Exception {
+                        ListenableFutureTask<Optional<PeripheralInterfaceBlockEntity>> task = ListenableFutureTask.create(() -> load(key));
+                        ControlCraftServer.getMainThreadExecutor().execute(task);
+                        return task;
+                    }
+
+                    @Override
+                    public @NotNull Optional<PeripheralInterfaceBlockEntity> load(@NotNull WorldBlockPos pos) throws Exception {
+                        return BlockEntityGetter.INSTANCE
+                                .getBlockEntityAt(
+                                        pos.globalPos(),
+                                        PeripheralInterfaceBlockEntity.class
+                                );
+                    }
+                });
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
@@ -80,11 +97,20 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
             String methodName,
             IArguments args) throws LuaException, ExecutionException {
 
-        BlockPos peripheralPos = NetworkManager.getRegisteredPeripheralPos(new PeripheralKey(peripheralName, currentProtocol));
-        if(peripheralPos == null)return MethodResult.of(null, "Receiver Not Registered");
+        WorldBlockPos peripheralPos = PeripheralNetwork.valid(new PeripheralNetwork.PeripheralKey(currentProtocol, peripheralName));
+        if(peripheralPos == null){
+            ControlCraft.LOGGER.error("Peripheral Not Found In Network: {}", peripheralName);
+            return MethodResult.of(null, "Receiver Not Registered");
+        }
         if(getLevel() == null)return MethodResult.of(null, "Level Is Null");
         PeripheralInterfaceBlockEntity receiver = cache.get(peripheralPos).orElse(null);
-        if(receiver == null)return MethodResult.of(null, "Peripheral Is Not A Receiver");
+        if(receiver == null){
+            ControlCraft.LOGGER.error("Receiver is null: {}", peripheralName);
+            return MethodResult.of(null, "Peripheral Is Not A Receiver");
+        }
+        if(receiver.isRemoved()){
+            ControlCraft.LOGGER.error("Receiver is already removed!: {}", peripheralName);
+        }
         return receiver
                     .callPeripheral(
                             access,
@@ -100,14 +126,13 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
                                         String peripheralName,
                                         String methodName,
                                         IArguments args)
-            throws LuaException
-    {
-        BlockPos peripheralPos = NetworkManager.getRegisteredPeripheralPos(new PeripheralKey(peripheralName, currentProtocol));
+            throws LuaException, ExecutionException {
+        WorldBlockPos peripheralPos = PeripheralNetwork.valid(new PeripheralNetwork.PeripheralKey(currentProtocol, peripheralName));
         if(peripheralPos == null)return MethodResult.of(null, "Receiver Not Registered");
         if(getLevel() == null)return MethodResult.of(null, "Level Is Null");
-        BlockEntity receiver = getLevel().getExistingBlockEntity(peripheralPos);
-        if(!(receiver instanceof PeripheralInterfaceBlockEntity))return MethodResult.of(null, "Peripheral Is Not A Receiver");
-        return ((PeripheralInterfaceBlockEntity)receiver)
+        PeripheralInterfaceBlockEntity receiver = cache.get(peripheralPos).orElse(null);
+        if(receiver == null)return MethodResult.of(null, "Peripheral Is Not A Receiver");
+        return receiver
                 .callPeripheralAsync(
                         access,
                         context,

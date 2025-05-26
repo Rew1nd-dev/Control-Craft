@@ -29,8 +29,8 @@ public enum UIContents implements Descriptive<UIContents> {
     MAX(Component.literal("Max"), literals("Maximum Value Of Signal 15")),
 
     TYPE(Component.literal("Type"), literals("Type Of The Peripheral")),
-    PROTOCOL(Component.literal("Protocol"), literals("Unique Channel")),
-    NAME(Component.literal("Name"), literals("Unique Name Under A Same Protocol")),
+    PROTOCOL(Component.literal("protocol"), literals("Unique Channel")),
+    NAME(Component.literal("Name"), literals("Unique Name Under A Same protocol")),
     SPATIAL_OFFSET(Component.literal("Spatial Offset"), literals("Offset Distance In Space")),
 
     ANCHOR_RESISTANCE_AT_POS(Component.literal("Resist At Pos"), literals("Resistance Apply To Block Instead Of COM")),
@@ -45,6 +45,10 @@ public enum UIContents implements Descriptive<UIContents> {
     DISASSEMBLY(Component.literal("Dis Assembly"), literals("Disassemble Contraption or Ship")),
     LOCK(Component.literal("Lock"), literals("Lock The Device")),
     UNLOCK(Component.literal("Unlock"), literals("Unlock The Device")),
+
+    FORCED(Component.literal("Forced"), literals("Force Online Mode", "Divert others if key is used", "Will try force online every 0.5s")),
+    ONLINE(Component.literal("Online"), literals("Online Hold Key")),
+    OFFLINE(Component.literal("Offline"), literals("Offline Hold Key")),
     ;
 
 

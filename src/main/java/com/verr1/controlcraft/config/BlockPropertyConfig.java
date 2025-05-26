@@ -23,6 +23,21 @@ public class BlockPropertyConfig
                     "  This Feature Is Currently **Experimental**, It Might Cause Unknown Concurrent Issues")
             .define("Enable Physics Thread Synced ComputerCraft", false);
 
+
+    private static final ForgeConfigSpec.BooleanValue TWEAKED_CONTROLLER_256 = BUILDER
+            .comment(
+                    "------------------------------------",
+                    "  Warning: Experimental",
+                    "------------------------------------",
+                    "  By Default, Tweaked Controller Transmit 15 Levels of Redstone Signal. ",
+                    "  When Enable This Settings, Tweaked Controller Will Transmit It's Decimal Part in Control Craft ",
+                    "  Copied Redstone Network, And Redstone Terminal Will Be Able To Read 256 Levels of The Axis Input",
+                    "  However, Lectern Tweaked Controller Will Not Be Able To Read Axis From CC Peripheral",
+                    "  Fix This By Calling setFullPrecision(true) Of The Lectern Peripheral Method"
+                    )
+            .define("Enable Double Precision Tweaked Controller", false);
+
+
     private static final ForgeConfigSpec.IntValue MAX_DISTANCE_SPATIAL_CAN_LINK = BUILDER
             .comment(
                     "  Defines How Long Can Running-Dynamic Spatial Can Find A Running-Static One As It's Target")
@@ -51,7 +66,7 @@ public class BlockPropertyConfig
             .comment(
                     "  Defines The Maximum Force A Single Propeller Can Apply"
                     )
-            .defineInRange("Propeller Max Force", 3_000_000, 0, Integer.MAX_VALUE);
+            .defineInRange("Propeller Max Force", 3_000_00, 0, Integer.MAX_VALUE);
 
     private static final ForgeConfigSpec.IntValue PROPELLER_MAX_TORQUE = BUILDER
             .comment(
@@ -63,7 +78,13 @@ public class BlockPropertyConfig
             .comment(
                     "  Defines The Maximum Force A Single Jet Engine Can Apply"
             )
-            .defineInRange("Jet Max Force", 3_000_000, 0, Integer.MAX_VALUE);
+            .defineInRange("Jet Max Force", 3_000_00, 0, Integer.MAX_VALUE);
+
+    private static final ForgeConfigSpec.BooleanValue CAN_JET_THRUST_BACK = BUILDER
+            .comment(
+                    "  Can Jet Engine Thrust Backwards (Thrust < 0), Very Useful For Prototype Design"
+            )
+            .define("Can Jet Thrust Back", true);
 
 
 
@@ -72,6 +93,8 @@ public class BlockPropertyConfig
 
 
     public static boolean _CC_OVERCLOCKING;
+
+    public static boolean _TWEAKED_CONTROLLER_256;
 
     public static boolean _NO_NEGATIVE_PID_INPUT;
 
@@ -87,10 +110,13 @@ public class BlockPropertyConfig
 
     public static int _JET_MAX_THRUST;
 
+    public static boolean _CAN_JET_THRUST_BACK;
+
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
         _CC_OVERCLOCKING = CC_OVERCLOCKING.get();
+        _TWEAKED_CONTROLLER_256 = TWEAKED_CONTROLLER_256.get();
         _NO_NEGATIVE_PID_INPUT = NO_NEGATIVE_PID_INPUT.get();
         _CHUNK_LOADER_RADIUS = CHUNK_LOADER_RADIUS.get();
         _PHYSICS_MAX_SLIDE_DISTANCE = PHYSICS_MAX_SLIDE_DISTANCE.get();
@@ -98,5 +124,6 @@ public class BlockPropertyConfig
         _PROPELLER_MAX_THRUST = PROPELLER_MAX_THRUST.get();
         _PROPELLER_MAX_TORQUE = PROPELLER_MAX_TORQUE.get();
         _JET_MAX_THRUST = JET_MAX_THRUST.get();
+        _CAN_JET_THRUST_BACK = CAN_JET_THRUST_BACK.get();
     }
 }

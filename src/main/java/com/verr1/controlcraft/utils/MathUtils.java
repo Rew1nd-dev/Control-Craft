@@ -44,6 +44,10 @@ public class MathUtils {
         return Math.min(max, Math.max(0, x));
     }
 
+    public static double relu(double x){
+        return Math.max(0, x);
+    }
+
     public static int max(Integer... ints){
         int max = Integer.MIN_VALUE;
         for(int i : ints){

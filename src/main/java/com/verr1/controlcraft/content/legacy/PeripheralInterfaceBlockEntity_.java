@@ -1,14 +1,18 @@
-package com.verr1.controlcraft.content.blocks.receiver;
+package com.verr1.controlcraft.content.legacy;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
+import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlock;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
+import com.verr1.controlcraft.foundation.data.PeripheralKey_;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
+import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
+import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
+import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.lua.IArguments;
 import dan200.computercraft.api.lua.ILuaContext;
@@ -23,52 +27,34 @@ import dan200.computercraft.shared.platform.InvalidateCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.network.NetworkEvent;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implements
+public class PeripheralInterfaceBlockEntity_ extends NetworkBlockEntity implements
         IPacketHandler
 {
     public static final NetworkKey PERIPHERAL = NetworkKey.create("peripheral");
-    public static final NetworkKey VALID_PERIPHERAL = NetworkKey.create("valid_peripheral");
     public static final NetworkKey PERIPHERAL_TYPE = NetworkKey.create("peripheral_type");
-    public static final NetworkKey FORCED = NetworkKey.create("forced");
-    public static final NetworkKey ONLINE = NetworkKey.create("online");
-    public static final NetworkKey OFFLINE = NetworkKey.create("offline");
 
     private IPeripheral attachedPeripheral;
     private final ConcurrentHashMap<String, PeripheralMethod> methods = new ConcurrentHashMap<>();
 
 
-
-
-    private PeripheralNetwork.PeripheralKey holdKey = PeripheralNetwork.PeripheralKey.NULL;
-
-
-
-    private boolean forced = false;
+    private PeripheralKey_ networkKey = PeripheralKey_.NULL;
 
 
     private final ConcurrentHashMap<String, Runnable> syncedTasks = new ConcurrentHashMap<>();
 
     public synchronized MethodResult callPeripheral(IComputerAccess access, ILuaContext context, String methodName, IArguments args) throws LuaException {
         if(level == null || level.isClientSide)return MethodResult.of(null, "You Are Calling This On The Client Side, Nothing Returned");
-        if(attachedPeripheral == null){
-            ControlCraft.LOGGER.error("Peripheral h:{}, v:{} Called, But No Peripheral Attached", holdKey, valid());
-            return MethodResult.of(null, "Receiver Called, But No Peripheral Attached");
-        }
-        if(!methods.containsKey(methodName)){
-            ControlCraft.LOGGER.error("Peripheral Called, But Method {} Not Found", methodName);
-            return MethodResult.of(null, "Receiver Called, But Method Not Found");
-        }
-        if(access == null){
-            ControlCraft.LOGGER.error("Peripheral Called, But No Access Provided");
-            return MethodResult.of(null, "Receiver Called, But No Access Provided");
-        }
+        if(attachedPeripheral == null) return MethodResult.of(null, "Receiver Called, But No Peripheral Attached");
+        if(!methods.containsKey(methodName))return MethodResult.of(null, "Receiver Called, But Method Not Found");
+        if(access == null)return MethodResult.of(null, "Receiver Called, But No Access Provided");
 
         return Optional.ofNullable(methods.get(methodName)).map(m -> {
             try {
@@ -148,7 +134,7 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
                 (ServerLevel)level,
                 attachedPos,
                 attachedDirection,
-                () -> {}
+                new InvalidPeripheralCallBack()
         );
         attachedPeripheral = peripheral;
         if(attachedPeripheral == null)return;
@@ -156,60 +142,35 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
         methods.putAll(ServerContext.get(((ServerLevel) level).getServer()).peripheralMethods().getSelfMethods(peripheral));
     }
 
-    public PeripheralNetwork.PeripheralKey getHoldKey(){
-        return holdKey;
+    public PeripheralKey_ getNetworkKey(){
+        if(registered())return networkKey;
+        return PeripheralKey_.NULL;
     }
 
-    public void setHoldKey(PeripheralNetwork.PeripheralKey holdKey) {
-        if(Objects.equals(holdKey.name(), ""))return;
 
-        this.holdKey = holdKey;
 
-        enqueueTask("online", this::onlineAccordingly);
+    public boolean registered(){
+        return NetworkManager.isRegistered(getBlockPos());
+    }
 
+
+    public void resetNetworkRegistry(PeripheralKey_ newKey){
+        if(level == null){
+            ControlCraft.LOGGER.error("trying to register network key when level is null !");
+            return;
+        }
+        if(level.isClientSide) {
+            ControlCraft.LOGGER.error("trying to register network key in client side !");
+            return;
+        }
+        if(Objects.equals(newKey.Name(), ""))return;
+        networkKey = NetworkManager.registerAndGetKey(newKey, getBlockPos());
         setChanged();
-    }
-
-    private void onlineAccordingly(){
-
-        if(forced)forceOnline();
-        else softOnline();
-    }
-
-    private void forceOnline(){
-        if(level == null || level.isClientSide)return;
-        PeripheralNetwork.forceOnline(holdKey, WorldBlockPos.of(level, getBlockPos()));
-    }
-
-    private void softOnline(){
-        if(level == null || level.isClientSide)return;
-        PeripheralNetwork.softOnline(holdKey, WorldBlockPos.of(level, getBlockPos()));
-    }
-
-    public void offline(){
-        PeripheralNetwork.offline(holdKey);
-    }
-
-    public boolean forced() {
-        return forced;
-    }
-
-    public void setForced(boolean forced) {
-        this.forced = forced;
-    }
-
-    public PeripheralNetwork.PeripheralKey valid(){
-        return PeripheralNetwork.valid(WorldBlockPos.of(level, getBlockPos()));
-    }
-
-
-    public boolean isOnline(){
-        return PeripheralNetwork.valid(WorldBlockPos.of(level, getBlockPos())).equals(holdKey);
     }
 
     @Override
     public void tickServer(){
-        PeripheralNetwork.activate(WorldBlockPos.of(level, getBlockPos()));
+        NetworkManager.activate(getBlockPos());
     }
 
     @Override
@@ -221,14 +182,10 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     @Override
     public void lazyTickServer() {
         updateAttachedPeripheral();
-
-        if(forced && !isOnline())forceOnline();
-
-
-        syncForNear(true, PERIPHERAL, PERIPHERAL_TYPE, VALID_PERIPHERAL);
+        syncForNear(true, PERIPHERAL, PERIPHERAL_TYPE);
     }
 
-    public PeripheralInterfaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public PeripheralInterfaceBlockEntity_(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         buildRegistry(PERIPHERAL_TYPE).withBasic(SerializePort.of(
                     () -> Optional.ofNullable(attachedPeripheral).map(IPeripheral::getType).orElse("Not Attached"),
@@ -239,40 +196,9 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
 
 
         buildRegistry(PERIPHERAL).withBasic(CompoundTagPort.of(
-                () -> getHoldKey().serialize(),
-                tag -> setHoldKey(PeripheralNetwork.PeripheralKey.deserialize(tag))
-        )).withClient(
-                new ClientBuffer<>(
-                        SerializeUtils.of(
-                                PeripheralNetwork.PeripheralKey::serialize,
-                                PeripheralNetwork.PeripheralKey::deserialize
-                        ),
-                        PeripheralNetwork.PeripheralKey.class)
-        ).register();
-
-
-        buildRegistry(VALID_PERIPHERAL).withBasic(CompoundTagPort.of(
-                () -> valid().serialize(),
-                $ -> {}
-        )).withClient(
-                new ClientBuffer<>(
-                        SerializeUtils.of(
-                                PeripheralNetwork.PeripheralKey::serialize,
-                                PeripheralNetwork.PeripheralKey::deserialize
-                        ),
-                        PeripheralNetwork.PeripheralKey.class)
-        )
-                .runtimeOnly()
-                .dispatchToSync()
-                .register();
-
-        buildRegistry(FORCED)
-                .withBasic(SerializePort.of(this::forced, this::setForced, SerializeUtils.BOOLEAN))
-                .withClient(ClientBuffer.BOOLEAN.get())
-                .register();
-
-        panel().registerUnit(ONLINE, this::onlineAccordingly);
-        panel().registerUnit(OFFLINE, () -> {offline(); setForced(false);});
+                () -> getNetworkKey().serialize(),
+                tag -> enqueueTask("reset", () -> resetNetworkRegistry(PeripheralKey_.deserialize(tag)))
+        )).withClient(new ClientBuffer<>(SerializeUtils.of(PeripheralKey_::serialize, PeripheralKey_::deserialize), PeripheralKey_.class)).register();
 
     }
 
@@ -280,21 +206,40 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     public void remove(){
         super.remove();
         if(level == null || level.isClientSide)return;
-
-        //
-
+        NetworkManager.UnregisterWirelessPeripheral(networkKey);
     }
 
 
 
+    protected void displayScreen(ServerPlayer player){
+
+        PeripheralKey_ networkKey = getNetworkKey();
+        String peripheralType = getAttachedPeripheralType();
+        var p = new BlockBoundClientPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_0)
+                .withLong(networkKey.Protocol())
+                .withUtf8(peripheralType)
+                .withUtf8(networkKey.Name())
+                .build();
+
+        ControlCraftPackets.sendToPlayer(p, player);
+
+    }
 
 
+    @Override
+    public void handleServer(NetworkEvent.Context context, BlockBoundServerPacket packet) {
+        if(packet.getType() == RegisteredPacketType.SETTING_0){
+            String name = packet.getUtf8s().get(0);
+            Long protocol = packet.getLongs().get(0);
+            resetNetworkRegistry(new PeripheralKey_(name, protocol));
+        }
+    }
 
     private class InvalidPeripheralCallBack implements InvalidateCallback{
         @Override
         public void run() {
             ControlCraft.LOGGER.info("Peripheral {} Invalidated", Optional.ofNullable(attachedPeripheral).map(IPeripheral::getType).orElse("null"));
-            enqueueTask("invalidate", PeripheralInterfaceBlockEntity.this::deleteAttachedPeripheral);
+            enqueueTask("invalidate", PeripheralInterfaceBlockEntity_.this::deleteAttachedPeripheral);
         }
     }
 }

@@ -39,7 +39,7 @@ public class TransmitterPeripheral extends AbstractAttachedPeripheral<Peripheral
         } catch (ExecutionException e) {
             ControlCraft.LOGGER.error("Error while calling remote method", e);
         }
-        return MethodResult.of();
+        return MethodResult.of("Error while calling remote method");
     }
 
     @LuaFunction
@@ -47,7 +47,12 @@ public class TransmitterPeripheral extends AbstractAttachedPeripheral<Peripheral
         String slotName = arguments.getString(0);
         String remoteName = arguments.getString(1);
         String methodName = arguments.getString(2);
-        return getTarget().callRemoteAsync(access, context, slotName, remoteName, methodName, arguments.drop(3));
+        try {
+            return getTarget().callRemoteAsync(access, context, slotName, remoteName, methodName, arguments.drop(3));
+        }catch (ExecutionException e) {
+            ControlCraft.LOGGER.error("Error while calling remote method", e);
+        }
+        return MethodResult.of("Error while calling remote method");
     }
 
     @LuaFunction

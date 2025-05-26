@@ -7,6 +7,7 @@ import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import com.verr1.controlcraft.content.blocks.kinetic.resistor.KineticResistorBlockEntity;
 import com.verr1.controlcraft.content.blocks.propeller.PropellerBlockEntity;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
+import com.verr1.controlcraft.content.legacy.PeripheralInterfaceBlockEntity_;
 import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlockEntity;
 import com.verr1.controlcraft.content.gui.layouts.element.*;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
@@ -34,6 +35,13 @@ import java.util.*;
 
 import static com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity.*;
 import static com.verr1.controlcraft.content.gui.layouts.api.ISerializableSchedule.SCHEDULE;
+
+
+/*
+ *   If you want a dynamic view
+ *   1.  make a syncTask to let server sync your data to client, or make this field auto synced on server side
+ *   2.  override the onScreenTick() to call readToLayout()
+ * */
 
 public class GenericUIFactory {
     public static Component NOT_FOUND = Component.literal("Not Found").withStyle(s -> s.withColor(ChatFormatting.RED));
@@ -148,7 +156,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundAnchorPos)
+                        createTerminalDeviceTab(boundAnchorPos)
                 )
                 .build();
     }
@@ -196,7 +204,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 )
                 .withTab(
                         REMOTE_TAB,
@@ -268,7 +276,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 )
                 .withTickTask(createSyncTasks(boundPos, SharedKeys.VALUE))
                 .build();
@@ -306,7 +314,7 @@ public class GenericUIFactory {
                                 .build()
                 ).withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 ).withTickTask(createSyncTasks(boundPos,
                         JetBlockEntity.THRUST,
                         JetBlockEntity.HORIZONTAL_ANGLE,
@@ -403,7 +411,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 )
                 .withTab(
                         CONTROLLER_TAB,
@@ -499,7 +507,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 )
                 .withTab(
                         CONTROLLER_TAB,
@@ -521,6 +529,34 @@ public class GenericUIFactory {
     }
 
 
+    public static GenericSettingScreen createPeripheralInterfaceScreen_(BlockPos boundPos){
+        var type_view = new BasicUIView<>(
+                boundPos,
+                PeripheralInterfaceBlockEntity_.PERIPHERAL_TYPE,
+                String.class,
+                "Not Attached",
+                Converter.convert(UIContents.TYPE, Converter::viewStyle),
+                s -> Component.literal(s).withStyle(Converter::optionStyle),
+                $ -> ""
+        );
+
+        var key_field = new PeripheralKeyUIField_(boundPos);
+
+        key_field.getNameLabel().withTextStyle(Converter::titleStyle);
+        key_field.getProtocolLabel().withTextStyle(Converter::titleStyle);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(ControlCraftBlocks.RECEIVER_BLOCK.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(PeripheralInterfaceBlockEntity_.PERIPHERAL_TYPE, type_view)
+                                .withPort(PeripheralInterfaceBlockEntity_.PERIPHERAL, key_field)
+                                .build()
+                )
+                .build();
+    }
+
     public static GenericSettingScreen createPeripheralInterfaceScreen(BlockPos boundPos){
         var type_view = new BasicUIView<>(
                 boundPos,
@@ -532,10 +568,34 @@ public class GenericUIFactory {
                 $ -> ""
         );
 
+        var key_view = new PeripheralKeyUIView(boundPos);
         var key_field = new PeripheralKeyUIField(boundPos);
 
-        key_field.getNameLabel().withTextStyle(Converter::titleStyle);
-        key_field.getProtocolLabel().withTextStyle(Converter::titleStyle);
+        var forced = new BooleanUIField(
+                boundPos,
+                PeripheralInterfaceBlockEntity.FORCED,
+                Converter.convert(UIContents.FORCED, Converter::titleStyle)
+        );
+
+        var online = new UnitUIPanel(
+                boundPos,
+                PeripheralInterfaceBlockEntity.ONLINE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.ONLINE, Converter::titleStyle)
+        );
+
+        var offline = new UnitUIPanel(
+                boundPos,
+                PeripheralInterfaceBlockEntity.OFFLINE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.OFFLINE, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(online, offline);
+        };
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.RECEIVER_BLOCK.asStack())
@@ -543,9 +603,21 @@ public class GenericUIFactory {
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
                                 .withPort(PeripheralInterfaceBlockEntity.PERIPHERAL_TYPE, type_view)
+                                .withPort(PeripheralInterfaceBlockEntity.VALID_PERIPHERAL, key_view)
                                 .withPort(PeripheralInterfaceBlockEntity.PERIPHERAL, key_field)
+                                .withPort(PeripheralInterfaceBlockEntity.FORCED, forced)
                                 .build()
                 )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(PeripheralInterfaceBlockEntity.ONLINE, online)
+                                .withPort(SharedKeys.DISASSEMBLE, offline)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTickTask(createSyncTasks(boundPos, PeripheralInterfaceBlockEntity.PERIPHERAL_TYPE))
+                .withTickTask(createSyncTasks(boundPos, PeripheralInterfaceBlockEntity.VALID_PERIPHERAL))
                 .build();
     }
 
@@ -585,7 +657,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(pos)
+                        createTerminalDeviceTab(pos)
                 )
                 .build();
     }
@@ -645,7 +717,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 )
                 .withTab(
                         REMOTE_TAB,
@@ -675,7 +747,7 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         REDSTONE_TAB,
-                        createTerminalDeviceTab_(boundPos)
+                        createTerminalDeviceTab(boundPos)
                 )
                 .withTickTask(createSyncTasks(boundPos, KineticResistorBlockEntity.RATIO))
                 .build();
@@ -688,7 +760,7 @@ public class GenericUIFactory {
     }
 
 
-    public static VerticalFlow createTerminalDeviceTab(BlockPos boundPos){
+    public static VerticalFlow createTerminalDeviceTab__(BlockPos boundPos){
         return new VerticalFlow.builder(boundPos)
                 .withPort(
                         ITerminalDevice.FIELD__,
@@ -696,7 +768,7 @@ public class GenericUIFactory {
                 ).build();
     }
 
-    public static VerticalFlow createTerminalDeviceTab_(BlockPos boundPos){
+    public static VerticalFlow createTerminalDeviceTab(BlockPos boundPos){
         return new VerticalFlow.builder(boundPos)
                 .withPort(
                         IReceiver.FIELD_,

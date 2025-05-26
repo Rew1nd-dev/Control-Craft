@@ -80,14 +80,14 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
         getTarget().setPitchYawForceServer(pitch, yaw);
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> clip(){
         BlockHitResult hitResult = getTarget().clipBlock(true);
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult);
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> clipEntity(){
         EntityHitResult hitResult = getTarget().clipEntity(Entity::isAlive);
         if(hitResult == null)return null;
@@ -102,28 +102,28 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
         );
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> clipBlockDetail(){
         BlockHitResult hitResult = getTarget().clipBlock(true);
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult, getTarget().getLevel());
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> clipEntityDetail(){
         EntityHitResult hitResult = getTarget().clipEntity((e) -> true);
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult);
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> clipShipDetail(){
         ShipHitResult hitResult = getTarget().clipShip();
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult);
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> clipPlayerDetail(){
         EntityHitResult hitResult = getTarget().clipServerPlayer();
         if(hitResult == null)return null;
@@ -199,33 +199,33 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
         return CCUtils.parse(hitResult);
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void clipNewShip(){
         getTarget().clipNewShip();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void clipNewServerPlayer(){
         getTarget().clipNewServerPlayer();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void clipNewEntity(){
         getTarget().clipNewEntity();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void clipNewEntityInView(){
         getTarget().clipNewEntityInView();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void clipNewBlock(){
         getTarget().clipNewBlock();
     }
 
     // It should not be here. Just leave it here for now.
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final Map<String, Object> raycast(double x_0, double y_0, double z_0,
                                              double x_1, double y_1, double z_1){
 
@@ -246,7 +246,7 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
     }
 
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final List<Map<String, Object>> getEntities(double radius){
         Level level = getTarget().getLevel();
         if(level == null)return List.of();
@@ -257,7 +257,7 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
         ).stream().map(CCUtils::parse).toList();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final List<Map<String, Object>> getMobs(double radius){
         Level level = getTarget().getLevel();
         if(level == null)return List.of();

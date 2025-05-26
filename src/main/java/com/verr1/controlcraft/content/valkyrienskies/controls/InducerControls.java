@@ -157,7 +157,7 @@ public class InducerControls {
     public static void jetTickControls(LogicalJet jet, @NotNull PhysShipWrapper physShip) {
         Vector3dc dir = jet.direction();
         double thrust = MathUtils.clamp(jet.thrust(), BlockPropertyConfig._JET_MAX_THRUST);
-
+        if(!BlockPropertyConfig._CAN_JET_THRUST_BACK)thrust = MathUtils.relu(thrust);
 
 
         Vector3dc force_sc = dir.mul(thrust, new Vector3d());

@@ -1,7 +1,10 @@
 package com.verr1.controlcraft.foundation.data;
 
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -12,6 +15,9 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import javax.annotation.Nullable;
 
 public record WorldBlockPos(String dimensionID, BlockPos pos) {
+
+    public static final WorldBlockPos NULL = new WorldBlockPos("null", BlockPos.ZERO);
+
     public static WorldBlockPos of(Level level, BlockPos pos){
         String d = VSGameUtilsKt.getDimensionId(level);
         return new WorldBlockPos(d, pos);
@@ -30,5 +36,18 @@ public record WorldBlockPos(String dimensionID, BlockPos pos) {
     }
 
 
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("pos", SerializeUtils.LONG.serialize(pos.asLong()))
+                .withCompound("dimension", SerializeUtils.STRING.serialize(dimensionID))
+                .build();
+    }
+
+
+    public static WorldBlockPos deserialize(CompoundTag tag){
+        String dim = SerializeUtils.STRING.deserialize(tag.getCompound("dimension"));
+        long posLong = SerializeUtils.LONG.deserialize(tag.getCompound("pos"));
+        return new WorldBlockPos(dim, BlockPos.of(posLong));
+    }
 
 }

@@ -5,8 +5,10 @@ import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.utility.Color;
 import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Couple;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
+import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.data.render.RayLerpHelper;
@@ -65,20 +67,20 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
+import org.joml.*;
 import org.joml.primitives.AABBd;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
@@ -118,7 +120,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     private CameraClipType rayType = CameraClipType.NO_RAY;
 
-
+    public final CameraMovementTracker tracker;
 
     private CameraClipType shipType = CameraClipType.SHIP_CLIP_OFF;
 
@@ -140,6 +142,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     private boolean isActiveDistanceSensor = false;
 
     private final DirectReceiver receiver = new DirectReceiver();
+
+    private CameraBoundFakePlayer fp;
 
     public void clipNewShip(){
         latestShipHitResult = clipShip();
@@ -246,6 +250,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
         Vector3d p = getCameraPosition();
         Vector3d q = ValkyrienSkies.set(new Vector3d(), r.getLocation());
         return p.distance(q);
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        if(level.isClientSide){
+            ControlCraft.LOGGER.info("Unloading Camera: {}", getBlockPos());
+        }
     }
 
     public int getOutputSignal(){
@@ -592,12 +604,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 .lineWidth(4f);
     }
 
+
+
     @OnlyIn(Dist.CLIENT)
     public void outlineClipRay(){
         ClipContext clipContext = clipContext();
         Vector3d offset = isLinkedCamera() ? new Vector3d(0, -0.5, 0) : new Vector3d(0, 0, 0);
 
-
+    /*
         ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(
                 "camera_clip_ray_" + getBlockPos().asLong(),
                 clipContext.getFrom().add(toMinecraft(offset)),
@@ -605,7 +619,26 @@ public class CameraBlockEntity extends OnShipBlockEntity
         )
                 .colored(Color.SPRING_GREEN.setAlpha(0.6f))
                 .lineWidth(0.3f);
+    * */
+        Matrix4dc w2c = Optional
+                .ofNullable(getClientShip())
+                .map(Ship::getTransform)
+                .map(ShipTransform::getWorldToShip)
+                .orElse(new Matrix4d());
 
+
+        Function<Vec3, Vec3> convert = v -> {
+            Vector3d v1 = new Vector3d(v.x, v.y, v.z);
+            return toMinecraft(w2c.transformPosition(v1));
+        };
+
+        ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(
+                        "camera_clip_ray_" + getBlockPos().asLong(),
+                        convert.apply(clipContext.getFrom()).add(toMinecraft(offset)),
+                        convert.apply(clipContext.getTo())
+                )
+                .colored(Color.SPRING_GREEN.setAlpha(0.6f))
+                .lineWidth(0.3f);
 
 
     }
@@ -694,7 +727,6 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
 
-
     @Override
     public void tickServer() {
         if(isActiveDistanceSensor()){
@@ -702,6 +734,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
             updateOutputSignal();
             updateNeighbor();
         }
+        fp._tick();
 
     }
 
@@ -790,8 +823,15 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
             ServerPlayer user = context.getSender();
             if(user == null || level == null)return;
+
+            // This Will Make Camera Move Next Tick And Load The Chunk On The Client Side
+            // See MixinChunkMap.java
+
+
             ServerCameraManager.registerUser(WorldBlockPos.of(level, getBlockPos()), user);
-            // fakePlayer.redirectConnection(user);
+
+
+            fp.activate(user);
 
         }
         if(packet.getType() == RegisteredPacketType.SETTING_1){
@@ -799,8 +839,9 @@ public class CameraBlockEntity extends OnShipBlockEntity
         }
         if(packet.getType() == RegisteredPacketType.EXTEND_0){
             if(level == null)return;
+
+
             ServerCameraManager.remove(WorldBlockPos.of(level, getBlockPos()));
-            // fakePlayer.redirectConnection();
 
         }
     }
@@ -833,8 +874,16 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     }
 
+    @Override
+    public void initialize() {
+        super.initialize();
+        if(level == null || level.isClientSide)return;
+        fp = new CameraBoundFakePlayer((ServerLevel) level, this);
+    }
+
     public CameraBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        this.tracker = new CameraMovementTracker(pos);
 
         buildRegistry(PITCH).withBasic(SerializePort.of(this::getPitch, this::setPitch, SerializeUtils.DOUBLE)).register();
         buildRegistry(YAW).withBasic(SerializePort.of(this::getYaw, this::setYaw, SerializeUtils.DOUBLE)).register();

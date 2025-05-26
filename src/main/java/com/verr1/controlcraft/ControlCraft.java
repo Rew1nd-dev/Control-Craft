@@ -93,6 +93,8 @@ public class ControlCraft
         Configurator.setLevel("org.valkryienskies.core.networking", Level.ERROR);
         Configurator.setLevel("org.valkryienskies.physics.networking", Level.ERROR);
 
+
+
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
 
@@ -100,7 +102,8 @@ public class ControlCraft
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftServer::ServerInit);
 
         MinecraftForge.EVENT_BUS.register(this);
-        config(ModLoadingContext.get());// Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
+        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BlockPropertyConfig.SPEC);
     }
 
 
@@ -139,13 +142,11 @@ public class ControlCraft
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftClient::clientInit);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftServer::ServerInit);
 
-        Configurator.setLevel("org.valkryienskies.core.impl.networking", Level.ERROR);
-        Configurator.setLevel("org.valkryienskies.core.networking", Level.ERROR);
-        Configurator.setLevel("org.valkryienskies.physics.networking", Level.ERROR);
+
 
         MinecraftForge.EVENT_BUS.register(this);
 
-        config(context);
+        context.registerConfig(ModConfig.Type.COMMON, BlockPropertyConfig.SPEC);
 
 
     }
@@ -153,8 +154,8 @@ public class ControlCraft
     private void config(ModLoadingContext context){
 
 
-        context.registerConfig(ModConfig.Type.COMMON, BlockPropertyConfig.SPEC);
-        context.registerConfig(ModConfig.Type.COMMON, PermissionConfig.SPEC);
+        // context.registerConfig(ModConfig.Type.COMMON, BlockPropertyConfig.SPEC);
+        // context.registerConfig(ModConfig.Type.COMMON, PermissionConfig.SPEC);
     }
 
 

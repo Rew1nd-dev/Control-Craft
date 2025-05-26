@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.network.handler;
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.api.Slot;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -83,6 +84,14 @@ public class NetworkHandler {
     public void receiveRequest(List<NetworkKey> requests, ServerPlayer sender){
         // assume requests are only from duplex channels
         syncForPlayer(false, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class));
+        /*
+        ControlCraftServer.SERVER_EXECUTOR.executeLater(
+                () -> syncForPlayer(false, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class)),
+                25
+        ); // simulating lag for 1125 ms
+        * */
+
+        
     }
 
     public void syncForNear(boolean simplex, NetworkKey... key){

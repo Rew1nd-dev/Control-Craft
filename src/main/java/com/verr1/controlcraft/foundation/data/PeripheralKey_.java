@@ -3,8 +3,8 @@ package com.verr1.controlcraft.foundation.data;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
-public record PeripheralKey(String Name, long Protocol) {
-    public static PeripheralKey NULL = new PeripheralKey("null", 0);
+public record PeripheralKey_(String Name, long Protocol) {
+    public static PeripheralKey_ NULL = new PeripheralKey_("null", 0);
     @Override
     public int hashCode() {
         return Long.hashCode(Protocol);
@@ -17,9 +17,9 @@ public record PeripheralKey(String Name, long Protocol) {
         return tag;
     }
 
-    public static @NotNull PeripheralKey deserialize(CompoundTag tag){
+    public static @NotNull PeripheralKey_ deserialize(CompoundTag tag){
         if (tag == null) return NULL;
         if(!(tag.contains("name") && tag.contains("protocol")))return NULL;
-        return new PeripheralKey(tag.getString("name"), tag.getLong("protocol"));
+        return new PeripheralKey_(tag.getString("name"), tag.getLong("protocol"));
     }
 }

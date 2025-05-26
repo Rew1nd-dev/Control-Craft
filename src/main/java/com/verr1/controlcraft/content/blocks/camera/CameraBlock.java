@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.blocks.camera;
 import com.simibubi.create.AllShapes;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.registry.ControlCraftBlockEntities;
@@ -72,7 +71,7 @@ public class CameraBlock extends DirectionalBlock implements IBE<CameraBlockEnti
                                  BlockHitResult hit){
         if(worldIn.isClientSide){
             if(!player.isShiftKeyDown() && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()){
-                ClientCameraManager.link(pos);
+                ClientCameraManager.linkDirect(pos);
             }
             if(      handIn == InteractionHand.MAIN_HAND
                     && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()

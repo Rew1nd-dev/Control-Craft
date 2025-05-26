@@ -9,6 +9,7 @@ import com.getitemfromblock.create_tweaked_controllers.packet.TweakedLinkedContr
 import com.simibubi.create.Create;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
+import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.compact.tweak.TweakedLinkedControllerServerHandlerExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +36,7 @@ public class MixinTweakLinkedControllerAxisPacket {
 
     @Inject(method = "handleLectern", at = @At("HEAD"), remap = false)
     void controlCraft$handleLectern(ServerPlayer player, TweakedLecternControllerBlockEntity lectern, CallbackInfo ci){
+        if(!BlockPropertyConfig._TWEAKED_CONTROLLER_256)return;
         if(!lectern.isUsedBy(player))return;
 
         lectern.SetFullPrecision(true); // If not, Lectern axis can't be read by cc

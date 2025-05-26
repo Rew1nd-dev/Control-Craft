@@ -20,10 +20,9 @@ import org.valkyrienskies.core.impl.game.ships.ShipObjectServerWorld;
 import org.valkyrienskies.core.impl.hooks.VSEvents;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class ConstraintCenter {
     private static final int lazyTickRate = 3;
@@ -74,15 +73,24 @@ public class ConstraintCenter {
     public static void removeConstraintIfPresent(ConstraintKey key){
         if(cache.containsKey(key)){
             ControlCraft.LOGGER.info("Removing Constraint: " + key);
-            removeConstraint(cache.get(key).ID());
+            boolean removed = removeConstraint(cache.get(key).ID());
+            if(removed){
+                cache.remove(key);
+                ControlCraft.LOGGER.info("Removed Constraint: " + key);
+            }
         }
     }
 
-    private static void removeConstraint(int id){
+    private static boolean removeConstraint(int id){
+        AtomicBoolean removed = new AtomicBoolean(false);
         Optional.ofNullable(ValkyrienSkies.getShipWorld(server))
                 .filter(ServerShipWorldCore.class::isInstance)
                 .map(ServerShipWorldCore.class::cast)
-                .ifPresent(shipWorldCore -> shipWorldCore.removeConstraint(id));
+                .ifPresent(shipWorldCore -> {
+                    shipWorldCore.removeConstraint(id);
+                    removed.set(true);
+                });
+        return removed.get();
     }
 
     public static void destroyAllConstrains(ServerLevel level, BlockPos pos){
@@ -92,7 +100,24 @@ public class ConstraintCenter {
             var constraints = accessor.controlCraft$getShipIdToConstraints();
             long id = VSGetterUtils.getLoadedServerShip(level, pos).map(Ship::getId).orElse(-1L);
             if(id == -1)return;
-            new ArrayList<>(constraints.get(id)).forEach(sswc::removeConstraint);
+
+            Map<Integer, ConstraintKey> constraintIDs = cache.entrySet()
+                    .stream()
+                    .collect(
+                        Collectors.toMap(
+                            entry -> entry.getValue().ID(),
+                            Map.Entry::getKey
+                    ));
+
+            new ArrayList<>(constraints.get(id)).forEach(
+                    cid -> {
+                        if(constraintIDs.containsKey(cid)){
+                            removeConstraintIfPresent(constraintIDs.get(cid));
+                        }else{
+                            removeConstraint(cid);
+                        }
+                    }
+            );
 
         }catch (Exception e){
             ControlCraft.LOGGER.error("Failed to destroy all constraints", e);

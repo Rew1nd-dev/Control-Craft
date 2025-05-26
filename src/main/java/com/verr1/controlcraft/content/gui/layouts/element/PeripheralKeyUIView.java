@@ -14,17 +14,18 @@ import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
-public class PeripheralKeyUIField extends TypedUIPort<PeripheralNetwork.PeripheralKey> implements TitleLabelProvider {
+public class PeripheralKeyUIView extends TypedUIPort<PeripheralNetwork.PeripheralKey> implements TitleLabelProvider {
 
     private final FormattedLabel protocolLabel = UIContents.PROTOCOL.toDescriptiveLabel().withTextStyle(Converter::titleStyle);
     private final FormattedLabel nameLabel = UIContents.NAME.toDescriptiveLabel().withTextStyle(Converter::titleStyle);
-    private final EditBox protocolField = new EditBox(Minecraft.getInstance().font, 0, 0, 60, 10, Component.literal(""));
+    private final FormattedLabel protocolField = new FormattedLabel(60, 10, Component.literal(""));
+    private final FormattedLabel nameField = new FormattedLabel(60, 10, Component.literal(""));
 
-    public EditBox getNameField() {
+    public FormattedLabel getNameField() {
         return nameField;
     }
 
-    public EditBox getProtocolField() {
+    public FormattedLabel getProtocolField() {
         return protocolField;
     }
 
@@ -36,15 +37,20 @@ public class PeripheralKeyUIField extends TypedUIPort<PeripheralNetwork.Peripher
         return protocolLabel;
     }
 
-    private final EditBox nameField = new EditBox(Minecraft.getInstance().font, 0, 0, 60, 10, Component.literal(""));
 
-    public PeripheralKeyUIField(BlockPos boundPos) {
+
+    public PeripheralKeyUIView(BlockPos boundPos) {
         super(
                 boundPos,
-                PeripheralInterfaceBlockEntity.PERIPHERAL,
+                PeripheralInterfaceBlockEntity.VALID_PERIPHERAL,
                 PeripheralNetwork.PeripheralKey.class,
                 PeripheralNetwork.PeripheralKey.NULL
         );
+    }
+
+    @Override
+    public void onScreenTick() {
+        readToLayout();
     }
 
     @Override
@@ -59,15 +65,13 @@ public class PeripheralKeyUIField extends TypedUIPort<PeripheralNetwork.Peripher
 
     @Override
     protected PeripheralNetwork.PeripheralKey readGUI() {
-        String name = nameField.getValue();
-        long protocol = ParseUtils.tryParseLong(protocolField.getValue());
-        return new PeripheralNetwork.PeripheralKey(protocol, name);
+        return null;
     }
 
     @Override
     protected void writeGUI(PeripheralNetwork.PeripheralKey value) {
-        nameField.setValue(value.name());
-        protocolField.setValue("" + value.protocol());
+        nameField.setText(Component.literal(value.name()));
+        protocolField.setText(Component.literal("" + value.protocol()));
     }
 
     @Override

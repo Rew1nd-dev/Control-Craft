@@ -46,33 +46,6 @@ public class CameraLinkScreen extends AbstractSimiScreen{
     }
 
     private void createListButton(){
-        /*
-        selections.clear();
-        SAVED_LINKS.values().stream().limit(10).forEach(
-            d -> {
-
-                FormattedLabel nameLabel = new FormattedLabel(0, 0, Component.literal(d.name));
-                nameLabel.setText(Component.literal(d.name));
-                SmallCheckbox linkButton = new SmallCheckbox(0, 0, 10, 10, Component.literal(""), false)
-                        .withCallback(
-                            cbx -> {
-                                selectionGroup.visitExcept(
-                                    btn -> !Objects.equals(btn.id(), cbx.id()),
-                                    btn -> btn.setSelected(false)
-                                );
-                                return false;
-                            }
-                        )
-                        .withID(d.name);
-                selectionGroup.withButton(linkButton);
-
-                selections.add(new LabelWithCheckBox(
-                        nameLabel,
-                        linkButton
-                ));
-            }
-        );
-        * */
         IntStream.range(0, MAX_SLOTS).forEach(
             $ -> {
                 var lwc = new LabelWithButtons(
@@ -154,40 +127,10 @@ public class CameraLinkScreen extends AbstractSimiScreen{
         setControlButton();
         // validate();
     }
-/*
-*  private void link(){
-        Optional.ofNullable(current()).map(SAVED_LINKS::get).ifPresent(
-                s -> ClientCameraManager.link(s.pos())
-        );
-        onClose();
-    }
-
-    private void dump(){
-        Optional.ofNullable(current())
-                .map(SAVED_LINKS::get)
-                .map(CameraLinkData::name)
-                .ifPresent(
-                    SAVED_LINKS::remove
-                );
-        resetSelectionButtons();
-    }
-    *
-    * private String current(){
-        AtomicReference<String> result = new AtomicReference<>("");
-        selections.forEach(
-            s -> {
-                if(s.checkBox.selected()){
-                    result.set(s.checkBox().id());
-                }
-            }
-        );
-        return result.get();
-    }
-* */
 
     private void link(String name){
         Optional.ofNullable(SAVED_LINKS.get(name)).map(CameraLinkData::pos).ifPresent(
-            ClientCameraManager::link
+            ClientCameraManager::linkWithAck
         );
         onClose();
     }

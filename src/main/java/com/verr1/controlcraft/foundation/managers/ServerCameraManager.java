@@ -1,7 +1,12 @@
 package com.verr1.controlcraft.foundation.managers;
 
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -64,10 +69,31 @@ public class ServerCameraManager {
         return player2Camera.get(player.getUUID());
     }
 
+    public static Vec3 getCameraOrPlayerPos(ServerPlayer player){
+        return Optional
+                .ofNullable(ServerCameraManager.getCamera(player))
+                .flatMap(p -> BlockEntityGetter.INSTANCE
+                        .getBlockEntityAt(p.globalPos(), CameraBlockEntity.class)
+                )
+                .map(CameraBlockEntity::getCameraPosition)
+                .map(ValkyrienSkies::toMinecraft)
+                .orElse(player.position());
+    }
+
+    public static @NotNull  ChunkPos getCameraOrPlayerChunkPos(ServerPlayer player){
+        return new ChunkPos(BlockPos.containing(getCameraOrPlayerPos(player)));
+    }
+
+    public static @NotNull SectionPos getCameraOrPlayerSection(ServerPlayer player){
+        return SectionPos.of(BlockPos.containing(getCameraOrPlayerPos(player)));
+    }
+
     public static @Nullable ChunkPos getCameraChunk(ServerPlayer player){
         if(isRegistered(player.getUUID())) return new ChunkPos(player2Camera.get(player.getUUID()).pos());
         return null;
     }
+
+
 
     public static boolean hasNearByCamera(Vec3 position){
         for(WorldBlockPos pos : camera2Player.keySet()){

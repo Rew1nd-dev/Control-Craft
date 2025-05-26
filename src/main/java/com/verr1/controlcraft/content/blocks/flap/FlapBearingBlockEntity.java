@@ -92,6 +92,7 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
     }
 
     public void assemble(){
+        if(isAssembled())return;
         if (level == null || !(level.getBlockState(worldPosition).getBlock() instanceof BearingBlock))
             return;
 
@@ -126,14 +127,17 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
     }
 
     public void disassemble() {
-        if (physicalWing == null)
-            return;
+        if (!isAssembled()) return;
         angle = 0;
         running = false;
         physicalWing.disassemble();
         AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(level, worldPosition);
         physicalWing = null;
         sendData();
+    }
+
+    public boolean isAssembled(){
+        return physicalWing != null;
     }
 
     @Override
@@ -299,6 +303,14 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
         }
     }
 
+    public void setAssemble(boolean toAssemble){
+        if (toAssemble){
+            assemble();
+        }else{
+            disassemble();
+        }
+    }
+
     public FlapBearingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
 
@@ -336,6 +348,17 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
                 ),
                 new DirectReceiver.InitContext(SlotType.DEGREE, Couple.create(0.0, 1.0)),
                 8
+        ).register(
+                new NumericField(
+                        () -> isAssembled() ? 1.0 : 0.0,
+                        t -> {
+                            if (t > 0.001) assemble();
+                            else disassemble();
+                        },
+                        "assembly"
+                ),
+                new DirectReceiver.InitContext(SlotType.IS_ASSEMBLED, Couple.create(0.0, 1.0)),
+                2
         );
 
 

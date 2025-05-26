@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.mixin;
+package com.verr1.controlcraft.mixin.camera;
 
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import net.minecraft.client.player.LocalPlayer;
