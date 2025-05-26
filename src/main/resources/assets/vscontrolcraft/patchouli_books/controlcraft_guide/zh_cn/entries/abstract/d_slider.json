@@ -1,0 +1,66 @@
+{
+  "name": "物理活塞",
+  "icon": "vscontrolcraft:slider",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:servo,vscontrolcraft:joint",
+      "title": "物理活塞",
+      "text": "核心功能 $(br2)通过内置控制器控制两个物理结构的相对位移/速度，支持位置锁定、抵消重力等高级操作模式。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "操作指南 $(br2)$(li)结构装配：Shift+右键点击活塞顶部方块进行物理绑定$(li)朝向调整：使用扳手右键切换工作面向"
+    },
+    {
+      "type": "patchouli:image",
+      "title": "控制面板",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_main.png"],
+      "text": "空手右键方块，将打开它的控制面板"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "主要面板 $(br2)Current: 根据模式，显示当前位移/速度值（单位：格/格·秒⁻¹） $(br2)Locked: 指示锁定约束是否激活 $(br2)Target: 根据模式，输入期望位移/速度值"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "主要面板 $(br2)$(li)Mode: 模式切换，位置控制/速度控制双模式$(li)Cheat: 一些便携功能，启用NO_REPULSE消除反作用力，（物理活塞默认屏蔽重力影响）"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "主要面板 $(br2)$(li)AutoLock: 智能锁定，当实际位置与目标偏差<0.001格（位置模式）或速度=0（速度模式）时，自动激活约束锁定"
+    },
+    {
+      "type": "patchouli:image",
+      "title": "红石面板",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_redstone.png"],
+      "text": "物理活塞的红石面板"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "红石面板 $(br2)红石面板中有3项可控项: 输出力，目标值，是否锁定，各个可控项均可绑定多个频道，详情见红石面板的通用介绍"
+    },
+    {
+      "type": "patchouli:image",
+      "title": "PID控制器面板",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_pid.png"],
+      "text": "物理活塞的PID控制器面板"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "PID面板 $(br2)电机内置PID控制器的参数，在这些参数下其真实输出力为（P*误差 + D*误差变化率 + I*误差积分）* 被控件质量 + 被控件在滑动方向重力分量 $(br)注意质量不会计入其它通过约束连接到被控件的物理结构$(br)如果你不会调参数，不要擅自调整这几项"
+    },
+    {
+      "type": "patchouli:image",
+      "title": "控制器指令面板",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_remote.png"],
+      "text": "物理活塞的指令面板"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "指令面板 $(br2)通过该面板的按钮可以让物理活塞进行一些操作，分别是$(li)Assembly(组装其上方的方块，等价于潜行右键)$(li)Lock(手动锁定)$(li)Lock(手动解锁)$(li)Dis Assembly(断开连接)"
+    }
+  ]
+}

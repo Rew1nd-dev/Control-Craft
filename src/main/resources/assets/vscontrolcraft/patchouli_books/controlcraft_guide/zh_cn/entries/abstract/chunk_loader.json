@@ -1,0 +1,18 @@
+{
+  "name": "区块加载器",
+  "icon": "vscontrolcraft:chunk_loader",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:chunk_loader",
+      "title": "区块加载器",
+      "text": "功能概述 $(br2)本装置可强制加载以自身为中心的5×5区块区域，仅对附着于物理结构的方块生效。加载范围随结构移动动态更新。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "部署要求 $(br2)需将加载器直接安装在物理结构表面。启用后持续运行，无红石信号需求。"
+    }
+  ]
+}
