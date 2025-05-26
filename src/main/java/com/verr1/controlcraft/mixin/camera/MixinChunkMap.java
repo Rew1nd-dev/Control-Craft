@@ -58,6 +58,11 @@ public abstract class MixinChunkMap {
 
     @Shadow @Final private ChunkMap.DistanceManager distanceManager;
 
+
+    private static boolean _isChunkInRange(int x1, int z1, int x2, int z2, int viewDistance){
+        return new ChunkPos(x1, z1).getChessboardDistance(new ChunkPos(x2, z2)) < viewDistance;
+    }
+
     @Inject(method = "updateChunkTracking", at = @At("HEAD"))
     private void onUpdateChunkTracking(
             ServerPlayer p_183755_,
@@ -204,9 +209,9 @@ public abstract class MixinChunkMap {
     ) {
         SectionPos playerPos = player.getLastSectionPos();
 
-        if (!ChunkMap.isChunkInRange(pos.x, pos.z, playerPos.x(), playerPos.z(), viewDistance)) {
+        if (!_isChunkInRange(pos.x, pos.z, playerPos.x(), playerPos.z(), viewDistance)) {
             SectionPos camPos = ServerCameraManager.getCameraOrPlayerSection(player);
-            if(!ChunkMap.isChunkInRange(pos.x, pos.z, camPos.x(), camPos.z(), viewDistance))return;
+            if(!_isChunkInRange(pos.x, pos.z, camPos.x(), camPos.z(), viewDistance))return;
             playerList.add(player);
         }
     }
@@ -214,7 +219,7 @@ public abstract class MixinChunkMap {
     private void util(
             Set<Pair<Integer, Integer>> toUnloadSet,
             Set<Pair<Integer, Integer>> toLoadSet,
-            Set<Pair<Integer, Integer>> toMatainSet,
+            Set<Pair<Integer, Integer>> toMaintain,
             int nx, int nz,
             int ox, int oz,
             int viewDistance
@@ -227,23 +232,23 @@ public abstract class MixinChunkMap {
 
             for(int x = xMin; x <= xMax; ++x) {
                 for(int z = zMin; z <= zMax; ++z) {
-                    boolean loaded = isChunkInRange(x, z, ox, oz, this.viewDistance);
-                    boolean toLoad = isChunkInRange(x, z, nx, nz, this.viewDistance);
+                    boolean loaded = _isChunkInRange(x, z, ox, oz, this.viewDistance);
+                    boolean toLoad = _isChunkInRange(x, z, nx, nz, this.viewDistance);
 
-                    // if(toMatainSet.contains(new Pair<>(x, z)))continue;
+                    // if(toMaintain.contains(new Pair<>(x, z)))continue;
 
                     if(loaded && !toLoad)toUnloadSet.add(new Pair<>(x, z));
                     if(!loaded && toLoad)toLoadSet.add(new Pair<>(x, z));
-                    if(loaded && toLoad)toMatainSet.add(new Pair<>(x, z));
+                    if(loaded && toLoad)toMaintain.add(new Pair<>(x, z));
                 }
             }
         } else {
             // teleport
             for(int x = ox - viewDistance; x <= ox + viewDistance; ++x) {
                 for(int z = oz - viewDistance; z <= oz + viewDistance; ++z) {
-                    if (isChunkInRange(x, z, ox, oz, this.viewDistance)) {
+                    if (_isChunkInRange(x, z, ox, oz, this.viewDistance)) {
 
-                        // if(toMatainSet.contains(new Pair<>(x, z)))continue;
+                        // if(toMaintain.contains(new Pair<>(x, z)))continue;
                         toUnloadSet.add(new Pair<>(x, z));
 
                     }
@@ -252,8 +257,8 @@ public abstract class MixinChunkMap {
 
             for(int x = nx - viewDistance; x <= nx + viewDistance; ++x) {
                 for(int z = nz - viewDistance; z <= nz + viewDistance; ++z) {
-                    if (isChunkInRange(x, z, nx, nz, this.viewDistance)) {
-                        // if(toMatainSet.contains(new Pair<>(x, z)))continue;
+                    if (_isChunkInRange(x, z, nx, nz, this.viewDistance)) {
+                        // if(toMaintain.contains(new Pair<>(x, z)))continue;
 
                         toLoadSet.add(new Pair<>(x, z));
                     }

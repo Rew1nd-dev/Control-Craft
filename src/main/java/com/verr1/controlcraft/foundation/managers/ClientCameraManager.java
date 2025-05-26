@@ -4,6 +4,7 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
+import com.verr1.controlcraft.foundation.camera.CameraClientChunkCacheExtension;
 import com.verr1.controlcraft.foundation.executor.executables.ConditionExecutable;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
@@ -62,24 +63,9 @@ public class ClientCameraManager {
     }
 
     public static void setQueryPos(Vec3 queryPos) {
+        ControlCraft.LOGGER.info("Setting QueryPos: {}", queryPos);
         QueryPos = queryPos;
     }
-/*
-public static Vec3 QueryPos() {
-        Level level = Minecraft.getInstance().level;
-        if(level == null)return null;
-
-        Vec3 q = Optional.ofNullable(QueryPos)
-                .map(p -> ValkyrienSkies.getShipManagingBlock(Minecraft.getInstance().level, BlockPos.containing(p)))
-                .map(s -> s.getTransform().getShipToWorld())
-                .map(t -> t.transformPosition(toJOML(QueryPos)))
-                .map(ValkyrienSkies::toMinecraft)
-                .orElse(QueryPos);
-
-        ControlCraft.LOGGER.info("returning query pos: {}", q);
-        return q;
-    }
-* */
 
 
     public static void linkDirect(BlockPos cameraPos){
@@ -116,6 +102,7 @@ public static Vec3 QueryPos() {
         Minecraft.getInstance().options.bobView().set(true);
         Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
         Minecraft.getInstance().levelRenderer.allChanged();
+        CameraClientChunkCacheExtension.clear();
         setLatest(null);
     }
 

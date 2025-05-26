@@ -54,7 +54,7 @@ public abstract class MixinClientChunkCache {
             Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> tagOutputConsumer,
             CallbackInfoReturnable<LevelChunk> cir
     ) {
-        ControlCraft.LOGGER.info("Trying Replace: {} {}", x, z);
+        // ControlCraft.LOGGER.debug("Trying Replace: {} {}", x, z);
 
         int renderDistance = Minecraft.getInstance().options.renderDistance().get();
         ChunkPos pos = new ChunkPos(x, z);
@@ -67,13 +67,15 @@ public abstract class MixinClientChunkCache {
             if(cameraPos == null)return;
             // Is Not Querying Or Linking
             if (pos.getChessboardDistance(new ChunkPos(BlockPos.containing(cameraPos))) <= (renderDistance + 1)){
-                ControlCraft.LOGGER.info("Should Add Chunk: {} {}", x, z);
+                // ControlCraft.LOGGER.info("Should Add Chunk: {} {} cam: {}", x, z, new ChunkPos(BlockPos.containing(cameraPos)));
                 shouldAddChunk = true;
+            }else{
+                ControlCraft.LOGGER.debug("Chunk: {} {} Not In View Range: cam: {}", x, z, new ChunkPos(BlockPos.containing(cameraPos)));
             }
 
             if (shouldAddChunk) {
                 LevelChunk newChunk = CameraClientChunkCacheExtension.replaceWithPacketData(level, x, z, new FriendlyByteBuf(buffer.copy()), chunkTag, tagOutputConsumer);
-                ControlCraft.LOGGER.info("Adding Chunk: {} {}", x, z);
+                // ControlCraft.LOGGER.debug("Adding Chunk: {} {}", x, z);
                 cir.setReturnValue(newChunk);
 
             }
@@ -89,11 +91,20 @@ public abstract class MixinClientChunkCache {
 
         Vec3 cameraPos = ClientCameraManager.getLinkOrQueryCameraWorldPosition();
         if(cameraPos == null)return;
-        // Player Is Linked And Game Is Request to Drop A Chunk Inside Camera's View, Don't Drop It From Extension
-        if (pos.getChessboardDistance(new ChunkPos(BlockPos.containing(cameraPos))) <= (renderDistance + 1))
-            return;
 
-        ControlCraft.LOGGER.info("Trying Drop Extension: {} {}", x, z);
+        // Don't Double-Check Whether To Drop, The Server-Side Drop Command Is Guaranteed To Be Correct, Ideally
+
+        /*
+        * if (pos.getChessboardDistance(new ChunkPos(BlockPos.containing(cameraPos))) <= (renderDistance + 1)){
+            ControlCraft.LOGGER.info("Stop Dropping Extension: {} {}, Cam: {}", x, z, new ChunkPos(BlockPos.containing(cameraPos)));
+            return;
+        }
+        *
+        *
+        * */
+
+
+        // ControlCraft.LOGGER.debug("Drop Extension: {} {}", x, z);
 
         CameraClientChunkCacheExtension.drop(level, pos);
     }
@@ -116,10 +127,10 @@ public abstract class MixinClientChunkCache {
         LevelChunk chunk = CameraClientChunkCacheExtension.getChunk(x, z);
 
         if (chunk != null){
-            // ControlCraft.LOGGER.info("Returning Chunk: {} {}", x, z);
+            // ControlCraft.LOGGER.debug("Returning Chunk: {} {}", x, z);
             cir.setReturnValue(chunk);
         }else{
-            ControlCraft.LOGGER.info("chunk {} {} is also null in extension", x, z);
+            // ControlCraft.LOGGER.debug("chunk {} {} is also null in extension", x, z);
         }
     }
 
