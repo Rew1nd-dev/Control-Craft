@@ -1,0 +1,32 @@
+{
+  "name": "Flap Bearing",
+  "icon": "vscontrolcraft:wing_controller",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:wing_controller",
+      "title": "Flap Bearing",
+      "text": "Overview $(br2)Functions like Clockwork's Flap Bearing but without angle limits."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/flap/panel_main.png"],
+      "text": "If adjusting speed rotates the propeller, placement is correct."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)$(li)Angle (°): Observe/set the flap's rotation angle."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/flap/panel_redstone.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Inputs:$(li)Angle.$(br)See general redstone panel documentation. $(br)Note: Angle adjustments are instant—animations are visual only."
+    }
+  ]
+}

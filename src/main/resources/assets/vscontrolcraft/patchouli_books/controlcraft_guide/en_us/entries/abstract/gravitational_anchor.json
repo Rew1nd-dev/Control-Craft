@@ -1,0 +1,27 @@
+{
+  "name": "Gravitational Anchor",
+  "icon": "vscontrolcraft:anchor",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:anchor",
+      "title": "Gravitational Anchor",
+      "text": "Overview $(br2)Applies extra gravity, linear/rotational damping to physics structures."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/anchor/panel_main.png"],
+      "text": ""
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br)$(li)Air Resist: Air resistance coefficient (positive values).$(li)Extra G: Additional gravity (set to -10 to cancel gravity).$(li)Rot Damp: Rotational damping (keep ≤0.1).$(li)Resist At Pos: Apply forces at anchor's center instead of structure's COM."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Warnings $(br)$(li)Avoid negative resistance (causes runaway acceleration).$(li)Rotational damping's effect point is irrelevant for torque."
+    }
+  ]
+}

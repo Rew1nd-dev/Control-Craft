@@ -1,0 +1,11 @@
+{
+  "name": "How to Play ControlCraft",
+  "icon": "vscontrolcraft:awe_in_wand",
+  "category": "vscontrolcraft:lead_in",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Control Craft mechanics are complex, often requiring math, physics, or programming knowledge for full mastery.$(br2)But this guide will teach you practical workflows to achieve your designs—even without deep theoretical understanding."
+    }
+  ]
+}

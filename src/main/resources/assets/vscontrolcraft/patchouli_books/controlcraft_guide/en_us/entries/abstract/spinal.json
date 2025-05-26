@@ -1,0 +1,17 @@
+{
+  "name": "Spinalyzer",
+  "icon": "vscontrolcraft:spinalyzer",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": { "item": "vscontrolcraft:spinalyzer" },
+      "title": "Rotation Analyzer",
+      "text": "Overview $(br2)Reads physics parameters via ComputerCraft (CC). Aligns with local coordinate system."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Function $(br2)Sends physics frame events to CC. Acts as a coordinate indicator if CC is unused."
+    }
+  ]
+}

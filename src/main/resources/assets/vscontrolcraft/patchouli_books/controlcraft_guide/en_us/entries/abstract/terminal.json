@@ -1,0 +1,27 @@
+{
+  "name": "Redstone Terminal",
+  "icon": "vscontrolcraft:terminal",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:terminal",
+      "title": "Redstone Terminal",
+      "text": "Overview $(br2)Most Control Craft blocks have redstone panels. This terminal assigns Create-compatible wireless redstone channels to each panel item (force, target, lock, etc.)."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Example Layout",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/terminal/general.png"],
+      "text": "Typical layout for a Physical Piston."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each row corresponds to a redstone panel item. Settings mirror the block's internal panel.$(br2)For toggle items (e.g., is_locked), the red switch toggles a built-in NOT gate to invert input signals.$(br2)The rightmost column toggles channel visibility."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Channels of the same type are grouped. Multiple active channels use the block's defined aggregation logic (summation or exclusivity)."
+    }
+  ]
+}

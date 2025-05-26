@@ -1,0 +1,28 @@
+{
+  "required": false,
+  "refmap": "mixins.controlcraft.refmap.json",
+  "mixins": [
+    "MixinAt",
+    "MixinCommonHooks",
+    "MixinContraption",
+    "MixinEntity",
+    "accessor.ShipObjectServerWorldAccessor",
+    "camera.MixinChunkMap",
+    "camera.MixinChunkMap$TrackedEntity",
+    "camera.MixinServerPlayer",
+    "tweak.MixinTweakedLecternControllerBlockEntity",
+    "tweak.MixinTweakLinkedControllerAxisPacket"
+  ],
+  "package": "com.verr1.controlcraft.mixin",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "camera.MixinCamera",
+    "camera.MixinClientChunkCache",
+    "camera.MixinGameRenderer",
+    "camera.MixinLevelRenderer",
+    "camera.MixinStorage",
+    "camera.MixinVSGameUtilsKt"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "About Power Sources",
+  "icon": "create:creative_motor",
+  "category": "vscontrolcraft:advance",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:jet,vscontrolcraft:propeller",
+      "title": "Power Sources",
+      "text": "$(bold)Unlocking Potential$()$(br2)Control-compatible power sources (jets, propellers) apply force, not acceleration. Mass changes require constant tuning. Redstone control is non-intuitive (min/max mappings)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "These sources were designed for CC integration. CC programs can easily read mass and adjust thrust dynamically. With 4 vector jets/propellers, you can build compact, agile drones."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "CC programming has a steep learning curve. Subsequent chapters provide preconfigured setups for casual use."
+    }
+  ]
+}

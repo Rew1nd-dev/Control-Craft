@@ -1,0 +1,50 @@
+{
+  "name": "Propeller",
+  "icon": "vscontrolcraft:propeller",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:propeller,vscontrolcraft:propeller_controller",
+      "title": "Propeller System",
+      "text": "Overview $(br2)Adjustable thrust/torque propeller and controller."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Propeller Placement",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/propeller/placement.png"],
+      "text": "Correct placement is confirmed by visible propeller rotation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Controller Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/propeller/panel_main.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)$(li)RPM: Set/observe propeller speed."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/propeller/panel_redstone.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Inputs: RPM (multiple channels for min/max).$(br)See general redstone panel documentation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Propeller Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/propeller/panel_sub_main.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)$(li)Omega: Current speed.$(li)Torque Coefficient: Torque-to-Omega ratio (can be negative).$(li)Thrust Coefficient: Thrust-to-Omega ratio (can be negative)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Notes $(br2)$(li)Thrust originates from the controller block. Propellers are visual aids.$(li)Use a wrench to hide propeller blades (cosmetic only)."
+    }
+  ]
+}

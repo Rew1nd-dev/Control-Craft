@@ -1,0 +1,21 @@
+{
+  "name": "Kinetic Proxy",
+  "icon": "vscontrolcraft:kinetic_proxy",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:kinetic_proxy",
+      "title": "Kinetic Proxy",
+      "text": "Overview $(br2)Converts mechanical power RPM into machine input or accepts commands from programmable gearboxes."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Function $(br2)Currently supports bearings and pistons:$(li)Bearings (Velocity Mode): Place on the proxy's interface side.$(li)Pistons (Velocity Mode): Speed is scaled. Programmable gearboxes can send position/velocity commands."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Notes $(li)In Velocity Mode, programmable gearbox commands adjust Target speed internally. Low speeds may fail to reach targets.$(li)Kinematic machines avoid these issues but still struggle at very low speeds."
+    }
+  ]
+}

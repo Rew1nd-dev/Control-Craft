@@ -1,0 +1,53 @@
+{
+  "name": "Spatial Anchor",
+  "icon": "vscontrolcraft:spatial_anchor",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:spatial_anchor",
+      "title": "Spatial Anchor",
+      "text": "Overview $(br2)Automatic alignment device for docking."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Spatial Anchor Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/spatial/panel_main.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Modes: Off / Target (Static) / Seeking Target (Dynamic).$(br2)Static anchors allow others to align. Dynamic anchors search for the nearest static anchor (same Protocol, ≤32 blocks)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel$(li)Offset: Adjust docking distance (dynamic anchor's value is used).$(li)Protocol: Channel filter.$(li)is_running: Enable/disable.$(li)is_static: Static/dynamic mode (requires is_running)."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/spatial/panel_redstone.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Inputs: is_running, Protocol, Offset.$(br)See general redstone panel documentation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Controller Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/spatial/panel_pid.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Controller Panel $(br2)Adjust PID parameters for 3D rotation/position control. Test within default ranges."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Alignment with Dynamic Structures",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/spatial/contraption.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Notes $(br2)Spatial anchors on dynamic structures default to Static mode. Use controllers to override."
+    }
+  ]
+}

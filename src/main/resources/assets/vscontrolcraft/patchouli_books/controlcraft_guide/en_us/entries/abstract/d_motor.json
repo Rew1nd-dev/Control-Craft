@@ -1,0 +1,74 @@
+{
+  "name": "Servo Motor",
+  "icon": "vscontrolcraft:servo",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:servo,vscontrolcraft:joint",
+      "title": "Servo Motor",
+      "text": "Overview $(br2)Efficiently controls two physics structures to maintain a given rotation angle/angular velocity under suitable conditions.$(br)The two motors differ only in rotation direction."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above into a physics structure (similar to Clockwork bearings). Glue not supported.$(li)Use a wrench to adjust orientation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_main.png"],
+      "text": "Right Click with an empty hand to open the control panel."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Displays basic settings:$(br2)Current: Real-time relative angle/angular velocity (radians/radians per second).$(br2)Locked: Whether the motor is constrained.$(br2)Target: Desired angle/angular velocity."
+    },
+    {
+      "type": "patchouli:image",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/offset.png"],
+      "text": "Both motors at 57°. Top: Controlled structure offset. Bottom: Axis offset."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Offset (First Line): Axis offset for the next assembly.$(br2)Offset (Second Line): Controlled structure's axis offset."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Mode: Angle or Angular Velocity.$(br2)Cheat:$(li)NO_REPULSE: Disables reaction force.$(li)NO_GRAVITY: Removes gravity."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)AutoLock: Automatically locks the motor when:$(li)Angular Velocity mode: Target is 0.$(li)Angle mode: Error < 1e-3."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_redstone.png"],
+      "text": "Servo Motor Redstone Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Configurable parameters: Output torque, Target value, Lock status. See general redstone panel documentation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "PID Control Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_pid.png"],
+      "text": "Servo Motor PID Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "PID Panel $(br2)Output torque formula: (P*error + D*error_rate + I*error_integral) * moment of inertia.$(br)Do not adjust if unfamiliar with PID tuning."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Remote Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_remote.png"],
+      "text": "Servo Motor Remote Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Remote Panel $(br2)Buttons:$(li)Assembly (Sneak + Right Click equivalent).$(li)Lock/Unlock.$(li)Disconnect."
+    }
+  ]
+}

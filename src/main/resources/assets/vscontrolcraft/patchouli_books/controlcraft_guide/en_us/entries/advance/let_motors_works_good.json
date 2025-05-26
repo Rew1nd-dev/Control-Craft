@@ -1,0 +1,23 @@
+{
+  "name": "Make Your Motor Works Good",
+  "icon": "vscontrolcraft:servo",
+  "category": "vscontrolcraft:advance",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Mass Ratio$()$(br2)Assume two physics structures are connected via a servo motor. The motor's base structure is called the $(bold)Base$(), and the other is the $(bold)Load$().$(br)The Base's mass should exceed the Load's. Otherwise, reaction forces from motor rotation may destabilize the Base. The NO_REPULSE cheat can mitigate this, but centrifugal effects from off-axis Loads cannot be eliminated."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "For structures A-B-C (connected by motors on A and B), ensure A > B > C in mass. If B is much lighter than A/C, constraints become unstable.$(br2)Larger Load masses reduce disturbances (centrifugal forces, attached sub-loads)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Center of Mass Balancing$()$(br2)Align the Load's center of mass (yellow cube in F3+B) with the motor's axis:$(li)Eliminates centrifugal forces.$(li)Prevents torque from gravity misalignment (use NO_GRAVITY cheat to suppress steady-state errors)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Avoid Friction$()$(br2)Ensure the Load does not physically contact the Base. Use VMod to disable collisions. Friction slows motor response and reduces precision."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "General - Redstone Panel",
+  "icon": "minecraft:redstone",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:image",
+      "title": "Typical Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/redstone/panel.png"],
+      "text": ""
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A typical redstone panel includes:$(li)Domain Selector: Chooses which property to control, matching the main panel's options.$(li)Aggregation Strategy:$(li2)Summation: Adds control values from multiple channels.$(li2)Exclusive: Only the latest active channel affects the value.$(li)Interpolation: Linear or nonlinear (finer control for weak signals)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Channels below the selector:$(li2)Direction Selector: Specifies input face for redstone signals.$(li2)Min/Max: Maps redstone strength (0-15) to target values. Values interpolate between min (0) and max (15)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "For toggle domains (e.g., motor lock), min/max are hidden. Default behavior: 0 = off, non-zero = on."
+    }
+  ]
+}

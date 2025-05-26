@@ -1,0 +1,17 @@
+{
+  "name": "Joints",
+  "icon": "vscontrolcraft:sphere_hinge",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:sphere_hinge,vscontrolcraft:revolute_joint,vscontrolcraft:pivot",
+      "title": "Joints",
+      "text": "Overview $(br2)Connects physics structures via constraints. Use the Tool Gun (see its chapter).$(br2)Adjust height with a wrench."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Sphere Hinge: Allows free rotation.$(li)Revolute Hinge: Fixed-axis rotation (unpowered Joint Motor).$(li)Pivot Hinge: Fixed-axis rotation (unpowered Servo Motor)."
+    }
+  ]
+}

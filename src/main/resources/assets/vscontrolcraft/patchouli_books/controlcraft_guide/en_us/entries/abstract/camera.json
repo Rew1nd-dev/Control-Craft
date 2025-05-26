@@ -1,0 +1,48 @@
+{
+  "name": "Camera",
+  "icon": "vscontrolcraft:camera",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:camera",
+      "title": "Camera",
+      "text": "Overview $(br2)Automated target-marking camera with remote connectivity and advanced ray detection.$(br2)Shift + Right Click to open the panel. Right Click to activate. Press Space to exit camera view.$(br)Use a Camera Connector to name and remotely link cameras."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/camera/panel_main.png"],
+      "text": ""
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)$(li)Is_Sensor: Enables distance detection. When active, outputs redstone signals based on block distance.$(li)Cast Ray:$(li2)Never: No ray rendering.$(li2)Always: Always render rays (visible to all).$(li2)On Use: Render only during use (visible to user)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)$(li)ShipOutline:$(li2)ON: Highlights physics structures.$(li2)OFF: Disables highlighting.$(li)Entity Outline:$(li2)OFF: Disable.$(li2)Target Only: Highlight centered entities.$(li2)IN View: Highlight all entities in view.$(li2)NEAREST: Highlight nearest entity."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/camera/panel_redstone.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Input options:$(li)Is_Sensor: When enabled:$(li2)If min < max, signal increases with distance (0 at min, 15 at max).$(li2)If min > max, signal decreases with distance."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Management/Naming",
+      "images": [
+        "vscontrolcraft:patchouli/categories/abstract/camera/remote_main.png",
+        "vscontrolcraft:patchouli/categories/abstract/camera/remote_name.png"
+      ]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Connector Panel $(br2)Right-click a camera with the connector to name it. Click X to cancel.$(br2)In the management panel:$(li)Box Button: Remotely connect (camera must be in loaded chunks).$(li)Trash Button: Delete all saved cameras.$(li)Refresh Button: Remove cameras in unloaded chunks.$(li)X Button: Delete selected camera."
+    }
+  ]
+}

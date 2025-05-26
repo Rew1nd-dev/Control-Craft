@@ -1,0 +1,23 @@
+{
+  "name": "Remote Peripheral Connection",
+  "icon": "vscontrolcraft:transmitter",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:transmitter,vscontrolcraft:receiver",
+      "title": "Remote CC Peripheral",
+      "text": "Overview $(br2)Links CC peripherals to control machines wirelessly via named channels."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Receiver Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/trx/receiver.png"],
+      "text": "Example: Attached to a Servo Motor."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Transmitter: Attach to CC computer.$(li)Receiver: Attach to machine.$(br2)Panel:$(li2)Type: Peripheral type.$(li2)Protocol: Channel.$(li2)Name: Unique identifier (≠ \"null\")."
+    }
+  ]
+}

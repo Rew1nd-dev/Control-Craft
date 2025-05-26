@@ -1,0 +1,65 @@
+{
+  "name": "Physical Piston",
+  "icon": "vscontrolcraft:slider",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:servo,vscontrolcraft:joint",
+      "title": "Physical Piston",
+      "text": "Overview $(br2)Controls two physics structures to maintain position/velocity."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above (glue not supported).$(li)Use a wrench to adjust orientation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_main.png"],
+      "text": "Right Click with an empty hand to open the control panel."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Displays:$(br2)Current: Position/velocity (blocks/blocks per second).$(br2)Locked: Whether constrained.$(br2)Target: Desired position/velocity."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Mode: Position or Velocity.$(br2)Cheat: NO_REPULSE disables reaction force (gravity is disabled by default)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)AutoLock: Locks when:$(li)Velocity mode: Target is 0.$(li)Position mode: Error < 1e-3."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_redstone.png"],
+      "text": "Physical Piston Redstone Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Configurable parameters: Output force, Target value, Lock status. See general redstone panel documentation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "PID Control Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_pid.png"],
+      "text": "Physical Piston PID Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "PID Panel $(br2)Output force formula: (P*error + D*error_rate + I*error_integral) * mass + gravity component.$(br)Do not adjust if unfamiliar."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Remote Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/slider/panel_remote.png"],
+      "text": "Physical Piston Remote Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Remote Panel $(br2)Buttons:$(li)Assembly.$(li)Lock/Unlock.$(li)Disconnect."
+    }
+  ]
+}

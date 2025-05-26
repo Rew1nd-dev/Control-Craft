@@ -1,0 +1,59 @@
+{
+  "name": "Kinematic Devices",
+  "icon": "vscontrolcraft:constraint_revolute",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:constraint_revolute,vscontrolcraft:constraint_joint,vscontrolcraft:constraint_slider",
+      "title": "Kinematic Components",
+      "text": "Overview $(br2)Kinematic variants of Servo Motors/Physical Pistons.$(br)Powerful but unsafe."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above (glue not supported).$(li)Use a wrench to adjust orientation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Control Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/kinematic/panel_main.png"],
+      "text": "Right Click with an empty hand to open the control panel."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Displays:$(br2)Current: Relative angle/angular velocity or position/velocity (radians/radians per second or blocks/blocks per second).$(br2)Target: Desired angle/angular velocity."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Compliance: Stops updating constraints when error falls below 1e-5 (default log value: -5)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)Mode: Angle or Angular Velocity."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/kinematic/panel_redstone.png"],
+      "text": "Kinematic Machine Redstone Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Configurable parameter: Target value (supports multiple inputs with min/max settings).$(br) See general redstone panel documentation."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Remote Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/kinematic/panel_remote.png"],
+      "text": "Kinematic Machine Remote Panel"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Remote Panel $(br2)Buttons:$(li)Assembly (Sneak + Right Click equivalent).$(li)Disconnect."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Warnings $(br2)Kinematic machines ignore physics, which has consequences:$(li)Avoid destroying connected structures without disassembly—this may crash the physics thread.$(li)Strong recoil requires the base to be static or massive to prevent oscillations."
+    }
+  ]
+}

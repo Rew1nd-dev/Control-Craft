@@ -1,0 +1,31 @@
+{
+  "name": "About PID",
+  "icon": "create:schedule",
+  "category": "vscontrolcraft:advance",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Intuitive Understanding$()$(br2)For a deep dive into PID, seek online tutorials. Here’s a simplified explanation."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)P Term$(): Higher values make the motor respond faster but may overshoot.$(br2)$(bold)D Term$(): Higher values smooth motion by resisting speed changes. Excessive D causes sluggish responses."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Steady-State Error$()$(br)Imagine a spring-loaded object: external forces cause permanent offsets. Motors face similar errors under external loads.$(br)$(bold)I Term$()$(br)The I term accumulates errors over time to eliminate offsets. Rarely used due to slow stabilization and oscillation risks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Internally, the motor integrates errors and multiplies by I to apply corrective force. Keep I=0 unless necessary—it amplifies oscillations during rapid target changes."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Recommended Values$()$(br)Defaults reset when mode changes:$(li)Position Mode: 24-0-14 (gentle). Try 100-0-20 for faster response.$(li)Velocity Mode: 10-0-0 (D=0 avoids oscillations)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)In Position Mode, excessive D can paradoxically amplify oscillations due to discrete force updates. Avoid extreme values."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "What's Included",
+  "icon": "vscontrolcraft:awe_in_wand",
+  "category": "vscontrolcraft:lead_in",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Chapter 1: Overview of Control Craft blocks. A concise manual for daily reference.$(br2)$(li)Chapter 2: Advanced techniques to optimize machine performance."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Chapter 3: Common composite structures and collaborative block interactions."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Why ControlCraft",
+  "icon": "vscontrolcraft:awe_in_wand",
+  "category": "vscontrolcraft:lead_in",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Valkyrien Skies introduced a physics engine to Minecraft, expanding the possibilities of structures from static megabuildings to dynamic machines with realistic physics.$(br2)However, players have long lacked precise control over these structures. Designing turrets, mechanical joints, or other constrained systems often requires bulky transmissions, imprecise angle control, and slow responsiveness."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Meanwhile, propulsion systems impose excessive limitations and suffer from force inaccuracy or transmission dependencies."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "This inspired Control Craft, which aims to provide:$(br2)$(li)Constraint devices with built-in controllers (bearings, pistons): Directly set target angles/positions via manual input, redstone interpolation, or scripts.$(br2)$(li)Precision propulsion systems (propellers, vector jets): Adjust thrust magnitude through manual settings, redstone, or scripts."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Functional blocks (anchors, hinges, cameras): Simplify structural design with versatile utilities.$(br2)$(li)Multi-tool gun: Repair disconnected constraints or bearings instantly, enabling modularity."
+    }
+  ]
+}

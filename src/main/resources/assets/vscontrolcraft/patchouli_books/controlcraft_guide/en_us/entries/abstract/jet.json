@@ -1,0 +1,41 @@
+{
+  "name": "Jet Engine",
+  "icon": "vscontrolcraft:jet",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:jet,vscontrolcraft:jet_rudder",
+      "title": "Vectorize Jet Engine",
+      "text": "Overview $(br2)Thrust vectoring engine with no energy cost."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Correct Placement",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/jet/placement.png"],
+      "text": "Correct placement is confirmed by visible thrust particles and directional changes."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Main Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/jet/panel_main.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Main Panel $(br2)$(li)Thrust: Set/observe thrust.$(li)Horizontal/Vertical: Thrust vector angles.$(br2)Direction conventions depend on placement—observe the rudder."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Redstone Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/jet/panel_redstone.png"]
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Redstone Panel $(br2)Inputs: Thrust, Horizontal, Vertical. Each channel has multiple extra channel for min/max.$(br) See general redstone panel documentation."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Notes $(br2)$(li)Thrust originates from the engine block. Rudders are visual guides only."
+    }
+  ]
+}

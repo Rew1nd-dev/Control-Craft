@@ -1,0 +1,63 @@
+{
+  "name": "All In One Tool Gun",
+  "icon": "vscontrolcraft:awe_in_wand",
+  "category": "vscontrolcraft:abstract",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "vscontrolcraft:awe_in_wand",
+      "title": "Tool Gun",
+      "text": "Description $(br2)Currently can only be used for connections.$(br2)Similar to Create's schematic tool. Hold Alt before using the mouse wheel to change modes."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Servo Connection",
+      "images": [
+        "vscontrolcraft:patchouli/categories/abstract/awe/motor/connect_0.png",
+        "vscontrolcraft:patchouli/categories/abstract/awe/motor/connect_1.png",
+        "vscontrolcraft:patchouli/categories/abstract/awe/motor/connect_2.png"
+      ],
+      "text": ""
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Connect Mode$(br)In this mode, right-click to select a device to apply a connection.$(li)Motors:$(li2)Selecting a motor will display a red frame on its face, indicating where ships will align.$(li2)Click the target block to show a yellow frame, marking the alignment face.$(li2)Right-click air to start the connection. Ships will attempt to align within 10s before constraints activate."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Joint Connection",
+      "images": [
+        "vscontrolcraft:patchouli/categories/abstract/awe/jmotor/connect_0.png",
+        "vscontrolcraft:patchouli/categories/abstract/awe/jmotor/connect_1.png",
+        "vscontrolcraft:patchouli/categories/abstract/awe/jmotor/connect_2.png"
+      ],
+      "text": ""
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Joint Motor:$(li2)Right-click the Joint Motor to display perpendicular red/yellow frames. Red indicates alignment, yellow marks the rotation axis.$(li2)Right-click a block to align its red frame with the motor's red frame.$(li2)Right-click another perpendicular face to align the yellow frame.$(li2)Right-click air to finalize.$(li)Slider:$(li2)Connects similarly to the Joint Motor."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Revolute Joint Connection Process",
+      "images": [
+        "vscontrolcraft:patchouli/categories/abstract/awe/rjoint/connect_0.png",
+        "vscontrolcraft:patchouli/categories/abstract/awe/rjoint/connect_1.png",
+        "vscontrolcraft:patchouli/categories/abstract/awe/rjoint/connect_2.png"
+      ],
+      "text": ""
+    },
+    {
+      "type": "patchouli:text",
+      "text": "For all hinges:$(li)Right-click two hinges in sequence and then air to connect.$(li)When targeting a Revolute Joint with the Tool Gun, a red frame appears on its side to indicate rotation axis.$(li)Connected Revolute Joints will have $(bold)relative$() rotation axes. Use a wrench (Shift + Right Click) to adjust the red frame's direction."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Notes:$(li)A small red dot appears on motors when targeted, showing the actual rotation axis (including offset adjustments).$(li)Shift + Right Click air to reset the selection process."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Disconnect Mode$(br)Right-click a machine to disconnect it. For hinges without stored constraints, click both hinges.$(br2)Disconnect All Mode: Deletes $(bold)all$() constraints in a structure, including those from other mods. Use only for irrecoverable constraint errors."
+    }
+  ]
+}
