@@ -42,12 +42,19 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     public static final NetworkKey ANGLE = NetworkKey.create("attack_angle");
     public static final NetworkKey OFFSET = NetworkKey.create("angle_offset");
+    public static final NetworkKey LIFT = NetworkKey.create("lift");
+    public static final NetworkKey DRAG = NetworkKey.create("drag");
+    public static final NetworkKey BIAS = NetworkKey.create("bias");
 
     private final DirectReceiver receiver = new DirectReceiver();
 
 
 
     private double offset = 0.0;
+
+
+
+    private double bias = 0.0;
     private double resistRatio = 1.0;
     private double liftRatio = 1.0;
 
@@ -78,7 +85,6 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .dispatchToSync()
-                .runtimeOnly()
                 .register();
 
         buildRegistry(OFFSET)
@@ -89,7 +95,36 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .dispatchToSync()
-                .runtimeOnly()
+                .register();
+
+        buildRegistry(LIFT)
+                .withBasic(SerializePort.of(
+                        this::getLiftRatio,
+                        this::setLiftRatio,
+                        SerializeUtils.DOUBLE
+                ))
+                .withClient(ClientBuffer.DOUBLE.get())
+                .dispatchToSync()
+                .register();
+
+        buildRegistry(DRAG)
+                .withBasic(SerializePort.of(
+                        this::getResistRatio,
+                        this::setResistRatio,
+                        SerializeUtils.DOUBLE
+                ))
+                .withClient(ClientBuffer.DOUBLE.get())
+                .dispatchToSync()
+                .register();
+
+        buildRegistry(BIAS)
+                .withBasic(SerializePort.of(
+                        this::getBias,
+                        this::setBias,
+                        SerializeUtils.DOUBLE
+                ))
+                .withClient(ClientBuffer.DOUBLE.get())
+                .dispatchToSync()
                 .register();
 
         receiver().register(
@@ -174,6 +209,14 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     public void setLiftRatio(double liftRatio) {
         this.liftRatio = liftRatio;
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    public void setBias(double bias) {
+        this.bias = bias;
     }
 
     @Override

@@ -236,10 +236,28 @@ public class GenericUIFactory {
         DoubleUIField offset = new DoubleUIField(
                 boundPos,
                 CompactFlapBlockEntity.OFFSET,
-                Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle)
+                Converter.convert(UIContents.FLAP_OFFSET, Converter::titleStyle)
         );
 
-        Runnable alignLabels = () -> Converter.alignLabel(angle, offset);
+        DoubleUIField lift = new DoubleUIField(
+                boundPos,
+                CompactFlapBlockEntity.LIFT,
+                Converter.convert(UIContents.FLAP_LIFT, Converter::titleStyle)
+        );
+
+        DoubleUIField drag = new DoubleUIField(
+                boundPos,
+                CompactFlapBlockEntity.DRAG,
+                Converter.convert(UIContents.FLAP_DRAG, Converter::titleStyle)
+        );
+
+        DoubleUIField bias = new DoubleUIField(
+                boundPos,
+                CompactFlapBlockEntity.BIAS,
+                Converter.convert(UIContents.FLAP_BIAS, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> Converter.alignLabel(angle, offset, lift, drag, bias);
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.WING_CONTROLLER_BLOCK.asStack())
@@ -249,6 +267,9 @@ public class GenericUIFactory {
                                 .withPort(SharedKeys.PLACE_HOLDER, angle_view)
                                 .withPort(CompactFlapBlockEntity.ANGLE, angle)
                                 .withPort(CompactFlapBlockEntity.OFFSET, offset)
+                                .withPort(CompactFlapBlockEntity.LIFT, lift)
+                                .withPort(CompactFlapBlockEntity.DRAG, drag)
+                                .withPort(CompactFlapBlockEntity.BIAS, bias)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
