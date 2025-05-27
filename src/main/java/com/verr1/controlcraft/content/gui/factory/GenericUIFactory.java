@@ -233,6 +233,13 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.DEGREE, Converter::titleStyle)
         );
 
+        DoubleUIField offset = new DoubleUIField(
+                boundPos,
+                CompactFlapBlockEntity.OFFSET,
+                Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> Converter.alignLabel(angle, offset);
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.WING_CONTROLLER_BLOCK.asStack())
@@ -241,6 +248,8 @@ public class GenericUIFactory {
                         new VerticalFlow.builder(boundPos)
                                 .withPort(SharedKeys.PLACE_HOLDER, angle_view)
                                 .withPort(CompactFlapBlockEntity.ANGLE, angle)
+                                .withPort(CompactFlapBlockEntity.OFFSET, offset)
+                                .withPreDoLayout(alignLabels)
                                 .build()
                 )
                 .withTab(

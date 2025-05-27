@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.content.blocks.camera;
+package com.verr1.controlcraft.foundation.camera;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;

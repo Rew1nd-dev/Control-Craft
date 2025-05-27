@@ -1,7 +1,9 @@
 package com.verr1.controlcraft.content.blocks.flap;
 
+import com.simibubi.create.foundation.utility.Color;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
+import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -30,6 +32,7 @@ import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import java.util.Optional;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         IReceiver
@@ -37,7 +40,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     public SynchronizedField<Double> angle = new SynchronizedField<>(0.0);
 
-    public static NetworkKey ANGLE = NetworkKey.create("attack_angle");
+    public static final NetworkKey ANGLE = NetworkKey.create("attack_angle");
+    public static final NetworkKey OFFSET = NetworkKey.create("angle_offset");
 
     private final DirectReceiver receiver = new DirectReceiver();
 
@@ -77,6 +81,17 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 .runtimeOnly()
                 .register();
 
+        buildRegistry(OFFSET)
+                .withBasic(SerializePort.of(
+                        this::getOffset,
+                        this::setOffset,
+                        SerializeUtils.DOUBLE
+                ))
+                .withClient(ClientBuffer.DOUBLE.get())
+                .dispatchToSync()
+                .runtimeOnly()
+                .register();
+
         receiver().register(
                 new NumericField(
                         () -> angle.read(),
@@ -96,9 +111,9 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     private Vector3d getBaseNormal(){
         Direction dir = getDirection();
         if(dir == Direction.UP){
-            return new Vector3d(1, 0, 0);
+            return new Vector3d(0, 0, 1);
         }else if(dir == Direction.DOWN){
-            return new Vector3d(-1, 0, 0);
+            return new Vector3d(0, 0, -1);
         }
         return new Vector3d(0, 1, 0);
     }
@@ -121,6 +136,20 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 liftRatio,
                 resistRatio
         );
+    }
+
+    private void db_renderNormal(){
+        Vector3dc n = getNormal();
+        Vector3dc start = toJOML(getBlockPos().getCenter());
+        Vector3dc end = start.fma(2, n, new Vector3d());
+
+        ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(
+                        "debug_flap_normal" + getBlockPos().asLong(),
+                        toMinecraft(start),
+                        toMinecraft(end)
+                )
+                .colored(Color.RED.setAlpha(0.6f))
+                .lineWidth(0.3f);
     }
 
     public double getOffset() {
@@ -151,18 +180,20 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public void tickServer() {
         super.tickServer();
         syncAttachInducer();
+        syncForNear(true, ANGLE, OFFSET);
     }
 
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
-        syncForNear(true, ANGLE);
+        // syncForNear(true, ANGLE);
     }
 
     @Override
     public void tickClient() {
         super.tickClient();
         tickAnimationData();
+        // db_renderNormal();
     }
 
     private void syncAttachInducer(){

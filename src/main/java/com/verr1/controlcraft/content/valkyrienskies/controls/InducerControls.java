@@ -18,6 +18,8 @@ import org.valkyrienskies.physics_api.PoseVel;
 
 import java.lang.Math;
 
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+
 /*
 *   This is what makes Control Craft to be Control Craft :)
 *
@@ -276,7 +278,43 @@ public class InducerControls {
 
 
     public static void flapTickControls(LogicalFlap flap, PhysShipWrapper ship){
+        double lift = flap.lift();
+        double drag = flap.drag();
 
+        Vector3dc p_sc = ship.getTransform().getPositionInShip();
+        Vector3dc r_sc = toJOML(flap.posInShip().getCenter()).sub(p_sc, new Vector3d());
+
+        Vector3dc v_wc = ship.getVelocity();
+        Vector3dc w_wc = ship.getAngularVelocity();
+        Vector3dc r_wc = ship.getTransform().getShipToWorld().transformDirection(r_sc, new Vector3d());
+        Vector3dc n_wc = ship.getTransform().getShipToWorld().transformDirection(flap.normal(), new Vector3d());
+
+        Vector3dc rv_wc = v_wc.add(w_wc.cross(r_wc, new Vector3d()), new Vector3d());
+        Vector3dc pj_wc = rv_wc.sub(
+                n_wc.mul(n_wc.dot(rv_wc), new Vector3d()), new Vector3d()
+        );
+
+        if(pj_wc.lengthSquared() < 1.0E-12 || rv_wc.lengthSquared() < 1.0E-12)return;
+
+        Vector3dc pj_d_wc = pj_wc.normalize(new Vector3d());
+
+        double angle = pj_d_wc.angle(rv_wc) * -Math.signum(n_wc.dot(rv_wc));
+
+        Vector3dc drag_d_wc = new Vector3d(rv_wc).mul(-1.0).normalize();
+
+        double s2a = Math.sin(2 * angle);
+        double lift_scale = MathUtils.clamp(lift * s2a * pj_wc.lengthSquared(), 1.0E7);
+        Vector3dc lift_wc = n_wc.mul(lift_scale, new Vector3d());
+
+        double c2a = 1 - Math.cos(2 * angle);
+        double drag_scale = drag * c2a * rv_wc.lengthSquared();
+        Vector3dc drag_wc = drag_d_wc.mul(drag_scale, new Vector3d());
+
+        Vector3dc combine_wc = lift_wc.add(drag_wc, new Vector3d());
+        Vector3dc torque_wc  = r_wc.cross(combine_wc, new Vector3d());
+
+        ship.applyInvariantForce(combine_wc);
+        ship.applyInvariantTorque(torque_wc);
     }
 
 }
