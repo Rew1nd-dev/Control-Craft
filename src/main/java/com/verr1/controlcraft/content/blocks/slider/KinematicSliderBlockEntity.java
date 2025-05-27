@@ -11,7 +11,6 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
-import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.control.KinematicController;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
@@ -142,7 +141,7 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
                 ))
                 .register();
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)
@@ -238,7 +237,7 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
     @Override
     public void tickServer() {
         super.tickServer();
-        syncForNear(true, FIELD_);
+        syncForNear(true, FIELD);
         tickConstraint();
         kineticPeripheral.tick();
         // tickPose();

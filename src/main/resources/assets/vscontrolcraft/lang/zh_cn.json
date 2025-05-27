@@ -25,6 +25,7 @@
   "item.vscontrolcraft.awe_in_wand": "多合一工具枪",
   "item.vscontrolcraft.camera_link": "摄像头连接器",
   "itemGroup.vscontrolcraft.main": "控制工艺",
+  "block.vscontrolcraft.compact_flap": "集成襟翼",
   "vscontrolcraft.cameracliptype.entity_in_view.0": "高亮视野内的实体",
   "vscontrolcraft.cameracliptype.entity_in_view.lines": "1",
   "vscontrolcraft.cameracliptype.entity_in_view.name": "视野内所有",
@@ -415,5 +416,10 @@
   "tooltip.description": "整体描述",
   "tooltip.forthisoption": "对于该选项:",
   "vscontrolcraft.miscdescription.face_bound.0": "该面绑定的输入:",
-  "vscontrolcraft.tabtype.generic.name": "主要控制面板"
+  "vscontrolcraft.tabtype.generic.name": "主要控制面板",
+  "vscontrolcraft.uicontents.forced.0": "强制上线模式",
+  "vscontrolcraft.uicontents.forced.1": "挤占其他占用该Key的外设接口",
+  "vscontrolcraft.uicontents.forced.2": "每0.5s检查上线状态",
+  "vscontrolcraft.uicontents.forced.lines": "3",
+  "vscontrolcraft.uicontents.forced.name": "强制上线"
 }

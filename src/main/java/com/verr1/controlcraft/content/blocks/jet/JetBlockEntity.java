@@ -11,10 +11,8 @@ import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.content.cctweaked.peripheral.JetPeripheral;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
-import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.SynchronizedField;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.foundation.data.logical.LogicalJet;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
@@ -190,7 +188,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
     public void tickServer() {
         syncAttachedJet();
         syncAttachedInducer();
-        syncForNear(true, FIELD_);
+        syncForNear(true, FIELD);
     }
 
 
@@ -209,7 +207,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
     public JetBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)

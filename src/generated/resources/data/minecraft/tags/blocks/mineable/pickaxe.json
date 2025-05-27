@@ -23,6 +23,7 @@
     "vscontrolcraft:constraint_slider",
     "vscontrolcraft:camera",
     "vscontrolcraft:kinetic_proxy",
-    "vscontrolcraft:kinetic_resistor"
+    "vscontrolcraft:kinetic_resistor",
+    "vscontrolcraft:compact_flap"
   ]
 }

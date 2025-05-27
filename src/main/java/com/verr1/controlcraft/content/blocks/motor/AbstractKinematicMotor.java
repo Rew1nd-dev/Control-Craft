@@ -15,9 +15,7 @@ import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.content.cctweaked.peripheral.KinematicMotorPeripheral;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
-import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.control.KinematicController;
-import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.foundation.data.logical.LogicalKinematicMotor;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
@@ -43,7 +41,6 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
 
 import java.lang.Math;
-import java.util.List;
 import java.util.Optional;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
@@ -145,7 +142,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
                 ))
                 .register();
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)
@@ -270,7 +267,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     @Override
     public void tickServer() {
         super.tickServer();
-        syncForNear(true, FIELD_);
+        syncForNear(true, FIELD);
         if(USE_CONSTRAINT_SPAMMING) {
             tickConstraint();
         } else{

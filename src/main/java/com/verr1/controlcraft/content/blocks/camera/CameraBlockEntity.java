@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.blocks.camera;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.utility.Color;
-import com.simibubi.create.foundation.utility.Components;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
@@ -19,10 +18,8 @@ import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.content.cctweaked.peripheral.CameraPeripheral;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
-import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.ShipHitResult;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.foundation.managers.ServerCameraManager;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
@@ -39,7 +36,6 @@ import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.*;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -703,7 +699,6 @@ public class CameraBlockEntity extends OnShipBlockEntity
         outlineExtraTo(ctx);
     }
 
-
     public Vector3d getCameraPositionShip(){
         Vec3 front = getBlockPos().getCenter();
         return new Vector3d(front.x, front.y, front.z);
@@ -736,14 +731,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
             updateOutputSignal();
             updateNeighbor();
         }
-        fp._tick();
+        // getOrCreateFakePlayer()._tick();
 
     }
 
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
-        syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD_);
+        syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD);
     }
 
 
@@ -827,7 +822,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
             if(user == null || level == null)return;
 
 
-            fp.activate(user);
+            getOrCreateFakePlayer().activate(user);
 
         }
         if(packet.getType() == RegisteredPacketType.SETTING_1){
@@ -836,6 +831,9 @@ public class CameraBlockEntity extends OnShipBlockEntity
         if(packet.getType() == RegisteredPacketType.EXTEND_0){
             ServerPlayer user = context.getSender();
             if(user == null || level == null)return;
+
+            // let the move(ServerPlayer p) send chunks again to user, avoiding holes on client side
+            user.setLastSectionPos(tracker.lastSectionPos());
 
             ServerCameraManager.remove(user.getUUID());  //WorldBlockPos.of(level, getBlockPos())
 
@@ -850,10 +848,15 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
             var ack = new ReceiveLatestWorldPosPacket(toMinecraft(getCameraPosition()));
             ControlCraftPackets.sendToPlayer(ack, user);
+
+            getOrCreateFakePlayer().activate(user);
+
+            /*
             ControlCraftServer.SERVER_EXECUTOR.executeLater(
-                    () -> fp.activate(user),
+                    () -> finalFp,
                     20
             );
+            * */
 
         }
     }
@@ -890,7 +893,12 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void initialize() {
         super.initialize();
         if(level == null || level.isClientSide)return;
-        fp = new CameraBoundFakePlayer((ServerLevel) level, this);
+        getOrCreateFakePlayer();
+    }
+
+    private CameraBoundFakePlayer getOrCreateFakePlayer(){
+        if(fp == null) fp = new CameraBoundFakePlayer((ServerLevel) level, this);
+        return fp;
     }
 
     public CameraBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -943,7 +951,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 .dispatchToSync()
                 .register();
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)

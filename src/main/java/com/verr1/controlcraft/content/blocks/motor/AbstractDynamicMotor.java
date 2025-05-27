@@ -13,7 +13,6 @@ import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.content.cctweaked.peripheral.DynamicMotorPeripheral;
 import com.verr1.controlcraft.foundation.api.delegate.IControllerProvider;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
-import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.*;
 import com.verr1.controlcraft.foundation.data.control.DynamicController;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
@@ -292,7 +291,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
-        syncForNear(true, FIELD_, CONTROLLER);
+        syncForNear(true, FIELD, CONTROLLER);
     }
 
     public void lockCheck(){
@@ -378,7 +377,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
                 .withClient(ClientBuffer.BOOLEAN.get())
                 .register();
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)

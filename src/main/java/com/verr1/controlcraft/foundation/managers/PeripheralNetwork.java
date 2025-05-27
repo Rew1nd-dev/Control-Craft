@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.foundation.managers;
 
 
+import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -74,7 +76,24 @@ public class PeripheralNetwork {
         lives.entrySet().forEach(e-> e.setValue(e.getValue() - 1));
     }
 
+    public static boolean isRegistered(PeripheralKey key){
+        return k2p.containsKey(key);
+    }
 
+    public static boolean isRegistered(WorldBlockPos pos){
+        return p2k.containsKey(pos);
+    }
+
+
+    public static void free(PeripheralKey key){
+        if(!isRegistered(key))return;
+        WorldBlockPos pos = k2p.get(key);
+        BlockEntityGetter.INSTANCE.getBlockEntityAt(pos.globalPos(), PeripheralInterfaceBlockEntity.class)
+                .ifPresent(p -> {
+                    p.setForced(false);
+                    p.offline();
+                });
+    }
 
     public static @NotNull PeripheralKey valid(WorldBlockPos pos){
         return p2k.getOrDefault(pos, PeripheralKey.NULL);

@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.gui.factory;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlockEntity;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import com.verr1.controlcraft.content.blocks.kinetic.resistor.KineticResistorBlockEntity;
 import com.verr1.controlcraft.content.blocks.propeller.PropellerBlockEntity;
@@ -215,6 +216,38 @@ public class GenericUIFactory {
                                 .build()
                 )
                 .withTickTask(createSyncTasks(boundPos, ANGLE))
+                .build();
+    }
+
+    public static GenericSettingScreen createCompactFlapScreen(BlockPos boundPos){
+        DoubleUIView angle_view = new DoubleUIView(
+                boundPos,
+                CompactFlapBlockEntity.ANGLE,
+                Converter.convert(SlotType.DEGREE, Converter::viewStyle)
+        );
+
+
+        DoubleUIField angle = new DoubleUIField(
+                boundPos,
+                CompactFlapBlockEntity.ANGLE,
+                Converter.convert(SlotType.DEGREE, Converter::titleStyle)
+        );
+
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(ControlCraftBlocks.WING_CONTROLLER_BLOCK.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(SharedKeys.PLACE_HOLDER, angle_view)
+                                .withPort(CompactFlapBlockEntity.ANGLE, angle)
+                                .build()
+                )
+                .withTab(
+                        REDSTONE_TAB,
+                        createTerminalDeviceTab(boundPos)
+                )
+                .withTickTask(createSyncTasks(boundPos, CompactFlapBlockEntity.ANGLE))
                 .build();
     }
 
@@ -529,33 +562,7 @@ public class GenericUIFactory {
     }
 
 
-    public static GenericSettingScreen createPeripheralInterfaceScreen_(BlockPos boundPos){
-        var type_view = new BasicUIView<>(
-                boundPos,
-                PeripheralInterfaceBlockEntity_.PERIPHERAL_TYPE,
-                String.class,
-                "Not Attached",
-                Converter.convert(UIContents.TYPE, Converter::viewStyle),
-                s -> Component.literal(s).withStyle(Converter::optionStyle),
-                $ -> ""
-        );
 
-        var key_field = new PeripheralKeyUIField_(boundPos);
-
-        key_field.getNameLabel().withTextStyle(Converter::titleStyle);
-        key_field.getProtocolLabel().withTextStyle(Converter::titleStyle);
-
-        return new GenericSettingScreen.builder(boundPos)
-                .withRenderedStack(ControlCraftBlocks.RECEIVER_BLOCK.asStack())
-                .withTab(
-                        GENERIC_SETTING_TAB,
-                        new VerticalFlow.builder(boundPos)
-                                .withPort(PeripheralInterfaceBlockEntity_.PERIPHERAL_TYPE, type_view)
-                                .withPort(PeripheralInterfaceBlockEntity_.PERIPHERAL, key_field)
-                                .build()
-                )
-                .build();
-    }
 
     public static GenericSettingScreen createPeripheralInterfaceScreen(BlockPos boundPos){
         var type_view = new BasicUIView<>(
@@ -771,7 +778,7 @@ public class GenericUIFactory {
     public static VerticalFlow createTerminalDeviceTab(BlockPos boundPos){
         return new VerticalFlow.builder(boundPos)
                 .withPort(
-                        IReceiver.FIELD_,
+                        IReceiver.FIELD,
                         new TerminalDeviceUIField(boundPos)
                 ).build();
     }

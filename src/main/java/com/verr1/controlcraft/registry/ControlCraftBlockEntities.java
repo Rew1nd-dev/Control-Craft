@@ -184,6 +184,7 @@ public class ControlCraftBlockEntities {
     public static final BlockEntityEntry<CompactFlapBlockEntity> COMPACT_FLAP_BLOCKENTITY = REGISTRATE
             .blockEntity(CompactFlapBlock.ID, CompactFlapBlockEntity::new)
             .validBlock(ControlCraftBlocks.COMPACT_FLAP_BLOCK)
+            .renderer(() -> CompactFlapRenderer::new)
             .register();
 
     public static void register(){

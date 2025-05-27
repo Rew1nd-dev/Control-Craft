@@ -12,7 +12,6 @@ import java.util.UUID;
 public class CameraBoundFakePlayer extends FakePlayer {
 
     private boolean isValid = false;
-    private final ServerLevel level;
     private final int live = 30;
     private int liveCounter = 10;
     private final CameraBlockEntity owner;
@@ -20,7 +19,6 @@ public class CameraBoundFakePlayer extends FakePlayer {
     public CameraBoundFakePlayer(ServerLevel level, CameraBlockEntity owner) {
         super(level, new GameProfile(UUID.randomUUID(), "CameraBoundFakePlayer"));
         this.owner = owner;
-        this.level = level;
     }
 
     public void reset(){
@@ -28,17 +26,24 @@ public class CameraBoundFakePlayer extends FakePlayer {
         unsetRemoved();
     }
 
+    private ServerLevel getLevel(){
+        if(!(owner.getLevel() instanceof ServerLevel level)){
+            throw new IllegalStateException("CameraBoundFakePlayer must be used in a ServerLevel context");
+        }
+        return level;
+    }
+
     public void activate(ServerPlayer user){
         liveCounter = live;
 
-        if(!level.players().contains(this)){
+        if(!getLevel().players().contains(this)){
             addToLevel(user);
         }
     }
 
     public void addToLevel(ServerPlayer user){
         reset();
-        level.addFreshEntity(this);
+        getLevel().addFreshEntity(this);
         owner.tracker.setLastSectionPos(user.getLastSectionPos());
     }
 
@@ -51,13 +56,15 @@ public class CameraBoundFakePlayer extends FakePlayer {
         remove(RemovalReason.DISCARDED);
     }
 
-    public void _tick(){
+
+    @Override
+    public void tick(){
         if(liveCounter < -1)return;
         if(liveCounter-- < 0)dump();
-        if(level.players().contains(this)){
+        if(getLevel().players().contains(this)){
             Vector3d p = owner.getCameraPosition();
             moveTo(p.x, p.y, p.z);
-            level.getChunkSource().move(this);
+            getLevel().getChunkSource().move(this);
         }
     }
 

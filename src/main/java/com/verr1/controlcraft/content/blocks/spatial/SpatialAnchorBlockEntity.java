@@ -272,7 +272,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
         trackNearestWhenRunning();
         syncAttachedInducer();
         updateSchedule();
-        syncForNear(true, IS_STATIC, IS_RUNNING, FIELD_);
+        syncForNear(true, IS_STATIC, IS_RUNNING, FIELD);
         // syncClient();
     }
 
@@ -308,7 +308,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
-        syncForNear(true, FIELD_);
+        syncForNear(true, FIELD);
     }
 
     @Override
@@ -334,7 +334,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
     public SpatialAnchorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)

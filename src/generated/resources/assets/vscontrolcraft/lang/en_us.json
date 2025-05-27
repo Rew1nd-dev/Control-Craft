@@ -2,6 +2,7 @@
   "block.vscontrolcraft.anchor": "Gravitational Anchor",
   "block.vscontrolcraft.camera": "Camera",
   "block.vscontrolcraft.chunk_loader": "Chunk Loader",
+  "block.vscontrolcraft.compact_flap": "Compact Flap",
   "block.vscontrolcraft.constraint_joint": "Kinematic Joint Motor",
   "block.vscontrolcraft.constraint_revolute": "Kinematic Servo Motor",
   "block.vscontrolcraft.constraint_slider": "Kinematic Physical Piston",

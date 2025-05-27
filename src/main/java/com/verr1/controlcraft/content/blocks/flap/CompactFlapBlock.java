@@ -36,7 +36,7 @@ public class CompactFlapBlock extends DirectionalBlock implements
 
     @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p){
-        // ScreenOpener.open(GenericUIFactory.createJetScreen(p));
+        ScreenOpener.open(GenericUIFactory.createCompactFlapScreen(p));
     }
 
 

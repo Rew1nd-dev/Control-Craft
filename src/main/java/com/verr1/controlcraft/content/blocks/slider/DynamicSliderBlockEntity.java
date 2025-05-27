@@ -281,7 +281,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
                 .withClient(ClientBuffer.BOOLEAN.get())
                 .register();
 
-        buildRegistry(FIELD_)
+        buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
                         t -> receiver().deserialize(t)
@@ -397,7 +397,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         super.tickServer();
         lockCheck();
         syncAttachInducer();
-        syncForNear(true, FIELD_);
+        syncForNear(true, FIELD);
         kineticPeripheral.tick();
     }
 

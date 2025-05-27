@@ -16,6 +16,9 @@ public enum ControlCraftAttachments {
     SPATIAL(SpatialForceInducer.class),
     JET(JetForceInducer.class),
     PROPELLER(PropellerForceInducer.class),
+    FLAP(FlapForceInducer.class),
+
+
 
     LEGACY_ANCHOR(AnchorForceInducer_.class),
     LEGACY_DYNAMIC_MOTOR(DynamicMotorForceInducer_.class),

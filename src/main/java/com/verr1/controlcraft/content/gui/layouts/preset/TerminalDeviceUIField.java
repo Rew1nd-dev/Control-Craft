@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.verr1.controlcraft.content.gui.factory.Converter.convert;
-import static com.verr1.controlcraft.foundation.redstone.IReceiver.FIELD_;
+import static com.verr1.controlcraft.foundation.redstone.IReceiver.FIELD;
 
 public class TerminalDeviceUIField extends TypedUIPort<CompoundTag> {
 
@@ -151,7 +151,7 @@ public class TerminalDeviceUIField extends TypedUIPort<CompoundTag> {
 
 
     public TerminalDeviceUIField(BlockPos boundPos) {
-        super(boundPos, FIELD_, CompoundTag.class, new CompoundTag());
+        super(boundPos, FIELD, CompoundTag.class, new CompoundTag());
     }
 
     @Override

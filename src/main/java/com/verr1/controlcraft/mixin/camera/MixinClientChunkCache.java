@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -37,12 +38,13 @@ public abstract class MixinClientChunkCache {
     @Shadow @Final
     ClientLevel level;
 
-    private static boolean isValidChunk(@Nullable LevelChunk p_104439_, int p_104440_, int p_104441_) {
+    private static boolean isValidChunk(@Nullable LevelChunk p_104439_, int x, int z) {
         if (p_104439_ == null) {
             return false;
         } else {
             ChunkPos chunkpos = p_104439_.getPos();
-            return chunkpos.x == p_104440_ && chunkpos.z == p_104441_;
+            return chunkpos.x == x && chunkpos.z == z;
+
         }
     }
 
