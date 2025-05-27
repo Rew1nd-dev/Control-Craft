@@ -49,6 +49,13 @@ public enum UIContents implements Descriptive<UIContents> {
     FORCED(Component.literal("Forced"), literals("Force Online Mode", "Divert others if key is used", "Will try force online every 0.5s")),
     ONLINE(Component.literal("Online"), literals("Online Hold Key")),
     OFFLINE(Component.literal("Offline"), literals("Offline Hold Key")),
+
+
+    FLAP_OFFSET(Component.literal("Offset"), literals("Angle Offset")),
+    FLAP_LIFT(Component.literal("Lift"), literals("Lift Ratio")),
+    FLAP_DRAG(Component.literal("Drag"), literals("Drag Ratio")),
+    FLAP_BIAS(Component.literal("Bias"), literals("Attack Angle Bias")),
+
     ;
 
 
