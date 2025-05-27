@@ -2,6 +2,7 @@ package com.verr1.controlcraft.registry.datagen;
 
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlock;
+import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlock;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlock;
 import com.verr1.controlcraft.content.blocks.jet.JetBlock;
 import com.verr1.controlcraft.content.blocks.jet.JetRudderBlock;
@@ -9,6 +10,7 @@ import com.verr1.controlcraft.content.blocks.joints.FreeJointBlock;
 import com.verr1.controlcraft.content.blocks.joints.PivotJointBlock;
 import com.verr1.controlcraft.content.blocks.joints.RevoluteJointBlock;
 import com.verr1.controlcraft.content.blocks.kinetic.proxy.KineticProxyBlock;
+import com.verr1.controlcraft.content.blocks.kinetic.resistor.KineticResistorBlock;
 import com.verr1.controlcraft.content.blocks.loader.ChunkLoaderBlock;
 import com.verr1.controlcraft.content.blocks.motor.*;
 import com.verr1.controlcraft.content.blocks.propeller.PropellerBlock;
@@ -45,7 +47,11 @@ public enum VsMasses {
     TRANSMITTER(PeripheralProxyBlock.ID, 5),
     SPATIAL_ANCHOR(SpatialAnchorBlock.ID, 500),
     REDSTONE_TERMINAL(TerminalBlock.ID, 5),
-    SPINAL(SpinalyzerBlock.ID, 5),;
+    SPINAL(SpinalyzerBlock.ID, 5),
+    KINETIC_RESISTOR(KineticResistorBlock.ID, 100),
+    COMPACT_FLAP(CompactFlapBlock.ID, 5),
+
+    ;
 
     public final String ID;
     public final double mass;

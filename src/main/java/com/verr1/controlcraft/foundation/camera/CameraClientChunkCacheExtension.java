@@ -252,6 +252,10 @@ public class CameraClientChunkCacheExtension {
         }
     }
 
+    public static int size(){
+        return CHUNK_MAP.size();
+    }
+
     public static LevelChunk replaceWithPacketData(ClientLevel level, int x, int z, FriendlyByteBuf packetData, CompoundTag chunkTag, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> tagOutput) {
         if (!Minecraft.getInstance().isSameThread())
             throw new UnsupportedOperationException("replaceWithPacketData called off-thread, this shouldn't happen!");

@@ -55,8 +55,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
 
     private double bias = 0.0;
-    private double resistRatio = 1.0;
-    private double liftRatio = 1.0;
+    private double resistRatio = 30.0;
+    private double liftRatio = 150.0;
 
     private Vector3dc cachedRelative = new Vector3d(0, 0, 0);
 

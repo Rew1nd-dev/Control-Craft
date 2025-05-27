@@ -41,7 +41,8 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
 
     public LerpedFloat animatedHorizontalAngle = LerpedFloat.angular();
 
-
+    private Vector3dc lastTickDirection = new Vector3d();
+    private Vector3dc thisTickDirection = new Vector3d();
 
 
     public float targetHorizontalAngle = 0;
@@ -49,6 +50,8 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     public float targetVerticalAngle = 0;
     public float targetThrust = 0;
 
+    private Direction vertical = Direction.UP;
+    private Direction horizontal = Direction.NORTH;
 
     public float getTargetThrust() {
         return targetThrust;
@@ -78,17 +81,29 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         return getDirection().getOpposite();
     }
 
+
+    public void updateVertical(){
+        // if(!(level instanceof ServerLevel lvl))return Direction.UP;
+        vertical = BlockEntityGetter.getLevelBlockEntityAt(level, getBlockPos().relative(getDirection().getOpposite()), JetBlockEntity.class)
+                .map(JetBlockEntity::getVertical).orElse(Direction.UP);
+    }
+
+    // jet rudder's direction is the opposite of jet
+    public void updateHorizontal(){
+        // if(!(level instanceof ServerLevel lvl))return Direction.NORTH;
+        horizontal = BlockEntityGetter.getLevelBlockEntityAt(level, getBlockPos().relative(getDirection().getOpposite()), JetBlockEntity.class)
+                .map(JetBlockEntity::getHorizontal).orElse(Direction.NORTH);
+    }
+
     public Direction getVertical(){
         // if(!(level instanceof ServerLevel lvl))return Direction.UP;
-        return BlockEntityGetter.getLevelBlockEntityAt(level, getBlockPos().relative(getDirection().getOpposite()), JetBlockEntity.class)
-                .map(JetBlockEntity::getVertical).orElse(Direction.UP);
+        return vertical;
     }
 
     // jet rudder's direction is the opposite of jet
     public Direction getHorizontal(){
         // if(!(level instanceof ServerLevel lvl))return Direction.NORTH;
-        return BlockEntityGetter.getLevelBlockEntityAt(level, getBlockPos().relative(getDirection().getOpposite()), JetBlockEntity.class)
-                .map(JetBlockEntity::getHorizontal).orElse(Direction.NORTH);
+        return horizontal;
     }
 
     public Vector3d getVerticalJOML(){
@@ -134,12 +149,28 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         return Couple.create(rh, rv);
     }
 
+    private void tickDirections(){
+        lastTickDirection = thisTickDirection;
+        thisTickDirection = getRenderThrustDir();
+    }
+
+    public Vector3dc getRenderDirection(float partialTick){
+        return lastTickDirection.lerp(thisTickDirection, partialTick, new Vector3d()).normalize();
+    }
 
     @Override
     public void tickClient() {
         super.tickClient();
         tickAnimation();
         tickParticles();
+        tickDirections();
+    }
+
+    @Override
+    public void lazyTickClient() {
+        super.lazyTickClient();
+        updateHorizontal();
+        updateVertical();
     }
 
     @Override
@@ -166,13 +197,13 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
 
 
     public void tickParticles(){
-        if(!level.isClientSide)return;
+        if(level == null || !level.isClientSide)return;
         Ship ship = VSGameUtilsKt.getShipObjectManagingPos(level, getBlockPos());
 
 
         Vector3d dir = getRenderThrustDir().mul(-1);
 
-        Vector3d p_wc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter()).fma(0.5, getDirectionJOML());
+        Vector3d p_wc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter()).fma(0.2, getDirectionJOML());
         Vector3d v_wc = dir.mul(MathUtils.clamp1(targetThrust * 1e-3) * 3, new Vector3d());
 
         if(v_wc.lengthSquared() < 1e-2)return;

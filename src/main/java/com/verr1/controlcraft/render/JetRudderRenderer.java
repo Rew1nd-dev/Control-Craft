@@ -12,6 +12,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import org.joml.Vector2dc;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEntity> {
     public JetRudderRenderer(BlockEntityRendererProvider.Context context) {
@@ -20,10 +22,12 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
     protected void renderSafe(JetRudderBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
         float base_offset = (float) Math.toRadians(0);
 
-        Couple<Double> angles = be.getRenderAngles();
+        // Couple<Double> angles = be.getRenderAngles();
 
-        float horizontal = angles.get(true).floatValue();
-        float vertical = angles.get(false).floatValue();
+        Vector3dc dir = be.getRenderDirection(partialTicks);
+
+        double horizontal = Math.atan2(dir.y(), dir.z());
+        double vertical = Math.atan2(dir.x(), Math.sqrt(dir.y() * dir.y() + dir.z() * dir.z()));
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());
         VertexConsumer translucent = bufferSource.getBuffer(RenderType.translucent());
 
@@ -33,6 +37,16 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
 
 
         rudder
+                .rotateCentered(Direction.EAST, -(float)(horizontal))
+                .rotateCentered(Direction.UP, (float)(vertical + Math.PI))
+                .light(light)
+                .renderInto(ms, solid);
+
+    }
+
+    /*
+    Legacy rendering
+    * rudder
                 .centre()
                 .rotateToFace(be.getDirection())
                 .unCentre()
@@ -75,6 +89,6 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
 
                 .light(light)
                 .renderInto(ms, solid);
-
-    }
+    *
+    * */
 }

@@ -71,7 +71,7 @@ public class CameraBlock extends DirectionalBlock implements IBE<CameraBlockEnti
                                  BlockHitResult hit){
         if(worldIn.isClientSide){
             if(!player.isShiftKeyDown() && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()){
-                ClientCameraManager.linkDirect(pos);
+                ClientCameraManager.linkWithAck(pos);
             }
             if(      handIn == InteractionHand.MAIN_HAND
                     && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()

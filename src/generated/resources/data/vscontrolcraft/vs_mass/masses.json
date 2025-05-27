@@ -90,5 +90,13 @@
   {
     "block": "vscontrolcraft:spinalyzer",
     "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:kinetic_resistor",
+    "mass": 100.0
+  },
+  {
+    "block": "vscontrolcraft:compact_flap",
+    "mass": 5.0
   }
 ]

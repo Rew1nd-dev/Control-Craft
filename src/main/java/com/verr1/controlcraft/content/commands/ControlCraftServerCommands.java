@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.commands;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
@@ -18,16 +17,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ControlCraftCommands {
+public class ControlCraftServerCommands {
 
     private static LiteralArgumentBuilder<CommandSourceStack> lt(String name){
         return LiteralArgumentBuilder.literal(name);
@@ -104,13 +101,13 @@ public class ControlCraftCommands {
                     lt("free-key").then(
                             arg("protocol", LongArgumentType.longArg()).then(
                                     arg("name", StringArgumentType.string()).executes(
-                                        ControlCraftCommands::freeCommand
+                                        ControlCraftServerCommands::freeCommand
                                     )
                             )
                     )
                 ).then(
                         lt("debug-count-fake-player").executes(
-                                ControlCraftCommands::countFPCommand
+                                ControlCraftServerCommands::countFPCommand
                         )
                     )
         );
