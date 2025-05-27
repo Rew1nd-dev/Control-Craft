@@ -19,9 +19,15 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+
 public class ServerCameraManager {
     private static final HashMap<UUID, WorldBlockPos> player2Camera = new HashMap<>();
     private static final HashMap<WorldBlockPos, UUID> camera2Player = new HashMap<>();
+
+    private static final HashMap<UUID, Vec3> player2CameraPos = new HashMap<>();
+
+
 
     private static final UUID RANDOM_UUID = UUID.randomUUID();
 
@@ -32,8 +38,19 @@ public class ServerCameraManager {
 
     public static void remove(WorldBlockPos pos){
         UUID player = camera2Player.get(pos);
+        player2CameraPos.remove(player);
         player2Camera.remove(player);
         camera2Player.remove(pos);
+    }
+
+    public static void updateCachedCameraPosition(ServerPlayer user, Vec3 latest){
+        player2CameraPos.put(user.getUUID(), latest);
+    }
+
+    public static Vec3 getCachedCameraOrPlayerPosition(ServerPlayer user){
+        return Optional
+                .ofNullable(player2CameraPos.get(user.getUUID()))
+                .orElse(user.position());
     }
 
     public static boolean isRegistered(WorldBlockPos pos){
@@ -46,6 +63,7 @@ public class ServerCameraManager {
 
     public static void remove(UUID player){
         WorldBlockPos pos = player2Camera.get(player);
+        player2CameraPos.remove(player);
         player2Camera.remove(player);
         camera2Player.remove(pos);
     }

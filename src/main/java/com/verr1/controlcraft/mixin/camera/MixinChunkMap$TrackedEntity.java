@@ -31,15 +31,7 @@ public class MixinChunkMap$TrackedEntity {
     @Redirect(method = "updatePlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;position()Lnet/minecraft/world/phys/Vec3;"))
     private Vec3 wwa(ServerPlayer player) {
         if (ServerCameraManager.isRegistered(player.getUUID())) {
-            return Optional
-                    .ofNullable(ServerCameraManager.getCamera(player))
-                    .flatMap(p -> BlockEntityGetter.INSTANCE
-                            .getBlockEntityAt(p.globalPos(), CameraBlockEntity.class)
-                    )
-                    .map(CameraBlockEntity::getCameraPosition)
-                    .map(ValkyrienSkies::toMinecraft)
-                    .orElse(player.position());
-
+            return ServerCameraManager.getCachedCameraOrPlayerPosition(player);
         }
         return player.position();
     }

@@ -260,7 +260,7 @@ public class GenericUIFactory {
         Runnable alignLabels = () -> Converter.alignLabel(angle, offset, lift, drag, bias);
 
         return new GenericSettingScreen.builder(boundPos)
-                .withRenderedStack(ControlCraftBlocks.WING_CONTROLLER_BLOCK.asStack())
+                .withRenderedStack(ControlCraftBlocks.COMPACT_FLAP_BLOCK.asStack())
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)

@@ -2,12 +2,17 @@ package com.verr1.controlcraft.foundation.camera;
 
 import com.mojang.authlib.GameProfile;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.foundation.managers.ServerCameraManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import org.joml.Vector3d;
 
+import java.util.HashMap;
 import java.util.UUID;
+
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CameraBoundFakePlayer extends FakePlayer {
 
@@ -15,6 +20,8 @@ public class CameraBoundFakePlayer extends FakePlayer {
     private final int live = 30;
     private int liveCounter = 10;
     private final CameraBlockEntity owner;
+
+
 
     public CameraBoundFakePlayer(ServerLevel level, CameraBlockEntity owner) {
         super(level, new GameProfile(UUID.randomUUID(), "CameraBoundFakePlayer"));
@@ -35,7 +42,7 @@ public class CameraBoundFakePlayer extends FakePlayer {
 
     public void activate(ServerPlayer user){
         liveCounter = live;
-
+        ServerCameraManager.updateCachedCameraPosition(user, toMinecraft(owner.getCameraPosition()));
         if(!getLevel().players().contains(this)){
             addToLevel(user);
         }

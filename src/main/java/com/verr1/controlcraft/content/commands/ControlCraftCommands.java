@@ -10,16 +10,21 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ControlCraftCommands {
@@ -64,6 +69,26 @@ public class ControlCraftCommands {
         return 1;
     }
 
+    private static int countFPCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set neglect a block!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        var fps = player.level().players().stream().filter(CameraBoundFakePlayer.class::isInstance).toList();
+        source.sendSuccess(() -> Component.literal("There are " + fps.size() + " fake players in the world."), false);
+        fps.forEach(
+                fp -> {
+                    source.sendSuccess(() -> Component.literal(
+                            "Position: " + fp.position()
+                    ), false);
+                }
+        );
+
+        return 1;
+    }
+
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
             Commands
@@ -83,7 +108,11 @@ public class ControlCraftCommands {
                                     )
                             )
                     )
-                )
+                ).then(
+                        lt("debug-count-fake-player").executes(
+                                ControlCraftCommands::countFPCommand
+                        )
+                    )
         );
     }
 

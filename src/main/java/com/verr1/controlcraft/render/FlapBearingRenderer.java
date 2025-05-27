@@ -25,7 +25,7 @@ public class FlapBearingRenderer extends SafeBlockEntityRenderer<FlapBearingBloc
         int sign = (dir == Direction.UP || dir == Direction.SOUTH || dir == Direction.EAST) ? 1 : -1;
         BlockState state = be.getBlockState();
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());
-        SuperByteBuffer propellerBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.WING_CONTROLLER_TOP, state);
+        SuperByteBuffer propellerBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.WING_CONTROLLER_TOP_O, state);
 
         propellerBuffer.rotateCentered(state.getValue(BlockStateProperties.FACING), (float) Math.toRadians(angle * sign))
                 .light(light)

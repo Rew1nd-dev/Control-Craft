@@ -11,6 +11,7 @@ public class ControlCraftPartialModels {
         SERVO_TOP = block("servo_top"),
         CONSTRAINT_SERVO_TOP = block("constraint_revolute_top"),
         WING_CONTROLLER_TOP = block("wing_controller_top"),
+        WING_CONTROLLER_TOP_O = block("wing_controller_top_o"),
         CAMERA_LENS = block("camera_lens"),
         RUDDER_PART = block("rudder"),
 
