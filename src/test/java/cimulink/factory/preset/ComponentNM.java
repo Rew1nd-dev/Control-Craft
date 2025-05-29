@@ -1,4 +1,4 @@
-package cimulink.factory;
+package cimulink.factory.preset;
 
 import cimulink.Component;
 import cimulink.NamedComponent;
@@ -12,15 +12,13 @@ import java.util.function.Function;
 
 public class ComponentNM<S> extends NamedComponent {
 
-
-
     ComponentNM(
             List<String> inputs,
             List<String> outputs,
             Function<Pair<@NotNull List<Double>, @NotNull S>, Pair<@NotNull List<Double>, @NotNull S>> transition,
-            boolean temporal
+            S defaultState
     ) {
-        super(temporal(inputs.size(), outputs.size(), transition), inputs, outputs);
+        super(temporal(inputs.size(), outputs.size(), transition, defaultState), inputs, outputs);
     }
 
     ComponentNM(
@@ -32,21 +30,6 @@ public class ComponentNM<S> extends NamedComponent {
     }
 
 
-    public static ComponentNM<Void> ofCombinational(
-            List<String> inputs,
-            List<String> outputs,
-            Function<List<Double>, List<Double>> transform
-    ){
-        return new ComponentNM<>(inputs, outputs, transform);
-    }
-
-    public static<S> ComponentNM<S> ofTemporal(
-            List<String> inputs,
-            List<String> outputs,
-            Function<Pair<@NotNull List<Double>, @NotNull S>, Pair<@NotNull List<Double>, @NotNull S>> transition
-    ){
-        return new ComponentNM<>(inputs, outputs, transition, true);
-    }
 
     private static <T> Component combinational(
             int N,
@@ -80,10 +63,11 @@ public class ComponentNM<S> extends NamedComponent {
             Function<
                     Pair<@NotNull List<Double>, @NotNull T>,
                     Pair<@NotNull List<Double>, @NotNull T>
-            > transition
+            > transition,
+            T defaultState
     ){
         return new Component(false, N, M) {
-            private T state;
+            private T state = defaultState;
             private final List<Double> cachedOutput = new ArrayList<>(M);
             private final List<Double> view = Collections.unmodifiableList(cachedOutput);
 
