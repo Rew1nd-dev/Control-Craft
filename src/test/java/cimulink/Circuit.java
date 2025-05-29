@@ -1,5 +1,6 @@
 package cimulink;
 
+import cimulink.utils.GraphUtils;
 import kotlin.Pair;
 import net.minecraft.core.IdMap;
 
@@ -28,6 +29,8 @@ public class Circuit {
     final List<List<Integer>> ordinal2wires                  ;
     final List<List<Integer>> ordinal2comps                  ;
 
+    final List<Integer> temporalComponent;
+
     private Circuit(
             List<Wire> wires,
             List<Component> components,
@@ -48,6 +51,11 @@ public class Circuit {
         this.outputWires = outputWires;
         this.ordinal2wires = ordinal2wires;
         this.ordinal2comps = ordinal2comps;
+        this.temporalComponent = IntStream
+                                    .range(0, components.size())
+                                    .filter(i -> !components.get(i).immediate)
+                                    .boxed()
+                                    .toList();
     }
 
 
@@ -66,6 +74,15 @@ public class Circuit {
     }
 
     public void forward(){
+        temporalComponent.forEach(cid -> {
+            Component comp = components.get(cid);
+            List<Double> output = comp.supply();
+            for(int i = 0; i < output.size(); i++){
+                int wid = comp2outputWireIDs.get(cid).get(i);
+                if(wid == Z_ID) continue; // Skip Z_ID wires
+                wires.get(wid).sample = output.get(i);
+            }
+        });
         for (List<Integer> comps : ordinal2comps) {
             /*
             // This Should Guarantee That 0 ordinal wires are output wires of any component
@@ -85,7 +102,9 @@ public class Circuit {
                                 .toList();
                         Component comp = components.get(c);
                         comp.consume(samples);
-                        if (!comp.immediate) return;
+                        if (!comp.immediate){
+                            return;
+                        }
                         List<Double> outputs = comp.supply();
                         List<Integer> outputWireIDs = comp2outputWireIDs.get(c);
                         for (int i = 0; i < outputs.size(); i++) {
@@ -128,7 +147,7 @@ public class Circuit {
     }
 
 
-    static class builder{
+    public static class builder{
         Map<String, NamedComponent> components = new HashMap<>();
 
         Map<ComponentPort, Set<ComponentPort>> connections = new HashMap<>();
@@ -231,16 +250,39 @@ public class Circuit {
         }
 
         private void computeOrdinal(){
-            Queue<String> componentQueue = new ArrayDeque<>(components.size());
-            Set<String> visited = new HashSet<>();
-            componentQueue.add("");
-            visited.add("");
-            // add zero ordinal comp to componentQueue
-            while(!componentQueue.isEmpty()){
-                String qName = componentQueue.poll();
-                int qOrdinal = ordinal.get(qName);
-                Set<String> subs = getSubComponents(qName);
+            Map<String, List<String>> graph = new HashMap<>();
+            Set<String> zeroOrderVertices = components
+                    .keySet()
+                    .stream()
+                    .filter(this::isZeroOrder)
+                    .collect(Collectors.toSet());
 
+            components
+                    .keySet().forEach(
+                            k -> graph.computeIfAbsent(k, $ -> new ArrayList<>()).addAll(getSubComponents(k))
+                    );
+
+
+            ordinal = GraphUtils.calculateOrders(
+                    graph,
+                    name -> !components.get(name).unnamed.immediate,
+                    zeroOrderVertices::contains
+            );
+
+            maxOrdinal = ordinal.values().stream().max(Comparator.naturalOrder()).orElse(0) + 1;
+        }
+
+        private boolean isZeroOrder(String name){
+            NamedComponent namedComponent = components.get(name);
+            if(!namedComponent.unnamed.immediate){
+                return true;
+            }else{
+                return !namedComponent
+                        .inputs()
+                        .stream()
+                        .map(i -> reverseConnections.containsKey(new ComponentPort(name, i)))
+                        .findAny()
+                        .orElse(false);
             }
         }
 
@@ -250,7 +292,7 @@ public class Circuit {
                     .outputs()
                     .stream()
                     .flatMap(o -> connections
-                            .get(new ComponentPort(componentName, o))
+                            .getOrDefault(new ComponentPort(componentName, o), Set.of())
                             .stream()
                             .map(cp -> cp.componentName)
                     )
@@ -258,6 +300,7 @@ public class Circuit {
         }
 
         public Circuit build(){
+            computeOrdinal();
             Map<String, Integer> componentName2componentId = new HashMap<>();
             Map<ComponentPort, Integer> outputPort2wireId = new HashMap<>();
             Map<String, Integer> outputName2wireId = new HashMap<>();

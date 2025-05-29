@@ -7,6 +7,8 @@ public abstract class Component {
     public final boolean immediate;
     private final int N;
 
+    public String debug_name = "";
+
     public int M() {
         return M;
     }
@@ -26,5 +28,16 @@ public abstract class Component {
     public abstract List<Double> supply();
 
     public abstract void consume(List<Double> inputs);
+
+    /*
+    * public final void transit(){
+        if(immediate){
+            throw new IllegalCallerException("This Component Is Not Defined As A Temporal Component, Cannot Transit");
+        }
+        transitInternal();
+    }
+
+    protected void transitInternal(){}
+    * */
 
 }

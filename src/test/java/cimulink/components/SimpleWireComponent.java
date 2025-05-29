@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 
 public class SimpleWireComponent extends Component {
 
-    protected SimpleWireComponent(int inputs, int outputs) {
+    public SimpleWireComponent(int inputs, int outputs) {
         super(true, inputs, outputs);
     }
 

@@ -15,7 +15,7 @@ public class NamedComponent {
     final List<String> inputs;
     final List<String> outputs;
 
-    NamedComponent(
+    public NamedComponent(
             Component unnamed,
             List<String> inputs,
             List<String> outputs
@@ -36,6 +36,11 @@ public class NamedComponent {
         }
     }
 
+    public NamedComponent db_withName(String name){
+        unnamed.debug_name = name;
+        return this;
+    }
+
     public List<String> inputs() {
         return inputs;
     }
@@ -50,6 +55,10 @@ public class NamedComponent {
 
     public int inputId(String name){
         return namedInputs.getOrDefault(name, -1);
+    }
+
+    public static NamedComponent combinational(Component raw){
+        return null;
     }
 
 }

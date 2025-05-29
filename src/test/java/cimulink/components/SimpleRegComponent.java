@@ -9,7 +9,7 @@ public class SimpleRegComponent extends Component {
 
 
 
-    protected SimpleRegComponent(int inputs, int outputs) {
+    public SimpleRegComponent(int inputs, int outputs) {
         super(false, inputs, outputs);
 
     }
