@@ -67,6 +67,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.joml.primitives.AABBd;
+import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -326,7 +327,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 .withDouble(pitch)
                 .withDouble(yaw)
                 .build();
-
+        setPitch(pitch);
+        setYaw(yaw);
         ControlCraftPackets.getChannel().send(PacketDistributor.ALL.noArg(), p);
     }
 
@@ -720,6 +722,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
         Quaterniond q = new Quaterniond();
         Ship ship = getShipOn();
         if(ship == null)return q;
+        if(ship instanceof ClientShip cs)return cs.getRenderTransform().getShipToWorldRotation();
         return ship.getTransform().getShipToWorldRotation();
     }
 
@@ -732,7 +735,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
             updateNeighbor();
         }
         // getOrCreateFakePlayer()._tick();
-
+        syncForOtherPlayers();
     }
 
     @Override
@@ -793,12 +796,34 @@ public class CameraBlockEntity extends OnShipBlockEntity
         ControlCraftPackets.getChannel().sendToServer(p);
     }
 
+    public void syncServerNoChunkLoading(String uuid){
+        if(level == null || !level.isClientSide)return;
+        var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
+                .withDouble(pitch)
+                .withDouble(yaw)
+                .withUtf8(uuid)
+                .build();
+        ControlCraftPackets.getChannel().sendToServer(p);
+    }
+
     @OnlyIn(Dist.CLIENT)
     public void syncServerFromClient(){
         if(level == null || !level.isClientSide)return;
         Player player = Minecraft.getInstance().player;
         if(player == null)return;
-        syncServer(player.getName().getString());
+        syncServerNoChunkLoading(player.getName().getString());
+    }
+
+    public void syncForOtherPlayers(){
+        if(level == null || !level.isClientSide)return;
+        var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
+                .withDouble(pitch)
+                .withDouble(yaw)
+                .build();
+        ControlCraftPackets.getChannel().send(
+                PacketDistributor.NEAR.noArg(),
+                p
+        );
     }
 
     public void displayScreen(ServerPlayer player){
@@ -825,9 +850,15 @@ public class CameraBlockEntity extends OnShipBlockEntity
             getOrCreateFakePlayer().activate(user);
 
         }
+
         if(packet.getType() == RegisteredPacketType.SETTING_1){
-            setActiveDistanceSensor(packet.getBooleans().get(0));
+            double p = packet.getDoubles().get(0);
+            double y = packet.getDoubles().get(1);
+            String uuid = packet.getUtf8s().get(0);
+            setPitch(p);
+            setYaw(y);
         }
+
         if(packet.getType() == RegisteredPacketType.EXTEND_0){
             ServerPlayer user = context.getSender();
             if(user == null || level == null)return;
@@ -884,7 +915,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
             double y = packet.getDoubles().get(1);
             setPitchForceClient(p);
             setYawForceClient(y);
-            syncServerFromClient();
+            // syncServerFromClient();
+        }
+        if(packet.getType() == RegisteredPacketType.SETTING_1){
+            if(isLinkedCamera())return;
+            double p = packet.getDoubles().get(0);
+            double y = packet.getDoubles().get(1);
+            setPitchForceClient(p);
+            setYawForceClient(y);
         }
 
     }

@@ -199,22 +199,22 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
         return CCUtils.parse(hitResult);
     }
 
-    @LuaFunction(mainThread = true)
+    @LuaFunction
     public final void clipNewShip(){
         getTarget().clipNewShip();
     }
 
-    @LuaFunction(mainThread = true)
+    @LuaFunction
     public final void clipNewServerPlayer(){
         getTarget().clipNewServerPlayer();
     }
 
-    @LuaFunction(mainThread = true)
+    @LuaFunction
     public final void clipNewEntity(){
         getTarget().clipNewEntity();
     }
 
-    @LuaFunction(mainThread = true)
+    @LuaFunction
     public final void clipNewEntityInView(){
         getTarget().clipNewEntityInView();
     }

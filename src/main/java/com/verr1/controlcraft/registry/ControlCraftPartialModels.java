@@ -13,6 +13,7 @@ public class ControlCraftPartialModels {
         WING_CONTROLLER_TOP = block("wing_controller_top"),
         WING_CONTROLLER_TOP_O = block("wing_controller_top_o"),
         CAMERA_LENS = block("camera_lens"),
+        CAMERA_YAW = block("camera_yaw"),
         RUDDER_PART = block("rudder"),
 
         SPATIAL_CORE = block("spatial_core"),

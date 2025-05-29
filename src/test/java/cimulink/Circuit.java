@@ -1,25 +1,54 @@
 package cimulink;
 
+import kotlin.Pair;
+import net.minecraft.core.IdMap;
+
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Circuit {
     public static final int Z_ID = -1;
+    public static final int INPUT_COMP_ID = -2;
 
-    List<Wire> wires = new ArrayList<>();
-    List<Component> components = new ArrayList<>();
+    final List<Wire> wires              ;
+    final List<Component> components    ;
 
-    List<Integer>       wire2InputComponentID = new ArrayList<>();
-    // List<List<Integer>> wire2OutputComponentIDs = new ArrayList<>();
+    final List<Integer>       wire2InputComponentID          ; // Wires Are Suppose Connected To Some Component Output Port
+       // List<List<Integer>> wire2OutputComponentIDs = new A;rrayList<>();
+                                                             ;
+    final List<List<Integer>> comp2inputWireIDs              ;
+    final List<List<Integer>> comp2outputWireIDs             ;
+                                                             ;
+    final Map<String, Integer> inputWires                    ;
+    final Map<String, Integer> outputWires                   ;
+                                                             ;
+       // List<Integer> wire2ordinal = new ArrayLi           ;
+    final List<List<Integer>> ordinal2wires                  ;
+    final List<List<Integer>> ordinal2comps                  ;
 
-    List<List<Integer>> comp2inputWireIDs = new ArrayList<>();
-    List<List<Integer>> comp2outputWireIDs = new ArrayList<>();
-
-    Map<String, Integer> inputWires = new HashMap<>();
-    Map<String, Integer> outputWires = new HashMap<>();
-
-    // List<Integer> wire2ordinal = new ArrayList<>();
-    List<List<Integer>> ordinal2wires = new ArrayList<>();
+    private Circuit(
+            List<Wire> wires,
+            List<Component> components,
+            List<Integer> wire2InputComponentID,
+            List<List<Integer>> comp2inputWireIDs,
+            List<List<Integer>> comp2outputWireIDs,
+            Map<String, Integer> inputWires,
+            Map<String, Integer> outputWires,
+            List<List<Integer>> ordinal2wires,
+            List<List<Integer>> ordinal2comps
+    ) {
+        this.wires = wires;
+        this.components = components;
+        this.wire2InputComponentID = wire2InputComponentID;
+        this.comp2inputWireIDs = comp2inputWireIDs;
+        this.comp2outputWireIDs = comp2outputWireIDs;
+        this.inputWires = inputWires;
+        this.outputWires = outputWires;
+        this.ordinal2wires = ordinal2wires;
+        this.ordinal2comps = ordinal2comps;
+    }
 
 
     public void input(String name, double value){
@@ -37,16 +66,19 @@ public class Circuit {
     }
 
     public void forward(){
-        for (List<Integer> ordinal2wire : ordinal2wires) {
-
+        for (List<Integer> comps : ordinal2comps) {
+            /*
+            // This Should Guarantee That 0 ordinal wires are output wires of any component
+            // And Is **NOT** Input Wires
             Set<Integer> comps = ordinal2wire
                     .stream()
-                    .map(wid -> wire2InputComponentID.get(wid))
+                    .map(wire2InputComponentID::get)
                     .collect(Collectors.toSet());
-
+            * */
             comps.forEach(
                     c -> {
                         List<Double> samples = comp2inputWireIDs
+            // This Will Help Comp To Find Their Inputs, Including Global Inputs
                                 .get(c)
                                 .stream()
                                 .map(wid -> wid == Z_ID ? 0 : wires.get(wid).sample)
@@ -58,6 +90,7 @@ public class Circuit {
                         List<Integer> outputWireIDs = comp2outputWireIDs.get(c);
                         for (int i = 0; i < outputs.size(); i++) {
                             int wireID = outputWireIDs.get(i);
+                            if(wireID == Z_ID)continue;
                             wires.get(wireID).sample = outputs.get(i);
                         }
 
@@ -70,28 +103,6 @@ public class Circuit {
 
 
     public void validate(){
-        /*
-        * wire2InputComponentID
-                .stream()
-                .filter(cid -> cid >= components.size() || cid < 0)
-                .findAny()
-                .ifPresent(
-                        t -> {
-                            throw new IllegalArgumentException("Invalid component ID in wire2InputComponentID: " + t);
-                        }
-                );
-
-        wire2OutputComponentIDs
-                .stream()
-                .flatMap(Collection::stream)
-                .filter(cid -> cid >= components.size() || cid < 0)
-                .findAny()
-                .ifPresent(
-                        t -> {
-                            throw new IllegalArgumentException("Invalid component ID in wire2OutputComponentID: " + t);
-                        }
-                );
-        * */
 
         comp2inputWireIDs
                 .stream()
@@ -121,13 +132,15 @@ public class Circuit {
         Map<String, NamedComponent> components = new HashMap<>();
 
         Map<ComponentPort, Set<ComponentPort>> connections = new HashMap<>();
+        Map<ComponentPort, ComponentPort> reverseConnections = new HashMap<>();
 
         Set<ComponentPort> assigned = new HashSet<>();
 
-        Map<String, ComponentPort> inputs = new HashMap<>();
+        Map<String, Set<ComponentPort>> inputs = new HashMap<>();
         Map<String, ComponentPort> outputs = new HashMap<>();
 
-        Map<ComponentPort, Integer> ordinal = new HashMap<>();
+        Map<String, Integer> ordinal = new HashMap<>(); // component2ordinal
+        int maxOrdinal = 0;
 
         public builder addComponent(String name, NamedComponent component){
             components.put(name, component);
@@ -153,6 +166,10 @@ public class Circuit {
                         $ -> new HashSet<>()
                     ).add(new ComponentPort(inputComponentName, inputComponentPortName));
 
+            reverseConnections.put(
+                    new ComponentPort(inputComponentName, inputComponentPortName),
+                    new ComponentPort(outputComponentName, outputComponentPortName)
+            );
             return this;
         }
 
@@ -196,7 +213,9 @@ public class Circuit {
 
             assign(componentName, portName);
 
-            inputs.put(name, new ComponentPort(componentName, portName));
+            inputs
+                    .computeIfAbsent(name, $ -> new HashSet<>())
+                    .add(new ComponentPort(componentName, portName));
             return this;
         }
 
@@ -212,79 +231,150 @@ public class Circuit {
         }
 
         private void computeOrdinal(){
+            Queue<String> componentQueue = new ArrayDeque<>(components.size());
+            Set<String> visited = new HashSet<>();
+            componentQueue.add("");
+            visited.add("");
+            // add zero ordinal comp to componentQueue
+            while(!componentQueue.isEmpty()){
+                String qName = componentQueue.poll();
+                int qOrdinal = ordinal.get(qName);
+                Set<String> subs = getSubComponents(qName);
 
+            }
+        }
+
+        private Set<String> getSubComponents(String componentName){
+            return components
+                    .get(componentName)
+                    .outputs()
+                    .stream()
+                    .flatMap(o -> connections
+                            .get(new ComponentPort(componentName, o))
+                            .stream()
+                            .map(cp -> cp.componentName)
+                    )
+                    .collect(Collectors.toSet());
         }
 
         public Circuit build(){
-            List<NamedComponent> circuitComponents = new ArrayList<>();
-            Map<String, Integer> component2Id = new HashMap<>();
-            for(var e : components.entrySet()){
-                NamedComponent component = e.getValue();
-                circuitComponents.add(component);
-                component2Id.put(e.getKey(), circuitComponents.size() - 1);
-            }
+            Map<String, Integer> componentName2componentId = new HashMap<>();
+            Map<ComponentPort, Integer> outputPort2wireId = new HashMap<>();
+            Map<String, Integer> outputName2wireId = new HashMap<>();
+            Map<String, Integer> inputName2wireId = new HashMap<>(); // for global input
 
-            List<Wire> wires = new ArrayList<>();
-            Map<ComponentPort, Integer> port2WireId = new HashMap<>();
+            AtomicInteger componentId = new AtomicInteger(0);
+            components.keySet().forEach(k -> componentName2componentId.put(k, componentId.getAndIncrement()));
+            AtomicInteger wireId = new AtomicInteger(0);
+            inputs.keySet().forEach(p -> inputName2wireId.put(p, wireId.getAndIncrement()));
+            outputs.keySet().forEach(p -> outputName2wireId.put(p, wireId.getAndIncrement()));
+            connections
+                    .keySet()
+                    .forEach(k -> outputPort2wireId.put(k, wireId.getAndIncrement()));
 
-            for (var e: connections.entrySet()){
-                ComponentPort outputPort = e.getKey();
-                // Create a wire for this connection
-                wires.add(new Wire());
-                // Map the ports to the wire ID
-                port2WireId.put(outputPort, wires.size() - 1);
-            }
+            outputs.forEach((k, v) -> outputPort2wireId.put(v, Objects.requireNonNull(outputName2wireId.get(k))));
 
+            Map<ComponentPort, Integer> inputPort2wireId = new HashMap<>();
+            inputs
+                    .entrySet()
+                    .stream()
+                    .flatMap(e -> e.getValue().stream().map(v -> new Pair<>(e.getKey(), v)))
+                    .forEach(kv -> inputPort2wireId.put(kv.getSecond(), Objects.requireNonNull(inputName2wireId.get(kv.getFirst()))));
 
-            List<Integer>       wire2InputComponentID = new ArrayList<>();
-
-
-            List<List<Integer>> comp2inputWireIDs = new ArrayList<>();
-            List<List<Integer>> comp2outputWireIDs = new ArrayList<>();
-
-            Map<String, Integer> inputWires = new HashMap<>();
-            Map<String, Integer> outputWires = new HashMap<>();
-
-            for (int i = 0; i < wires.size(); i++) {
-                wire2InputComponentID.add(Z_ID);
-            }
-
-            for (int i = 0; i < circuitComponents.size(); i++) {
-                comp2inputWireIDs.add(new ArrayList<>());
-                comp2outputWireIDs.add(new ArrayList<>());
-            }
-
-            for (var e: connections.entrySet()){
-                ComponentPort outputPort = e.getKey();
+            connections
+                    .entrySet()
+                    .stream()
+                    .flatMap(e -> e.getValue().stream().map(v -> new Pair<>(e.getKey(), v)))
+                    .forEach(kv -> inputPort2wireId.put(kv.getSecond(), Objects.requireNonNull(outputPort2wireId.get(kv.getFirst()))));
 
 
-                int wireId = port2WireId.get(outputPort);
-                int outputId = component2Id.get(outputPort.componentName);
-                wire2InputComponentID.set(wireId, outputId);
-            }
-
+            Map<Integer, List<Integer>> compId2inputWireIds = new HashMap<>();
+            Map<Integer, List<Integer>> compId2outputWireIds = new HashMap<>();
             for(var e: components.entrySet()){
-                int componentId = component2Id.get(e.getKey());
-                NamedComponent component = circuitComponents.get(componentId);
-                component.namedOutputs.entrySet().forEach(
-                        oe -> {
-                            String portName = oe.getKey();
-                            int outputPortIndex = oe.getValue();
-                            /*
-                            ComponentPort port = new ComponentPort(e.getKey(), outputPort);
-                            Set<ComponentPort> connectedPorts = connections.get(port);
-                            if (connectedPorts != null) {
+                NamedComponent comp = e.getValue();
+                String name = e.getKey();
 
-                            }
-                            * */
+                List<Integer> inputIndex2wireId = comp
+                        .inputs()
+                        .stream()
+                        .map(i -> new ComponentPort(name, i))
+                        .map(cp -> inputPort2wireId.getOrDefault(cp, Z_ID))
+                        .toList();
 
-                        }
-                );
+                List<Integer> outputIndex2wireId = comp
+                        .outputs()
+                        .stream()
+                        .map(i -> new ComponentPort(name, i))
+                        .map(cp -> outputPort2wireId.getOrDefault(cp, Z_ID))
+                        .toList();
 
-
+                compId2outputWireIds.put(componentName2componentId.get(name), outputIndex2wireId);
+                compId2inputWireIds.put(componentName2componentId.get(name), inputIndex2wireId);
             }
 
-            return null;
+            Map<Integer, ComponentPort> wireId2outputPort = new HashMap<>();
+            outputPort2wireId.forEach((k, v) -> wireId2outputPort.put(v, k));
+
+            Map<Integer, String> componentId2componentName = new HashMap<>();
+            componentName2componentId.forEach((k, v) -> componentId2componentName.put(v, k));
+
+
+            Map<Integer, Set<Integer>> ordinal2compId = new HashMap<>();
+
+            ordinal.forEach(
+                    (componentName, ordinal) -> ordinal2compId
+                                .computeIfAbsent(ordinal, $ -> new HashSet<>())
+                                .add(componentName2componentId.get(componentName))
+            );
+
+            List<Integer> wire2InputComponentID = IntStream
+                    .range(0, wireId.get())
+                    .map(i -> Optional
+                            // may be connected to global input port
+                                .ofNullable(wireId2outputPort.get(i))
+                                .map(p -> p.componentName)
+                                .map(componentName2componentId::get)
+                                .orElse(INPUT_COMP_ID)
+                    )
+                    .boxed()
+                    .toList();
+
+            List<List<Integer>> comp2inputWireIDs = IntStream
+                    .range(0, components.size())
+                    .mapToObj(compId2inputWireIds::get)
+                    .toList();
+
+            List<List<Integer>> comp2outputWireIDs = IntStream
+                    .range(0, components.size())
+                    .mapToObj(compId2outputWireIds::get)
+                    .toList();
+
+            List<Wire> wires = IntStream
+                    .range(0, wireId.get())
+                    .mapToObj($ -> new Wire())
+                    .toList();
+
+            List<Component> comps = IntStream
+                    .range(0, componentId.get())
+                    .mapToObj(i -> components.get(componentId2componentName.get(i)).unnamed)
+                    .toList();
+
+            List<List<Integer>> ordinal2comps = IntStream
+                    .range(0, maxOrdinal)
+                    .mapToObj(o -> ordinal2compId.get(o).stream().toList())
+                    .toList();
+
+            return new Circuit(
+                    wires,
+                    comps,
+                    wire2InputComponentID,
+                    comp2inputWireIDs,
+                    comp2outputWireIDs,
+                    inputName2wireId,
+                    outputName2wireId,
+                    List.of(),
+                    ordinal2comps
+            );
         }
 
         record ComponentPort(String componentName, String portName){

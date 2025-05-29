@@ -87,9 +87,18 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
 
     public synchronized MethodResult callPeripheralAsync(IComputerAccess access, ILuaContext context, String slot, String methodName, IArguments args){
         if(level == null || level.isClientSide)return MethodResult.of(null, "You Are Calling This On The Client Side, Nothing Returned");
-        if(attachedPeripheral == null) return MethodResult.of(null, "Receiver Called, But No Peripheral Attached");
-        if(!methods.containsKey(methodName))return MethodResult.of(null, "Receiver Called, But Method Not Found");
-        if(access == null)return MethodResult.of(null, "Receiver Called, But No Access Provided");
+        if(attachedPeripheral == null){
+            ControlCraft.LOGGER.error("Async Peripheral h:{}, v:{} Called, But No Peripheral Attached", holdKey, valid());
+            return MethodResult.of(null, "Receiver Called, But No Peripheral Attached");
+        }
+        if(!methods.containsKey(methodName)){
+            ControlCraft.LOGGER.error("Async Peripheral Called, But Method {} Not Found", methodName);
+            return MethodResult.of(null, "Receiver Called, But Method Not Found");
+        }
+        if(access == null){
+            ControlCraft.LOGGER.error("Async Peripheral Called, But No Access Provided");
+            return MethodResult.of(null, "Receiver Called, But No Access Provided");
+        }
         // attachedPeripheral may be set to null after the task being queued
         final IPeripheral snapshot = attachedPeripheral;
         enqueueTask(slot, ()->{
