@@ -59,11 +59,12 @@ public class Circuit {
     }
 
 
-    public void input(String name, double value){
+    public Circuit input(String name, double value){
         if(!inputWires.containsKey(name)){
             throw new IllegalArgumentException("Circuit Does Not Contain Input Wire: " + name);
         }
         wires.get(inputWires.get(name)).sample = value;
+        return this;
     }
 
     public double output(String name){
@@ -73,7 +74,7 @@ public class Circuit {
         return wires.get(outputWires.get(name)).sample;
     }
 
-    public void forward(){
+    public Circuit forward(){
         temporalComponent.forEach(cid -> {
             Component comp = components.get(cid);
             List<Double> output = comp.supply();
@@ -116,6 +117,8 @@ public class Circuit {
                     }
             );
         }
+
+        return this;
     }
 
 
@@ -198,7 +201,7 @@ public class Circuit {
             }
             NamedComponent component = components.get(componentName);
             if (!component.namedOutputs.containsKey(portName)) {
-                throw new IllegalArgumentException("Output Port not found: " + portName + " in component " + componentName);
+                throw new IllegalArgumentException("Output Port not found: " + portName + " in component " + componentName + " valid names: " + component.outputs);
             }
         }
 
@@ -208,7 +211,7 @@ public class Circuit {
             }
             NamedComponent component = components.get(componentName);
             if (!component.namedInputs.containsKey(portName)) {
-                throw new IllegalArgumentException("Input Port not found: " + portName + " in component " + componentName);
+                throw new IllegalArgumentException("Input Port not found: " + portName + " in component " + componentName + " valid names: " + component.inputs());
             }
         }
 

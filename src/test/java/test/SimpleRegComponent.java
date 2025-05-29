@@ -1,4 +1,4 @@
-package cimulink.components;
+package test;
 
 import cimulink.Component;
 

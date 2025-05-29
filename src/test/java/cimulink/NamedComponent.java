@@ -41,6 +41,10 @@ public class NamedComponent {
         return this;
     }
 
+    public String db_name(){
+        return unnamed.debug_name;
+    }
+
     public List<String> inputs() {
         return inputs;
     }

@@ -1,13 +1,11 @@
 package cimulink.factory.preset;
 
-import com.verr1.controlcraft.utils.MathUtils;
+import cimulink.factory.basic.Component11;
 import kotlin.Pair;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Function;
 
-public class Schmitt extends Component11<Schmitt.SchmittState>{
+public class Schmitt extends Component11<Schmitt.SchmittState> {
 
 
 

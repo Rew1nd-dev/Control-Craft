@@ -1,10 +1,8 @@
-package cimulink.components;
+package test;
 
 import cimulink.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SimpleWireComponent extends Component {

@@ -1,18 +1,18 @@
-package cimulink.factory.preset;
+package cimulink.factory.basic;
 
 import cimulink.Component;
 import cimulink.NamedComponent;
+import cimulink.components.CombinationalComponent;
+import cimulink.components.TemporalComponent;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 public class ComponentNM<S> extends NamedComponent {
 
-    ComponentNM(
+    public ComponentNM(
             List<String> inputs,
             List<String> outputs,
             Function<Pair<@NotNull List<Double>, @NotNull S>, Pair<@NotNull List<Double>, @NotNull S>> transition,
@@ -21,13 +21,14 @@ public class ComponentNM<S> extends NamedComponent {
         super(temporal(inputs.size(), outputs.size(), transition, defaultState), inputs, outputs);
     }
 
-    ComponentNM(
+    public ComponentNM(
             List<String> inputs,
             List<String> outputs,
             Function<List<Double>, List<Double>> transform
     ) {
-        super(combinational(inputs.size(), outputs.size(), transform), List.of("a", "b"), List.of("o"));
+        super(combinational(inputs.size(), outputs.size(), transform), inputs, outputs);
     }
+
 
 
 
@@ -36,7 +37,24 @@ public class ComponentNM<S> extends NamedComponent {
             int M,
             Function<List<Double>, List<Double>> transform
     ){
-        return new Component(false, N, M) {
+        return new CombinationalComponent(N, M, transform);
+    }
+
+    private static<T> Component temporal(
+            int N,
+            int M,
+            Function<
+                    Pair<@NotNull List<Double>, @NotNull T>,
+                    Pair<@NotNull List<Double>, @NotNull T>
+            > transition,
+            T defaultState
+    ){
+        return new TemporalComponent<T>(N, M, transition, defaultState);
+    }
+
+    /*
+
+    new Component(false, N, M) {
             private final List<Double> cachedOutput = new ArrayList<>(M);
             private final List<Double> view = Collections.unmodifiableList(cachedOutput);
 
@@ -55,18 +73,7 @@ public class ComponentNM<S> extends NamedComponent {
 
             }
         };
-    }
-
-    private static<T> Component temporal(
-            int N,
-            int M,
-            Function<
-                    Pair<@NotNull List<Double>, @NotNull T>,
-                    Pair<@NotNull List<Double>, @NotNull T>
-            > transition,
-            T defaultState
-    ){
-        return new Component(false, N, M) {
+    * Component(false, N, M) {
             private T state = defaultState;
             private final List<Double> cachedOutput = new ArrayList<>(M);
             private final List<Double> view = Collections.unmodifiableList(cachedOutput);
@@ -87,5 +94,5 @@ public class ComponentNM<S> extends NamedComponent {
                 state = o.getSecond();
             }
         };
-    }
+    * */
 }
