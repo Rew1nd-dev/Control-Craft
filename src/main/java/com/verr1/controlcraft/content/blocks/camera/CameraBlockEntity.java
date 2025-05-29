@@ -373,6 +373,21 @@ public class CameraBlockEntity extends OnShipBlockEntity
         );
     }
 
+    private @NotNull ClipContext clipContextShip(){
+        if(level == null)return EMPTY;
+        Vector3dc camPos_wc = getCameraPositionShip(); // VSGetterUtils.getAbsolutePosition(WorldBlockPos.of(level, worldPosition));
+        Vector3dc camFront_wc = getLocViewForward();
+        Vector3dc camStart_wc = camPos_wc.add(camFront_wc, new Vector3d());
+        Vector3dc camTo_wc = camStart_wc.fma(clipRange, camFront_wc, new Vector3d());
+        return new ClipContext(
+                ValkyrienSkies.toMinecraft(camStart_wc),
+                ValkyrienSkies.toMinecraft(camTo_wc),
+                ClipContext.Block.OUTLINE,
+                ClipContext.Fluid.NONE,
+                null
+        );
+    }
+
 
     private @NotNull AABB clipAABB(){
         if(level == null)return AABB.of(BoundingBox.fromCorners(new Vec3i(0, 0, 0), new Vec3i(0, 0, 0)));
@@ -622,7 +637,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     * */
         Matrix4dc w2c = Optional
                 .ofNullable(getClientShip())
-                .map(Ship::getTransform)
+                .map(ClientShip::getRenderTransform)
                 .map(ShipTransform::getWorldToShip)
                 .orElse(new Matrix4d());
 
@@ -636,6 +651,24 @@ public class CameraBlockEntity extends OnShipBlockEntity
                         "camera_clip_ray_" + getBlockPos().asLong(),
                         convert.apply(clipContext.getFrom()).add(toMinecraft(offset)),
                         convert.apply(clipContext.getTo())
+                )
+                .colored(Color.SPRING_GREEN.setAlpha(0.6f))
+                .lineWidth(0.3f);
+
+
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void outlineClipRayShip(){
+        ClipContext clipContext = clipContextShip();
+        Vector3d offset = isLinkedCamera() ? new Vector3d(0, -0.5, 0) : new Vector3d(0, 0, 0);
+
+
+
+        ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(
+                        "camera_clip_ray_" + getBlockPos().asLong(),
+                        clipContext.getFrom().add(toMinecraft(offset)),
+                        clipContext.getTo()
                 )
                 .colored(Color.SPRING_GREEN.setAlpha(0.6f))
                 .lineWidth(0.3f);
@@ -755,7 +788,9 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 rayType() == CameraClipType.RAY_ALWAYS
                         ||
                 rayType() == CameraClipType.RAY_ON_USE && isLinkedCamera()
-        )outlineClipRay();
+        ){
+            outlineClipRayShip();
+        }
 
         if(shipType() == CameraClipType.SHIP_CLIP_ON && isLinkedCamera())outlineShipClip();
 

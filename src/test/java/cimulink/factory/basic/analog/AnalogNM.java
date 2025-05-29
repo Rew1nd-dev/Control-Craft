@@ -1,4 +1,4 @@
-package cimulink.factory.basic;
+package cimulink.factory.basic.analog;
 
 import cimulink.Component;
 import cimulink.NamedComponent;
@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Function;
 
-public class ComponentNM<S> extends NamedComponent {
+public class AnalogNM<S> extends NamedComponent {
 
-    public ComponentNM(
+    public AnalogNM(
             List<String> inputs,
             List<String> outputs,
             Function<Pair<@NotNull List<Double>, @NotNull S>, Pair<@NotNull List<Double>, @NotNull S>> transition,
@@ -21,7 +21,7 @@ public class ComponentNM<S> extends NamedComponent {
         super(temporal(inputs.size(), outputs.size(), transition, defaultState), inputs, outputs);
     }
 
-    public ComponentNM(
+    public AnalogNM(
             List<String> inputs,
             List<String> outputs,
             Function<List<Double>, List<Double>> transform

@@ -3,34 +3,35 @@
   "icon": "vscontrolcraft:camera",
   "category": "vscontrolcraft:abstract",
   "pages": [
+
     {
       "type": "patchouli:spotlight",
       "item": "vscontrolcraft:camera",
       "title": "Camera",
-      "text": "Overview $(br2)Automated target-marking camera with remote connectivity and advanced ray detection.$(br2)Shift + Right Click to open the panel. Right Click to activate. Press Space to exit camera view.$(br)Use a Camera Connector to name and remotely link cameras."
+      "text": "Introduction $(br2)A camera that automatically marks targets. Can be remotely connected and features rich ray detection capabilities.$(br2)Use Shift + right-click to open the panel; right-click directly uses the camera. Press Spacebar to exit the camera view.$(br)Use the Camera Connector to name multiple cameras and connect to them remotely."
     },
     {
       "type": "patchouli:image",
-      "title": "Main Panel",
+      "title": "Camera Main Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/camera/panel_main.png"],
       "text": ""
     },
     {
       "type": "patchouli:text",
-      "text": "Main Panel $(br2)$(li)Is_Sensor: Enables distance detection. When active, outputs redstone signals based on block distance.$(li)Cast Ray:$(li2)Never: No ray rendering.$(li2)Always: Always render rays (visible to all).$(li2)On Use: Render only during use (visible to user)."
+      "text": "Main Panel $(li)Is_Sensor: Sets whether it acts as a distance detector. If enabled, it detects the distance of the block in front and outputs the corresponding Redstone signal.$(li)Cast Ray:$(li2)Never: Never renders the ray.$(li2)Always: Always renders the ray, visible to all players.$(li2)On Use: Renders the ray only during use, visible only to the user."
     },
     {
       "type": "patchouli:text",
-      "text": "Main Panel $(br2)$(li)ShipOutline:$(li2)ON: Highlights physics structures.$(li2)OFF: Disables highlighting.$(li)Entity Outline:$(li2)OFF: Disable.$(li2)Target Only: Highlight centered entities.$(li2)IN View: Highlight all entities in view.$(li2)NEAREST: Highlight nearest entity."
+      "text": "Main Panel $(li)Ship Outline:$(li2)ON: Highlights ship structures when looking at them.$(li2)OFF: Does not highlight ship structures.$(li)Entity Outline:$(li2)OFF: Disabled.$(li2)Target Only: Highlights only the entity directly in the center of the view.$(li2)IN View: Highlights all entities within a certain range in the field of view.$(li2)NEAREST: Highlights the nearest entity within a certain range in the field of view."
     },
     {
       "type": "patchouli:image",
-      "title": "Redstone Panel",
+      "title": "Camera Redstone Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/camera/panel_redstone.png"]
     },
     {
       "type": "patchouli:text",
-      "text": "Redstone Panel $(br2)Input options:$(li)Is_Sensor: When enabled:$(li2)If min < max, signal increases with distance (0 at min, 15 at max).$(li2)If min > max, signal decreases with distance."
+      "text": "Redstone Panel $(br2) In the Redstone panel, the following can act as Redstone inputs:$(li)Is_Sensor: Toggles whether it acts as a distance detector. When enabled:$(li2)If min < max, the signal strength increases as distance increases: Outputs Redstone signal 0 when distance ≤ min, outputs 15 when distance ≥ max. Linear interpolation applies between these values.$(li2)If min > max, the opposite occurs: signal strength increases as distance decreases."
     },
     {
       "type": "patchouli:image",
@@ -42,7 +43,19 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Connector Panel $(br2)Right-click a camera with the connector to name it. Click X to cancel.$(br2)In the management panel:$(li)Box Button: Remotely connect (camera must be in loaded chunks).$(li)Trash Button: Delete all saved cameras.$(li)Refresh Button: Remove cameras in unloaded chunks.$(li)X Button: Delete selected camera."
+      "text": "Connector Panel $(br2) Right-clicking a camera with the connector opens the naming panel. Enter a name and close the panel to save; click the X button to cancel.$(br2)In the management panel, clicking the square button will remotely connect to that camera. Note: The camera must be in a chunk loaded by the client."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Buttons in the panel:$(li)Trash Can Button: Discards all saved cameras.$(li)Refresh Button: Removes all cameras located in chunks not loaded by the client.$(li)X Button: Deletes the corresponding camera."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Cameras can now be remotely connected regardless of distance. If the chunk is not loaded by the client, the server will send surrounding chunks to the client. While in the camera view, players can observe block updates and entity movements within its chunk. It also works on ship structures, but with caveats:$(li)Ship structures cannot travel too far and unload on the client (must not exceed ShipUnloadDistance in VS Config), as this may cause crashes."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)If chunk voids appear near the player after exiting the camera view, moving away until they are out of sight and returning should reload them. This should not occur under normal circumstances.$(li)Compatibility issues may arise with some mods."
     }
   ]
 }

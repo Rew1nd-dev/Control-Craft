@@ -1,23 +1,19 @@
-package cimulink.factory.preset;
+package cimulink.factory.preset.analog;
 
-import cimulink.factory.basic.Component11;
-import cimulink.factory.basic.ComponentNM;
+import cimulink.factory.basic.analog.AnalogNM;
+import cimulink.utils.ArrayUtils;
 import kotlin.Pair;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 
-public class ShifterNM extends ComponentNM<ShifterNM.RegisterNM> {
-    public static final String OUTPUT_PREFIX = "o_";
-    public static final String INPUT_PREFIX = "i_";
-
+public class ShifterNM extends AnalogNM<ShifterNM.RegisterNM> {
 
     // N For Delay, M for Parallel Size
     public ShifterNM(int N, int M) {
         super(
-                createInputNames(M),
-                createOutputNames(M),
+                ArrayUtils.createInputNames(M),
+                ArrayUtils.createOutputNames(M),
                 ShifterNM::transit,
                 new RegisterNM(N, M)
         );
@@ -26,40 +22,28 @@ public class ShifterNM extends ComponentNM<ShifterNM.RegisterNM> {
     public static Pair<List<Double>, RegisterNM> transit(Pair<List<Double>, RegisterNM> in){
         List<Double> vals = in.getFirst();
         RegisterNM reg = in.getSecond();
-        List<Double> out = reg.values();
         reg.shift(vals);
+        List<Double> out = reg.values();
         return new Pair<>(out, reg);
     }
 
-    public static String __in(int index){
-        return INPUT_PREFIX + index;
-    }
+
 
     public String in(int index){
         if(index < 0 || index >= inputs().size()){
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for inputs.");
         }
-        return __in(index);
-    }
-
-    public static String __out(int index){
-        return OUTPUT_PREFIX + index;
+        return ArrayUtils.__in(index);
     }
 
     public String out(int index){
         if(index < 0 || index >= outputs().size()){
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for outputs.");
         }
-        return __out(index);
+        return ArrayUtils.__out(index);
     }
 
-    public static List<String> createInputNames(int n){
-        return IntStream.range(0, n).mapToObj(ShifterNM::__in).toList();
-    }
 
-    public static List<String> createOutputNames(int n){
-        return IntStream.range(0, n).mapToObj(ShifterNM::__out).toList();
-    }
 
     public static class RegisterNM {
 
@@ -72,8 +56,8 @@ public class ShifterNM extends ComponentNM<ShifterNM.RegisterNM> {
             M = m;
 
             for(int i = 0; i < M; i++){
-                var dq = new ArrayDeque<Double>(n);
-                while (dq.size() < N)dq.add(0.0);
+                var dq = new ArrayDeque<Double>(N + 2);
+                while (dq.size() <= N)dq.add(0.0);
                 storage.add(dq);
             }
 
@@ -88,7 +72,7 @@ public class ShifterNM extends ComponentNM<ShifterNM.RegisterNM> {
 
             for (int i = 0; i < M; i++) {
                 Queue<Double> queue = storage.get(i);
-                queue.poll(); // Remove the oldest value
+                queue.poll();// Remove the oldest value
                 queue.add(values.get(i)); // Add the new value
             }
         }

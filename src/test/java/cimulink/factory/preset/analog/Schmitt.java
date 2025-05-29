@@ -1,11 +1,11 @@
-package cimulink.factory.preset;
+package cimulink.factory.preset.analog;
 
-import cimulink.factory.basic.Component11;
+import cimulink.factory.basic.analog.Analog11;
 import kotlin.Pair;
 
 import java.util.List;
 
-public class Schmitt extends Component11<Schmitt.SchmittState> {
+public class Schmitt extends Analog11<Schmitt.SchmittState> {
 
 
 
@@ -16,8 +16,8 @@ public class Schmitt extends Component11<Schmitt.SchmittState> {
         );
     }
 
-    private static Pair<List<Double>, SchmittState> transit(Pair<List<Double>, SchmittState> in){
-        double raw = in.getFirst().get(0);
+    private static Pair<Double, SchmittState> transit(Pair<Double, SchmittState> in){
+        double raw = in.getFirst();
         SchmittState state = in.getSecond();
 
         double up = state.upValue();
@@ -33,7 +33,7 @@ public class Schmitt extends Component11<Schmitt.SchmittState> {
                 :
                 raw > up;
 
-        return new Pair<>(List.of(out), new SchmittState(next_up, up, down));
+        return new Pair<>(out, new SchmittState(next_up, up, down));
     }
 
 

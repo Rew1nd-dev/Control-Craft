@@ -1,23 +1,32 @@
 {
-  "name": "Remote Peripheral Connection",
+  "name": "Remote CC Peripheral Connection",
   "icon": "vscontrolcraft:transmitter",
   "category": "vscontrolcraft:abstract",
   "pages": [
+
     {
       "type": "patchouli:spotlight",
       "item": "vscontrolcraft:transmitter,vscontrolcraft:receiver",
-      "title": "Remote CC Peripheral",
-      "text": "Overview $(br2)Links CC peripherals to control machines wirelessly via named channels."
+      "title": "Peripheral Proxy",
+      "text": "Introduction $(br2)Using transmitters and receivers with assigned names allows CC computers to remotely connect and control ship-block CC peripherals."
     },
     {
       "type": "patchouli:image",
       "title": "Receiver Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/trx/receiver.png"],
-      "text": "Example: Attached to a Servo Motor."
+      "text": "Example shown attached to a servo motor"
     },
     {
       "type": "patchouli:text",
-      "text": "$(li)Transmitter: Attach to CC computer.$(li)Receiver: Attach to machine.$(br2)Panel:$(li2)Type: Peripheral type.$(li2)Protocol: Channel.$(li2)Name: Unique identifier (≠ \"null\")."
+      "text": "$(li)Transmitter: Place on a CC computer $(li)Receiver: Place on a ship control block. In the receiver panel:$(li2)Type shows the current peripheral type$(li2)Protocol indicates the current channel$(li2)Name is the assigned name for this peripheral under the channel $(br2)Note: The top two lines show the currently registered channel and name, while the bottom section shows the channel and name stored in the block. Peripheral receivers must have unique names within the same channel and cannot be \"null\". A registered name of \"null\" indicates unregistered status or registration failure (name already taken in the channel)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Force Occupancy: When enabled, the receiver checks registration status every 0.5s. If the actual channel/name differs from the stored values, it will attempt registration. If another peripheral uses the same channel/name, it will override that peripheral's registration. If multiple peripheral agents force-register the same channel/name, you'll observe flickering registration status as they compete to override each other."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "If a peripheral agent with Force Occupancy enabled becomes inaccessible (e.g., on a ship that was deleted) making the channel/name unusable, use the /controlcraft free-key <Protocol> <Name> command to release that channel/name."
     }
   ]
 }

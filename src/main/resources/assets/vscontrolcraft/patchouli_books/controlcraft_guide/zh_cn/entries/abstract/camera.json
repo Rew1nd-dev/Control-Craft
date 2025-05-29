@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "vscontrolcraft:camera",
-      "title": "襟翼轴承",
+      "title": "摄像头",
       "text": "简介 $(br2)自动标记目标的摄像头，可以远程连接，具有丰富的射线检测功能$(br2)使用shift+右键打开面板，右键则是直接使用摄像头，在摄像头视角按空格脱离$(br)使用摄像头连接器可以命名多个摄像头并远程连接"
     },
     {

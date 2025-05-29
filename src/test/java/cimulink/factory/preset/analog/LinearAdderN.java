@@ -1,40 +1,30 @@
-package cimulink.factory.preset;
+package cimulink.factory.preset.analog;
 
-import cimulink.factory.basic.ComponentNM;
+import cimulink.factory.basic.analog.AnalogNM;
+import cimulink.utils.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
-public class LinearAdderN extends ComponentNM<Void> {
-    public static final String OUTPUT_O = "o";
-    public static final String INPUT_PREFIX = "i_";
+public class LinearAdderN extends AnalogNM<Void> {
 
     public LinearAdderN(List<Double> coefficients) {
         super(
-                createInputNames(coefficients.size()),
-                List.of(OUTPUT_O),
+                ArrayUtils.createInputNames(coefficients.size()),
+                List.of(ArrayUtils.OUTPUT_O),
                 in -> fma(new ArrayList<>(coefficients), in) // immutable
         );
-    }
-
-    public static String __in(int index){
-        return INPUT_PREFIX + index;
     }
 
     public String in(int index){
         if(index < 0 || index >= inputs().size()){
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for inputs.");
         }
-        return __in(index);
+        return ArrayUtils.__in(index);
     }
 
     public String out(){
-        return __o();
-    }
-
-    public static String __o() {
-        return OUTPUT_O;
+        return ArrayUtils.__o();
     }
 
     private static List<Double> fma(List<Double> coefficients, List<Double> inputs){
@@ -46,11 +36,6 @@ public class LinearAdderN extends ComponentNM<Void> {
             result += coefficients.get(i) * inputs.get(i);
         }
         return List.of(result);
-    }
-
-
-    public static List<String> createInputNames(int n){
-        return IntStream.range(0, n).mapToObj(LinearAdderN::__in).toList();
     }
 
 

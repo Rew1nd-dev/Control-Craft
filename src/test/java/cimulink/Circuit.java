@@ -75,8 +75,16 @@ public class Circuit {
     }
 
     public Circuit forward(){
+        /*
         temporalComponent.forEach(cid -> {
             Component comp = components.get(cid);
+            List<Double> samples = comp2inputWireIDs
+                    // This Will Help Comp To Find Their Inputs, Including Global Inputs
+                    .get(cid)
+                    .stream()
+                    .map(wid -> wid == Z_ID ? 0 : wires.get(wid).sample)
+                    .toList();
+            comp.consume(samples);
             List<Double> output = comp.supply();
             for(int i = 0; i < output.size(); i++){
                 int wid = comp2outputWireIDs.get(cid).get(i);
@@ -84,15 +92,11 @@ public class Circuit {
                 wires.get(wid).sample = output.get(i);
             }
         });
+        if (!comp.immediate){
+            return;
+        }
+        * */
         for (List<Integer> comps : ordinal2comps) {
-            /*
-            // This Should Guarantee That 0 ordinal wires are output wires of any component
-            // And Is **NOT** Input Wires
-            Set<Integer> comps = ordinal2wire
-                    .stream()
-                    .map(wire2InputComponentID::get)
-                    .collect(Collectors.toSet());
-            * */
             comps.forEach(
                     c -> {
                         List<Double> samples = comp2inputWireIDs
@@ -102,10 +106,8 @@ public class Circuit {
                                 .map(wid -> wid == Z_ID ? 0 : wires.get(wid).sample)
                                 .toList();
                         Component comp = components.get(c);
+
                         comp.consume(samples);
-                        if (!comp.immediate){
-                            return;
-                        }
                         List<Double> outputs = comp.supply();
                         List<Integer> outputWireIDs = comp2outputWireIDs.get(c);
                         for (int i = 0; i < outputs.size(); i++) {
