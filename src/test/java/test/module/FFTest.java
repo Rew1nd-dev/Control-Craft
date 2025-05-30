@@ -1,10 +1,10 @@
 package test.module;
 
-import cimulink.Circuit;
-import cimulink.factory.basic.digital.DigitalNM;
-import cimulink.factory.preset.analog.ShifterNM;
-import cimulink.factory.preset.digital.ff.DFlipFlop;
-import cimulink.factory.preset.digital.ff.TFlipFlop;
+import cimulink.v1.Circuit;
+import cimulink.v1.factory.basic.digital.DigitalNM;
+import cimulink.v1.factory.preset.analog.ShifterNM;
+import cimulink.v1.factory.preset.digital.ff.DFlipFlop;
+import cimulink.v1.factory.preset.digital.ff.TFlipFlop;
 
 import java.util.List;
 

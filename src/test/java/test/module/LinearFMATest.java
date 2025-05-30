@@ -1,8 +1,8 @@
 package test.module;
 
-import cimulink.Circuit;
-import cimulink.factory.NamedComponentFactory;
-import cimulink.factory.preset.analog.LinearAdderN;
+import cimulink.v1.Circuit;
+import cimulink.v1.factory.NamedComponentFactory;
+import cimulink.v1.factory.preset.analog.LinearAdderN;
 
 import java.util.List;
 
