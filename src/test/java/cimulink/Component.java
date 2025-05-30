@@ -29,15 +29,7 @@ public abstract class Component {
 
     public abstract void consume(List<Double> inputs);
 
-    /*
-    * public final void transit(){
-        if(immediate){
-            throw new IllegalCallerException("This Component Is Not Defined As A Temporal Component, Cannot Transit");
-        }
-        transitInternal();
-    }
+    public abstract void transit();
 
-    protected void transitInternal(){}
-    * */
 
 }

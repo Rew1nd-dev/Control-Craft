@@ -2,12 +2,13 @@ package cimulink;
 
 import cimulink.utils.GraphUtils;
 import kotlin.Pair;
-import net.minecraft.core.IdMap;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 
 public class Circuit {
     public static final int Z_ID = -1;
@@ -17,19 +18,33 @@ public class Circuit {
     final List<Component> components    ;
 
     final List<Integer>       wire2InputComponentID          ; // Wires Are Suppose Connected To Some Component Output Port
-       // List<List<Integer>> wire2OutputComponentIDs = new A;rrayList<>();
+
                                                              ;
     final List<List<Integer>> comp2inputWireIDs              ;
     final List<List<Integer>> comp2outputWireIDs             ;
                                                              ;
     final Map<String, Integer> inputWires                    ;
     final Map<String, Integer> outputWires                   ;
-                                                             ;
-       // List<Integer> wire2ordinal = new ArrayLi           ;
-    final List<List<Integer>> ordinal2wires                  ;
+
+
+
+    final List<String> inputs;
+    final List<String> outputs;
+
+    /** Contract:
+     * <p>
+     *      1.  Assuming All Temporal Components Sample At Positive Edges
+     * <p>
+     *          --> Temporal Components not here
+     * <p>
+     *
+     * <p>
+     *     Because: Circuit forward() stops at temporal component input wires
+     *
+    * */
     final List<List<Integer>> ordinal2comps                  ;
 
-    final List<Integer> temporalComponent;
+    final List<Integer> temporalComponents;
 
     private Circuit(
             List<Wire> wires,
@@ -39,7 +54,7 @@ public class Circuit {
             List<List<Integer>> comp2outputWireIDs,
             Map<String, Integer> inputWires,
             Map<String, Integer> outputWires,
-            List<List<Integer>> ordinal2wires,
+            List<Integer> temporalComponents,
             List<List<Integer>> ordinal2comps
     ) {
         this.wires = wires;
@@ -49,13 +64,21 @@ public class Circuit {
         this.comp2outputWireIDs = comp2outputWireIDs;
         this.inputWires = inputWires;
         this.outputWires = outputWires;
-        this.ordinal2wires = ordinal2wires;
+        // this.ordinal2wires = ordinal2wires;
         this.ordinal2comps = ordinal2comps;
-        this.temporalComponent = IntStream
-                                    .range(0, components.size())
-                                    .filter(i -> !components.get(i).immediate)
-                                    .boxed()
-                                    .toList();
+
+        this.temporalComponents = temporalComponents;
+        this.inputs = inputWires.keySet().stream().sorted().toList();
+        this.outputs = outputWires.keySet().stream().sorted().toList();
+
+
+    }
+
+    public boolean anyTemporalOutput(){
+        return temporalComponents
+                    .stream()
+                    .flatMap(tci -> comp2outputWireIDs.get(tci).stream())
+                    .anyMatch(outputWires::containsValue);
     }
 
 
@@ -74,53 +97,89 @@ public class Circuit {
         return wires.get(outputWires.get(name)).sample;
     }
 
+    public List<String> inputs() {
+        return inputs;
+    }
+
+    public List<String> outputs() {
+        return outputs;
+    }
+
+
     public Circuit forward(){
-        /*
-        temporalComponent.forEach(cid -> {
-            Component comp = components.get(cid);
-            List<Double> samples = comp2inputWireIDs
-                    // This Will Help Comp To Find Their Inputs, Including Global Inputs
-                    .get(cid)
-                    .stream()
-                    .map(wid -> wid == Z_ID ? 0 : wires.get(wid).sample)
-                    .toList();
-            comp.consume(samples);
-            List<Double> output = comp.supply();
-            for(int i = 0; i < output.size(); i++){
-                int wid = comp2outputWireIDs.get(cid).get(i);
-                if(wid == Z_ID) continue; // Skip Z_ID wires
-                wires.get(wid).sample = output.get(i);
-            }
-        });
-        if (!comp.immediate){
-            return;
-        }
-        * */
-        for (List<Integer> comps : ordinal2comps) {
-            comps.forEach(
-                    c -> {
-                        List<Double> samples = comp2inputWireIDs
-            // This Will Help Comp To Find Their Inputs, Including Global Inputs
-                                .get(c)
-                                .stream()
-                                .map(wid -> wid == Z_ID ? 0 : wires.get(wid).sample)
-                                .toList();
-                        Component comp = components.get(c);
-
-                        comp.consume(samples);
-                        List<Double> outputs = comp.supply();
-                        List<Integer> outputWireIDs = comp2outputWireIDs.get(c);
-                        for (int i = 0; i < outputs.size(); i++) {
-                            int wireID = outputWireIDs.get(i);
-                            if(wireID == Z_ID)continue;
-                            wires.get(wireID).sample = outputs.get(i);
-                        }
-
-                    }
-            );
-        }
-
+        // Input Coming (input() should be called before forward())
+        // Before Positive Edge Coming Input Supply New Inputs, Combinational Should Forward Themselves
+        forwardCombinational();
+        // Actual Positive Edge
+        forwardTemporal();
+        // After Positive Edge, Temporal Supply New Inputs, Combinational Should Forward Themselves
+        forwardCombinational();
+        // All Logic Are Done
+        // Call output() to get output values
         return this;
+    }
+
+    private void forwardTemporal(){
+        // This is not done by mimicking forwardCombinational()
+        // Because Temporal Components May Connect Serially, Which Causes Inconsistent Behavior If Using Methods of Combinational
+        // (i.e. forEach sequence matters)
+        // So Always Consider Their Transition Starts Only After All Temporal Components Finish Input Snapshot
+        // Which Makes Sense, Considering Gate Delay In Reality :)
+
+
+        // Temporal Components Snapshot Their Input On Positive Edges
+        temporalComponents.forEach(this::snapTemporal);
+        // After All Temporal Components Finish Their Snapshot, They Transit To Next State And Supply Output
+        temporalComponents.forEach(this::transitTemporal);
+    }
+
+    private void forwardCombinational(){
+        // ordinal is computed before Circuit is built
+        // It's guaranteed that combinational components' inputs are up-to-date
+        // if they are updated by ordinals
+        for (List<Integer> comps : ordinal2comps) {
+            comps.forEach(this::forwardCombinational);
+        }
+    }
+
+    private void forwardCombinational(int c){
+        List<Double> samples = sampleInput(c);
+        Component comp = components.get(c);
+        comp.consume(samples);
+        comp.transit();
+        List<Double> outputs = comp.supply();
+        supplyOutputs(c, outputs);
+    }
+
+    private List<Double> sampleInput(int c){
+        return comp2inputWireIDs
+                // This Will Help Comp To Find Their Inputs, Including Global Inputs
+                .get(c)
+                .stream()
+                .map(wid -> wid == Z_ID ? 0 : wires.get(wid).sample)
+                .toList();
+    }
+
+    private void supplyOutputs(int c, List<Double> outputs){
+        List<Integer> outputWireIDs = comp2outputWireIDs.get(c);
+        for (int i = 0; i < outputs.size(); i++) {
+            int wireID = outputWireIDs.get(i);
+            if(wireID == Z_ID)continue;
+            wires.get(wireID).sample = outputs.get(i);
+        }
+    }
+
+    private void snapTemporal(int c){
+        List<Double> samples = sampleInput(c);
+        Component comp = components.get(c);
+        comp.consume(samples);
+    }
+
+    private void transitTemporal(int c){
+        Component comp = components.get(c);
+        comp.transit();
+        List<Double> outputs = comp.supply();
+        supplyOutputs(c, outputs);
     }
 
 
@@ -369,11 +428,19 @@ public class Circuit {
 
             Map<Integer, Set<Integer>> ordinal2compId = new HashMap<>();
 
-            ordinal.forEach(
-                    (componentName, ordinal) -> ordinal2compId
-                                .computeIfAbsent(ordinal, $ -> new HashSet<>())
-                                .add(componentName2componentId.get(componentName))
-            );
+
+            Function<String, Boolean> isImmediate = s -> components.get(s).unnamed.immediate;
+            // Temporal Component Are Not Added To Ordinal Array
+            // Setting Temporal Component To 0-ordered Is A Trick To Help Compute Ordinals
+            ordinal
+                    .entrySet()
+                    .stream()
+                    .filter(e -> isImmediate.apply(e.getKey()))
+                    .forEach(
+                            e -> ordinal2compId
+                                        .computeIfAbsent(e.getValue(), $ -> new HashSet<>())
+                                        .add(componentName2componentId.get(e.getKey()))
+                    );
 
             List<Integer> wire2InputComponentID = IntStream
                     .range(0, wireId.get())
@@ -412,6 +479,13 @@ public class Circuit {
                     .mapToObj(o -> ordinal2compId.get(o).stream().toList())
                     .toList();
 
+            List<Integer> temporalComponents = IntStream
+                    .range(0, comps.size())
+                    .filter(i -> !comps.get(i).immediate)
+                    .boxed()
+                    .toList();
+            // ordinal2comps.get(0).stream().filter(isImmediate::apply).toList();
+            // need test
             return new Circuit(
                     wires,
                     comps,
@@ -420,7 +494,7 @@ public class Circuit {
                     comp2outputWireIDs,
                     inputName2wireId,
                     outputName2wireId,
-                    List.of(),
+                    temporalComponents,
                     ordinal2comps
             );
         }

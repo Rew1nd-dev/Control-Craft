@@ -13,6 +13,7 @@ public class TemporalComponent<T> extends Component {
 
     private T state;
     private final List<Double> cachedOutput = new ArrayList<>();
+    private final List<Double> cachedInput = new ArrayList<>();
     private final List<Double> view = Collections.unmodifiableList(cachedOutput);
 
     private final Function<Pair<@NotNull List<Double>, @NotNull T>, Pair<@NotNull List<Double>, @NotNull T>> transition;
@@ -38,8 +39,14 @@ public class TemporalComponent<T> extends Component {
         if(inputs.size() != N()){
             throw new IllegalArgumentException("Input size mismatch, expect: " + N() + ", got: " + inputs.size());
         }
+        cachedInput.clear();
+        cachedInput.addAll(inputs);
+    }
+
+    @Override
+    public void transit() {
+        var o = transition.apply(new Pair<>(cachedInput, state));
         cachedOutput.clear();
-        var o = transition.apply(new Pair<>(inputs, state));
         cachedOutput.addAll(o.getFirst());
         state = o.getSecond();
     }

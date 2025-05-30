@@ -11,6 +11,7 @@ import java.util.function.Function;
 public class CombinationalComponent extends Component {
 
     private final List<Double> cachedOutput = new ArrayList<>();
+    private final List<Double> cachedInput = new ArrayList<>();
     private final List<Double> view = Collections.unmodifiableList(cachedOutput);
     private final Function<List<Double>, List<Double>> transform;
 
@@ -33,9 +34,13 @@ public class CombinationalComponent extends Component {
         if(inputs.size() != N()){
             throw new IllegalArgumentException("Input size mismatch, expect: " + N() + ", got: " + inputs.size());
         }
-        cachedOutput.clear();
-        cachedOutput.addAll(transform.apply(inputs));
-
+        cachedInput.clear();
+        cachedInput.addAll(inputs);
     }
 
+    @Override
+    public void transit() {
+        cachedOutput.clear();
+        cachedOutput.addAll(transform.apply(cachedInput));
+    }
 }
