@@ -3,7 +3,6 @@ package com.verr1.controlcraft.utils;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
-import com.verr1.controlcraft.foundation.network.SyncLock;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
@@ -338,65 +337,6 @@ public class SerializeUtils {
         @NotNull T deserialize(CompoundTag tag);
     }
 
-    public static class LockableReadWriter<T>{
-        public SyncLock readLock = new SyncLock();
-        private final ReadWriter<T> readWriter;
-
-        public LockableReadWriter(ReadWriter<T> readWriter){
-            this.readWriter = readWriter;
-        }
-
-        public void readAndUpdateWithKey(CompoundTag tag){
-            if(readLock.isLocked())return;
-            readLock.update();
-            readWriter.onReadWithKey(tag);
-        }
-
-        public void readAndUpdateDefault(CompoundTag tag){
-            if(readLock.isLocked())return;
-            readLock.update();
-            readWriter.onReadDefault(tag);
-        }
-
-        public void writeDefault(CompoundTag tag){
-            // if(readLock.isLocked())return;
-            // readLock.update();
-            readWriter.onWriteDefault(tag);
-        }
-
-
-    }
-
-    public static class LockableReadWriteExecutor{
-        public SyncLock readLock = new SyncLock();
-        private final ReadWriteExecutor readWriteExecutor;
-
-        public LockableReadWriteExecutor(ReadWriteExecutor readWriteExecutor){
-            this.readWriteExecutor = readWriteExecutor;
-        }
-
-        public void readAndUpdateWithKey(CompoundTag tag){
-            if(readLock.isLocked())return;
-            readLock.update();
-            readWriteExecutor.onReadWithKey(tag);
-        }
-
-        public void readAndUpdateDefault(CompoundTag tag){
-            if(readLock.isLocked())return;
-            readLock.update();
-            readWriteExecutor.onReadDefault(tag);
-        }
-
-        public void writeWithKey(CompoundTag tag){
-            // if(lock.isLocked())return;
-            readWriteExecutor.onWriteWithKey(tag);
-        }
-
-        public void writeDefault(CompoundTag tag){
-            // if(lock.isLocked())return;
-            readWriteExecutor.onWriteDefault(tag);
-        }
-    }
 
     public static class ReadWriter<T> extends ReadWriteExecutor {
         private final Supplier<T> supplier;

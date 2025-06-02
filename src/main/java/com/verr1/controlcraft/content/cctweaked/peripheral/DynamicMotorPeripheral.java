@@ -85,12 +85,12 @@ public class DynamicMotorPeripheral extends AbstractAttachedPeripheral<AbstractD
         getTarget().setMode(isAdjustingAngle);
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void lock(){
         getTarget().tryLock();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void unlock(){
         getTarget().tryUnlock();
     }

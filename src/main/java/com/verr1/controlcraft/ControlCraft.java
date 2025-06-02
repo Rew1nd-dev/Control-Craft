@@ -83,6 +83,8 @@ public class ControlCraft
         ControlCraftCreativeTabs.register(modEventBus);
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
+        CimulinkBlocks.register();
+        CimulinkBlockEntity.register();
         ControlCraftPackets.registerPackets();
         ControlCraftItems.register();
         ControlCraftMenuTypes.register();
@@ -129,6 +131,8 @@ public class ControlCraft
         ControlCraftCreativeTabs.register(modEventBus);
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
+        CimulinkBlocks.register();
+        CimulinkBlockEntity.register();
         ControlCraftPackets.registerPackets();
         ControlCraftItems.register();
         ControlCraftMenuTypes.register();

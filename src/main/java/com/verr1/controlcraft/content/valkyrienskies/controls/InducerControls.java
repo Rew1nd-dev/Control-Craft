@@ -307,7 +307,7 @@ public class InducerControls {
         Vector3dc lift_wc = n_wc.mul(lift_scale, new Vector3d());
 
         double c2a = 1 - Math.cos(2 * angle);
-        double drag_scale = drag * c2a * rv_wc.lengthSquared();
+        double drag_scale = MathUtils.clamp(drag * c2a * rv_wc.lengthSquared(), 1.0E7);
         Vector3dc drag_wc = drag_d_wc.mul(drag_scale, new Vector3d());
 
         Vector3dc combine_wc = lift_wc.add(drag_wc, new Vector3d());

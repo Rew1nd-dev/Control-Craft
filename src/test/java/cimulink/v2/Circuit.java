@@ -1,5 +1,6 @@
 package cimulink.v2;
 
+import cimulink.v2.components.Component;
 import cimulink.v2.components.NamedComponent;
 import kotlin.Pair;
 
@@ -7,9 +8,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Circuit extends Component{
+public class Circuit extends NamedComponent {
 
     public static final Supplier<Component> PLACE_HOLDER = PlaceHolder::new;
 
@@ -19,25 +21,34 @@ public class Circuit extends Component{
     List<List<ComponentPort>> wireId2inputComponentIds;
 
     List<Integer> ordinal2componentId;
+    List<Boolean> isImmediate;
 
     // Contract: The First And Second Component Should Be Circuit Input And Output Component,
     // But Initializing Helper Needs "this", So Put A PlaceHolder At Builder
     private Circuit(
-            int n, int m,
+            List<String> inputNames, List<String> outputNames,
             int inputId, int outputId,
             List<Component> components,
             List<List<Integer>> component2outputWireIds,
             List<List<ComponentPort>> wireId2inputComponentIds,
             List<Integer> ordinal2componentId
     ) {
-        super(n, m);
+        super(inputNames, outputNames);
         components.set(inputId, new CircuitInputComponent());
         components.set(outputId, new CircuitOutputComponent());
         this.components = components;
         this.component2outputWireIds = component2outputWireIds;
         this.wireId2inputComponentIds = wireId2inputComponentIds;
         this.ordinal2componentId = ordinal2componentId;
+
+        Boolean[] isImmediateArray = new Boolean[m()];
+        for(int i = 0; i < n(); i++)input(i, 0.0);
+        onInputChange();
+        changedInput().forEach(i -> isImmediateArray[i] = true);
+        isImmediate = List.of(isImmediateArray);
     }
+
+
 
     @Override
     public void onInputChange() {
@@ -88,6 +99,11 @@ public class Circuit extends Component{
         propagate();
     }
 
+    @Override
+    protected boolean immediateInternal(int index) {
+        return isImmediate.get(index);
+    }
+
     public void cycle(){
         onInputChange();
         onPositiveEdge();
@@ -128,33 +144,43 @@ public class Circuit extends Component{
     }
 
     private static class PlaceHolder extends Component{
-
         public PlaceHolder() {
             super(0, 0);
         }
-
         @Override
-        public void onInputChange() {
-
-        }
-
+        public void onInputChange() {}
         @Override
-        public void onPositiveEdge() {
-
-        }
+        public void onPositiveEdge() {}
+        @Override
+        protected boolean immediateInternal(int index) {return false;}
     }
 
     private static class NamedInput extends NamedComponent{
         public NamedInput(List<String> outputs) {
-            super(PLACE_HOLDER.get(), List.of(), outputs);
+            super(List.of(), outputs);
+        }
+        @Override
+        public void onInputChange() {}
+        @Override
+        public void onPositiveEdge() {}
+        @Override
+        protected boolean immediateInternal(int index) {
+            return false;
         }
     }
 
     private static class NamedOutput extends NamedComponent{
         public NamedOutput(List<String> inputs) {
-            super(PLACE_HOLDER.get(), inputs, List.of());
+            super(inputs, List.of());
         }
+        @Override
+        public void onInputChange() {}
+        @Override
+        public void onPositiveEdge() {}
+        @Override
+        protected boolean immediateInternal(int index) {return false;}
     }
+
 
     public static class builder{
         private static final String INPUT_NAME = "input@#$%^";
@@ -172,6 +198,18 @@ public class Circuit extends Component{
 
         Map<String, Integer> ordinal = new HashMap<>();
 
+        List<String> inputNames;
+        List<String> outputNames;
+        /*
+        List<Boolean> isImmediate;
+
+        private void computeImmediate(){
+            Set<ComponentPortName> outputPorts = new HashSet<>(reverseConnections.values());
+            Set<ComponentPortName> inputPorts = reverseConnections.keySet();
+            Map<ComponentPortName, Boolean> outputIsImmediate = new HashMap<>();
+
+        }
+        * */
 
         public Circuit build(){
             addComponent(INPUT_NAME, new NamedInput(inputs.keySet().stream().toList()));
@@ -180,21 +218,22 @@ public class Circuit extends Component{
                     cp_cp.getFirst().componentName, cp_cp.getFirst().portName,
                     cp_cp.getSecond().componentName, cp_cp.getSecond().portName
             );
-            inputs
-                .entrySet()
+            inputNames = inputs.keySet().stream().toList();
+            outputNames = outputs.keySet().stream().toList();
+            inputNames
                 .stream()
-                .flatMap(e -> e
-                        .getValue()
+                .flatMap(e -> inputs
+                        .get(e)
                         .stream()
-                        .map(cp -> new Pair<>(new ComponentPortName(INPUT_NAME, e.getKey()), cp))
+                        .map(cp -> new Pair<>(new ComponentPortName(INPUT_NAME, e), cp))
                 ).forEach(connect);
 
-            outputs
-                .entrySet()
+            outputNames
                 .stream()
-                .map(e -> new Pair<>(new ComponentPortName(OUTPUT_NAME, e.getKey()), e.getValue()))
+                .map(e -> new Pair<>(outputs.get(e), new ComponentPortName(OUTPUT_NAME, e)))
                 .forEach(connect);
 
+            // computeImmediate();
             computeOrdinal();
 
             Map<String, Integer> componentName2componentId = new HashMap<>();
@@ -242,21 +281,19 @@ public class Circuit extends Component{
 
             List<Component> components_ = IntStream
                     .range(0, componentId.get())
-                    .mapToObj(i -> components.get(componentId2componentName.get(i)).unnamed())
+                    .mapToObj(i -> (Component)components.get(componentId2componentName.get(i)))
                     .toList();
 
-            int n = inputs.size();
-            int m = outputs.size();
             int inputId = componentName2componentId.get(INPUT_NAME);
             int outputId = componentName2componentId.get(OUTPUT_NAME);
 
             return new Circuit(
-                    n, m,
+                    inputNames, outputNames,
                     inputId, outputId,
                     components_,
                     component2outputWireIds,
                     wire2inputComponentIds,
-                    List.of() // have not been implemented
+                    List.of() // have not been implemented,
             );
 
         }

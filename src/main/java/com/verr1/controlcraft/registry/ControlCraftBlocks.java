@@ -41,7 +41,7 @@ import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
 public class ControlCraftBlocks {
     static {
-        REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.TAB);
+        REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.MAIN);
     }
 
     public static final BlockEntry<ChunkLoaderBlock> CHUNK_LOADER = REGISTRATE
@@ -407,6 +407,5 @@ public class ControlCraftBlocks {
             .transform(customItemModel())
             .register();
 
-    public static void register(){
-    }
+    public static void register(){}
 }

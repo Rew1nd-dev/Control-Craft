@@ -10,7 +10,7 @@ import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 public class ControlCraftItems {
 
     static {
-        REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.TAB);
+        REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.MAIN);
     }
 
     public static final ItemEntry<AweInWandItem> ALL_IN_WAND = REGISTRATE.item("awe_in_wand", AweInWandItem::new)

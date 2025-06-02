@@ -1,18 +1,10 @@
 package cimulink.v2.components;
 
-import cimulink.v2.Circuit;
-import cimulink.v2.Component;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NamedComponent {
-
-
-
-    private final Component unnamed;
-
+public abstract class NamedComponent extends Component{
 
 
     private final Map<String, Integer> namedInputs; // name -> input array index
@@ -24,11 +16,10 @@ public class NamedComponent {
     private final List<String> outputs;
 
     public NamedComponent(
-            Component unnamed,
             List<String> inputs,
             List<String> outputs
     ) {
-        this.unnamed = unnamed;
+        super(inputs.size(), outputs.size());
         this.inputs = inputs;
         this.outputs = outputs;
 
@@ -61,9 +52,6 @@ public class NamedComponent {
         return outputs;
     }
 
-    public Component unnamed() {
-        return unnamed;
-    }
 
     public Map<String, Integer> namedInputs() {
         return namedInputs;

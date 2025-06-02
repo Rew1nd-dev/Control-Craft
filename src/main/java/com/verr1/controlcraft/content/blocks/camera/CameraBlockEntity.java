@@ -762,6 +762,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     @Override
     public void tickServer() {
+        super.tickServer();
         if(isActiveDistanceSensor()){
             //setChanged();
             updateOutputSignal();
@@ -850,13 +851,13 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     public void syncForOtherPlayers(){
-        if(level == null || !level.isClientSide)return;
-        var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
+        if(level == null || level.isClientSide)return;
+        var p = new BlockBoundClientPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
                 .withDouble(pitch)
                 .withDouble(yaw)
                 .build();
         ControlCraftPackets.getChannel().send(
-                PacketDistributor.NEAR.noArg(),
+                PacketDistributor.ALL.noArg(),
                 p
         );
     }

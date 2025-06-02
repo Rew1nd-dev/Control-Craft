@@ -1,16 +1,20 @@
 package cimulink.v2.components.compiled;
 
-import cimulink.v2.Component;
+import cimulink.v2.components.NamedComponent;
 import kotlin.Pair;
 
 import java.util.List;
 
-public abstract class Temporal<S> extends Component {
+public abstract class Temporal<S> extends NamedComponent {
 
     private S state;
 
-    public Temporal(int n, int m, S defaultState) {
-        super(n, m);
+    public Temporal(
+            List<String> inputs,
+            List<String> outputs,
+            S defaultState
+    ) {
+        super(inputs, outputs);
         state = defaultState;
     }
 
@@ -22,6 +26,11 @@ public abstract class Temporal<S> extends Component {
         var o = transit(retrieveInput(), state);
         state = o.getSecond();
         updateOutput(o.getFirst());
+    }
+
+    @Override
+    protected final boolean immediateInternal(int $) {
+        return false;
     }
 
     protected abstract Pair<List<Double>, S> transit(List<Double> input, S state);

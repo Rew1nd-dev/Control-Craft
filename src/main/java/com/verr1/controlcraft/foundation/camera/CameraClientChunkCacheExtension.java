@@ -32,7 +32,7 @@ package com.verr1.controlcraft.foundation.camera;
  *
  *     "Object" form shall mean any form resulting from mechanical
  *     transformation or translation of a Source form, including but
- *     not limited to compiled object code, generated documentation,
+ *     not limited to wrapped object code, generated documentation,
  *     and conversions to other media types.
  *
  *     "Work" shall mean the work of authorship, whether in Source or

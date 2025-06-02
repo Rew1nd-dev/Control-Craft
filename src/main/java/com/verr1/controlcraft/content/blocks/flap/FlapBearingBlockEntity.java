@@ -330,7 +330,7 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .dispatchToSync()
-                .runtimeOnly()
+                //.runtimeOnly()
                 .register();
 
         panel().registerUnit(SharedKeys.ASSEMBLE, this::assemble);
