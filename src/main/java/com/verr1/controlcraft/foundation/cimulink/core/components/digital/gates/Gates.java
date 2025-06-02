@@ -1,7 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates;
 
-import cimulink.v3.components.digital.BooleanCombinational;
-import cimulink.v3.utils.ArrayUtils;
+
+
+import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanCombinational;
+import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 
 import java.util.List;
 import java.util.function.Function;
