@@ -62,6 +62,11 @@ public class DynamicMotorPeripheral extends AbstractAttachedPeripheral<AbstractD
     }
 
     @LuaFunction
+    public final double getAngularVelocity(){
+        return getTarget().getServoAngularVelocity();
+    }
+
+    @LuaFunction
     public final double getCurrentValue(){
         return getTarget().getController().getValue();
     }

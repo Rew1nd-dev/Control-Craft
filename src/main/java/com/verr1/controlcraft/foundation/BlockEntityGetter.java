@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
@@ -33,6 +34,9 @@ public class BlockEntityGetter {
                         }
                     });
 
+    public static BlockEntityGetter get(){
+        return INSTANCE;
+    }
 
     private BlockEntityGetter(MinecraftServer server){
         this.server = server;
@@ -42,7 +46,9 @@ public class BlockEntityGetter {
         INSTANCE = new BlockEntityGetter(server);
     }
 
-
+    public <T> Optional<T> getBlockEntityAt(WorldBlockPos worldBlockPos, Class<T> clazz){
+        return getBlockEntityAt(worldBlockPos.globalPos(), clazz);
+    }
 
 
     public <T> Optional<T> getBlockEntityAt(GlobalPos globalPos, Class<T> clazz){

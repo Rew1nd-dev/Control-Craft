@@ -76,14 +76,18 @@ public class Module {
 
     public static void dcTest(){
         DirectCurrent dc = (DirectCurrent) new DirectCurrent(5.0).withName("dc");
+        Shifter reg = (Shifter)new Shifter(0, 1).withName("reg");
         CircuitConstructor constructor = new CircuitConstructor();
-        constructor.addComponent(dc);
+        constructor.addComponent(dc, reg);
 
-        constructor.defineOutput("o", dc.__out(0));
-                //.defineInput("i", dc.__in(0));
+        constructor.defineOutput("o", dc.__out(0))
+                .connect(dc.__out(0), reg.__in(0))
+                .defineOutput("o_reg", reg.__out(0));
+
 
         Circuit c = constructor.build("dc_test");
 
+        c.cycle();
         c.cycle();
 
         PrintOutputs(c);

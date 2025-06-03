@@ -1,7 +1,6 @@
 package test;
 
-import test.module.Module;
-import test.module.Packaging;
+import test.game.BlockLinkPortTest;
 
 public class Main {
     public static void main(String[] args) {
@@ -9,8 +8,9 @@ public class Main {
         // Here you can add code to test your components or run simulations
 
         // CircuitConnectivityTest.propagateMapTest();
-        // Module.shifterSerialTest();
-        Packaging.packageTest_1();
+        // Module.dcTest();
+        // Packaging.packageTest_1();
+        BlockLinkPortTest.loopTest();
     }
 
 

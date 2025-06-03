@@ -17,7 +17,7 @@ public class ChunkManager {
     private static int lazyTickRate = 0;
 
 
-    public static void tick(TickEvent.ServerTickEvent event){
+    public static void tick(){
         // ControlCraftMod.LOGGER.info("ChunkManager.tick called " + ServerLevelChunkUnloadTicks.size());
         removeNoHolderChunks();
         lazyTick();

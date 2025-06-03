@@ -122,7 +122,7 @@ public class Circuit extends NamedComponent {
     }
 
     public void cycle(){
-        onInputChange();
+        onInputChange(0);
         onPositiveEdge();
     }
 

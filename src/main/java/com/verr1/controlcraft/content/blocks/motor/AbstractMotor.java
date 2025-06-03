@@ -106,7 +106,7 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         return VSMathUtils.get_yc2xc(own, cmp, getServoDirection(), getCompanionShipAlign());
     }
 
-    public double getServoAngularSpeed(){
+    public double getServoAngularVelocity(){
         if(noCompanionShip())return 0;
         ShipPhysics own = readSelf();
         ShipPhysics cmp = readComp();

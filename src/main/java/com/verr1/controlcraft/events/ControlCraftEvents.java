@@ -5,6 +5,7 @@ import com.verr1.controlcraft.content.legacy.NetworkManager;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
 import com.verr1.controlcraft.content.compact.tweak.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
+import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
 import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
@@ -42,11 +43,15 @@ public class ControlCraftEvents {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         // ControlCraftServer.SERVER_INTERVAL_EXECUTOR.tick();
-        ControlCraftServer.SERVER_EXECUTOR.tick();
-        SpatialLinkManager.tick();
-        ChunkManager.tick(event);
-        // NetworkManager.tick();
-        PeripheralNetwork.tick();
+        if(event.phase == TickEvent.Phase.START){
+            ControlCraftServer.SERVER_EXECUTOR.tick();
+            SpatialLinkManager.tick();
+            ChunkManager.tick();
+            PeripheralNetwork.tick();
+        } else if (event.phase == TickEvent.Phase.END) {
+            BlockLinkPort.postTick();
+        }
+
     }
 
     @SubscribeEvent

@@ -6,9 +6,7 @@ package com.verr1.controlcraft.foundation.cimulink.core.components;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils.checkName;
 
@@ -24,17 +22,18 @@ public abstract class NamedComponent extends Component {
     private final List<String> inputs;
     private final List<String> outputs;
 
+
     public NamedComponent(
             List<String> inputs,
             List<String> outputs
     ) {
         super(inputs.size(), outputs.size());
 
-        this.inputs = inputs;
-        this.outputs = outputs;
+        this.inputs = Collections.unmodifiableList(inputs);
+        this.outputs = Collections.unmodifiableList(outputs);
 
-        this.namedInputs = new HashMap<>();
-        this.namedOutputs = new HashMap<>();
+        Map<String, Integer> namedInputs = new HashMap<>();
+        Map<String, Integer> namedOutputs = new HashMap<>();
         for (int i = 0; i < inputs.size(); i++) {
             String name = inputs.get(i);
             namedInputs.put(name, i);
@@ -43,9 +42,16 @@ public abstract class NamedComponent extends Component {
             String name = outputs.get(i);
             namedOutputs.put(name, i);
         }
+
+        this.namedInputs = Collections.unmodifiableMap(namedInputs);
+        this.namedOutputs = Collections.unmodifiableMap(namedOutputs);
+
+
         ArrayUtils.AssertDifferent(inputs);
         ArrayUtils.AssertDifferent(outputs);
-        ArrayUtils.AssertDifferent(namedOutputs.keySet(), namedInputs.keySet());
+        ArrayUtils.AssertDifferent(this.namedOutputs.keySet(), this.namedInputs.keySet());
+
+
     }
 
     public NamedComponent withName(String name){
@@ -65,13 +71,13 @@ public abstract class NamedComponent extends Component {
     }
 
     public NamedComponent input(String name, double value){
-        ArrayUtils.AssertExistence(namedInputs.keySet(), name);
+        ArrayUtils.AssertPresence(namedInputs.keySet(), name);
         input(namedInputs.get(name), value);
         return this;
     }
 
     public double output(String name){
-        ArrayUtils.AssertExistence(namedOutputs.keySet(), name);
+        ArrayUtils.AssertPresence(namedOutputs.keySet(), name);
         return output(namedOutputs.get(name));
     }
 
@@ -113,11 +119,49 @@ public abstract class NamedComponent extends Component {
     }
 
 
+    public double retrieveOutput(String name) {
+        ArrayUtils.AssertPresence(outputs, name);
+        return super.retrieveOutput(namedOutputs.get(name));
+    }
+
+    public double peekOutput(String name) {
+        ArrayUtils.AssertPresence(outputs, name);
+        return super.peekOutput(namedOutputs.get(name));
+    }
+
+    public double retrieveInput(String name) {
+        ArrayUtils.AssertPresence(outputs, name);
+        return super.retrieveInput(namedOutputs.get(name));
+    }
+
+    public double peekInput(String name) {
+        ArrayUtils.AssertPresence(outputs, name);
+        return super.peekInput(namedOutputs.get(name));
+    }
+
     public List<String> propagateTo(String name) {
         if (!namedInputs.containsKey(name)) {
             throw new IllegalArgumentException("Output name '" + name + "' does not exist in component '" + this.outputs() + "'");
         }
         return propagateTo(namedInputs.get(name)).stream().map(p -> outputs().get(p)).toList();
+    }
+
+    public void onInputChange(String... changedInputs){
+        for(var name: changedInputs){
+            if (namedInputs.containsKey(name))continue;
+            throw new IllegalArgumentException("Input name '" + name + "' does not exist in component '" + this.inputs() + "'");
+        }
+
+        onInputChange(Arrays.stream(changedInputs).map(namedInputs::get).toList().toArray(new Integer[0]));
+    }
+
+
+    public List<String> changedOutputName() {
+        return super.changedOutput().stream().map(outputs::get).toList();
+    }
+
+    public List<String> changedInputName() {
+        return super.changedInput().stream().map(inputs::get).toList();
     }
 
     public int outputId(String name){

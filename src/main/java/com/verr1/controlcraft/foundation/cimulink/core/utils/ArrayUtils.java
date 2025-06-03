@@ -30,19 +30,19 @@ public class ArrayUtils {
         return IntStream.range(0, n).mapToObj(i -> prefix + i).toList();
     }
 
-    public static void AssertSize(Collection<?> array, int size){
+    public static void AssertSize(Collection<?> array, int size) throws IllegalArgumentException{
         if (array.size() != size) {
             throw new IllegalArgumentException("Expected size: " + size + ", but got: " + array.size());
         }
     }
 
-    public static void AssertSameSize(Collection<?> array, Collection<?> array1){
+    public static void AssertSameSize(Collection<?> array, Collection<?> array1) throws IllegalArgumentException{
         if (array.size() != array1.size()) {
             throw new IllegalArgumentException("Size of Collections Are Different");
         }
     }
 
-    public static<T extends Comparable<T>> void AssertDifferent(Collection<T> c0, Collection<T> c1){
+    public static<T extends Comparable<T>> void AssertDifferent(Collection<T> c0, Collection<T> c1) throws IllegalArgumentException{
         for (T t: c0){
             if(c1.contains(t)){
                 throw new IllegalArgumentException("Object: " + t + " is duplicate in both Sets: " + c0 + " " + c1);
@@ -61,7 +61,7 @@ public class ArrayUtils {
     }
 
 
-    public static<T extends Comparable<T>> void AssertDifferent(Collection<T> c0){
+    public static<T extends Comparable<T>> void AssertDifferent(Collection<T> c0) throws IllegalArgumentException{
         Set<T> visited = new HashSet<>();
         for (T t: c0){
             if(visited.contains(t)){
@@ -72,15 +72,21 @@ public class ArrayUtils {
     }
 
 
-    public static void AssertRange(int index, int max){
+    public static void AssertRange(int index, int max) throws IndexOutOfBoundsException{
         if (index < 0 || index >= max) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + max);
         }
     }
 
-    public static<T> void AssertExistence(Collection<T> c, T member){
+    public static<T> void AssertPresence(Collection<T> c, T member) throws IllegalArgumentException{
         if (!c.contains(member)){
             throw new IllegalArgumentException("Object: " + member + " is not present in: " + c);
+        }
+    }
+
+    public static<T> void AssertAbsence(Collection<T> c, T member) throws IllegalArgumentException{
+        if (c.contains(member)){
+            throw new IllegalArgumentException("Object: " + member + " is already exist in: " + c);
         }
     }
 

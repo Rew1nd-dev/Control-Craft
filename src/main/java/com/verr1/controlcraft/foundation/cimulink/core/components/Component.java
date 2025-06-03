@@ -27,6 +27,7 @@ public abstract class Component {
         return IntStream.range(0, outputs.size()).filter(i -> outputs.get(i).dirty()).boxed().toList();
     }
 
+
     public List<Double> retrieveOutput(){
         return outputs.stream().mapToDouble(Port::retrieve).boxed().toList();
     }
@@ -44,8 +45,8 @@ public abstract class Component {
         return inputs.get(index).peek();
     }
 
-    protected  List<Integer> changedInput(){
-        return IntStream.range(0, inputs.size()).filter(i -> outputs.get(i).dirty()).boxed().toList();
+    public List<Integer> changedInput(){
+        return IntStream.range(0, inputs.size()).filter(i -> inputs.get(i).dirty()).boxed().toList();
     }
 
     public boolean anyInputChanged(){
