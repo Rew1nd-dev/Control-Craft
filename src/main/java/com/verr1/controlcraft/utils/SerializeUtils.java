@@ -3,6 +3,7 @@ package com.verr1.controlcraft.utils;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
+import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
@@ -13,9 +14,7 @@ import org.joml.Vector3dc;
 import org.valkyrienskies.core.apigame.constraints.*;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -32,6 +31,11 @@ public class SerializeUtils {
     public static Serializer<Boolean> BOOLEAN = of(SerializeUtils::ofBoolean, tag -> tag.getBoolean("value"));
     public static Serializer<String> STRING = of(SerializeUtils::ofString, tag -> tag.getString("value"));
     public static Serializer<CompoundTag> UNIT = of(tag -> tag, tag -> tag);
+
+    public static Serializer<BlockPort> BLOCK_PORT = SerializeUtils.of(
+            BlockPort::serialize,
+            BlockPort::deserialize
+    );
 
     public static Serializer<Vector3dc> VECTOR3DC = of(
             vec -> {
@@ -99,6 +103,68 @@ public class SerializeUtils {
                     collector.accumulator().accept(container, element);
                 }
                 return collector.finisher().apply(container);
+            }
+        };
+    }
+
+    public static <K, V> Serializer<HashMap<K, V>> ofMap(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+        return new Serializer<>() {
+            @Override
+            public CompoundTag serialize(@NotNull HashMap<K, V> map) {
+                CompoundTagBuilder builder = new CompoundTagBuilder();
+                builder.withLong("count", (long) map.size());
+                int index = 0;
+                for (Map.Entry<K, V> entry : map.entrySet()) {
+                    CompoundTag keyTag = keySerializer.serialize(entry.getKey());
+                    CompoundTag valueTag = valueSerializer.serialize(entry.getValue());
+                    builder.withCompound("key_" + index, keyTag);
+                    builder.withCompound("value_" + index, valueTag);
+                    index++;
+                }
+                return builder.build();
+            }
+
+            @Override
+            public @NotNull HashMap<K, V> deserialize(CompoundTag tag) {
+                long count = tag.getLong("count");
+                HashMap<K, V> map = new HashMap<>();
+                for (long i = 0; i < count; i++) {
+                    CompoundTag keyTag = tag.getCompound("key_" + i);
+                    CompoundTag valueTag = tag.getCompound("value_" + i);
+                    K key = keySerializer.deserialize(keyTag);
+                    V value = valueSerializer.deserialize(valueTag);
+                    map.put(key, value);
+                }
+                return map;
+            }
+        };
+    }
+
+    public static <V> Serializer<Set<V>> ofSet(Serializer<V> elementSerializer) {
+        return new Serializer<>() {
+            @Override
+            public CompoundTag serialize(@NotNull Set<V> set) {
+                CompoundTagBuilder builder = new CompoundTagBuilder();
+                builder.withLong("count", (long) set.size());
+                int index = 0;
+                for (V element : set) {
+                    CompoundTag elementTag = elementSerializer.serialize(element);
+                    builder.withCompound("element_" + index, elementTag);
+                    index++;
+                }
+                return builder.build();
+            }
+
+            @Override
+            public @NotNull Set<V> deserialize(CompoundTag tag) {
+                long count = tag.getLong("count");
+                Set<V> set = new HashSet<>();
+                for (long i = 0; i < count; i++) {
+                    CompoundTag elementTag = tag.getCompound("element_" + i);
+                    V element = elementSerializer.deserialize(elementTag);
+                    set.add(element);
+                }
+                return set;
             }
         };
     }
@@ -268,7 +334,7 @@ public class SerializeUtils {
             }
     );
 
-
+    // public static Serializer<>
 
 
     public static <T> Serializer<T> of(Function<T, CompoundTag> serializer, Function<CompoundTag, T> deserializer){

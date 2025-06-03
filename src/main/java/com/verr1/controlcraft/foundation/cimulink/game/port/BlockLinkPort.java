@@ -1,7 +1,5 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port;
 
-import com.verr1.controlcraft.ControlCraft;
-import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -9,7 +7,10 @@ import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,15 +18,22 @@ import java.util.stream.Collectors;
 // for connection recording, forming a graph
 public abstract class BlockLinkPort {
 
-    public static final HashSet<WorldBlockPos> ALL_BLP = new HashSet<>();
+    public static final Set<WorldBlockPos> ALL_BLP = new HashSet<>();
 
+
+
+    public static final SerializeUtils.Serializer<HashMap<String, BlockPort>> BACKWARD =
+            SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.BLOCK_PORT);
+
+    public static final SerializeUtils.Serializer<HashMap<String, Set<BlockPort>>> FORWARD =
+            SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.ofSet(SerializeUtils.BLOCK_PORT));
 
     private static final Set<BlockPort> EMPTY = new HashSet<>();
 
 
 
-    private final Map<String, Set<BlockPort>>   forwardLinks  = new HashMap<>();
-    private final Map<String, BlockPort>        backwardLinks = new HashMap<>();
+    private final HashMap<String, Set<BlockPort>>   forwardLinks  = new HashMap<>();
+    private final HashMap<String, BlockPort>        backwardLinks = new HashMap<>();
 
     private final Map<String, Set<BlockPort>>   forwardView  = Collections.unmodifiableMap(forwardLinks);
     private final Map<String, BlockPort>        backwardView = Collections.unmodifiableMap(backwardLinks);
@@ -34,11 +42,6 @@ public abstract class BlockLinkPort {
 
     private NamedComponent realTimeComponent;
 
-    protected BlockLinkPort(WorldBlockPos portPos) {
-        this.portPos = portPos;
-        add(portPos);
-        recreate();
-    }
 
     protected BlockLinkPort(WorldBlockPos portPos, NamedComponent initial) {
         this.portPos = portPos;
@@ -312,6 +315,8 @@ public abstract class BlockLinkPort {
 
     public final void recreate(){
         realTimeComponent = create();
+        inputsNames().forEach(this::disconnectInput);
+        outputsNames().forEach(this::disconnectOutput);
     }
 
     public void onInputChange(String... changedInput) {
@@ -323,9 +328,19 @@ public abstract class BlockLinkPort {
     }
 
 
+    public CompoundTag serializeLinks(){
+        return CompoundTagBuilder.create()
+                .withCompound("forward", FORWARD.serialize(forwardLinks))
+                .withCompound("backward", BACKWARD.serialize(backwardLinks))
+                .build();
+    }
 
-
-
+    public void deserializeLinks(CompoundTag tag){
+        forwardLinks.clear();
+        backwardLinks.clear();
+        forwardLinks.putAll(FORWARD.deserialize(tag.getCompound("forward")));
+        backwardLinks.putAll(BACKWARD.deserialize(tag.getCompound("backward")));
+    }
 
     public static class PropagateContext{
         private final int MAX_DEPTH = 128;

@@ -9,4 +9,9 @@ public class LogicGateLinkPort extends SwitchableLinkPort<GateTypes> {
     public LogicGateLinkPort(WorldBlockPos portPos) {
         super(portPos, GateTypes.AND);
     }
+
+    @Override
+    protected Class<GateTypes> clazz() {
+        return GateTypes.class;
+    }
 }

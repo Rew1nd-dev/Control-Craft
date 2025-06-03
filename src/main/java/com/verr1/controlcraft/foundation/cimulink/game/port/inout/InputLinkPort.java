@@ -39,28 +39,6 @@ public class InputLinkPort{
 
     }
 
-    // find all temporal component, call onPositiveEdge() and propagate output
-
-
-
-    /*
-    private static void propagateOutput(BlockLinkPort blp, String changedOutput, double value, BlockLinkPort.PropagateContext watcher){
-        blp.forwardLinks().getOrDefault(changedOutput, EMPTY).stream().collect(Collectors.groupingBy(
-                BlockPort::pos, // 按 BlockPos 分组
-                HashMap::new,   // 使用 HashMap 作为容器
-                Collectors.mapping(
-                        BlockPort::portName, // 提取 String 值
-                        Collectors.toList() // 收集到 Set<String>
-                )
-        )).forEach((worldBlockPos, portNames) -> {
-            BlockLinkPort.of(worldBlockPos).ifPresent(blp_ -> {
-                portNames.forEach(n -> blp_.input(n, value));
-                propagateCombinational(watcher.increaseAndGet(), blp_);
-            });
-
-        });
-    }
-    * */
     public void validate(){
         if(linkedPortInput == null)return;
         BlockLinkPort

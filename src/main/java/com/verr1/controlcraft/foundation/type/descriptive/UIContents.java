@@ -56,7 +56,7 @@ public enum UIContents implements Descriptive<UIContents> {
     FLAP_DRAG(Component.literal("Drag"), literals("Drag Ratio")),
     FLAP_BIAS(Component.literal("Bias"), literals("Attack Angle Bias")),
 
-    ;
+    GATE_TYPES(Component.literal("Type"), literals("Logic Gate Types"));
 
 
     public FormattedLabel toUILabel() {

@@ -12,4 +12,9 @@ public class FFLinkPort extends SwitchableLinkPort<FFTypes> {
     public FFLinkPort(WorldBlockPos portPos) {
         super(portPos, FFTypes.D_FF);
     }
+
+    @Override
+    protected Class<FFTypes> clazz() {
+        return FFTypes.class;
+    }
 }
