@@ -69,9 +69,11 @@ public abstract class Component {
         return inputs.stream().mapToDouble(Port::retrieve).boxed().toList();
     }
 
-    protected  List<Double> peekInput(){
+    public  List<Double> peekInput(){
         return inputs.stream().mapToDouble(Port::peek).boxed().toList();
     }
+
+
 
     protected void updateOutput(List<Double> outputValues){
         if(outputValues.size() != outputs.size()){

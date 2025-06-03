@@ -15,7 +15,8 @@ public enum WandModesType {
     JOINT,
     DESTROY,
     DESTROY_ALL,
-    SLIDER;
+    SLIDER,
+    LINK;
 
 
     public static final HashMap<WandModesType, IWandMode> modeOf = new HashMap<>();
@@ -29,16 +30,18 @@ public enum WandModesType {
         WandJointConnectionMode.createInstance();
         WandDestroyConstrainMode.createInstance();
         WandDestroyAllConstrainMode.createInstance();
+        WandLinkMode.createInstance();
         modeOf.put(HINGE, WandJointConnectionMode.instance);
         modeOf.put(DESTROY, WandDestroyConstrainMode.instance);
         modeOf.put(DESTROY_ALL, WandDestroyAllConstrainMode.instance);
         modeOf.put(SERVO, WandServoAssembleMode.instance);
         modeOf.put(JOINT, WandJointAssembleMode.instance);
         modeOf.put(SLIDER, WandSliderAssembleMode.instance);
+        modeOf.put(LINK, WandLinkMode.instance);
     };
 
 
-    private WandModesType(){
+    WandModesType(){
         this.langKey = name().toLowerCase();
     }
 

@@ -25,4 +25,6 @@ public class SharedKeys {
     public static final NetworkKey COMP_OFFSET = NetworkKey.create("comp_offset");
 
     public static final NetworkKey BLP = NetworkKey.create("blp");
+    public static final NetworkKey CONNECTION_STATUS = NetworkKey.create("connection_status");
+    public static final NetworkKey VALUE_STATUS = NetworkKey.create("value_status");
 }

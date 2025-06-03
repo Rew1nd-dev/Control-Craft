@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -163,7 +164,13 @@ public abstract class BlockLinkPort {
         return realTimeComponent.outputs();
     }
 
+    public final List<Double> inputs(){
+        return realTimeComponent.peekInput();
+    }
 
+    public final List<Double> outputs(){
+        return realTimeComponent.peekOutput();
+    }
 
     public final Map<String, Integer> nameOutputs() {
         return realTimeComponent.namedOutputs();
@@ -207,6 +214,7 @@ public abstract class BlockLinkPort {
     }
 
     public void deleteInput(String name){
+        ControlCraft.LOGGER.info("deleting invalid input: {}", name);
         backwardLinks.remove(name);
     }
 
@@ -234,6 +242,7 @@ public abstract class BlockLinkPort {
     }
 
     public void deleteOutput(String name, BlockPort forwardPort){
+        ControlCraft.LOGGER.info("deleting invalid output: {} -> {}", name, forwardPort);
         forwardLinks.getOrDefault(name, EMPTY).remove(forwardPort);
         if(forwardLinks.getOrDefault(name, EMPTY).isEmpty())forwardLinks.remove(name);
     }
@@ -243,25 +252,34 @@ public abstract class BlockLinkPort {
     }
 
     public void removeInvalidOutput(){
-        List<Pair<String, BlockPort>> invalidOutputs = new ArrayList<>();
-        forwardLinks.forEach((outputName, ports) -> {
-            invalidOutputs.addAll(
-                    ports.stream()
-                            .filter(p -> of(p.pos()).isEmpty())
-                            .map(bp -> new Pair<>(outputName, bp))
-                            .toList()
-            );
-        });
-        invalidOutputs.forEach(p -> deleteOutput(p.getFirst(), p.getSecond()));
+        forwardLinks.entrySet().stream().flatMap(e ->
+            e.getValue().stream().map(bp -> new Pair<>(e.getKey(), bp))
+        ).filter(e -> {
+            String outputName = e.getFirst();
+            BlockPort bp = e.getSecond();
+            BlockLinkPort blp = of(bp.pos()).orElse(null);
+            if(blp == null)return true;
+            return !blp.backwardLinks()
+                    .getOrDefault(bp.portName(), BlockPort.EMPTY)
+                    .equals(new BlockPort(pos(), outputName)); // if the output is not in the blp, it is invalid
+        })
+        .toList()
+        .forEach(e -> deleteOutput(e.getFirst(), e.getSecond()));
+
     }
 
     public void removeInvalidInput(){
-        List<String> invalidInputs = new ArrayList<>();
-        backwardLinks.forEach((inputName, port) -> {
-            if(of(port.pos()).isPresent())return;
-            invalidInputs.add(inputName);
-        });
-        invalidInputs.forEach(this::deleteInput);
+        // List<String> invalidInputs = new ArrayList<>();
+        backwardLinks.entrySet().stream().filter(e -> {
+            String inputName = e.getKey();
+            BlockPort bp = e.getValue();
+            BlockLinkPort blp = of(bp.pos()).orElse(null);
+            if(blp == null)return true;
+            return !blp.forwardLinks()
+                    .getOrDefault(inputName, EMPTY)
+                    .contains(new BlockPort(pos(), inputName)); // if the input is not in the blp, it is invalid
+        })
+                .toList().forEach(e -> deleteInput(e.getKey()));
     }
 
     public WorldBlockPos pos(){
@@ -330,16 +348,40 @@ public abstract class BlockLinkPort {
 
     public CompoundTag serializeLinks(){
         return CompoundTagBuilder.create()
-                .withCompound("forward", FORWARD.serialize(forwardLinks))
-                .withCompound("backward", BACKWARD.serialize(backwardLinks))
+                .withCompound("forward", serializeForward())
+                .withCompound("backward", serializeBackward())
                 .build();
+    }
+
+    public CompoundTag serialize(){
+        return serializeLinks();
+    }
+
+    public void deserialize(CompoundTag tag){
+        deserializeLinks(tag);
+    }
+
+    public CompoundTag serializeForward(){
+        return FORWARD.serialize(forwardLinks);
+    }
+
+    public static Map<String, Set<BlockPort>> deserializeForward(CompoundTag tag){
+        return FORWARD.deserialize(tag);
+    }
+
+    public static Map<String, BlockPort> deserializeBackward(CompoundTag tag){
+        return BACKWARD.deserialize(tag);
+    }
+
+    public CompoundTag serializeBackward(){
+        return BACKWARD.serialize(backwardLinks);
     }
 
     public void deserializeLinks(CompoundTag tag){
         forwardLinks.clear();
         backwardLinks.clear();
-        forwardLinks.putAll(FORWARD.deserialize(tag.getCompound("forward")));
-        backwardLinks.putAll(BACKWARD.deserialize(tag.getCompound("backward")));
+        forwardLinks.putAll(deserializeForward(tag.getCompound("forward")));
+        backwardLinks.putAll(deserializeBackward(tag.getCompound("backward")));
     }
 
     public static class PropagateContext{

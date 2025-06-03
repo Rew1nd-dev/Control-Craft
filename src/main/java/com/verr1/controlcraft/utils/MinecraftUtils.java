@@ -64,6 +64,16 @@ public class MinecraftUtils {
                 .orElse(null);
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public static @Nullable BlockPos lookingAtPos(){
+        Minecraft mc = Minecraft.getInstance();
+        return Optional
+                .ofNullable(mc.hitResult)
+                .filter(BlockHitResult.class::isInstance)
+                .map(BlockHitResult.class::cast)
+                .map(BlockHitResult::getBlockPos)
+                .orElse(null);
+    }
 
     @OnlyIn(Dist.CLIENT)
     public static<T extends Descriptive<?>> int maxLength(List<T> descriptive){

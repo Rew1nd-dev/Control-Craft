@@ -6,6 +6,14 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
 
 public record BlockPort(WorldBlockPos pos, String portName) {
+    public static final BlockPort EMPTY = new BlockPort(WorldBlockPos.NULL, "");
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BlockPort other)) return false;
+        return pos.equals(other.pos) && portName.equals(other.portName);
+    }
 
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()

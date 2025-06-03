@@ -169,6 +169,41 @@ public class SerializeUtils {
         };
     }
 
+    /**
+     * Creates a Serializer for List<V> using the provided element Serializer.
+     *
+     * @param elementSerializer the Serializer for the elements of the List
+     * @param <V> the type of elements in the List
+     * @return a Serializer for List<V>
+     */
+    public static <V> Serializer<List<V>> ofList(Serializer<V> elementSerializer) {
+        return new Serializer<List<V>>() {
+            @Override
+            public CompoundTag serialize(@NotNull List<V> list) {
+                CompoundTagBuilder builder = new CompoundTagBuilder();
+                builder.withLong("count", (long) list.size());
+                for (int i = 0; i < list.size(); i++) {
+                    V element = list.get(i);
+                    CompoundTag elementTag = elementSerializer.serialize(element);
+                    builder.withCompound("element_" + i, elementTag);
+                }
+                return builder.build();
+            }
+
+            @Override
+            public @NotNull List<V> deserialize(CompoundTag tag) {
+                long count = tag.getLong("count");
+                List<V> list = new ArrayList<>();
+                for (long i = 0; i < count; i++) {
+                    CompoundTag elementTag = tag.getCompound("element_" + i);
+                    V element = elementSerializer.deserialize(elementTag);
+                    list.add(element);
+                }
+                return list;
+            }
+        };
+    }
+
     @SuppressWarnings("unchecked") // It's checked
     public static<T extends Enum<?>> Serializer<T> ofEnum(Class<T> enumClazz){
         return (Serializer<T>)EnumSerializerCache.computeIfAbsent(

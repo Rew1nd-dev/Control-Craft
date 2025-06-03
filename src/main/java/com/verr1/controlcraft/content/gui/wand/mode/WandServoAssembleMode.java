@@ -75,7 +75,7 @@ public class WandServoAssembleMode extends WandAbstractDualSelectionMode {
     }
 
     @Override
-    protected void sendPacket(WandSelection x, WandSelection y) {
+    protected void confirm(WandSelection x, WandSelection y) {
 
         if(x == WandSelection.NULL)return;
         BlockEntity be = Minecraft.getInstance().player.level().getExistingBlockEntity(x.pos());

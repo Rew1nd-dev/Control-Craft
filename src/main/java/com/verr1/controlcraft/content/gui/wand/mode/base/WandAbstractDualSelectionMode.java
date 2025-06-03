@@ -71,8 +71,8 @@ public abstract class WandAbstractDualSelectionMode extends WandAbstractMultiple
             return;
         }
 
-        sendPacket(x, y);
+        confirm(x, y);
     }
 
-    protected abstract void sendPacket(WandSelection x, WandSelection y);
+    protected abstract void confirm(WandSelection x, WandSelection y);
 }

@@ -1,9 +1,10 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port.types;
 
+import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
 import com.verr1.controlcraft.foundation.cimulink.game.ComponentInstances;
 
-public enum FFTypes implements Inspectable<Temporal<Boolean>>{
+public enum FFTypes implements Inspectable<Temporal<Boolean>>, Descriptive<FFTypes> {
     T_FF(ComponentInstances.T_FF),
     D_FF(ComponentInstances.D_FF),
     JK_FF(ComponentInstances.JK_FF),
@@ -18,5 +19,15 @@ public enum FFTypes implements Inspectable<Temporal<Boolean>>{
     @Override
     public ComponentInstances.Inspector<Temporal<Boolean>> inspector() {
         return inspector;
+    }
+
+    @Override
+    public FFTypes self() {
+        return this;
+    }
+
+    @Override
+    public Class<FFTypes> clazz() {
+        return FFTypes.class;
     }
 }

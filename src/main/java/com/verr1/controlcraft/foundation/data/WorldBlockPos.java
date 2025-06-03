@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public record WorldBlockPos(String dimensionID, BlockPos pos) {
 
@@ -21,6 +22,18 @@ public record WorldBlockPos(String dimensionID, BlockPos pos) {
     public static WorldBlockPos of(Level level, BlockPos pos){
         String d = VSGameUtilsKt.getDimensionId(level);
         return new WorldBlockPos(d, pos);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        WorldBlockPos that = (WorldBlockPos) o;
+        return Objects.equals(pos, that.pos) && Objects.equals(dimensionID, that.dimensionID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dimensionID, pos);
     }
 
     public GlobalPos globalPos(){

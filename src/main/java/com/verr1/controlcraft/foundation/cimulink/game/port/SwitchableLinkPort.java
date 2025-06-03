@@ -36,13 +36,14 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
         return currentType.inspector().get();
     }
 
-
+    @Override
     public CompoundTag serialize() {
         return CompoundTagBuilder.create().withCompound("blp", serializeLinks())
                 .withCompound("current_type", TYPE.serializeNullable(currentType))
                 .build();
     }
 
+    @Override
     public void deserialize(CompoundTag tag){
         setCurrentType(TYPE.deserialize(tag.getCompound("current_type")));
         deserializeLinks(tag.getCompound("blp"));

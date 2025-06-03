@@ -56,7 +56,7 @@ public class WandSliderAssembleMode extends WandAbstractTripleSelectionMode {
 
 
     @Override
-    protected void sendPacket(WandSelection x, WandSelection y, WandSelection z) {
+    protected void confirm(WandSelection x, WandSelection y, WandSelection z) {
         BlockPos sliderPos = x.pos();
         BlockPos compPos = y.pos();
         Direction compAlign = y.face();

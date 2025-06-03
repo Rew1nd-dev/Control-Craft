@@ -80,7 +80,7 @@ public class WandJointConnectionMode extends WandAbstractDualSelectionMode {
     }
 
     @Override
-    protected void sendPacket(WandSelection x, WandSelection y) {
+    protected void confirm(WandSelection x, WandSelection y) {
         BlockPos jointPos = x.pos();
         BlockPos compPos = y.pos();
 

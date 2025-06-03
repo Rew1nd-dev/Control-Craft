@@ -73,10 +73,10 @@ public abstract class WandAbstractQuadSelectionMode extends WandAbstractMultiple
             return;
         }
 
-        sendPacket(x, y, z, w);
+        confirm(x, y, z, w);
     }
 
-    protected abstract void sendPacket(WandSelection x, WandSelection y, WandSelection z, WandSelection w);
+    protected abstract void confirm(WandSelection x, WandSelection y, WandSelection z, WandSelection w);
 
     @Override
     public abstract String getID();
