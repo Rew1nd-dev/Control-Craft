@@ -23,7 +23,7 @@ public class CimulinkBlocks {
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .transform(TagGen.axeOrPickaxe())
             .blockstate(
-                    BlockStateGen.horizontalBlockProvider(true)
+                    BlockStateGen.directionalBlockProvider(true)
             )
             .item()
             .transform(customItemModel())

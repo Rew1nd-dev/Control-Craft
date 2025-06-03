@@ -20,25 +20,27 @@ import net.minecraft.world.level.block.state.BlockState;
 public class LogicGateBlockEntity extends NetworkBlockEntity implements ILinkableBlock {
 
 
-    private final LogicGateLinkPort linkPort;
+    private LogicGateLinkPort linkPort;
 
     public static final NetworkKey GATE_TYPE = NetworkKey.create("gate_type");
 
 
-
+    @Override
+    public void initialize() {
+        super.initialize();
+        linkPort = new LogicGateLinkPort(WorldBlockPos.of(level, getBlockPos()));
+    }
 
     public LogicGateBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         if(level == null){
             ControlCraft.LOGGER.error("LogicGate Be Created With Null Level! at: {}", pos);
         }
-        linkPort = new LogicGateLinkPort(WorldBlockPos.of(level, pos));
-
 
         buildRegistry(GATE_TYPE)
             .withBasic(SerializePort.of(
-                linkPort::getCurrentType,
-                linkPort::setCurrentType,
+                () -> linkPort().getCurrentType(),
+                t ->  linkPort().setCurrentType(t),
                 SerializeUtils.ofEnum(GateTypes.class)
             ))
             .withClient(ClientBuffer.of(GateTypes.class))
@@ -47,8 +49,8 @@ public class LogicGateBlockEntity extends NetworkBlockEntity implements ILinkabl
 
         buildRegistry(SharedKeys.BLP)
             .withBasic(CompoundTagPort.of(
-                linkPort::serialize,
-                linkPort::deserialize
+                () -> linkPort().serialize(),
+                t -> linkPort().deserialize(t)
             ))
             .dispatchToSync()
             .register();
@@ -67,7 +69,7 @@ public class LogicGateBlockEntity extends NetworkBlockEntity implements ILinkabl
     }
 
     @Override
-    public BlockLinkPort linkPort() {
+    public LogicGateLinkPort linkPort() {
         return linkPort;
     }
 }

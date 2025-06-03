@@ -24,6 +24,7 @@
     "vscontrolcraft:camera",
     "vscontrolcraft:kinetic_proxy",
     "vscontrolcraft:kinetic_resistor",
-    "vscontrolcraft:compact_flap"
+    "vscontrolcraft:compact_flap",
+    "vscontrolcraft:logic_gates"
   ]
 }

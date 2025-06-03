@@ -44,4 +44,6 @@ public enum GateTypes implements Inspectable<BooleanCombinational>, Descriptive<
     public Class<GateTypes> clazz() {
         return GateTypes.class;
     }
+
+    public static void register(){}
 }

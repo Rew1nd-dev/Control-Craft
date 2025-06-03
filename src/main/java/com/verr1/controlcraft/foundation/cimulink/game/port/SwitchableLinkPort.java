@@ -16,6 +16,7 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
     protected SwitchableLinkPort(WorldBlockPos portPos, T defaultValue) {
         super(portPos, defaultValue.inspector().get());
         TYPE = SerializeUtils.ofEnum(clazz());
+        currentType = defaultValue;
     }
 
     protected abstract Class<T> clazz();
@@ -38,7 +39,7 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
 
     public CompoundTag serialize() {
         return CompoundTagBuilder.create().withCompound("blp", serializeLinks())
-                .withCompound("current_type", TYPE.serialize(currentType))
+                .withCompound("current_type", TYPE.serializeNullable(currentType))
                 .build();
     }
 
