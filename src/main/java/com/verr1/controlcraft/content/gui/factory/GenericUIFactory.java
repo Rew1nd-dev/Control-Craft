@@ -797,13 +797,7 @@ public class GenericUIFactory {
     }
 
 
-    public static VerticalFlow createTerminalDeviceTab__(BlockPos boundPos){
-        return new VerticalFlow.builder(boundPos)
-                .withPort(
-                        ITerminalDevice.FIELD__,
-                        new TerminalDeviceUIField__(boundPos)
-                ).build();
-    }
+
 
     public static VerticalFlow createTerminalDeviceTab(BlockPos boundPos){
         return new VerticalFlow.builder(boundPos)

@@ -53,6 +53,14 @@ public abstract class BlockLinkPort {
         }
     }
 
+    public String name(){
+        return realTimeComponent.name();
+    }
+
+    public void setName(String name){
+        realTimeComponent.withName(name);
+    }
+
     public static void propagateOutput(PropagateContext watcher, BlockLinkPort blp){
         blp.changedOutput().forEach(changedOutput -> {
             double value = blp.retrieveOutput(changedOutput);

@@ -10,6 +10,7 @@ import static com.verr1.controlcraft.content.gui.factory.GenericUIFactory.boundB
 
 public abstract class TypedUIPort<T> extends NetworkUIPort<T> {
 
+    private final NetworkKey key;
 
     public TypedUIPort(BlockPos boundPos, NetworkKey key, Class<T> dataType, T defaultValue) {
         super(
@@ -18,6 +19,11 @@ public abstract class TypedUIPort<T> extends NetworkUIPort<T> {
                         .map(be -> be.handler().readClientBuffer(key, dataType))
                         .orElse(defaultValue)
         );
+        this.key = key;
     }
 
+
+    public NetworkKey key(){
+        return key;
+    }
 }

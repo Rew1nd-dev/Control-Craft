@@ -10,12 +10,14 @@ import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
 import com.verr1.controlcraft.foundation.data.links.ValueStatus;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
+import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,6 +39,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     public final void initialize() {
         super.initialize();
         linkPort = create(level, getBlockPos());
+        syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
         initializeExtra();
     }
 
@@ -54,6 +57,16 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
                         () -> linkPort().serialize(),
                         t -> linkPort().deserialize(t)
                 ))
+                .register();
+
+        buildRegistry(SharedKeys.COMPONENT_NAME)
+                .withBasic(SerializePort.of(
+                        this::name,
+                        this::setName,
+                        SerializeUtils.STRING
+                ))
+                .withClient(ClientBuffer.STRING.get())
+                .dispatchToSync()
                 .register();
 /*
 buildRegistry(SharedKeys.STATUS)
@@ -86,6 +99,16 @@ buildRegistry(SharedKeys.STATUS)
         );
     }
 
+    public void setName(String name){
+        if(linkPort() == null)return;
+        linkPort().setName(name);
+    }
+
+    public String name(){
+        if(linkPort() == null)return "why?";
+        return linkPort().name();
+    }
+
     private<R> void registerPartial(
             NetworkKey key,
             Supplier<CompoundTag> ser,
@@ -105,7 +128,8 @@ buildRegistry(SharedKeys.STATUS)
                         clazz
                 ))
                 .dispatchToSync()
-                .runtimeOnly();
+                .runtimeOnly()
+                .register();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -143,6 +167,7 @@ buildRegistry(SharedKeys.STATUS)
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
+        if(linkPort() == null)return;
         linkPort().removeInvalid();
     }
 
@@ -162,10 +187,16 @@ buildRegistry(SharedKeys.STATUS)
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        return tooltip.addAll(makeToolTip(readClientValueStatus(), readClientConnectionStatus()));
+        if(isPlayerSneaking){
+            tooltip.addAll(makeDetailedToolTip(readClientConnectionStatus()));
+        }else{
+            tooltip.addAll(makeToolTip(readClientValueStatus(), readClientConnectionStatus()));
+        }
+        return true;
     }
 
     public static List<Component> makeToolTip(ValueStatus vs, ConnectionStatus cs){
+        if(vs == null || cs == null)return List.of();
         int inSize = Math.min(vs.inputValues.size(), cs.inputs.size());
         int outSize = Math.min(vs.outputValues.size(), cs.outputs.size());
         Component inTitle = Component.literal("Inputs").withStyle(s -> s.withColor(ChatFormatting.DARK_BLUE));
@@ -176,15 +207,37 @@ buildRegistry(SharedKeys.STATUS)
                 i -> sbi.append(cs.inputs.get(i)).append(": ").append(vs.inputValues.get(i)).append(" | ")
         );
         StringBuilder sbo = new StringBuilder();
-        IntStream.range(0, inSize).forEach(
-                i -> sbo.append(cs.inputs.get(i)).append(": ").append(vs.inputValues.get(i)).append(" | ")
+        IntStream.range(0, outSize).forEach(
+                i -> sbo.append(cs.outputs.get(i)).append(": ").append(vs.outputValues.get(i)).append(" | ")
         );
 
         return List.of(
+                Component.literal("    values:"),
                 inTitle,
                 Component.literal(sbi.toString()).withStyle(ChatFormatting.GREEN),
                 outTitle,
                 Component.literal(sbo.toString()).withStyle(ChatFormatting.DARK_GREEN)
         );
     }
+
+    public static List<Component> makeDetailedToolTip(ConnectionStatus cs){
+
+        MutableComponent in = Component.literal("in: \n");
+        cs.inputPorts.forEach((inName, outBp) -> {
+            in.append(inName).append(" <- ").append(outBp.portName()).append("\n");
+        });
+        MutableComponent out = Component.literal("out: \n");
+        cs.outputPorts.forEach((outName, inBps) -> {
+            out.append(outName).append("->");
+            MutableComponent bps = Component.literal("");
+            inBps.forEach(bp -> bps.append(bp.portName()).append(", "));
+            out.append(bps).append("\n");
+        });
+        return List.of(
+                Component.literal("    Connection Status:").withStyle(ChatFormatting.GOLD),
+                in.withStyle(ChatFormatting.GREEN),
+                out.withStyle(ChatFormatting.DARK_GREEN)
+        );
+    }
+
 }

@@ -10,6 +10,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class LinkScreen extends AbstractSimiScreen {
 
 
+    public LinkScreen(){
+
+    }
+
     @Override
     protected void renderWindow(GuiGraphics guiGraphics, int i, int i1, float v) {
 

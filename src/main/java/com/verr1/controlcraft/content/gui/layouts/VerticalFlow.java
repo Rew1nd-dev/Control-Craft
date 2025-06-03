@@ -2,6 +2,7 @@ package com.verr1.controlcraft.content.gui.layouts;
 
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.content.gui.layouts.api.SwitchableTab;
+import com.verr1.controlcraft.content.gui.layouts.element.TypedUIPort;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.executor.executables.ConditionExecutable;
@@ -194,6 +195,15 @@ public class VerticalFlow implements SwitchableTab {
                 NetworkUIPort<?> port
         ){
             list.add(ImmutablePair.of(key, port));
+            return this;
+        }
+
+        public builder withPort(
+                TypedUIPort<?>... port
+        ){
+            for(var p: port){
+                list.add(ImmutablePair.of(p.key(), p));
+            }
             return this;
         }
 
