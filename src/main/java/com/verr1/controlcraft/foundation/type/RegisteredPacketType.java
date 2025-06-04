@@ -26,6 +26,8 @@ public enum RegisteredPacketType {
     DESTROY_ALL_CONSTRAIN,
     DESTROY_CONSTRAIN,
 
+    DELINK,
+
     CONNECT,
     BRUTE_CONNECT,
 

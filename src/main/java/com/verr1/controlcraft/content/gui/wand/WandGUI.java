@@ -40,6 +40,7 @@ public class WandGUI implements IGuiOverlay {
     public WandModesType currentType = WandModesType.DESTROY;
 
     private boolean shouldSetModeByLooking = false;
+    private boolean isConnecting = false;
 
     public WandGUI(){
         selectionScreen = new ModeSelectionScreen(WandGUIModesType.getAllTypes(), this::setMode);
@@ -88,6 +89,7 @@ public class WandGUI implements IGuiOverlay {
 
     public void setModeByLooking(){
         if(WandModesType.modeOf(currentType).isRunning())return;
+
         Optional
             .ofNullable(MinecraftUtils.lookingAt())
             .ifPresent(
@@ -105,7 +107,8 @@ public class WandGUI implements IGuiOverlay {
                         currentType = WandModesType.HINGE;
                     }
                     if(blockEntity instanceof CimulinkBlockEntity<?>){
-                        currentType = WandModesType.LINK;
+                        if(isConnecting) currentType = WandModesType.LINK;
+                        else currentType = WandModesType.DELINK;
                     }
                 }
             );
@@ -162,7 +165,8 @@ public class WandGUI implements IGuiOverlay {
                 currentType = WandModesType.DESTROY_ALL;
                 break;
         }
-        shouldSetModeByLooking = (mode == WandGUIModesType.CONNECT || mode == WandGUIModesType.LINK);
+        shouldSetModeByLooking = (mode == WandGUIModesType.CONNECT || mode == WandGUIModesType.DISCONNECT);
+        isConnecting = (mode == WandGUIModesType.CONNECT);
     }
 
 

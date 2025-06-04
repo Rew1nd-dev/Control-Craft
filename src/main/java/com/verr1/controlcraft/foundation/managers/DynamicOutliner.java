@@ -38,6 +38,13 @@ public class DynamicOutliner {
         return entry.outline.outlineParams();
     }
 
+    public Outline.OutlineParams showLine(Object slot, Vec3 start, Vec3 end, int ticks) {
+        OutlineEntry entry = outlines.computeIfAbsent(slot, k -> new OutlineEntry(new RayLerpHelper()));
+        entry.ticksTillRemoval = ticks;
+        entry.outline.push(new Line(start, end));
+        return entry.outline.outlineParams();
+    }
+
     public void renderOutlines(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         outlines.forEach((key, entry) -> {
             RayLerpHelper outline = entry.getOutline();

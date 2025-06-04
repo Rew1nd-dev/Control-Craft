@@ -10,6 +10,8 @@ import com.verr1.controlcraft.foundation.api.operatable.IBruteConnectable;
 import com.verr1.controlcraft.foundation.api.operatable.IConstraintHolder;
 import com.verr1.controlcraft.foundation.api.delegate.IControllerProvider;
 import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
+import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.executor.executables.FaceAlignmentSchedule;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldMessage;
 import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
@@ -18,6 +20,7 @@ import com.verr1.controlcraft.foundation.network.packets.specific.ExposedFieldOp
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -38,8 +41,30 @@ public class ServerGenericPacketHandler {
             case DESTROY_ALL_CONSTRAIN: handleDestroyAllConstraints(packet, context); break;
             case BRUTE_CONNECT: handleBruteConnect(packet, context); break;
             case CONNECT: handleConnect(packet, context); break;
+            case DELINK: handleDelink(packet, context);
             default: break;
         }
+    }
+
+    public static void handleDelink(GenericServerPacket packet, NetworkEvent.Context context){
+        BlockPos pos = BlockPos.of(packet.getLongs().get(0));
+        String portName = packet.getUtf8s().get(0);
+        boolean isInput = packet.getBooleans().get(0);
+        if(context.getSender() == null) return;
+        ServerLevel level = context.getSender().serverLevel();
+        BlockLinkPort.of(WorldBlockPos.of(level, pos)).ifPresent(blp -> {
+            try{
+                if(isInput){
+                    blp.disconnectInput(portName);
+                }else {
+                    blp.disconnectOutput(portName);
+                }
+            }catch (IllegalArgumentException e){
+                context.getSender().sendSystemMessage(Component.literal(e.getMessage()));
+            }
+
+        });
+
     }
 
     public static void handleBruteConnect(GenericServerPacket packet, NetworkEvent.Context context){

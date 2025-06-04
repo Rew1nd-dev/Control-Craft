@@ -38,6 +38,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
+
 public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends NetworkBlockEntity implements
         ILinkableBlock, IHaveGoggleInformation
 {
@@ -92,6 +94,11 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
                 ValueStatus::deserialize,
                 ValueStatus.class
         );
+    }
+
+    public Vec3 getFaceCenter(){
+        Vec3 faceDir = toVec3(getDirection().getNormal());
+        return getBlockPos().getCenter().add(faceDir.scale(-0.2));
     }
 
     public void setName(String name){

@@ -27,9 +27,7 @@ public enum WandGUIModesType implements Descriptive<WandGUIModesType> {
             "Don't Use This Unless There's Some ",
             "Constraint Cannot Be Removed Normally"
             )),
-    LINK(literals(
-            "Cimulink"
-    ))
+
     ;
 
     @Override

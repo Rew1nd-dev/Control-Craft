@@ -9,6 +9,7 @@ import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
 import com.verr1.controlcraft.foundation.managers.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
+import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.CimulinkLinkPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MathUtils;
@@ -45,6 +46,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
 
 
     public static @Nullable ClientViewContext computeContext(WandSelection ws){
+        if(Minecraft.getInstance().level == null)return null;
         return CimulinkRenderCenter.computeContext(ws.pos(), ws.location(), Minecraft.getInstance().level);
     }
 
@@ -67,7 +69,14 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         if(cvc == null)return;
         Color c = cvc.isInput() ? Color.GREEN.darker() : Color.RED.darker();
         ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), "link_looking", 0.4);
+        if(cvc.isInput()){
+            CimulinkRenderCenter.renderInConnection(cvc.pos(), cvc.portName());
+        }else{
+            CimulinkRenderCenter.renderOutConnection(cvc.pos(), cvc.portName());
+        }
     }
+
+
 
     public void tickSelected(WandSelection sel, String slot){
         if(sel.equals(WandSelection.NULL))return;
@@ -103,4 +112,6 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
 
         ControlCraftPackets.getChannel().sendToServer(p);
     }
+
+
 }
