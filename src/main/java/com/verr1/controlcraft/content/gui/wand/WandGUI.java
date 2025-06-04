@@ -121,7 +121,7 @@ public class WandGUI implements IGuiOverlay {
                 motor -> {
                     Matrix4dc transform = Optional.ofNullable(motor.getShipOn()).map(s -> s.getTransform().getShipToWorld()).orElse(new Matrix4d());
                     Vector3dc offsetCenter = transform.transformPosition(motor.getRotationCenterPosJOML());
-                    ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), Color.RED.getRGB(), "offset", 0.4);
+                    ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), Color.RED.getRGB(), "portPos", 0.4);
                 }
             );
     }

@@ -629,7 +629,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     /*
         ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(
                 "camera_clip_ray_" + getBlockPos().asLong(),
-                clipContext.getFrom().add(toMinecraft(offset)),
+                clipContext.getFrom().add(toMinecraft(portPos)),
                 clipContext.getTo()
         )
                 .colored(Color.SPRING_GREEN.setAlpha(0.6f))

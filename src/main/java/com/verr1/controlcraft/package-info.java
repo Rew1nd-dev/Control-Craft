@@ -2,7 +2,7 @@ package com.verr1.controlcraft;
 
 /*
 *   TODO:
-*    √ xyz offset of motors
+*    √ xyz portPos of motors
 *    × chunk loader on/off button, loads chunks base on ship's AABB size
 *    × Angle limit of motors
 *    √ Reworked gui

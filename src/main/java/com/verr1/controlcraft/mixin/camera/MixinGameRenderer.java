@@ -106,7 +106,7 @@ abstract class MixinGameRenderer {
         // position.
         final double fov = this.getFov(mainCamera, partialTicks, true);
 
-        // Use [camera.getPosition()] instead of [vec3] because mounting the player to the ship has changed the camera
+        // Use [camera.getPosition()] instead of [portPos] because mounting the player to the ship has changed the camera
         // position.
         prepareCullFrustum.call(instance, matrixStack, mainCamera.getPosition(),
                 this.getProjectionMatrix(Math.max(fov, this.minecraft.options.fov().get())));

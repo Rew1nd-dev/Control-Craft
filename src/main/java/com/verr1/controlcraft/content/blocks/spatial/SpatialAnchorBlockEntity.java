@@ -63,7 +63,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
 
     public static NetworkKey IS_RUNNING = NetworkKey.create("is_running");
     public static NetworkKey IS_STATIC = NetworkKey.create("is_static");
-    public static NetworkKey OFFSET = NetworkKey.create("offset");
+    public static NetworkKey OFFSET = NetworkKey.create("portPos");
     public static NetworkKey PROTOCOL = NetworkKey.create("protocol");
 
     private boolean isRunning = false;
@@ -366,7 +366,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
                 new NumericField(
                         this::getAnchorOffset,
                         this::setAnchorOffset,
-                        "offset"
+                        "portPos"
                 ),
                 new DirectReceiver.InitContext(SlotType.OFFSET, Couple.create(0.0, 10.0)),
                 new DirectReceiver.InitContext(SlotType.OFFSET, Couple.create(0.0, 10.0))

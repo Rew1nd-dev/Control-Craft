@@ -1,12 +1,9 @@
 package com.verr1.controlcraft.content.gui.wand.mode;
 
 import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractDualSelectionMode;
-import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractMultipleSelectionMode;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.IWandMode;
-import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.foundation.data.WandSelection;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
@@ -24,7 +21,6 @@ import org.joml.Vector3d;
 import java.awt.*;
 import java.util.Optional;
 
-import static com.simibubi.create.infrastructure.ponder.scenes.fluid.HosePulleyScenes.level;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
@@ -75,7 +71,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         ClientViewContext cvc = cbe.clientViewMap();
         if(cvc == null)return;
 
-        Vector3d offsetCenter = toJOML(cbe.getBlockPos().getCenter().add(cvc.offset()));
+        Vector3d offsetCenter = toJOML(cbe.getBlockPos().getCenter().add(cvc.portPos()));
         Color c = cvc.isInput() ? Color.GREEN : Color.GREEN.darker();
         ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), c.getRGB(), "link_looking", 0.4);
 
@@ -86,7 +82,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         ClientViewContext cvc = computeContext(sel);
         if(cvc == null)return;
 
-        Vector3d offsetCenter = toJOML(sel.pos().getCenter().add(cvc.offset()));
+        Vector3d offsetCenter = toJOML(sel.pos().getCenter().add(cvc.portPos()));
         Color c = cvc.isInput() ? Color.GREEN : Color.GREEN.darker();
         ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), c.getRGB(), slot, 0.4);
     }

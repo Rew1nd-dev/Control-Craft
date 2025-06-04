@@ -183,7 +183,7 @@ public class SerializeUtils {
      * @return a Serializer for List<V>
      */
     public static <V> Serializer<List<V>> ofList(Serializer<V> elementSerializer) {
-        return new Serializer<List<V>>() {
+        return new Serializer<>() {
             @Override
             public CompoundTag serialize(@NotNull List<V> list) {
                 CompoundTagBuilder builder = new CompoundTagBuilder();
