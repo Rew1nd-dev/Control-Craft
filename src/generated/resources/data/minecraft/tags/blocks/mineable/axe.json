@@ -2,6 +2,7 @@
   "values": [
     "vscontrolcraft:chunk_loader",
     "vscontrolcraft:propeller_controller",
-    "vscontrolcraft:logic_gates"
+    "vscontrolcraft:logic_gates",
+    "vscontrolcraft:ff"
   ]
 }

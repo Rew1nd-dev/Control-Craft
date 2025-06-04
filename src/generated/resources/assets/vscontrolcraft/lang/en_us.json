@@ -6,6 +6,7 @@
   "block.vscontrolcraft.constraint_joint": "Kinematic Joint Motor",
   "block.vscontrolcraft.constraint_revolute": "Kinematic Servo Motor",
   "block.vscontrolcraft.constraint_slider": "Kinematic Physical Piston",
+  "block.vscontrolcraft.ff": "Ff",
   "block.vscontrolcraft.jet": "Jet Engine",
   "block.vscontrolcraft.jet_rudder": "Jet Rudder",
   "block.vscontrolcraft.joint": "Dynamic Joint Motor",
@@ -400,6 +401,9 @@
   "vscontrolcraft.uicontents.disassembly.0": "Disassemble Contraption or Ship",
   "vscontrolcraft.uicontents.disassembly.lines": "1",
   "vscontrolcraft.uicontents.disassembly.name": "Dis Assembly",
+  "vscontrolcraft.uicontents.ff_types.0": "Flip Flop Types",
+  "vscontrolcraft.uicontents.ff_types.lines": "1",
+  "vscontrolcraft.uicontents.ff_types.name": "Type",
   "vscontrolcraft.uicontents.flap_bias.0": "Attack Angle Bias",
   "vscontrolcraft.uicontents.flap_bias.lines": "1",
   "vscontrolcraft.uicontents.flap_bias.name": "Bias",
@@ -490,5 +494,8 @@
   "vscontrolcraft.wandguimodestype.disconnect_all.3": "Constraint Cannot Be Removed Normally",
   "vscontrolcraft.wandguimodestype.disconnect_all.lines": "4",
   "vscontrolcraft.wandguimodestype.disconnect_all.name": "DISCONNECT_ALL",
+  "vscontrolcraft.wandguimodestype.link.0": "Cimulink",
+  "vscontrolcraft.wandguimodestype.link.lines": "1",
+  "vscontrolcraft.wandguimodestype.link.name": "LINK",
   "wand.gui.cycle": "Cycle"
 }

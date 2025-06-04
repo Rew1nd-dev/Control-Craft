@@ -5,6 +5,7 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
@@ -35,6 +36,11 @@ public class SerializeUtils {
     public static Serializer<BlockPort> BLOCK_PORT = SerializeUtils.of(
             BlockPort::serialize,
             BlockPort::deserialize
+    );
+
+    public static Serializer<BlockPos> BLOCK_POS = SerializeUtils.of(
+            bp -> LONG.serialize(bp.asLong()),
+            l -> BlockPos.of(LONG.deserialize(l))
     );
 
     public static Serializer<Vector3dc> VECTOR3DC = of(

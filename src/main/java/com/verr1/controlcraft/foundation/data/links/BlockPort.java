@@ -15,6 +15,11 @@ public record BlockPort(WorldBlockPos pos, String portName) {
         return pos.equals(other.pos) && portName.equals(other.portName);
     }
 
+    @Override
+    public int hashCode() {
+        return pos.hashCode() ^ portName().hashCode();
+    }
+
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()
                 .withCompound("pos", pos.serialize())
@@ -28,5 +33,7 @@ public record BlockPort(WorldBlockPos pos, String portName) {
                 SerializeUtils.STRING.deserialize(tag.getCompound("port_name"))
         );
     }
+
+
 
 }

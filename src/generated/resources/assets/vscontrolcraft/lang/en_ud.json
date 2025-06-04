@@ -6,6 +6,7 @@
   "block.vscontrolcraft.constraint_joint": "ɹoʇoW ʇuıoſ ɔıʇɐɯǝuıʞ",
   "block.vscontrolcraft.constraint_revolute": "ɹoʇoW oʌɹǝS ɔıʇɐɯǝuıʞ",
   "block.vscontrolcraft.constraint_slider": "uoʇsıԀ ןɐɔısʎɥԀ ɔıʇɐɯǝuıʞ",
+  "block.vscontrolcraft.ff": "ɟℲ",
   "block.vscontrolcraft.jet": "ǝuıbuƎ ʇǝſ",
   "block.vscontrolcraft.jet_rudder": "ɹǝppnᴚ ʇǝſ",
   "block.vscontrolcraft.joint": "ɹoʇoW ʇuıoſ ɔıɯɐuʎᗡ",
@@ -400,6 +401,9 @@
   "vscontrolcraft.uicontents.disassembly.0": "dıɥS ɹo uoıʇdɐɹʇuoƆ ǝןqɯǝssɐsıᗡ",
   "vscontrolcraft.uicontents.disassembly.lines": "Ɩ",
   "vscontrolcraft.uicontents.disassembly.name": "ʎןqɯǝssⱯ sıᗡ",
+  "vscontrolcraft.uicontents.ff_types.0": "sǝdʎ⟘ doןℲ dıןℲ",
+  "vscontrolcraft.uicontents.ff_types.lines": "Ɩ",
+  "vscontrolcraft.uicontents.ff_types.name": "ǝdʎ⟘",
   "vscontrolcraft.uicontents.flap_bias.0": "sɐıᗺ ǝןbuⱯ ʞɔɐʇʇⱯ",
   "vscontrolcraft.uicontents.flap_bias.lines": "Ɩ",
   "vscontrolcraft.uicontents.flap_bias.name": "sɐıᗺ",
@@ -490,5 +494,8 @@
   "vscontrolcraft.wandguimodestype.disconnect_all.3": "ʎןןɐɯɹoN pǝʌoɯǝᴚ ǝᗺ ʇouuɐƆ ʇuıɐɹʇsuoƆ",
   "vscontrolcraft.wandguimodestype.disconnect_all.lines": "ㄣ",
   "vscontrolcraft.wandguimodestype.disconnect_all.name": "ꞀꞀⱯ‾⟘ƆƎNNOƆSIᗡ",
+  "vscontrolcraft.wandguimodestype.link.0": "ʞuıןnɯıƆ",
+  "vscontrolcraft.wandguimodestype.link.lines": "Ɩ",
+  "vscontrolcraft.wandguimodestype.link.name": "ʞNIꞀ",
   "wand.gui.cycle": "ǝןɔʎƆ"
 }

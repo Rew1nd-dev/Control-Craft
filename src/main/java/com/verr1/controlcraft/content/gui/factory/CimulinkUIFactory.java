@@ -6,7 +6,9 @@ import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
 import com.verr1.controlcraft.content.gui.layouts.element.OptionUIField;
 import com.verr1.controlcraft.content.gui.layouts.element.StringUIField;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
+import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.CimulinkBlocks;
@@ -22,13 +24,39 @@ public class CimulinkUIFactory {
 
     public static GenericSettingScreen createLogicGateScreen(BlockPos boundPos){
 
-
-
         OptionUIField<GateTypes> type = new OptionUIField<>(
                 boundPos,
                 LogicGateBlockEntity.GATE_TYPE,
                 GateTypes.class,
                 convert(UIContents.GATE_TYPES, Converter::titleStyle)
+        );
+
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, type)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createFFScreen(BlockPos boundPos){
+
+        OptionUIField<FFTypes> type = new OptionUIField<>(
+                boundPos,
+                FFBlockEntity.FF_TYPE,
+                FFTypes.class,
+                convert(UIContents.FF_TYPES, Converter::titleStyle)
         );
 
         StringUIField name = new StringUIField(

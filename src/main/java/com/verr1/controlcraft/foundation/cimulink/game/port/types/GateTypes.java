@@ -15,7 +15,9 @@ public enum GateTypes implements Inspectable<BooleanCombinational>, Descriptive<
     AND(ComponentInstances.AND2, literals("2->1 AND Gate")),
     OR(ComponentInstances.OR2, literals("2->1 OR Gate")),
     XOR(ComponentInstances.XOR2, literals("2->1 XOR Gate")),
-    NOT(ComponentInstances.NOT, literals("1->1 Negate")),;
+    NOT(ComponentInstances.NOT, literals("1->1 Negate")),
+
+    ;
 
     private final ComponentInstances.Inspector<BooleanCombinational> inspector;
 

@@ -1,15 +1,15 @@
 package com.verr1.controlcraft.content.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.LongArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
+import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
@@ -17,6 +17,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -86,6 +88,30 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int inputCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        int index = context.getArgument("portId", Integer.class);
+        double value = context.getArgument("value", Double.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set neglect a block!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        HitResult ht = player.pick(5, 1, false);
+        if(!(ht instanceof BlockHitResult bht)){
+            source.sendFailure(Component.literal("No block Found in your vicinity"));
+            return 0;
+        }
+        BlockLinkPort.of(WorldBlockPos.of(player.serverLevel(), bht.getBlockPos())).ifPresentOrElse(
+                blp -> {
+                    blp.input(blp.in(index), value);
+                    BlockLinkPort.propagateCombinational(new BlockLinkPort.PropagateContext(), blp);
+                },
+                () -> source.sendFailure(Component.literal("BlockLinkPort Not Found"))
+        );
+        return 1;
+    }
+
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
             Commands
@@ -110,6 +136,18 @@ public class ControlCraftServerCommands {
                                 ControlCraftServerCommands::countFPCommand
                         )
                     )
+        );
+        dispatcher.register(
+                Commands.literal("cimulink")
+                        .then(lt("in")
+                            .then(arg("portId", IntegerArgumentType.integer())
+                                    .then(arg("value", DoubleArgumentType.doubleArg())
+                                            .executes(
+                                                ControlCraftServerCommands::inputCommand
+                                            )
+                                    )
+                                )
+                        )
         );
     }
 

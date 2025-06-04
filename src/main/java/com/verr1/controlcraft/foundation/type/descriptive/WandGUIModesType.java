@@ -26,7 +26,11 @@ public enum WandGUIModesType implements Descriptive<WandGUIModesType> {
             "Won't Reset Device, Need Manually Replace",
             "Don't Use This Unless There's Some ",
             "Constraint Cannot Be Removed Normally"
-            )),;
+            )),
+    LINK(literals(
+            "Cimulink"
+    ))
+    ;
 
     @Override
     public WandGUIModesType self() {

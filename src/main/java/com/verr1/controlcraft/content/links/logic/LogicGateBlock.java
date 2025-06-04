@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
+import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -25,7 +26,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static com.verr1.controlcraft.registry.ControlCraftShapes.HALF_BOX_BASE;
 
-public class LogicGateBlock extends DirectionalBlock implements IBE<LogicGateBlockEntity> {
+public class LogicGateBlock extends CimulinkBlock<LogicGateBlockEntity> {
     public static final String ID = "logic_gates";
 
 
@@ -33,21 +34,6 @@ public class LogicGateBlock extends DirectionalBlock implements IBE<LogicGateBlo
         super(properties);
     }
 
-    @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-        super.createBlockStateDefinition(builder);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getClickedFace());
-    }
-
-    @Override
-    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        return HALF_BOX_BASE.get(state.getValue(FACING));
-    }
 
     @Override
     public Class<LogicGateBlockEntity> getBlockEntityClass() {
@@ -59,19 +45,6 @@ public class LogicGateBlock extends DirectionalBlock implements IBE<LogicGateBlo
         ScreenOpener.open(CimulinkUIFactory.createLogicGateScreen(p));
     }
 
-    @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn,
-                                 BlockHitResult hit){
-        if(     worldIn.isClientSide
-                && handIn == InteractionHand.MAIN_HAND
-                && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()
-                && !player.isShiftKeyDown()
-        ){
-            displayScreen(pos);
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.PASS;
-    }
 
     @Override
     public BlockEntityType<? extends LogicGateBlockEntity> getBlockEntityType() {

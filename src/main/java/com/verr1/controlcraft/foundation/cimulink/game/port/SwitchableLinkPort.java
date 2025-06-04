@@ -24,7 +24,9 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
     public void setCurrentType(T type){
         if(type == currentType)return;
         currentType = type;
+        String preservedName = name();
         recreate();
+        setName(preservedName);
     }
 
     public T getCurrentType() {

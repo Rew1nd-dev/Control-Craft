@@ -39,6 +39,7 @@ public enum ControlCraftPackets {
     REQUEST_SYNC(LazyRequestBlockEntitySyncPacket.class, LazyRequestBlockEntitySyncPacket::new, NetworkDirection.PLAY_TO_SERVER),
     SYNC_BLOCKENTITY_SERVER(SyncBlockEntityServerPacket.class, SyncBlockEntityServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
     REMOTE(RemotePacket.class, RemotePacket::new, NetworkDirection.PLAY_TO_SERVER),
+    CIMULINK_LINK(CimulinkLinkPacket.class, CimulinkLinkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     ;
 
 

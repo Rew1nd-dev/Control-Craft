@@ -22,13 +22,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NotNull;
 
 public class LogicGateBlockEntity extends CimulinkBlockEntity<LogicGateLinkPort> {
 
     public static final NetworkKey GATE_TYPE = NetworkKey.create("gate_type");
 
     @Override
-    protected LogicGateLinkPort create(Level level, BlockPos pos) {
+    protected LogicGateLinkPort create(@NotNull Level level, BlockPos pos) {
         return new LogicGateLinkPort(WorldBlockPos.of(level, getBlockPos()));
     }
 

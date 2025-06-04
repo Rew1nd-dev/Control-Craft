@@ -35,6 +35,7 @@ public class ControlCraftEvents {
         BlockEntityGetter.create(event.getServer());
         ConstraintCenter.onServerStaring(event.getServer());
         ControlCraftServer.INSTANCE = event.getServer();
+        ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftAttachments.register();
 
         // VSEvents.ShipLoadEvent.Companion.on(ControlCraftAttachments::onShipLoad);

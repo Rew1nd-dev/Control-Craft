@@ -17,6 +17,7 @@ public abstract class Combinational extends NamedComponent {
 
     @Override
     public final void onInputChange(Integer... indexes) {
+        if(indexes.length == 0)return;
         updateOutput(transform(retrieveInput()));
     }
 

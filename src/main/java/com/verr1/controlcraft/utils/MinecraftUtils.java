@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
@@ -76,6 +77,17 @@ public class MinecraftUtils {
     }
 
     @OnlyIn(Dist.CLIENT)
+    public static @Nullable Vec3 lookingAtVec(){
+        Minecraft mc = Minecraft.getInstance();
+        return Optional
+                .ofNullable(mc.hitResult)
+                .filter(BlockHitResult.class::isInstance)
+                .map(BlockHitResult.class::cast)
+                .map(BlockHitResult::getLocation)
+                .orElse(null);
+    }
+
+    @OnlyIn(Dist.CLIENT)
     public static<T extends Descriptive<?>> int maxLength(List<T> descriptive){
         AtomicInteger maxLen = new AtomicInteger(0);
         descriptive.forEach(c -> {
@@ -97,6 +109,10 @@ public class MinecraftUtils {
     public static Direction getVerticalDirectionSimple(Direction facing){
         if(facing.getAxis() != Direction.Axis.Y)return Direction.UP;
         return Direction.NORTH;
+    }
+
+    public static Vec3 toVec3(Vec3i vec3i){
+        return new Vec3(vec3i.getX(), vec3i.getY(), vec3i.getZ());
     }
 
     public static Direction getVerticalDirection(BlockState state){

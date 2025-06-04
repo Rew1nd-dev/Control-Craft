@@ -4,6 +4,7 @@ package com.verr1.controlcraft;
 import com.verr1.controlcraft.content.compact.tweak.RedstoneLinkNetworkHandlerExtension;
 import com.verr1.controlcraft.foundation.executor.Executor;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ControlCraftServer {
     public static MinecraftServer INSTANCE;
+    public static ServerLevel OVERWORLD;
     public static RedstoneLinkNetworkHandlerExtension DECIMAL_LINK_NETWORK_HANDLER = new RedstoneLinkNetworkHandlerExtension();
     public static final Executor SERVER_EXECUTOR = new Executor();
 

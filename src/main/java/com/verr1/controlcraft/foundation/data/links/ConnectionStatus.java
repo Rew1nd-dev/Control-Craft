@@ -1,9 +1,14 @@
 package com.verr1.controlcraft.foundation.data.links;
 
+import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 
@@ -36,6 +41,22 @@ public class ConnectionStatus {
         this.outputs.addAll(outputs);
     }
 
+    public String in(int index){
+        if(index >= inputs.size() || index < 0)return "out of bound";
+        return inputs.get(index);
+    }
+
+    public String out(int index){
+        if(index >= outputs.size() || index < 0)return "out of bound";
+        return outputs.get(index);
+    }
+
+
+    public static String mapToName(BlockPos pos, Level level){
+        return BlockEntityGetter.getLevelBlockEntityAt(level, pos, CimulinkBlockEntity.class)
+                .map(CimulinkBlockEntity::readClientComponentName)
+                .orElse("not found");
+    }
 
     public static CompoundTag summarize(BlockLinkPort blp){
         return CompoundTagBuilder.create()

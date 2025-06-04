@@ -5,6 +5,7 @@ import com.verr1.controlcraft.content.blocks.joints.AbstractJointBlockEntity;
 import com.verr1.controlcraft.content.blocks.motor.*;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
 import com.verr1.controlcraft.content.blocks.slider.KinematicSliderBlockEntity;
+import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.data.WandSelection;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.foundation.type.descriptive.WandGUIModesType;
@@ -103,6 +104,9 @@ public class WandGUI implements IGuiOverlay {
                     if(blockEntity instanceof AbstractJointBlockEntity){
                         currentType = WandModesType.HINGE;
                     }
+                    if(blockEntity instanceof CimulinkBlockEntity<?>){
+                        currentType = WandModesType.LINK;
+                    }
                 }
             );
     }
@@ -158,7 +162,7 @@ public class WandGUI implements IGuiOverlay {
                 currentType = WandModesType.DESTROY_ALL;
                 break;
         }
-        shouldSetModeByLooking = (mode == WandGUIModesType.CONNECT);
+        shouldSetModeByLooking = (mode == WandGUIModesType.CONNECT || mode == WandGUIModesType.LINK);
     }
 
 
@@ -166,7 +170,7 @@ public class WandGUI implements IGuiOverlay {
         if(!event.getLevel().isClientSide)return;
         if(event.getHand() != InteractionHand.MAIN_HAND)return;
         if(!isClientWandInHand())return;
-        WandSelection selection = new WandSelection(event.getPos(), event.getFace());
+        WandSelection selection = new WandSelection(event.getPos(), event.getFace(), event.getHitVec().getLocation());
         select(selection);
     }
 

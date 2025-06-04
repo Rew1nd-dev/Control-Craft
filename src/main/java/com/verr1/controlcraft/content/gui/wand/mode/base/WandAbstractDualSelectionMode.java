@@ -42,8 +42,6 @@ public abstract class WandAbstractDualSelectionMode extends WandAbstractMultiple
     public void onConfirm() {
         switch (state){
             case TO_SELECT_X, TO_SELECT_Y:
-                // clear();
-                // next_state = State.TO_SELECT_X;
                 break;
             case TO_CONFIRM:
                 confirm();

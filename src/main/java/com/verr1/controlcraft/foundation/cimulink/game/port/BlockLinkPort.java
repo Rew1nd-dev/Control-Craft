@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
@@ -21,7 +22,8 @@ public abstract class BlockLinkPort {
 
     public static final Set<WorldBlockPos> ALL_BLP = new HashSet<>();
 
-
+    public static final SerializeUtils.Serializer<HashMap<BlockPos, String>> POS_NAME_MAP =
+            SerializeUtils.ofMap(SerializeUtils.BLOCK_POS, SerializeUtils.STRING);
 
     public static final SerializeUtils.Serializer<HashMap<String, BlockPort>> BACKWARD =
             SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.BLOCK_PORT);
@@ -81,6 +83,7 @@ public abstract class BlockLinkPort {
                         propagateCombinational(watcher, nextBlp);
                     }catch (IllegalArgumentException e){
                         System.out.println("Error during propagation: " + e);
+                        blp.removeAllLinks();
                         // ControlCraft.LOGGER.error("Error during propagation: {}", e.toString());
                     }
 
@@ -276,6 +279,11 @@ public abstract class BlockLinkPort {
 
     }
 
+    public void removeAllLinks(){
+        inputsNames().forEach(this::disconnectInput);
+        outputsNames().forEach(this::disconnectOutput);
+    }
+
     public void removeInvalidInput(){
         // List<String> invalidInputs = new ArrayList<>();
         backwardLinks.entrySet().stream().filter(e -> {
@@ -284,7 +292,7 @@ public abstract class BlockLinkPort {
             BlockLinkPort blp = of(bp.pos()).orElse(null);
             if(blp == null)return true;
             return !blp.forwardLinks()
-                    .getOrDefault(inputName, EMPTY)
+                    .getOrDefault(bp.portName(), EMPTY)
                     .contains(new BlockPort(pos(), inputName)); // if the input is not in the blp, it is invalid
         })
                 .toList().forEach(e -> deleteInput(e.getKey()));
@@ -296,8 +304,7 @@ public abstract class BlockLinkPort {
 
     public void quit(){
         remove(pos());
-        inputsNames().forEach(this::disconnectInput);
-        outputsNames().forEach(this::disconnectOutput);
+        removeAllLinks();
     }
 
 
@@ -373,6 +380,8 @@ public abstract class BlockLinkPort {
         return FORWARD.serialize(forwardLinks);
     }
 
+
+
     public static Map<String, Set<BlockPort>> deserializeForward(CompoundTag tag){
         return FORWARD.deserialize(tag);
     }
@@ -423,6 +432,7 @@ public abstract class BlockLinkPort {
             try{
                 ArrayUtils.AssertAbsence(visited, pos);
             }catch (Exception e){
+
                 throw new IllegalArgumentException("Enclosed Loop Detected: " + visitedMessage());
             }
 
