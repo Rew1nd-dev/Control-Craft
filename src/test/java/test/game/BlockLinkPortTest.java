@@ -1,10 +1,9 @@
 package test.game;
 
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
-import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.FFLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.digital.LogicGateLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.digital.GateLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 
@@ -12,9 +11,9 @@ public class BlockLinkPortTest {
 
 
     public static void connectivityTest(){
-        var or0 = new LogicGateLinkPort(Debug.MapToDebug(0));
-        var or1 = new LogicGateLinkPort(Debug.MapToDebug(1));
-        var or2 = new LogicGateLinkPort(Debug.MapToDebug(2));
+        var or0 = new GateLinkPort(Debug.MapToDebug(0));
+        var or1 = new GateLinkPort(Debug.MapToDebug(1));
+        var or2 = new GateLinkPort(Debug.MapToDebug(2));
 
         // TestEnvBlockLinkWorld.add(or0, or1, or2);
 

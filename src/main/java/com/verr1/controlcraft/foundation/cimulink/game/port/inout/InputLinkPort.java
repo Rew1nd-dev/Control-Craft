@@ -1,61 +1,38 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port.inout;
 
 
-import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.Component;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Sink;
+import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Source;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
-import com.verr1.controlcraft.foundation.data.links.BlockPort;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public class InputLinkPort{
-
-
-    private static final Set<BlockPort> EMPTY = new HashSet<>();
-
-    private BlockPort linkedPortInput;
+public class InputLinkPort extends BlockLinkPort{
 
     private final Component.Port inputPort = new Component.Port();
 
-    public void linkTo(BlockPort port){
-        linkedPortInput = port;
+    public InputLinkPort(WorldBlockPos portPos) {
+        super(portPos, new Source());
+    }
+
+    public double peek(){
+        return inputPort.peek();
     }
 
     public void input(double value){
         inputPort.update(value);
     }
 
-    private void propagateCombinational(){
-        if(!inputPort.dirty())return;
-        if(linkedPortInput == null)return;
-        BlockLinkPort.of(linkedPortInput.pos()).ifPresent(blp -> {
-
-            if(!blp.nameInputs().containsKey(linkedPortInput.portName()))return;
-
-            blp.input(linkedPortInput.portName(), inputPort.retrieve());
-            BlockLinkPort.propagateCombinational(new BlockLinkPort.PropagateContext(), blp);
-        });
-
-    }
-
-    public void validate(){
-        if(linkedPortInput == null)return;
-        BlockLinkPort
-            .of(linkedPortInput.pos())
-            .filter(blp -> blp.nameInputs().containsKey(linkedPortInput.portName()))
-            .ifPresentOrElse(
-                    $ -> {},
-                    () -> {
-                        ControlCraft.LOGGER.info("removed invalid blp: " + linkedPortInput);
-                        linkedPortInput = null;
-                    }
-            );
-    }
-
     public void tick(){
-        validate();
-        propagateCombinational();
+        if(!inputPort.dirty())return;
+        ((Source)__raw()).setInput(inputPort.retrieve());
+        propagateCombinational(new PropagateContext(), this);
     }
 
+
+    @Override
+    public NamedComponent create() {
+        return new Source();
+    }
 }

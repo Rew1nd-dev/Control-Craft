@@ -19,6 +19,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +38,8 @@ public class CimulinkRenderCenter {
 
     public static Vec3 computeInputPortOffset(Direction horizontal, Direction vertical, int count, int total){
         double x = -0.25;
-        double y = (total - 1) * DELTA_Y / 2 - (count * DELTA_Y / 2);
+        double y = (total - 1) * DELTA_Y / 2 - (count * DELTA_Y);
+
         Vec3 h = MinecraftUtils.toVec3(horizontal.getNormal());
         Vec3 v = MinecraftUtils.toVec3(vertical.getNormal());
         return h.scale(x).add(v.scale(y));
@@ -150,7 +152,7 @@ public class CimulinkRenderCenter {
         if(ins == null)return;
         BlockPort out = new BlockPort(WorldBlockPos.of(Minecraft.getInstance().level, pos), portName);
         ins.forEach(in -> {
-            Optional.ofNullable(RenderedConnection.of(out, in)).ifPresent(r -> r.render(pos.toShortString() + portName, 40));
+            Optional.ofNullable(RenderedConnection.of(out, in)).ifPresent(r -> r.render(pos.toShortString() + portName + in.portName(), 40, Color.GREEN));
         });
     }
 
@@ -158,10 +160,10 @@ public class CimulinkRenderCenter {
         CimulinkBlockEntity<?> cbe = of(pos);
         if(cbe == null)return;
         ConnectionStatus cs = cbe.readClientConnectionStatus();
-        BlockPort in = cs.inputPorts.get(portName);
-        if(in == null)return;
-        BlockPort out = new BlockPort(WorldBlockPos.of(Minecraft.getInstance().level, pos), portName);
-        Optional.ofNullable(RenderedConnection.of(out, in)).ifPresent(r -> r.render(pos.toShortString() + portName, 40));
+        BlockPort out = cs.inputPorts.get(portName);
+        if(out == null)return;
+        BlockPort in = new BlockPort(WorldBlockPos.of(Minecraft.getInstance().level, pos), portName);
+        Optional.ofNullable(RenderedConnection.of(out, in)).ifPresent(r -> r.render(pos.toShortString() + portName, 40, Color.GREEN));
     }
 
     public static @Nullable CimulinkBlockEntity<?> of(BlockPos clientPos){
@@ -186,8 +188,8 @@ public class CimulinkRenderCenter {
             CimulinkBlockEntity<?> cbo = CimulinkRenderCenter.of(out.pos().pos());
             CimulinkBlockEntity<?> cbi = CimulinkRenderCenter.of(in.pos().pos());
             if(cbo == null || cbi == null) return null;
-            ConnectionStatus csi = cbi.readClientConnectionStatus();
             ConnectionStatus cso = cbo.readClientConnectionStatus();
+            ConnectionStatus csi = cbi.readClientConnectionStatus();
             if(csi == null || cso == null) return null;
             int indexO = cso.outputs.indexOf(out.portName());
             Vec3 outPos = cbo.getFaceCenter().add(
@@ -198,12 +200,12 @@ public class CimulinkRenderCenter {
                             cso.outputs.size()
                     )
             );
-            int indexI = csi.inputs.indexOf(out.portName());
+            int indexI = csi.inputs.indexOf(in.portName());
             Vec3 inPos = cbi.getFaceCenter().add(
-                    computeOutputPortOffset(
+                    computeInputPortOffset(
                             cbi.getHorizontal(),
                             cbi.getVertical(),
-                            indexO,
+                            indexI,
                             csi.inputs.size()
                     )
             );
@@ -216,12 +218,12 @@ public class CimulinkRenderCenter {
             );
         }
 
-        public void render(String slot, int ticks){
+        public void render(String slot, int ticks, Color color){
             ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(slot,
                     points.get(0),
                     points.get(1),
                     ticks
-            );
+            ).colored(color.getRGB());
         }
 
         public static RenderedConnection of(Vec3 out, Vec3 in,

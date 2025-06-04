@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.simibubi.create.foundation.utility.FilesHelper;
 import com.tterrag.registrate.providers.ProviderType;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.type.descriptive.GroupPolicy;
 import com.verr1.controlcraft.foundation.type.descriptive.LerpType;
@@ -76,6 +77,7 @@ public class ControlCraftDataGen {
         GroupPolicy.register();
         LerpType.register();
         GateTypes.register();
+        FFTypes.register();
     }
 
 }

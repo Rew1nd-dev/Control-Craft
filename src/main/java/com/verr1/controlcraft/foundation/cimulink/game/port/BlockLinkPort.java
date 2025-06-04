@@ -64,6 +64,7 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateOutput(PropagateContext watcher, BlockLinkPort blp){
+        if(blp.anyInputChanged())watcher.visit(blp.pos());
         blp.changedOutput().forEach(changedOutput -> {
             double value = blp.retrieveOutput(changedOutput);
             String changedOutputName = blp.outputsNames().get(changedOutput);
@@ -79,7 +80,7 @@ public abstract class BlockLinkPort {
                 of(worldBlockPos).ifPresent(nextBlp -> {
                     try{
                         portNames.forEach(n -> nextBlp.input(n, value));
-                        watcher.visit(blp.pos());
+
                         propagateCombinational(watcher, nextBlp);
                     }catch (IllegalArgumentException e){
                         System.out.println("Error during propagation: " + e);
@@ -105,6 +106,13 @@ public abstract class BlockLinkPort {
         propagateOutput(watcher, blp);
     }
 
+    public boolean anyOutputChanged(){
+        return realTimeComponent.anyOutputChanged();
+    }
+
+    public boolean anyInputChanged(){
+        return realTimeComponent.anyInputChanged();
+    }
 
     public static void propagateTemporal(){
         ALL_BLP.stream().map(BlockLinkPort::of).forEach(blp -> blp.ifPresent(BlockLinkPort::onPositiveEdge));
@@ -427,14 +435,9 @@ public abstract class BlockLinkPort {
         }
 
         public void EncloseLoopDetection(WorldBlockPos pos){
-            /*
-            if(depth < MAX_DEPTH)return;
-            throw new IllegalArgumentException("propagation too long or enclose loop detected!");
-            * */
             try{
                 ArrayUtils.AssertAbsence(visited, pos);
             }catch (Exception e){
-
                 throw new IllegalArgumentException("Enclosed Loop Detected: " + visitedMessage());
             }
 

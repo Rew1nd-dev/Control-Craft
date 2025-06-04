@@ -3,7 +3,7 @@ package com.verr1.controlcraft.content.links.ff;
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
-import com.verr1.controlcraft.registry.CimulinkBlockEntity;
+import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -27,6 +27,6 @@ public class FFBlock extends CimulinkBlock<FFBlockEntity> {
 
     @Override
     public BlockEntityType<? extends FFBlockEntity> getBlockEntityType() {
-        return CimulinkBlockEntity.FF_BLOCKENTITY.get();
+        return CimulinkBlockEntities.FF_BLOCKENTITY.get();
     }
 }

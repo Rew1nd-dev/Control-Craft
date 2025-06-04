@@ -57,7 +57,11 @@ public enum UIContents implements Descriptive<UIContents> {
     FLAP_BIAS(Component.literal("Bias"), literals("Attack Angle Bias")),
 
     GATE_TYPES(Component.literal("Type"), literals("Logic Gate Types")),
-    FF_TYPES(Component.literal("Type"), literals("Flip Flop Types"));;
+    FF_TYPES(Component.literal("Type"), literals("Flip Flop Types")),
+
+    LINK_INPUT(Component.literal("Input"), literals("Input Port Value")),
+    LINK_OUTPUT(Component.literal("Output"), literals("Output Port Value")),
+    ;
 
 
     public FormattedLabel toUILabel() {

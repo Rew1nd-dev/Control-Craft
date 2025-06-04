@@ -26,6 +26,8 @@
     "vscontrolcraft:kinetic_resistor",
     "vscontrolcraft:compact_flap",
     "vscontrolcraft:logic_gates",
-    "vscontrolcraft:ff"
+    "vscontrolcraft:ff",
+    "vscontrolcraft:input_link",
+    "vscontrolcraft:output_link"
   ]
 }

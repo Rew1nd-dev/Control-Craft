@@ -3,6 +3,8 @@
     "vscontrolcraft:chunk_loader",
     "vscontrolcraft:propeller_controller",
     "vscontrolcraft:logic_gates",
-    "vscontrolcraft:ff"
+    "vscontrolcraft:ff",
+    "vscontrolcraft:input_link",
+    "vscontrolcraft:output_link"
   ]
 }

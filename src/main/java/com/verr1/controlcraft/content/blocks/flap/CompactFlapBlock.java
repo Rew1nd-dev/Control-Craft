@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.blocks.flap;
 
+import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
@@ -23,7 +24,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
-public class CompactFlapBlock extends DirectionalBlock implements
+public class CompactFlapBlock extends BearingBlock implements
         ISignalAcceptor, IBE<CompactFlapBlockEntity>
 {
 
@@ -59,22 +60,33 @@ public class CompactFlapBlock extends DirectionalBlock implements
             return InteractionResult.SUCCESS;
         }
 
+        if(hit.getDirection() == state.getValue(FlapBearingBlock.FACING)){
+            if (!player.mayBuild())
+                return InteractionResult.FAIL;
+            if (player.isShiftKeyDown())
+                return InteractionResult.FAIL;
+            if (player.getItemInHand(handIn)
+                    .isEmpty()) {
+                if (worldIn.isClientSide)
+                    return InteractionResult.SUCCESS;
+                withBlockEntityDo(worldIn, pos, be -> {
+                    if(!be.running){
+                        be.assemble();
+                    }else{
+                        be.disassemble();
+                    }
+
+                });
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.PASS;
+        }
+
         return InteractionResult.PASS;
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-        super.createBlockStateDefinition(builder);
-    }
 
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction face = context.getClickedFace();
-        if(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())face = face.getOpposite();
-        return defaultBlockState().setValue(FACING, face);
-    }
+    
 
     @Override
     public Class<CompactFlapBlockEntity> getBlockEntityClass() {

@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
 import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
 import com.verr1.controlcraft.foundation.data.links.ValueStatus;
+import com.verr1.controlcraft.foundation.managers.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -135,7 +136,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     @OnlyIn(Dist.CLIENT)
     private void requestConnectionStatusOnFocus(){
         BlockPos p = MinecraftUtils.lookingAtPos();
-        if(p == null || !p.equals(getBlockPos()))return;
+        // if(p == null || !p.equals(getBlockPos()))return;
         handler().request(SharedKeys.CONNECTION_STATUS);
     }
 
@@ -167,6 +168,22 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     public void lazyTickClient() {
         super.lazyTickClient();
         requestConnectionStatusOnFocus();
+        tickConnection();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void tickConnection(){
+        Optional.ofNullable(readClientConnectionStatus())
+                .map(r -> r.inputPorts.keySet())
+                .ifPresent(
+                    s -> s.forEach(
+                        inName -> CimulinkRenderCenter.renderInConnection(
+                                getBlockPos(),
+                                inName
+                        )
+                    )
+                );
+
     }
 
     @Override
@@ -251,18 +268,28 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 
     public static List<Component> makeDetailedToolTip(ConnectionStatus cs, Level world){
         if(cs == null)return List.of();
-        MutableComponent in = Component.literal("in:");
+        MutableComponent in = Component.literal("in:").withStyle(s -> s.withColor(ChatFormatting.BLUE).withBold(true));
         List<Component> inputComponents = new ArrayList<>();
 
-        cs.inputPorts.forEach((inName, outBp) -> inputComponents.add(Component.literal("    " + inName + "<-" + ConnectionStatus.mapToName(outBp.pos().pos(), world) + "-" + outBp.portName())));
+        cs.inputPorts.forEach((inName, outBp) -> inputComponents.add(
+                Component.literal("  " + inName + " <-").withStyle(s -> s.withColor(ChatFormatting.BLUE))
+                        .append(
+                Component.literal("[" +  ConnectionStatus.mapToName(outBp.pos().pos(), world) + ":" + outBp.portName() + "]")
+                        .withStyle(s -> s.withColor(ChatFormatting.DARK_AQUA).withUnderlined(true))
+                        )
 
-        MutableComponent out = Component.literal("out: ");
+        ));
+
+        MutableComponent out = Component.literal("out: ").withStyle(s -> s.withColor(ChatFormatting.RED).withBold(true));
         List<Component> outputComponents = new ArrayList<>();
         cs.outputPorts.forEach((outName, inBps) -> {
 
-            outputComponents.add(Component.literal(outName + "->"));
+            outputComponents.add(Component.literal("  " + outName + "->").withStyle(s -> s.withColor(ChatFormatting.RED)));
             inBps.forEach(inBp ->
-                outputComponents.add(Component.literal("    " + ConnectionStatus.mapToName(inBp.pos().pos(), world) + "-" + inBp.portName()))
+                outputComponents.add(
+                        Component.literal("    [" + ConnectionStatus.mapToName(inBp.pos().pos(), world) + ":" + inBp.portName() + "]")
+                                .withStyle(s -> s.withColor(ChatFormatting.DARK_AQUA).withUnderlined(true))
+                )
             );
         });
 

@@ -145,7 +145,7 @@ public class Packaging {
 
     public static void packageTest_1(){
 
-        double p = 15, i = 1, d = 4;
+        double p = 15, i = 0, d = 0.2;
         double ts = 1.0 / 100.0;
 
         Circuit integral = (Circuit) ACCUMULATOR.get().withName("sum");

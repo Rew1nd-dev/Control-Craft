@@ -1,15 +1,20 @@
 package com.verr1.controlcraft.content.blocks.flap;
 
+import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.AssemblyException;
+import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
+import com.simibubi.create.content.contraptions.bearing.BearingBlock;
+import com.simibubi.create.content.contraptions.bearing.BearingContraption;
+import com.simibubi.create.content.contraptions.bearing.IBearingBlockEntity;
 import com.simibubi.create.foundation.utility.Color;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
-import com.verr1.controlcraft.foundation.data.NetworkKey;
-import com.verr1.controlcraft.foundation.data.NumericField;
-import com.verr1.controlcraft.foundation.data.SynchronizedField;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.data.*;
 import com.verr1.controlcraft.foundation.data.logical.LogicalFlap;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -22,8 +27,10 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -35,7 +42,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CompactFlapBlockEntity extends OnShipBlockEntity implements
-        IReceiver
+        IReceiver, IBearingBlockEntity
 {
 
     public SynchronizedField<Double> angle = new SynchronizedField<>(0.0);
@@ -227,6 +234,12 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     @Override
+    public void tickCommon() {
+        super.tickCommon();
+        applyRotation();
+    }
+
+    @Override
     public void lazyTickServer() {
         super.lazyTickServer();
         // syncForNear(true, ANGLE);
@@ -250,15 +263,6 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 ));
     }
 
-    // currently don't use this, calculate relative in force inducer
-    private void updateRelative(){
-        cachedRelative = Optional
-                .ofNullable(getLoadedServerShip())
-                .map(Ship::getTransform)
-                .map(ShipTransform::getPositionInShip)
-                .map(v -> toJOML(getBlockPos().getCenter()).sub(v.add(0.5, 0.5, 0.5, new Vector3d())))
-                .orElse(new Vector3d());
-    }
 
     public Vector3dc getRelative() {
         return cachedRelative;
@@ -268,6 +272,24 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public String name() {
         return "compact_flap";
     }
+
+
+    @Override
+    public void destroy() {
+        if(level == null || !level.isClientSide){
+            disassemble();
+        }
+        super.destroy();
+    }
+
+    @Override
+    public void remove() {
+        if(level == null || !level.isClientSide){
+            disassemble();
+        }
+        super.remove();
+    }
+
 
 
     public LerpedFloat getClientAnimatedAngle() {
@@ -280,5 +302,132 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         if(level == null || !level.isClientSide)return;
         clientAnimatedAngle.chase(angle.read(), 0.1, LerpedFloat.Chaser.EXP);
         clientAnimatedAngle.tickChaser();
+    }
+
+    protected ControlledContraptionEntity physicalWing;
+    protected float adjustSpeed;
+    protected double visualAngle;
+    protected boolean running;
+
+    public boolean isAssembled(){
+        return physicalWing != null;
+    }
+
+    public void assemble(){
+        if(isAssembled())return;
+        if (level == null || !(level.getBlockState(worldPosition).getBlock() instanceof BearingBlock))
+            return;
+
+        Direction direction = getBlockState().getValue(BearingBlock.FACING);
+        WingContraption wingContraption = new WingContraption(direction);
+
+        AssemblyException lastException;
+        try {
+            if (!wingContraption.assemble(level, worldPosition))
+                return;
+
+            lastException = null;
+        } catch (AssemblyException e) {
+            lastException = e;
+            ControlCraft.LOGGER.info(e.toString());
+            sendData();
+            return;
+        }
+
+        running = true;
+        wingContraption.removeBlocksFromWorld(level, BlockPos.ZERO);
+        physicalWing = ControlledContraptionEntity.create(level, this, wingContraption);
+        BlockPos anchor = worldPosition.relative(direction);
+        physicalWing.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+        physicalWing.setRotationAxis(direction.getAxis());
+        level.addFreshEntity(physicalWing);
+
+        AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
+        visualAngle = 0;
+        sendData();
+
+    }
+
+    public void disassemble() {
+        if (!isAssembled()) return;
+        visualAngle = 0;
+        running = false;
+        physicalWing.disassemble();
+        AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(level, worldPosition);
+        physicalWing = null;
+        sendData();
+    }
+
+    protected void applyRotation() {
+        if(level == null)return;
+        float wingAngle = level.isClientSide ? clientAnimatedAngle.getValue() : (float) visualAngle;
+        if (physicalWing == null)
+            return;
+        physicalWing.setAngle(wingAngle);
+        BlockState blockState = getBlockState();
+        if (blockState.hasProperty(BlockStateProperties.FACING))
+            physicalWing.setRotationAxis(
+                    blockState
+                            .getValue(BlockStateProperties.FACING)
+                            .getAxis()
+            );
+    }
+
+    @Override
+    public boolean isAttachedTo(AbstractContraptionEntity contraption) {
+        return contraption == physicalWing;
+    }
+
+    @Override
+    public void attach(ControlledContraptionEntity contraption) {
+        BlockState blockState = getBlockState();
+        if (!(contraption.getContraption() instanceof BearingContraption))
+            return;
+        if (!blockState.hasProperty(BearingBlock.FACING))
+            return;
+
+        this.physicalWing = contraption;
+        setChanged();
+        BlockPos anchor = worldPosition.relative(blockState.getValue(BearingBlock.FACING));
+        physicalWing.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+        if (!level.isClientSide) {
+            sendData();
+        }
+    }
+
+    @Override
+    public void onStall() {
+        if (level == null || !level.isClientSide)
+            sendData();
+    }
+
+    @Override
+    public boolean isValid() {
+        return isRemoved();
+    }
+
+    @Override
+    public BlockPos getBlockPosition() {
+        return getBlockPos();
+    }
+
+    @Override
+    public float getInterpolatedAngle(float partialTicks) {
+        return (float) Mth.lerp(partialTicks, visualAngle, visualAngle + adjustSpeed * 0.05f);
+    }
+
+    @Override
+    public boolean isWoodenTop() {
+        return false;
+    }
+
+    @Override
+    public void setAngle(float v) {
+        setAngle((double)v);
+    }
+
+
+    public void setAngle(double forcedAngle) {
+        visualAngle = MathUtils.angleReset((float) forcedAngle);
     }
 }
