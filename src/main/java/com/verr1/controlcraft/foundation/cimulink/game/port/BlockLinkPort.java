@@ -143,6 +143,8 @@ public abstract class BlockLinkPort {
         return realTimeComponent.m();
     }
 
+    public void reset(){realTimeComponent.reset();}
+
     public Map<String, Set<BlockPort>> forwardLinks() {
         return forwardView;
     }

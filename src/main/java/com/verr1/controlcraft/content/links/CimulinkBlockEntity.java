@@ -33,10 +33,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -46,9 +43,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 {
 
     private final T linkPort;
-
-    private final Map<Integer, Vec3> cachedInputViewOffsets = new HashMap<>();
-    private final Map<Integer, Vec3> cachedOutputViewOffsets = new HashMap<>();
 
     @Override
     public final void initialize() {
@@ -101,12 +95,10 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     }
 
     public void setName(String name){
-        if(linkPort() == null)return;
         linkPort().setName(name);
     }
 
     public String name(){
-        if(linkPort() == null)return "why?";
         return linkPort().name();
     }
 
@@ -207,73 +199,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 
 
 
-    private static Vec3 computePortOffset(Direction horizontal, Direction Vertical, int count, boolean isInput){
-        horizontal = isInput ? horizontal.getOpposite(): horizontal;
-        double x = 0.25;
-        double dy = 0.15;
-        int total = 4;
-        double yLen = (total - 1) * dy;
-        double y = yLen / 2 - count * dy;
-        return  MinecraftUtils.toVec3(horizontal.getNormal()).scale(x).add(
-                MinecraftUtils.toVec3(Vertical.getNormal()).scale(y)
-        );
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private Vec3 getInputPortOffset(int index){
-        return cachedInputViewOffsets.computeIfAbsent(index, i -> computePortOffset(getHorizontal(), getVertical(), i, true));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private Vec3 getOutputPortOffset(int index){
-        return cachedOutputViewOffsets.computeIfAbsent(index, i -> computePortOffset(getHorizontal(), getVertical(), i, false));
-    }
-    @OnlyIn(Dist.CLIENT)
-    private int closestInput(Vec3 lookingAtVec, int totalInputCount){
-        return IntStream
-                .range(0, totalInputCount)
-                .boxed()
-                .min(Comparator.comparingDouble(
-                        i -> lookingAtVec.distanceToSqr(getInputPortOffset(i))
-                    )
-                )
-                .orElse(0);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private int closestOutput(Vec3 lookingAtVec, int totalOutputCount){
-        return IntStream
-                .range(0, totalOutputCount)
-                .boxed()
-                .min(Comparator.comparingDouble(
-                                i -> lookingAtVec.distanceToSqr(getOutputPortOffset(i))
-                        )
-                ).orElse(0);
-    }
-
-
-    @OnlyIn(Dist.CLIENT)
-    public @Nullable ClientViewContext clientViewMap(){
-        Vec3 lookingAtVec = MinecraftUtils.lookingAtVec();
-        BlockPos lookingAtPos = MinecraftUtils.lookingAtPos();
-        if (lookingAtVec == null || lookingAtPos == null || !lookingAtPos.equals(getBlockPos()))return null;
-        return clientViewMap(this, lookingAtVec);
-    }
-
-    public static ClientViewContext clientViewMap(CimulinkBlockEntity<?> be, Vec3 lookingAtVec){
-        ConnectionStatus cs = be.readClientConnectionStatus();
-        if(cs == null)return null;
-        Vec3 viewOffset = lookingAtVec.subtract(be.getBlockPos().getCenter());
-        int inputIndex = be.closestInput(viewOffset, cs.inputs.size());
-        int outputIndex = be.closestOutput(viewOffset, cs.outputs.size());
-        double inputOffset = be.getInputPortOffset(inputIndex).subtract(viewOffset).lengthSqr();
-        double outputOffset = be.getOutputPortOffset(outputIndex).subtract(viewOffset).lengthSqr();
-        return inputOffset < outputOffset ?
-                new ClientViewContext(be.getBlockPos(), cs.in(inputIndex), true, be.getInputPortOffset(inputIndex))
-                :
-                new ClientViewContext(be.getBlockPos(), cs.out(outputIndex), false, be.getOutputPortOffset(outputIndex));
-    }
-
     @Override
     public T linkPort(){
         return linkPort;
@@ -297,44 +222,50 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         Component inTitle = Component.literal("Inputs").withStyle(s -> s.withColor(ChatFormatting.DARK_BLUE));
         Component outTitle = Component.literal("Outputs").withStyle(s -> s.withColor(ChatFormatting.DARK_RED));
 
-        StringBuilder sbi = new StringBuilder();
+        List<Component> inputComponents = new ArrayList<>();
         IntStream.range(0, inSize).forEach(
-                i -> sbi.append(cs.inputs.get(i)).append(": ").append(vs.inputValues.get(i)).append(" | ")
+                i -> inputComponents.add(Component.literal(cs.inputs.get(i) + ": [" + "%.2f".formatted(vs.inputValues.get(i)) + "]"))
         );
-        StringBuilder sbo = new StringBuilder();
+        List<Component> outputComponents = new ArrayList<>();
         IntStream.range(0, outSize).forEach(
-                i -> sbo.append(cs.outputs.get(i)).append(": ").append(vs.outputValues.get(i)).append(" | ")
+                i -> outputComponents.add(Component.literal(cs.outputs.get(i) + ": [" + "%.2f".formatted(vs.outputValues.get(i)) + "]"))
         );
 
-        return List.of(
-                Component.literal("    Values:").withStyle(ChatFormatting.GOLD),
-                inTitle,
-                Component.literal(sbi.toString()).withStyle(ChatFormatting.GREEN),
-                outTitle,
-                Component.literal(sbo.toString()).withStyle(ChatFormatting.DARK_GREEN)
-        );
+        ArrayList<Component> result = new ArrayList<>();
+        result.add(Component.literal("    Values:").withStyle(ChatFormatting.GOLD));
+        result.add(inTitle);
+        result.addAll(inputComponents);
+        result.add(outTitle);
+        result.addAll(outputComponents);
+
+
+        return result;
     }
 
     public static List<Component> makeDetailedToolTip(ConnectionStatus cs, Level world){
         if(cs == null)return List.of();
-        MutableComponent in = Component.literal("in: \n");
-        cs.inputPorts.forEach((inName, outBp) -> {
-            in.append(inName).append(" <- ")
-                    .append(ConnectionStatus.mapToName(outBp.pos().pos(), world)).append("-")
-                    .append(outBp.portName()).append("\n");
-        });
-        MutableComponent out = Component.literal("out: \n");
+        MutableComponent in = Component.literal("in:");
+        List<Component> inputComponents = new ArrayList<>();
+
+        cs.inputPorts.forEach((inName, outBp) -> inputComponents.add(Component.literal("    " + inName + "<-" + ConnectionStatus.mapToName(outBp.pos().pos(), world) + "-" + outBp.portName())));
+
+        MutableComponent out = Component.literal("out: ");
+        List<Component> outputComponents = new ArrayList<>();
         cs.outputPorts.forEach((outName, inBps) -> {
-            out.append(outName).append("->");
-            MutableComponent bps = Component.literal("");
-            inBps.forEach(bp -> bps.append(ConnectionStatus.mapToName(bp.pos().pos(), world)).append("-").append(bp.portName()).append(", "));
-            out.append(bps).append("\n");
+
+            outputComponents.add(Component.literal(outName + "->"));
+            inBps.forEach(inBp ->
+                outputComponents.add(Component.literal("    " + ConnectionStatus.mapToName(inBp.pos().pos(), world) + "-" + inBp.portName()))
+            );
         });
-        return List.of(
-                Component.literal("    Connection Status:").withStyle(ChatFormatting.GOLD),
-                in.withStyle(ChatFormatting.GREEN),
-                out.withStyle(ChatFormatting.DARK_GREEN)
-        );
+
+        ArrayList<Component> result = new ArrayList<>();
+        result.add(Component.literal("    Connection Status").withStyle(ChatFormatting.GOLD));
+        result.add(in);
+        result.addAll(inputComponents);
+        result.add(out);
+        result.addAll(outputComponents);
+        return result;
     }
 
 }
