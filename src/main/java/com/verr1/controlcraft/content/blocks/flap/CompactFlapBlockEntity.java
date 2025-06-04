@@ -13,6 +13,7 @@ import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
+import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
 import com.verr1.controlcraft.foundation.data.*;
 import com.verr1.controlcraft.foundation.data.logical.LogicalFlap;
@@ -133,6 +134,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 .withClient(ClientBuffer.DOUBLE.get())
                 .dispatchToSync()
                 .register();
+
+        panel().registerUnit(SharedKeys.ASSEMBLE, this::assemble);
+
+        panel().registerUnit(SharedKeys.DISASSEMBLE, this::disassemble);
 
         receiver().register(
                 new NumericField(
@@ -289,7 +294,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         }
         super.remove();
     }
-
+    // The following are bearing part
 
 
     public LerpedFloat getClientAnimatedAngle() {
