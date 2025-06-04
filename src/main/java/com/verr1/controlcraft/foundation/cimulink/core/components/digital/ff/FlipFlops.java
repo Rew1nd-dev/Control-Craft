@@ -33,7 +33,7 @@ public class FlipFlops {
     public static final Supplier<Temporal<Boolean>> T_FF = () -> new FF11<>(() -> false){
         @Override
         protected Pair<Boolean, Boolean> transit(Boolean input, Boolean state) {
-            return new Pair<>(!state, false);
+            return new Pair<>(!input, false);
         }
     };
 

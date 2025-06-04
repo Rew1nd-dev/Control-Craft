@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.api.IWandMode;
 import com.verr1.controlcraft.foundation.data.WandSelection;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
+import com.verr1.controlcraft.foundation.managers.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.foundation.network.packets.specific.CimulinkLinkPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
@@ -15,7 +16,9 @@ import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 
 import java.awt.*;
@@ -41,17 +44,8 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
 
 
 
-    public static ClientViewContext computeContext(WandSelection ws){
-
-        if(ws == WandSelection.NULL)return null;
-        CimulinkBlockEntity<?> cbe = BlockEntityGetter
-                .getLevelBlockEntityAt(Minecraft.getInstance().level, ws.pos(), CimulinkBlockEntity.class)
-                .orElse(null);
-        Vec3 lookingAtVec = ws.location();
-
-        if (cbe == null || lookingAtVec == null)return null;
-
-        return CimulinkBlockEntity.clientViewMap(cbe, lookingAtVec);
+    public static @Nullable ClientViewContext computeContext(WandSelection ws){
+        return CimulinkRenderCenter.computeContext(ws.pos(), ws.location(), Minecraft.getInstance().level);
     }
 
 
@@ -60,21 +54,19 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
     public void tick() {
         tickSelected(x, "x_sel");
         tickSelected(y, "y_sel");
-        CimulinkBlockEntity<?> cbe = Optional.ofNullable(MinecraftUtils.lookingAt()).filter(
-                CimulinkBlockEntity.class::isInstance)
-                .map(CimulinkBlockEntity.class::cast)
-                .orElse(null);
+        tickLooking();
+
+    }
+
+    public void tickLooking(){
         Vec3 lookingAtVec = MinecraftUtils.lookingAtVec();
         BlockPos lookingAtPos = MinecraftUtils.lookingAtPos();
-        if (cbe == null || lookingAtVec == null || lookingAtPos == null)return;
-
-        ClientViewContext cvc = cbe.clientViewMap();
+        Level level = Minecraft.getInstance().level;
+        if(lookingAtPos == null || lookingAtVec == null || level == null)return;
+        ClientViewContext cvc = CimulinkRenderCenter.computeContext(lookingAtPos, lookingAtVec, level);
         if(cvc == null)return;
-
-        Vector3d offsetCenter = toJOML(cbe.getBlockPos().getCenter().add(cvc.portPos()));
-        Color c = cvc.isInput() ? Color.GREEN : Color.GREEN.darker();
-        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), c.getRGB(), "link_looking", 0.4);
-
+        Color c = cvc.isInput() ? Color.GREEN.darker() : Color.RED.darker();
+        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), "link_looking", 0.4);
     }
 
     public void tickSelected(WandSelection sel, String slot){
@@ -82,9 +74,8 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         ClientViewContext cvc = computeContext(sel);
         if(cvc == null)return;
 
-        Vector3d offsetCenter = toJOML(sel.pos().getCenter().add(cvc.portPos()));
-        Color c = cvc.isInput() ? Color.GREEN : Color.GREEN.darker();
-        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), c.getRGB(), slot, 0.4);
+        Color c = cvc.isInput() ? Color.GREEN.darker() : Color.RED.darker();
+        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), slot, 0.4);
     }
 
 

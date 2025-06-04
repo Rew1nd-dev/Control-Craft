@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -34,7 +35,7 @@ public class CimulinkRenderCenter {
         return h.scale(x).add(v.scale(y));
     }
 
-    public static @Nullable IndexNameAndVec3 closestInput(ConnectionStatus cs, Vec3 viewHitVec, Direction horizontal, Direction vertical, Vec3 blockCenter){
+    public static @Nullable ComputeContext closestInput(ConnectionStatus cs, Vec3 viewHitVec, Direction horizontal, Direction vertical, Vec3 blockCenter){
         int closestIndex = -1;
         double closestDistance = Double.MAX_VALUE;
         Vec3 closestVec = null;
@@ -54,16 +55,17 @@ public class CimulinkRenderCenter {
             return null;
         }
 
-        return new IndexNameAndVec3(
+        return new ComputeContext(
                 closestIndex,
                 cs.in(closestIndex),
                 BlockPos.containing(blockCenter) ,
                 closestVec,
-                closestDistance
+                closestDistance,
+                true
         );
     }
 
-    public static IndexNameAndVec3 closestOutput(ConnectionStatus cs, Vec3 viewHitVec, Direction horizontal, Direction vertical, Vec3 blockCenter){
+    public static ComputeContext closestOutput(ConnectionStatus cs, Vec3 viewHitVec, Direction horizontal, Direction vertical, Vec3 blockCenter){
         int closestIndex = -1;
         double closestDistance = Double.MAX_VALUE;
         Vec3 closestVec = null;
@@ -81,21 +83,22 @@ public class CimulinkRenderCenter {
         if(closestIndex == -1){
             return null;
         }
-        return new IndexNameAndVec3(
+        return new ComputeContext(
                     closestIndex,
                     cs.out(closestIndex),
                     BlockPos.containing(blockCenter),
                     closestVec,
-                    closestDistance
+                    closestDistance,
+                    false
         )
                 ;
     }
 
     private static @Nullable ClientViewContext compareAndMakeContext(
-            IndexNameAndVec3 closestInput,
-            IndexNameAndVec3 closestOutput
+            @Nullable ComputeContext closestInput,
+            @Nullable ComputeContext closestOutput
     ){
-        IndexNameAndVec3 winner = null;
+        ComputeContext winner = null;
         if(closestInput == null && closestOutput == null)return null;
         if(closestInput == null)winner = closestOutput;
         else if(closestOutput == null)winner = closestInput;
@@ -105,29 +108,29 @@ public class CimulinkRenderCenter {
         return new ClientViewContext(
                     winner.pos,
                     winner.portName,
-                    false,
+                    winner.isInput,
                     winner.portPos
             );
     }
 
     // given a cbe to check and a viewHitVec, return the closest looking port pos and name index
     public static @Nullable ClientViewContext computeContext(
-            BlockPos cbePos,
-            Vec3 viewHitVec,
-            Level world
+            @NotNull BlockPos cbePos,
+            @NotNull Vec3 viewHitVec,
+            @NotNull Level world
     ){
         CimulinkBlockEntity<?> cbe =
                 BlockEntityGetter.getLevelBlockEntityAt(world, cbePos, CimulinkBlockEntity.class)
                 .orElse(null);
         if(cbe == null)return null;
         ConnectionStatus cs = cbe.readClientConnectionStatus();
-
-        IndexNameAndVec3 closestInput = closestInput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getBlockPos().getCenter());
-        IndexNameAndVec3 closestOutput = closestOutput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getBlockPos().getCenter());
+        if(cs == null)return null;
+        ComputeContext closestInput = closestInput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getBlockPos().getCenter());
+        ComputeContext closestOutput = closestOutput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getBlockPos().getCenter());
 
         return compareAndMakeContext(closestInput, closestOutput);
     }
 
 
-    public record IndexNameAndVec3(int id, String portName, BlockPos pos, Vec3 portPos, double result){}
+    public record ComputeContext(int id, String portName, BlockPos pos, Vec3 portPos, double result, boolean isInput){}
 }
