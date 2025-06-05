@@ -4,7 +4,7 @@ import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractMultipleSel
 import com.verr1.controlcraft.foundation.api.IWandMode;
 import com.verr1.controlcraft.foundation.data.WandSelection;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
-import com.verr1.controlcraft.foundation.managers.CimulinkRenderCenter;
+import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;

@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.foundation.managers;
+package com.verr1.controlcraft.foundation.managers.render;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;

@@ -3,7 +3,7 @@ package com.verr1.controlcraft;
 import com.simibubi.create.foundation.render.SuperByteBufferCache;
 import com.verr1.controlcraft.content.gui.wand.WandGUI;
 import com.verr1.controlcraft.foundation.executor.Executor;
-import com.verr1.controlcraft.foundation.managers.DynamicOutliner;
+import com.verr1.controlcraft.foundation.managers.render.DynamicOutliner;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import com.verr1.controlcraft.render.CachedBufferer;
 

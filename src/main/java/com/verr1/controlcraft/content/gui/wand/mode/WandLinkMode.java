@@ -1,28 +1,28 @@
 package com.verr1.controlcraft.content.gui.wand.mode;
 
+import com.simibubi.create.CreateClient;
 import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractDualSelectionMode;
-import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
-import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.IWandMode;
 import com.verr1.controlcraft.foundation.data.WandSelection;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
-import com.verr1.controlcraft.foundation.managers.CimulinkRenderCenter;
+import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
-import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.CimulinkLinkPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.MinecraftUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Optional;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
@@ -74,9 +74,15 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         }else{
             CimulinkRenderCenter.renderOutConnection(cvc.pos(), cvc.portName());
         }
+        CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(makeHoverTip(cvc));
     }
 
-
+    public static List<MutableComponent> makeHoverTip(ClientViewContext cvc){
+        MutableComponent in = Component.literal(cvc.portName()).withStyle(s -> s.withColor(ChatFormatting.GREEN));
+        MutableComponent port = Component.literal("Port: ").withStyle(s -> s.withBold(true).withColor(ChatFormatting.DARK_AQUA));
+        MutableComponent placeHolder = Component.literal("");
+        return List.of(placeHolder, placeHolder, port.append(in));
+    }
 
     public void tickSelected(WandSelection sel, String slot){
         if(sel.equals(WandSelection.NULL))return;
