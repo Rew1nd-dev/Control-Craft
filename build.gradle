@@ -145,6 +145,7 @@ repositories {
             includeGroup("maven.modrinth")
         }
     }
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     // Add KFF Maven repository
     maven {
         url "https://cursemaven.com"
@@ -196,9 +197,11 @@ configurations {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    implementation fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
+    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
+    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
+    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
     // compileOnly("maven.modrinth:embeddium:${embeddium_version}")
 
     runtimeOnly fg.deobf("libs:architectury-forge:9.2.14")
@@ -228,7 +231,7 @@ dependencies {
     implementation fg.deobf("libs:tau:2.0.1")
 
     implementation fg.deobf("libs:cbcmodernwarfare:0.0.6c")
-    implementation fg.deobf("libs:createbigcannons:5.8.3")
+    implementation("com.rbasamoyai:createbigcannons:${createbigcannons_version}+mc.${minecraft_version}-forge") { transitive = false }
 
     // minecraftLibrary("org.jgrapht:jgrapht-core:1.5.2")
 

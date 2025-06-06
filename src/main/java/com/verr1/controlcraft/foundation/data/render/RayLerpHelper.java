@@ -1,8 +1,6 @@
 package com.verr1.controlcraft.foundation.data.render;
 
-import com.simibubi.create.foundation.outliner.LineOutline;
-import com.simibubi.create.foundation.outliner.Outline;
-import com.simibubi.create.foundation.utility.Color;
+import net.createmod.catnip.outliner.Outline;
 import net.minecraft.world.phys.Vec3;
 
 public class RayLerpHelper {

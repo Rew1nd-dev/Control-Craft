@@ -1,9 +1,7 @@
 package com.verr1.controlcraft.content.blocks.camera;
 
 import com.simibubi.create.CreateClient;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Color;
-import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
@@ -36,6 +34,9 @@ import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.*;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
+import net.createmod.catnip.outliner.Outliner;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -604,14 +605,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
         double radiusSquare = Math.tan(coneAngle) * clipRange;
         AABBd endAABB = MathUtils.centerWithRadius(camEnd, radiusSquare).intersection(toJOML(trivialAABB()));
 
-        CreateClient.OUTLINER.showAABB(
+        Outliner.getInstance().showAABB(
                 "camera_cone_aabb",
                 coneAABB
         )
                 .colored(Color.RED)
                 .lineWidth(4f);
 
-        CreateClient.OUTLINER.showAABB(
+        Outliner.getInstance().showAABB(
                 "camera_cone_aabb_end",
                 toMinecraft(endAABB)
         )

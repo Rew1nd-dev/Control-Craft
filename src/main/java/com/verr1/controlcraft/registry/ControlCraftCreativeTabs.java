@@ -1,9 +1,9 @@
 package com.verr1.controlcraft.registry;
 
 import com.simibubi.create.AllCreativeModeTabs;
-import com.simibubi.create.foundation.utility.Components;
 import com.verr1.controlcraft.ControlCraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,7 +18,7 @@ public class ControlCraftCreativeTabs {
 
     public static final RegistryObject<CreativeModeTab> MAIN = REGISTER.register("tab",
             () -> CreativeModeTab.builder()
-                    .title(Components.translatable("itemGroup."+ ControlCraft.MODID +".main"))
+                    .title(Component.translatable("itemGroup."+ ControlCraft.MODID +".main"))
                     .withTabsBefore(AllCreativeModeTabs.BASE_CREATIVE_TAB.getKey())
                     .icon(ControlCraftBlocks.CONSTRAINT_SERVO_MOTOR_BLOCK::asStack)
                     .displayItems((params, output) -> {

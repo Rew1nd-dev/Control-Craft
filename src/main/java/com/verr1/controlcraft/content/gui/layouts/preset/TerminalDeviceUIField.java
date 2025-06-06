@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.content.gui.layouts.preset;
 
 import com.simibubi.create.foundation.gui.widget.Label;
-import com.simibubi.create.foundation.utility.Couple;
+import net.createmod.catnip.data.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;

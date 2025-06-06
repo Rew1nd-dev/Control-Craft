@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.registry;
 
-import com.jozufozu.flywheel.core.PartialModel;
 import com.verr1.controlcraft.ControlCraft;
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 
 public class ControlCraftPartialModels {
     public static final PartialModel
@@ -26,7 +26,7 @@ public class ControlCraftPartialModels {
 
 
     private static PartialModel block(String path) {
-        return new PartialModel(ControlCraft.asResource("block/" + path));
+        return PartialModel.of(ControlCraft.asResource("block/" + path));
     }
 
 

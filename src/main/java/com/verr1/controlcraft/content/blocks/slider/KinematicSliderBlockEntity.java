@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.blocks.slider;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.KSliderKineticPeripheral;
 import com.verr1.controlcraft.content.gui.layouts.api.IKinematicUIDevice;
@@ -22,6 +21,8 @@ import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

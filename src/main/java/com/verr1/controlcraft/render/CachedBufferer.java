@@ -1,13 +1,14 @@
 package com.verr1.controlcraft.render;
 
-import com.jozufozu.flywheel.core.PartialModel;
-import com.jozufozu.flywheel.util.transform.TransformStack;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.foundation.render.BakedModelRenderHelper;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.render.SuperByteBufferCache;
-import com.simibubi.create.foundation.utility.AngleHelper;
 import com.verr1.controlcraft.ControlCraftClient;
+
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import dev.engine_room.flywheel.lib.transform.TransformStack;
+import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.render.SuperBufferFactory;
+import net.createmod.catnip.render.SuperByteBuffer;
+import net.createmod.catnip.render.SuperByteBufferCache;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,18 +27,18 @@ public class CachedBufferer {
     }
 
     public static SuperByteBuffer block(SuperByteBufferCache.Compartment<BlockState> compartment, BlockState toRender) {
-        return ControlCraftClient.BUFFER_CACHE.get(compartment, toRender, () -> BakedModelRenderHelper.standardBlockRender(toRender));
+        return ControlCraftClient.BUFFER_CACHE.get(compartment, toRender, () -> SuperBufferFactory.getInstance().createForBlock(toRender));
     }
 
     public static SuperByteBuffer partial(PartialModel partial, BlockState referenceState) {
         return ControlCraftClient.BUFFER_CACHE.get(CC_PARTIAL, partial,
-                () -> BakedModelRenderHelper.standardModelRender(partial.get(), referenceState));
+                () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState));
     }
 
     public static SuperByteBuffer partial(PartialModel partial, BlockState referenceState,
                                           Supplier<PoseStack> modelTransform) {
         return ControlCraftClient.BUFFER_CACHE.get(CC_PARTIAL, partial,
-                () -> BakedModelRenderHelper.standardModelRender(partial.get(), referenceState, modelTransform.get()));
+                () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState, modelTransform.get()));
     }
 
     public static SuperByteBuffer partialFacing(PartialModel partial, BlockState referenceState) {
@@ -58,17 +59,17 @@ public class CachedBufferer {
     public static SuperByteBuffer partialDirectional(PartialModel partial, BlockState referenceState, Direction dir,
                                                      Supplier<PoseStack> modelTransform) {
         return ControlCraftClient.BUFFER_CACHE.get(CC_DIRECTIONAL_PARTIAL, Pair.of(dir, partial),
-                () -> BakedModelRenderHelper.standardModelRender(partial.get(), referenceState, modelTransform.get()));
+                () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState, modelTransform.get()));
     }
 
     public static Supplier<PoseStack> rotateToFace(Direction facing) {
         return () -> {
             PoseStack stack = new PoseStack();
-            TransformStack.cast(stack)
-                    .centre()
+            TransformStack.of(stack)
+                    .center()
                     .rotateY(AngleHelper.horizontalAngle(facing))
                     .rotateX(AngleHelper.verticalAngle(facing))
-                    .unCentre();
+                    .uncenter();
             return stack;
         };
     }
@@ -76,11 +77,11 @@ public class CachedBufferer {
     public static Supplier<PoseStack> rotateToFaceVertical(Direction facing) {
         return () -> {
             PoseStack stack = new PoseStack();
-            TransformStack.cast(stack)
-                    .centre()
+            TransformStack.of(stack)
+                    .center()
                     .rotateY(AngleHelper.horizontalAngle(facing))
                     .rotateX(AngleHelper.verticalAngle(facing) + 90)
-                    .unCentre();
+                    .uncenter();
             return stack;
         };
     }

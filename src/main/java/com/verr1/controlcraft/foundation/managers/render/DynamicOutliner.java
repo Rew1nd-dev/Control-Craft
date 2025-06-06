@@ -1,10 +1,11 @@
 package com.verr1.controlcraft.foundation.managers.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.foundation.outliner.Outline;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.verr1.controlcraft.foundation.data.render.Line;
 import com.verr1.controlcraft.foundation.data.render.RayLerpHelper;
+
+import net.createmod.catnip.outliner.Outline;
+import net.createmod.catnip.render.SuperRenderTypeBuffer;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;

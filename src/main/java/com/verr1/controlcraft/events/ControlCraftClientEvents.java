@@ -9,11 +9,12 @@ import com.simibubi.create.content.contraptions.minecart.CouplingRenderer;
 import com.simibubi.create.content.trains.entity.CarriageCouplingRenderer;
 import com.simibubi.create.content.trains.track.TrackBlockOutline;
 import com.simibubi.create.content.trains.track.TrackTargetingClient;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.foundation.managers.WorldRenderHandler;
+
+import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.render.DefaultSuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -45,7 +46,7 @@ public class ControlCraftClientEvents {
 
         PoseStack ms = event.getPoseStack();
         ms.pushPose();
-        SuperRenderTypeBuffer buffer = SuperRenderTypeBuffer.getInstance();
+        DefaultSuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
         float partialTicks = AnimationTickHolder.getPartialTicks();
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
                 .getPosition();

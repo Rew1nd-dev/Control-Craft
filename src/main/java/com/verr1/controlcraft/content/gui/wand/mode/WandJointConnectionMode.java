@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.gui.wand.mode;
 
 
-import com.jozufozu.flywheel.util.Color;
 import com.verr1.controlcraft.content.blocks.joints.RevoluteJointBlockEntity;
 import com.verr1.controlcraft.content.gui.wand.WandGUI;
 import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractDualSelectionMode;
@@ -12,6 +11,8 @@ import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MinecraftUtils;
+
+import net.createmod.catnip.theme.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

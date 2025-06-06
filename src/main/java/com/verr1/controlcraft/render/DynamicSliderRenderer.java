@@ -3,10 +3,11 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import com.verr1.controlcraft.utils.VSMathUtils;
+
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -29,11 +30,11 @@ public class DynamicSliderRenderer extends SafeBlockEntityRenderer<DynamicSlider
 
         Vector3fc scale = new Vector3f(1, 1, 1 + distance);//be.getDirectionJOML().absolute().mul(distance).add(ones).get(new Vector3f()) ;
         buffer_pil
-                .centre()
+                .center()
                 .rotateToFace(
                         be.getDirection().getOpposite()
                 )
-                .unCentre()
+                .uncenter()
                 .scale(1, 1, 1 + distance)
                 .light(light)
                 .renderInto(ms, solid);

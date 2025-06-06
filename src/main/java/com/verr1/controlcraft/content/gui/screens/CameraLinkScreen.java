@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.gui.screens;
 
-import com.simibubi.create.foundation.gui.AbstractSimiScreen;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
@@ -11,6 +10,8 @@ import com.verr1.controlcraft.content.gui.layouts.api.SizedScreenElement;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
+
+import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.GridLayout;

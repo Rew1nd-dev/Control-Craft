@@ -58,7 +58,7 @@ public class AbstractJointBlock extends DirectionalAxisKineticBlock implements I
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         if(!(context.getLevel() instanceof ServerLevel level))return InteractionResult.SUCCESS;
-        BlockEntityGetter.INSTANCE
+        BlockEntityGetter
                 .getLevelBlockEntityAt(level, context.getClickedPos(), AbstractJointBlockEntity.class)
                 .ifPresent(AbstractJointBlockEntity::adjust);
         return InteractionResult.SUCCESS;
@@ -71,7 +71,7 @@ public class AbstractJointBlock extends DirectionalAxisKineticBlock implements I
         if(state.getValue(FLIPPED)){
             super.onWrenched(state, context);
         }
-        BlockEntityGetter.INSTANCE
+        BlockEntityGetter
                 .getLevelBlockEntityAt((ServerLevel) context.getLevel(), context.getClickedPos(), RevoluteJointBlockEntity.class)
                 .ifPresent(RevoluteJointBlockEntity::flip);
 

@@ -1,8 +1,6 @@
 package com.verr1.controlcraft.content.gui.screens;
 
-import com.simibubi.create.foundation.gui.AbstractSimiScreen;
 import com.simibubi.create.foundation.gui.AllIcons;
-import com.simibubi.create.foundation.gui.element.GuiGameElement;
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.verr1.controlcraft.content.gui.layouts.TabSwitch;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
@@ -10,6 +8,9 @@ import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.content.gui.widgets.TabIconButton;
 import com.verr1.controlcraft.content.gui.layouts.api.SizedScreenElement;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
+
+import net.createmod.catnip.gui.AbstractSimiScreen;
+import net.createmod.catnip.gui.element.GuiGameElement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

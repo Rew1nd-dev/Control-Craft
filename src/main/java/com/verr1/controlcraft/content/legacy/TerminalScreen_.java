@@ -4,8 +4,6 @@ package com.verr1.controlcraft.content.legacy;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.simibubi.create.foundation.gui.widget.IconButton;
-import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
 import com.verr1.controlcraft.foundation.data.terminal.TerminalRowData;
 import com.verr1.controlcraft.foundation.data.terminal.TerminalRowSetting;
@@ -15,6 +13,8 @@ import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.ParseUtils;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -70,9 +70,9 @@ public class TerminalScreen_ extends AbstractSimiContainerScreen<TerminalMenu__>
         setWindowSize(
                 Math.max(
                         background.width,
-                        PLAYER_INVENTORY.width
+                        PLAYER_INVENTORY.getWidth()
                 ),
-                background.height + 4 + PLAYER_INVENTORY.height
+                background.height + 4 + PLAYER_INVENTORY.getHeight()
         );
         super.init();
 
@@ -103,7 +103,7 @@ public class TerminalScreen_ extends AbstractSimiContainerScreen<TerminalMenu__>
     protected void renderBg(@NotNull GuiGraphics graphics, float p_97788_, int p_97789_, int p_97790_) {
         // debugWindowArea(graphics);
 
-        int invX = getLeftOfCentered(PLAYER_INVENTORY.width);
+        int invX = getLeftOfCentered(PLAYER_INVENTORY.getWidth());
         int invY = topPos + background.height + 4;
         renderPlayerInventory(graphics, invX, invY);
 
@@ -156,7 +156,7 @@ public class TerminalScreen_ extends AbstractSimiContainerScreen<TerminalMenu__>
         var minTitle = UIContents.MIN.toDescriptiveLabel();
 
 
-        var minField = new EditBox(font, 0, 0, input_len_x, len_y, Components.literal(""));
+        var minField = new EditBox(font, 0, 0, input_len_x, len_y, Component.literal(""));
         minField.setTextColor(-1);
         minField.setTextColorUneditable(-1);
         minField.setBordered(!isBoolean);
@@ -169,7 +169,7 @@ public class TerminalScreen_ extends AbstractSimiContainerScreen<TerminalMenu__>
 
 
 
-        var maxField = new EditBox(font, 0, 0, input_len_x, len_y, Components.literal(""));
+        var maxField = new EditBox(font, 0, 0, input_len_x, len_y, Component.literal(""));
         maxField.setTextColor(-1);
         maxField.setTextColorUneditable(-1);
         maxField.setBordered(!isBoolean);

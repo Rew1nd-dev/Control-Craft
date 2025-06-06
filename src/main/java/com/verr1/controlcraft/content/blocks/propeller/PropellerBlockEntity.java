@@ -1,9 +1,10 @@
 package com.verr1.controlcraft.content.blocks.propeller;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
+import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.gui.ScreenOpener;
+
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.foundation.utility.CreateLang;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -131,17 +132,17 @@ public class PropellerBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        Lang.text("Propeller Statistic")
+        CreateLang.text("Propeller Statistic")
                 .style(GRAY)
                 .forGoggles(tooltip);
 
         float omega = (float)rotationalSpeed;
 
-        Lang.number(omega)
+        CreateLang.number(omega)
                 .text("/s")
                 .style(ChatFormatting.AQUA)
                 .space()
-                .add(Lang.text("current omega")
+                .add(CreateLang.text("current omega")
                         .style(ChatFormatting.DARK_GRAY))
                 .forGoggles(tooltip, 1);
         return true;
