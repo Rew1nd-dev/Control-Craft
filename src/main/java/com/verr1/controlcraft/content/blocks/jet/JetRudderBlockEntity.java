@@ -1,7 +1,5 @@
 package com.verr1.controlcraft.content.blocks.jet;
 
-import com.simibubi.create.foundation.utility.Couple;
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -16,6 +14,9 @@ import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
+
+import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;

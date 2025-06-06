@@ -1,9 +1,11 @@
 package com.verr1.controlcraft.content.gui.widgets;
 
-import com.simibubi.create.foundation.gui.element.ScreenElement;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.layouts.api.ComponentLike;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+
+import net.createmod.catnip.gui.element.ScreenElement;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.blocks.terminal;
 
 import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.compact.tweak.$IRedstoneLinkable;
@@ -16,6 +15,8 @@ import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

@@ -3,10 +3,11 @@ package com.verr1.controlcraft.content.compact.tweak;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
-import com.simibubi.create.foundation.utility.Couple;
-import com.simibubi.create.foundation.utility.IntAttached;
-import com.simibubi.create.foundation.utility.WorldAttached;
 import com.verr1.controlcraft.ControlCraftServer;
+
+import net.createmod.catnip.data.Couple;
+import net.createmod.catnip.data.IntAttached;
+import net.createmod.catnip.data.WorldAttached;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 

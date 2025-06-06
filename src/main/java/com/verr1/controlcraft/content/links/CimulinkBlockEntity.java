@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.content.links;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;

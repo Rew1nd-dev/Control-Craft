@@ -3,7 +3,7 @@ package com.verr1.controlcraft.content.blocks.motor;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
+import net.createmod.catnip.gui.ScreenOpener;
 import com.verr1.controlcraft.content.compact.vmod.CopyableMotor;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.foundation.api.common.ISignalAcceptor;

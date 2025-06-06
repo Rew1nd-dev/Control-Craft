@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.content.gui.screens;
 
 
-import com.simibubi.create.foundation.gui.AbstractSimiScreen;
+import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

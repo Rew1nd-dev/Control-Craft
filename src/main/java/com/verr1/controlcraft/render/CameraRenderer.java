@@ -3,17 +3,13 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.outliner.LineOutline;
-import com.simibubi.create.foundation.outliner.Outline;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
-import com.simibubi.create.foundation.utility.Color;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.data.render.Line;
 import com.verr1.controlcraft.foundation.data.render.RayLerpHelper;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import kotlin.Pair;
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -67,13 +63,13 @@ public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
 
 
         yawBuffer
-                .rotateCentered(horizontal, hv.getFirst().floatValue())
+                .rotateCentered(hv.getFirst().floatValue(), horizontal)
                 .light(light)
                 .renderInto(ms, solid);
 
         lensBuffer
-                .rotateCentered(horizontal, hv.getFirst().floatValue())
-                .rotateCentered(vertical, hv.getSecond().floatValue())
+                .rotateCentered(hv.getFirst().floatValue(), horizontal)
+                .rotateCentered(hv.getSecond().floatValue(), vertical)
                 .light(light)
                 .renderInto(ms, solid);
     }

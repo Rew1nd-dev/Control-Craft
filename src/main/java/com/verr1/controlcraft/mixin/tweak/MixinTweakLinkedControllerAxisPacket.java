@@ -8,7 +8,7 @@ import com.getitemfromblock.create_tweaked_controllers.item.TweakedLinkedControl
 import com.getitemfromblock.create_tweaked_controllers.packet.TweakedLinkedControllerAxisPacket;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
-import com.simibubi.create.foundation.utility.Couple;
+import net.createmod.catnip.data.Couple;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.compact.tweak.TweakedLinkedControllerServerHandlerExtension;
 import net.minecraft.core.BlockPos;
@@ -51,7 +51,8 @@ public class MixinTweakLinkedControllerAxisPacket {
             ArrayList<Float> axisValues = new ArrayList<>(controlCraft$makeAxis(fullAxis));
 
             for(byte i = 0; i < 10; ++i) {
-                axisCouples.add(TweakedLinkedControllerItem.toFrequency(heldItem, i + 15));
+                // TODO: blocked by Tweaked on Create 6
+                // axisCouples.add(TweakedLinkedControllerItem.toFrequency(heldItem, i + 15));
             }
 
             TweakedLinkedControllerServerHandlerExtension.ReceiveAxis(world, pos, uniqueID, axisCouples, axisValues);

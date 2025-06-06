@@ -3,10 +3,11 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
+
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -27,7 +28,7 @@ public class CompactFlapRenderer extends SafeBlockEntityRenderer<CompactFlapBloc
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());
         SuperByteBuffer propellerBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.WING_CONTROLLER_TOP, state);
 
-        propellerBuffer.rotateCentered(state.getValue(BlockStateProperties.FACING), (float) Math.toRadians(angle))
+        propellerBuffer.rotateCentered((float) Math.toRadians(angle), state.getValue(BlockStateProperties.FACING))
                 .light(light)
                 .renderInto(ms, solid);
     }

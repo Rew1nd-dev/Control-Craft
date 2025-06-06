@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.content.gui.layouts.api;
 
-import com.simibubi.create.foundation.gui.element.ScreenElement;
+import net.createmod.catnip.gui.element.ScreenElement;
 import net.minecraft.client.gui.GuiGraphics;
 
 public interface SizedScreenElement extends ScreenElement {

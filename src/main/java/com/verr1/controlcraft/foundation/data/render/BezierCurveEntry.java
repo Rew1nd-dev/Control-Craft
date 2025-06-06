@@ -4,8 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.render.RenderTypes;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.verr1.controlcraft.utils.BezierCurve;
+
+import net.createmod.catnip.render.SuperRenderTypeBuffer;
+import net.createmod.ponder.enums.PonderSpecialTextures;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -112,7 +114,7 @@ public class BezierCurveEntry {
         ms.translate(-camera.x, -camera.y, -camera.z); // 相机坐标系转换
 
         renderInto(
-                buffer.getBuffer(RenderTypes.getOutlineTranslucent(AllSpecialTextures.BLANK.getLocation(), true)),
+                buffer.getBuffer(RenderTypes.entityTranslucentBlockMipped()),
                 ms.last().pose(),
                 0xFF00FFFF // 颜色：青色
         );

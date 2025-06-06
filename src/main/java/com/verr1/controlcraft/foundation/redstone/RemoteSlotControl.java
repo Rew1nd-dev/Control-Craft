@@ -1,12 +1,13 @@
 package com.verr1.controlcraft.foundation.redstone;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.nbt.CompoundTag;
 
 public class RemoteSlotControl {

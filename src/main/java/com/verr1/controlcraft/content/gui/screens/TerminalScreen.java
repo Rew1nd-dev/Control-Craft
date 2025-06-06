@@ -4,8 +4,6 @@ package com.verr1.controlcraft.content.gui.screens;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
-import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.gui.widgets.DescriptiveScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.gui.widgets.IconSelectionScrollInput;
@@ -21,6 +19,8 @@ import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.ParseUtils;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -96,9 +96,9 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
 
             name = UIContents.NAME.toUILabel(); // will be modified
             minTitle = UIContents.MIN.toDescriptiveLabel();
-            minField = new EditBox(font, 0, 0, input_len_x, len_y, Components.literal(""));
+            minField = new EditBox(font, 0, 0, input_len_x, len_y, Component.literal(""));
             maxTitle = UIContents.MAX.toDescriptiveLabel();
-            maxField = new EditBox(font, 0, 0, input_len_x, len_y, Components.literal(""));
+            maxField = new EditBox(font, 0, 0, input_len_x, len_y, Component.literal(""));
             toggleField = new SmallCheckbox(0, 0, 10, 10, MiscDescription.TURN_ON.specific().get(0), false);
             toggleReverse = new SmallCheckbox(0, 0, 10, 10, MiscDescription.REVERSE_INPUT.specific().get(0), false);
 
@@ -247,7 +247,7 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
 
         blockSelector.forOptions(
                 IntStream.range(0, pages)
-                        .mapToObj(i -> Components.literal("Page " + (i + 1)))
+                        .mapToObj(i -> Component.literal("Page " + (i + 1)))
                         .toList()
         );
 
@@ -282,9 +282,9 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
         setWindowSize(
                 Math.max(
                         background.width,
-                        PLAYER_INVENTORY.width
+                        PLAYER_INVENTORY.getWidth()
                 ),
-                background.height + 4 + PLAYER_INVENTORY.height
+                background.height + 4 + PLAYER_INVENTORY.getHeight()
         );
         super.init();
 
@@ -309,7 +309,7 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
     protected void renderBg(@NotNull GuiGraphics graphics, float p_97788_, int p_97789_, int p_97790_) {
         // debugWindowArea(graphics);
 
-        int invX = getLeftOfCentered(PLAYER_INVENTORY.width);
+        int invX = getLeftOfCentered(PLAYER_INVENTORY.getWidth());
         int invY = topPos + background.height + 4;
         renderPlayerInventory(graphics, invX, invY);
 

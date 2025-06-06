@@ -35,7 +35,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.material.MapColor;
 
-import static com.simibubi.create.AllMovementBehaviours.movementBehaviour;
+import static com.simibubi.create.api.behaviour.movement.MovementBehaviour.movementBehaviour;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 

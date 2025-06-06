@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.registry;
 
-import com.simibubi.create.content.kinetics.base.ShaftInstance;
+import com.simibubi.create.content.kinetics.base.ShaftVisual;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
@@ -169,14 +169,14 @@ public class ControlCraftBlockEntities {
 
     public static final BlockEntityEntry<KineticProxyBlockEntity> KINETIC_PROXY_BLOCKENTITY = REGISTRATE
             .blockEntity(KineticProxyBlock.ID, KineticProxyBlockEntity::new)
-            .instance(() -> ShaftInstance::new, false)
+            .visual(() -> ShaftVisual::new, false)
             .validBlock(ControlCraftBlocks.KINETIC_PROXY_BLOCK)
             .renderer(() -> ShaftRenderer::new)
             .register();
 
     public static final BlockEntityEntry<KineticResistorBlockEntity> KINETIC_RESISTOR_BLOCKENTITY = REGISTRATE
             .blockEntity(KineticResistorBlock.ID, KineticResistorBlockEntity::new)
-            .instance(() -> ShaftInstance::new, false)
+            .visual(() -> ShaftVisual::new, false)
             .validBlock(ControlCraftBlocks.KINETIC_RESISTOR_BLOCK)
             .renderer(() -> ShaftRenderer::new)
             .register();

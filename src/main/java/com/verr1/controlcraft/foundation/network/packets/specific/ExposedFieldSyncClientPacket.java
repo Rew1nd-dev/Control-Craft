@@ -1,12 +1,13 @@
 package com.verr1.controlcraft.foundation.network.packets.specific;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldMessage;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;

@@ -1,10 +1,11 @@
 package com.verr1.controlcraft.content.legacy;
 
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.foundation.data.terminal.TerminalRowData;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.registry.ControlCraftBlocks;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;

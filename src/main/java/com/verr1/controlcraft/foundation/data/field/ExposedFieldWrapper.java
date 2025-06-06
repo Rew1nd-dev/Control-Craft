@@ -1,10 +1,11 @@
 package com.verr1.controlcraft.foundation.data.field;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 

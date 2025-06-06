@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.blocks.motor;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.create.KMotorKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
 import com.verr1.controlcraft.content.valkyrienskies.transform.KinematicMotorTransformProvider;
@@ -26,6 +25,7 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

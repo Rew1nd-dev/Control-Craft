@@ -2,7 +2,7 @@ package com.verr1.controlcraft.content.legacy;
 
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
-import com.simibubi.create.foundation.utility.Couple;
+import net.createmod.catnip.data.Couple;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.terminal.TerminalRowSetting;

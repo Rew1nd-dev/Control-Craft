@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.content.links;
 
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
+import net.createmod.catnip.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
 import net.minecraft.core.BlockPos;

@@ -1,9 +1,10 @@
 package com.verr1.controlcraft.content.items;
 
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.screens.CameraCreateLinkScreen;
 import com.verr1.controlcraft.content.gui.screens.CameraLinkScreen;
 import com.verr1.controlcraft.registry.ControlCraftBlocks;
+
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;

@@ -2,7 +2,7 @@ package com.verr1.controlcraft.content.blocks.propeller;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
+import net.createmod.catnip.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.registry.ControlCraftBlockEntities;
 import net.minecraft.core.BlockPos;

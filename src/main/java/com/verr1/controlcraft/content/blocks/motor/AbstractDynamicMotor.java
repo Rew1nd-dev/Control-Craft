@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.blocks.motor;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.DMotorKineticPeripheral;
@@ -28,6 +27,7 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

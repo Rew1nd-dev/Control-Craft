@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.legacy;
 
 import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -13,6 +12,8 @@ import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
 import com.verr1.controlcraft.utils.SerializeUtils;
+
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

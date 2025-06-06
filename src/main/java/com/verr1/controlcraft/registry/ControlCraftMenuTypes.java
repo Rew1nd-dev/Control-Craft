@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.registry;
 
-import com.simibubi.create.Create;
 import com.tterrag.registrate.builders.MenuBuilder;
 import com.tterrag.registrate.util.entry.MenuEntry;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
@@ -18,7 +17,7 @@ public class ControlCraftMenuTypes {
 
     private static <C extends AbstractContainerMenu, S extends Screen & MenuAccess<C>> MenuEntry<C> register(
             String name, MenuBuilder.ForgeMenuFactory<C> factory, NonNullSupplier<MenuBuilder.ScreenFactory<C, S>> screenFactory) {
-        return Create.REGISTRATE
+        return ControlCraftRegistry.REGISTRATE
                 .menu(name, factory, screenFactory)
                 .register();
     }

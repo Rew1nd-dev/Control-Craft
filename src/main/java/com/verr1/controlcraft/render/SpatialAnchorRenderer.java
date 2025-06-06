@@ -3,10 +3,11 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlockEntity;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
+
+import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -33,7 +34,7 @@ public class SpatialAnchorRenderer extends SafeBlockEntityRenderer<SpatialAnchor
         float time = AnimationTickHolder.getRenderTime(be.getLevel());
         float angle = ((time * speed * on * 3f / 10) % 360) / 180 * (float) Math.PI;
 
-        buffer.rotateCentered(state.getValue(BlockStateProperties.FACING), angle)
+        buffer.rotateCentered(angle, state.getValue(BlockStateProperties.FACING))
                 .light(light)
                 .renderInto(ms, translucent);
 
