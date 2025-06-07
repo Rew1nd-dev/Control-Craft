@@ -56,7 +56,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
     public void tick() {
         tickSelected(x, "x_sel");
         tickSelected(y, "y_sel");
-        tickLooking();
+        // tickLooking();
 
     }
 
@@ -74,7 +74,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         }else{
             CimulinkRenderCenter.renderOutConnection(cvc.pos(), cvc.portName());
         }
-        CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(makeHoverTip(cvc));
+        // CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(makeHoverTip(cvc));
     }
 
     public static List<MutableComponent> makeHoverTip(ClientViewContext cvc){

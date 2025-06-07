@@ -18,12 +18,12 @@ import org.joml.Vector3dc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BezierCurveEntry {
+public class BezierCurveEntry implements RenderableOutline{
 
-    private final Vector3d start;
-    private final Vector3d end;
-    private final Vector3d startDirection;
-    private final Vector3d endDirection;
+    private final Vector3dc start;
+    private final Vector3dc end;
+    private final Vector3dc startDirection;
+    private final Vector3dc endDirection;
     private final int segments;
 
     private final float width;
@@ -36,10 +36,10 @@ public class BezierCurveEntry {
     List<Vector3dc[]> squareVertices = new ArrayList<>();
 
     public BezierCurveEntry(
-            Vector3d start,
-            Vector3d end,
-            Vector3d startDirection,
-            Vector3d endDirection,
+            Vector3dc start,
+            Vector3dc end,
+            Vector3dc startDirection,
+            Vector3dc endDirection,
             float width,
             int segments
     ) {
@@ -51,12 +51,16 @@ public class BezierCurveEntry {
         this.width = width;
         this.points = BezierCurve.calculateCubicBezier(
                 start,
-                start.add(startDirection),
-                end.add(endDirection),
+                start.add(startDirection, new Vector3d()),
+                end.add(endDirection, new Vector3d()),
                 end,
                 segments
         );
         createVertices();
+    }
+
+    public void tick(){
+
     }
 
     private void createVertices() {
@@ -112,7 +116,7 @@ public class BezierCurveEntry {
         ms.translate(-camera.x, -camera.y, -camera.z); // 相机坐标系转换
 
         renderInto(
-                buffer.getBuffer(RenderTypes.getOutlineTranslucent(AllSpecialTextures.BLANK.getLocation(), true)),
+                buffer.getBuffer(RenderType.debugFilledBox()), //RenderTypes.getOutlineTranslucent(AllSpecialTextures.BLANK.getLocation()
                 ms.last().pose(),
                 0xFF00FFFF // 颜色：青色
         );

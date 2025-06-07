@@ -40,7 +40,7 @@ public class TabSwitch {
             if (this.tabArea != null) {
                 newTab.doLayout(this.tabArea);
             }
-
+            this.currentTab.onMessage(TabListener.Message.POST_DO_LAYOUT);
             if (p_276120_) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             }

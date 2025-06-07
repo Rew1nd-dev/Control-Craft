@@ -2,25 +2,25 @@ package com.verr1.controlcraft.content.gui.factory;
 
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
-import com.verr1.controlcraft.content.gui.layouts.element.DoubleUIField;
-import com.verr1.controlcraft.content.gui.layouts.element.DoubleUIView;
-import com.verr1.controlcraft.content.gui.layouts.element.OptionUIField;
-import com.verr1.controlcraft.content.gui.layouts.element.StringUIField;
+import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
+import com.verr1.controlcraft.content.gui.layouts.element.*;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
 import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
+import com.verr1.controlcraft.content.links.fma.LinearAdderBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
+import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.CimulinkBlocks;
 import net.minecraft.core.BlockPos;
 
-import static com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity.ANGLE;
+import static com.verr1.controlcraft.content.gui.factory.Converter.alignLabel;
 import static com.verr1.controlcraft.content.gui.factory.Converter.convert;
-import static com.verr1.controlcraft.content.gui.factory.GenericUIFactory.GENERIC_SETTING_TAB;
-import static com.verr1.controlcraft.content.gui.factory.GenericUIFactory.createSyncTasks;
+import static com.verr1.controlcraft.content.gui.factory.GenericUIFactory.*;
 
 public class CimulinkUIFactory {
 
@@ -88,6 +88,10 @@ public class CimulinkUIFactory {
                                 .withPort(input)
                                 .build()
                 )
+                .withTab(
+                        REDSTONE_TAB,
+                        createTerminalDeviceTab(boundPos)
+                )
                 .withTickTask(createSyncTasks(boundPos, OutputPortBlockEntity.OUTPUT))
                 .build();
     }
@@ -118,6 +122,108 @@ public class CimulinkUIFactory {
                                 .build()
                 )
                 .build();
+    }
+
+    public static GenericSettingScreen createShifterScreen(BlockPos boundPos){
+
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                title(UIContents.NAME)
+        );
+
+        LongUIField delay = new LongUIField(
+                boundPos,
+                ShifterLinkBlockEntity.DELAY,
+                title(UIContents.SHIFTER_DELAY)
+        );
+
+        LongUIField parallel = new LongUIField(
+                boundPos,
+                ShifterLinkBlockEntity.PARALLEL,
+                title(UIContents.SHIFTER_PARALLEL)
+        );
+
+        Runnable alignLabels = () -> alignLabel(delay, parallel);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, delay, parallel)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createFMAScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                title(UIContents.NAME)
+        );
+
+        CoeffUIPort coeffs = new CoeffUIPort(boundPos);
+
+        UnitUIPanel inc = new UnitUIPanel(
+                boundPos,
+                LinearAdderBlockEntity.INC,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.FMA_INC, Converter::titleStyle)
+        );
+
+        UnitUIPanel dec = new UnitUIPanel(
+                boundPos,
+                LinearAdderBlockEntity.DEC,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.FMA_DEC, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> alignLabel(inc, dec);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, coeffs)
+                                .withPreDoLayout(coeffs::alignLabels)
+                                .build()
+                )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(inc, dec)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createNameOnlyScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                title(UIContents.NAME)
+        );
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name)
+                                .build()
+                )
+                .build();
+    }
+
+    public static LabelProvider title(Descriptive<?> d){
+        return convert(d, Converter::titleStyle);
     }
 
 }

@@ -5,6 +5,10 @@
     "vscontrolcraft:logic_gates",
     "vscontrolcraft:ff",
     "vscontrolcraft:input_link",
-    "vscontrolcraft:output_link"
+    "vscontrolcraft:output_link",
+    "vscontrolcraft:shifter",
+    "vscontrolcraft:fma",
+    "vscontrolcraft:mux",
+    "vscontrolcraft:comparator"
   ]
 }

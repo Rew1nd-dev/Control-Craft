@@ -2,6 +2,7 @@ package com.verr1.controlcraft.foundation.cimulink.core.utils;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public class ArrayUtils {
@@ -53,6 +54,11 @@ public class ArrayUtils {
     public static <T> List<T> ListOf(int n, T defaultValue){
         return IntStream.range(0, n)
                 .mapToObj(i -> defaultValue)
+                .toList();
+    }
+    public static <T> List<T> ListOf(int n, Supplier<T> defaultValue){
+        return IntStream.range(0, n)
+                .mapToObj(i -> defaultValue.get())
                 .toList();
     }
 

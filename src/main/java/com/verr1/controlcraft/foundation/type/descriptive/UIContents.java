@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.type.descriptive;
 
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,17 @@ public enum UIContents implements Descriptive<UIContents> {
 
     LINK_INPUT(Component.literal("Input"), literals("Input Port Value")),
     LINK_OUTPUT(Component.literal("Output"), literals("Output Port Value")),
+
+    SHIFTER_DELAY(Component.literal("Delay"), literals("Shifter Delay")),
+    SHIFTER_PARALLEL(Component.literal("Parallel"), literals("Shifter Inputs Size")),
+
+    FMA_COEFFICIENT(Component.literal("Coefficients"), literals("Linear Adder Coefficients")),
+
+    FMA_INC(Component.literal("Add Input"), literals("Linear Adder Coefficients")),
+    FMA_DEC(Component.literal("Del Input"), literals("Linear Adder Coefficients"))
     ;
+
+
 
 
     public FormattedLabel toUILabel() {

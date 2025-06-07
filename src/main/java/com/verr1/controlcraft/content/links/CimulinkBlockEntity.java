@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.content.links;
 
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
+import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
@@ -9,6 +11,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
 import com.verr1.controlcraft.foundation.data.links.ValueStatus;
+import com.verr1.controlcraft.foundation.data.render.FancyBezierCurveEntry;
 import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -16,12 +19,14 @@ import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -38,10 +43,11 @@ import java.util.stream.IntStream;
 import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
 
 public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends NetworkBlockEntity implements
-        ILinkableBlock, IHaveGoggleInformation
+        ILinkableBlock, IHaveHoveringInformation
 {
 
     private final T linkPort;
+    private final ClientWatcher watcher = new ClientWatcher();
 
     @Override
     public final void initialize() {
@@ -92,6 +98,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
                 ValueStatus.class
         );
     }
+
+
 
     public Vec3 getFaceCenter(){
         Vec3 faceDir = toVec3(getDirection().getNormal());
@@ -144,7 +152,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 
     @OnlyIn(Dist.CLIENT)
     private void requestValueStatusOnFocus(){
-        if(!beingLookingAt())return;
+        // if(!beingLookingAt())return;
         handler().request(SharedKeys.VALUE_STATUS);
     }
 
@@ -152,6 +160,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     public void tickClient() {
         super.tickClient();
         requestValueStatusOnFocus();
+        tickRenderCurves();
+        watcher.tick();
     }
 
     @Override
@@ -164,7 +174,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     public void lazyTickClient() {
         super.lazyTickClient();
         requestConnectionStatusOnFocus();
-        tickConnection();
+        // tickConnection();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -179,7 +189,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
                         )
                     )
                 );
-
     }
 
     @Override
@@ -224,8 +233,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         return linkPort;
     }
 
-    @Override
-    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+
+    public boolean __addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if(level == null)return false;
         if(isPlayerSneaking){
             tooltip.addAll(makeDetailedToolTip(readClientConnectionStatus(), level));
@@ -233,6 +242,11 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
             tooltip.addAll(makeToolTip(readClientValueStatus(), readClientConnectionStatus()));
         }
         return true;
+    }
+
+    @Override
+    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        return __addToGoggleTooltip(tooltip, isPlayerSneaking);
     }
 
     public static List<Component> makeToolTip(ValueStatus vs, ConnectionStatus cs){
@@ -298,4 +312,97 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         return result;
     }
 
+
+    private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new HashMap<>();
+
+    private void tickRenderCurves(){
+        ConnectionStatus cs = readClientConnectionStatus();
+        if(cs == null)return;
+        cs.inputPorts.forEach((inName, value) -> {
+            BlockPos inPos = getBlockPos();
+            Direction inDir = getDirection();
+            Direction inVertical = getVertical();
+            Direction inHorizontal = getHorizontal();
+            int inIndex = cs.inputs.indexOf(inName);
+            int inCount = cs.inputs.size();
+
+            BlockPos outPos = value.pos().pos();
+            CimulinkBlockEntity<?> obe = CimulinkRenderCenter.of(outPos);
+            if (obe == null) return;
+
+            String outName = value.portName();
+            ConnectionStatus cso = obe.readClientConnectionStatus();
+            if(cso == null)return;
+
+            int outIndex = cso.outputs.indexOf(outName);
+            int outCount = cso.outputs.size();
+
+            Direction outDir = obe.getDirection();
+            Direction outHorizontal = obe.getHorizontal();
+            Direction outVertical = obe.getVertical();
+            var k = new CimulinkRenderCenter.RenderCurveKey(
+                    inPos, inIndex, inCount, inDir, inHorizontal, inVertical,
+                    outPos, outIndex, outCount, outDir, outHorizontal, outVertical
+            );
+            ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier);
+
+            cachedKeys.put(inName, k);
+        });
+    }
+
+    private void tickFlash(){
+        if(!(level instanceof ClientLevel clientLevel))return;
+        cachedKeys.values().forEach(
+                k -> Optional
+                        .ofNullable(ControlCraftClient.CLIENT_CURVE_OUTLINER.retrieveLine(k))
+                        .filter(FancyBezierCurveEntry.class::isInstance)
+                        .map(FancyBezierCurveEntry.class::cast)
+                        .ifPresent(FancyBezierCurveEntry::flash)
+        );
+        /*setLights(
+                                clientLevel.getRawBrightness(getBlockPos(), 0),
+                                clientLevel.getRawBrightness(getBlockPos(), 0)
+                        )*/
+    }
+
+    private void tickChangedFlash(List<Integer> changedInput){
+        if(!(level instanceof ClientLevel clientLevel))return;
+        ConnectionStatus cs = readClientConnectionStatus();
+        if(cs == null)return;
+        changedInput.stream().filter(i -> i < cs.inputs.size())
+                .map(cs.inputs::get)
+                .map(cachedKeys::get)
+                .map(ControlCraftClient.CLIENT_CURVE_OUTLINER::retrieveLine)
+                .filter(FancyBezierCurveEntry.class::isInstance)
+                .map(FancyBezierCurveEntry.class::cast)
+                .forEach(FancyBezierCurveEntry::flash);
+    }
+
+    protected void onClientInputChanged(List<Integer> changedInput){
+        tickChangedFlash(changedInput);
+    }
+
+    private class ClientWatcher{
+        ValueStatus cached;
+
+        List<Integer> changedInput(){
+            if(cached == null)return List.of();
+            ValueStatus current = readClientValueStatus();
+            if(current.inputValues.size() != cached.inputValues.size())return List.of();
+            int size = current.inputValues.size();
+            return IntStream.range(0, size)
+                    .filter(i -> !Objects.equals(current.inputValues.get(i), cached.inputValues.get(i)))
+                    .boxed()
+                    .toList();
+        }
+
+        void push(){
+            cached = readClientValueStatus();
+        }
+
+        void tick(){
+            onClientInputChanged(changedInput());
+            push();
+        }
+    }
 }

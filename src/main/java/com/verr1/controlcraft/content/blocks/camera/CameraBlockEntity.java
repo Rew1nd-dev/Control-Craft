@@ -981,7 +981,13 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
         buildRegistry(PITCH).withBasic(SerializePort.of(this::getPitch, this::setPitch, SerializeUtils.DOUBLE)).register();
         buildRegistry(YAW).withBasic(SerializePort.of(this::getYaw, this::setYaw, SerializeUtils.DOUBLE)).register();
-        buildRegistry(IS_ACTIVE_SENSOR).withBasic(SerializePort.of(this::isActiveDistanceSensor, this::setActiveDistanceSensor, SerializeUtils.BOOLEAN)).register();
+        buildRegistry(IS_ACTIVE_SENSOR)
+                .withBasic(SerializePort.of(
+                        this::isActiveDistanceSensor,
+                        this::setActiveDistanceSensor,
+                        SerializeUtils.BOOLEAN))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .register();
 
         buildRegistry(RAY_TYPE)
                 .withBasic(
@@ -1038,8 +1044,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
         receiver().register(
                 new NumericField(
-                        () -> isActiveDistanceSensor() ? 1.0 : 0.0,
-                        t -> setActiveDistanceSensor(t > 0.01),
+                        () -> 1.0,
+                        t -> {},
                         "sensor"
                 ),
                 new DirectReceiver.InitContext(SlotType.IS_SENSOR, Couple.create(0.0, 1.0))

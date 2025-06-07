@@ -7,6 +7,8 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 
 public class ShifterLinkPort extends BlockLinkPort {
 
+
+
     private int parallel = 1;
     private int delay = 1;
 
@@ -15,14 +17,22 @@ public class ShifterLinkPort extends BlockLinkPort {
     }
 
 
-    public void setParallel(int p){
-        parallel = p;
+    public void setParallel(long p){
+        parallel = (int)p;
         recreate();
     }
 
-    public void setDelay(int d){
-        delay = d;
+    public void setDelay(long d){
+        delay = (int)d;
         recreate();
+    }
+
+    public long parallel() {
+        return parallel;
+    }
+
+    public long delay() {
+        return delay;
     }
 
     @Override

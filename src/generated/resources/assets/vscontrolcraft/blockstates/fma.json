@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "vscontrolcraft:block/fma/block",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "vscontrolcraft:block/fma/block",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "vscontrolcraft:block/fma/block",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "vscontrolcraft:block/fma/block",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "vscontrolcraft:block/fma/block"
+    },
+    "facing=west": {
+      "model": "vscontrolcraft:block/fma/block",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

@@ -14,6 +14,7 @@ import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.foundation.managers.WorldRenderHandler;
+import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,13 +34,15 @@ public class ControlCraftClientEvents {
     public static void onTick(TickEvent.ClientTickEvent event){
         ControlCraftClient.CLIENT_EXECUTOR.tick();
         ControlCraftClient.CLIENT_LERPED_OUTLINER.tickOutlines();
+        ControlCraftClient.CLIENT_CURVE_OUTLINER.tickOutlines();
         ControlCraftClient.CLIENT_WAND_HANDLER.tick();
         ClientCameraManager.tick();
+        CimulinkRenderCenter.tick();
     }
 
     @SubscribeEvent
     public static void onRenderWorld(RenderLevelStageEvent event) {
-        WorldRenderHandler.onRenderWorld(event);
+        // WorldRenderHandler.onRenderWorld(event);
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES)
             return;
 
@@ -51,6 +54,7 @@ public class ControlCraftClientEvents {
                 .getPosition();
 
         ControlCraftClient.CLIENT_LERPED_OUTLINER.renderOutlines(ms, buffer, camera, partialTicks);
+        ControlCraftClient.CLIENT_CURVE_OUTLINER.renderOutlines(ms, buffer, camera, partialTicks);
 
         buffer.draw();
         RenderSystem.enableCull();

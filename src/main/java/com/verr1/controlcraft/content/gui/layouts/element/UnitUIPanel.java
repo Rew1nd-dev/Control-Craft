@@ -17,6 +17,10 @@ public class UnitUIPanel extends TypedUIPanel<Double> implements TitleLabelProvi
     protected final FormattedLabel title;
     protected final SmallIconButton unitButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::trigger);
 
+
+
+    protected final NetworkKey key;
+
     public UnitUIPanel(
             BlockPos boundPos,
             NetworkKey key,
@@ -31,9 +35,12 @@ public class UnitUIPanel extends TypedUIPanel<Double> implements TitleLabelProvi
                 defaultValue
         );
         title = titleProv.toDescriptiveLabel();
+        this.key = key;
     }
 
-
+    public NetworkKey key() {
+        return key;
+    }
 
     @Override
     protected void initLayout(GridLayout layoutToFill) {

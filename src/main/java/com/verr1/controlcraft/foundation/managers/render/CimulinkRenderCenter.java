@@ -1,5 +1,18 @@
 package com.verr1.controlcraft.foundation.managers.render;
 
+import com.google.common.base.Objects;
+import com.jozufozu.flywheel.util.transform.TransformStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
+import com.simibubi.create.CreateClient;
+import com.simibubi.create.content.redstone.link.LinkBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
+import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.simibubi.create.foundation.utility.AngleHelper;
+import com.simibubi.create.foundation.utility.Iterate;
+import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.VecHelper;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
@@ -8,29 +21,149 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
 import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
+import com.verr1.controlcraft.foundation.data.links.ValueStatus;
+import com.verr1.controlcraft.foundation.data.render.BezierCurveEntry;
+import com.verr1.controlcraft.foundation.data.render.FancyBezierCurveEntry;
+import com.verr1.controlcraft.foundation.data.render.RenderableOutline;
 import com.verr1.controlcraft.utils.MinecraftUtils;
+import it.unimi.dsi.fastutil.Hash;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3dc;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 @OnlyIn(Dist.CLIENT)
 public class CimulinkRenderCenter {
-    static final double DELTA_Y = 0.2;
+    public static class LinkPortSlot extends ValueBoxTransform.Sided {
+        // transform is set in ValueBox, and state is Blockstate at ValueBox::pos
+
+        private float y = 8;
+        private float x = 3;
+
+        public LinkPortSlot(float x, float y){
+            this.y = y;
+            this.x = x;
+        }
+
+
+        @Override
+        protected Vec3 getSouthLocation() {
+            int signY = direction == Direction.DOWN ? -1 : 1;
+            int signX = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -1;
+            return VecHelper.voxelSpace(8 + signX * x, 8 + signY * y, 8);
+        }
+
+    }
+
+
+
+    public static void tick() {
+        tickCurves();
+        Minecraft mc = Minecraft.getInstance();
+        HitResult target = mc.hitResult;
+        ClientLevel world = mc.level;
+        if (!(target instanceof BlockHitResult result) || world == null)
+            return;
+
+
+        BlockPos pos = result.getBlockPos();
+
+        CimulinkBlockEntity<?> cbe = of(pos);
+        if (cbe == null)return;
+        if (cbe.getDirection() != result.getDirection())return; // not looking at face
+        ConnectionStatus cs = cbe.readClientConnectionStatus();
+        if (cs == null)return;
+        ClientViewContext cvc = computeContext(pos, target.getLocation(), world);
+        if(cvc == null)return;
+
+        String portName = cvc.portName();
+
+        ValueStatus vs = cbe.readClientValueStatus();
+        double val = -1;
+        if(vs != null){
+            try{
+                val = cvc.isInput() ?
+                        vs.inputValues.get(cs.inputs.indexOf(cvc.portName()))
+                        :
+                        vs.outputValues.get(cs.outputs.indexOf(cvc.portName()));
+            }catch (IndexOutOfBoundsException ignored) {}
+        }
+
+        AABB bb = new AABB(Vec3.ZERO, Vec3.ZERO).inflate(.25f);
+        MutableComponent label = Component.literal(portName + " ");
+        MutableComponent inout = cvc.isInput() ? Component.literal("Input: ") : Component.literal("Output: ");
+        MutableComponent value = Component.literal("[" + "%.4f".formatted(val) + "]").withStyle(s -> s.withUnderlined(true).withColor(ChatFormatting.DARK_AQUA));
+
+        ValueBox box = new ValueBox(label, bb, pos).wideOutline();
+        var xy = computeLocalOffset(cvc, cs);
+        LinkPortSlot transform =
+                (LinkPortSlot)new LinkPortSlot(
+                    xy.getFirst() * 16,
+                    xy.getSecond() * 16
+                ).fromSide(cbe.getDirection()); //
+
+        CreateClient.OUTLINER
+                .showValueBox(pos, box.transform(transform))
+                .highlightFace(result.getDirection());
+
+
+
+        List<MutableComponent> tip = new ArrayList<>();
+        tip.add(inout.append(label).append(value));
+        CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(tip);
+    }
+
+    public static Pair<Float, Float> computeLocalOffset(ClientViewContext cvc, ConnectionStatus cs){
+        if(cvc.isInput()){
+            int index = cs.inputs.indexOf(cvc.portName());
+            if(index == -1){
+                ControlCraft.LOGGER.error("Failed to find input port index for rendering");
+                return Pair.of(0.0f, 0.0f);
+            }
+            return Pair.of(-0.25f, (float)deltaY(index, cs.inputs.size()));
+        }else{
+            int index = cs.outputs.indexOf(cvc.portName());
+            if(index == -1){
+                ControlCraft.LOGGER.error("Failed to find output port index for rendering");
+                return Pair.of(0.0f, 0.0f);
+            }
+            return Pair.of(0.25f, (float)deltaY(index, cs.outputs.size()));
+        }
+
+    }
+
+    private static double deltaY(int count, int total){
+        double dy = 1.0 / total;
+        return (total - 1) * dy / 2 - (count * dy);
+    }
 
     public static Vec3 computeOutputPortOffset(Direction horizontal, Direction vertical, int count, int total){
-        double x = 0.25;
-        double y = (total - 1) * DELTA_Y / 2 - (count * DELTA_Y / 2);
+        double x = 0.15;
+        double y = deltaY(count, total);
         Vec3 h = MinecraftUtils.toVec3(horizontal.getNormal());
         Vec3 v = MinecraftUtils.toVec3(vertical.getNormal());
         return h.scale(x).add(v.scale(y));
@@ -38,7 +171,7 @@ public class CimulinkRenderCenter {
 
     public static Vec3 computeInputPortOffset(Direction horizontal, Direction vertical, int count, int total){
         double x = -0.25;
-        double y = (total - 1) * DELTA_Y / 2 - (count * DELTA_Y);
+        double y = deltaY(count, total);
 
         Vec3 h = MinecraftUtils.toVec3(horizontal.getNormal());
         Vec3 v = MinecraftUtils.toVec3(vertical.getNormal());
@@ -143,6 +276,73 @@ public class CimulinkRenderCenter {
 
 
     public record ComputeContext(int id, String portName, BlockPos pos, Vec3 portPos, double result, boolean isInput){}
+
+
+
+    public static final ConcurrentHashMap<RenderCurveKey, Integer> CURVE2LIVES = new ConcurrentHashMap<>();
+
+    public static void keep(RenderCurveKey k){
+        ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier);
+        // CURVE2LIVES.put(k, 20);
+    }
+
+    public static void tickCurves(){
+        CURVE2LIVES.entrySet().forEach(e -> e.setValue(e.getValue() - 1));
+        CURVE2LIVES.entrySet()
+                .stream()
+                .filter(e -> e.getValue() < 0)
+                .toList()
+                .forEach(e -> CURVE2LIVES.remove(e.getKey()));
+        tickRender();
+    }
+
+    public static void tickRender(){
+        CURVE2LIVES.keySet().forEach( k ->
+            ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier)
+        );
+    }
+
+    public record RenderCurveKey(
+            BlockPos inPos, int inIndex, int inCount, Direction inDir, Direction inHorizontal, Direction inVertical,
+            BlockPos outPos, int outIndex, int outCount, Direction outDir, Direction outHorizontal, Direction outVertical
+    ){
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof RenderCurveKey that)) return false;
+            if (inIndex != that.inIndex) return false;
+            if (outIndex != that.outIndex) return false;
+            if (!inDir.equals(that.inDir)) return false;
+            if (!outDir.equals(that.outDir)) return false;
+            if (!inPos.equals(that.inPos)) return false;
+            if (!outPos.equals(that.outPos)) return false;
+            if (inCount != that.inCount) return false;
+            if (!inHorizontal.equals(that.inHorizontal)) return false;
+            if (!inVertical.equals(that.inVertical)) return false;
+            if (!outHorizontal.equals(that.outHorizontal)) return false;
+            if (!outVertical.equals(that.outVertical)) return false;
+
+            return outCount == that.outCount;
+        }
+
+        public RenderableOutline createBezier(){
+            Vector3dc inJoml = toJOML(Vec3.atLowerCornerOf(inDir.getNormal()));
+            Vector3dc outJoml = toJOML(Vec3.atLowerCornerOf(outDir.getNormal()));
+            return new FancyBezierCurveEntry(
+                    toJOML(outPos.getCenter().add(computeOutputPortOffset(outHorizontal, outVertical, outIndex, outCount))).fma(-0.5, outJoml),
+                    toJOML(inPos.getCenter().add(computeInputPortOffset(inHorizontal, inVertical, inIndex, inCount))).fma(-0.5, inJoml),
+                    outJoml,
+                    inJoml,
+                    0.1f,
+                    20
+            );
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(inPos, inIndex, inCount, outPos, outIndex, outCount, inDir, outDir);
+        }
+    }
 
     public static void renderOutConnection(BlockPos pos, String portName){
         CimulinkBlockEntity<?> cbe = of(pos);

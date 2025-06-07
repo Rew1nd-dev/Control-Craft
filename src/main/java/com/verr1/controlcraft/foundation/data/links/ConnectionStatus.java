@@ -26,6 +26,8 @@ public class ConnectionStatus {
     public final List<String> inputs = new ArrayList<>();
     public final List<String> outputs = new ArrayList<>();
 
+    public String clazzName;
+
 
     public ConnectionStatus(){}
 
@@ -33,12 +35,14 @@ public class ConnectionStatus {
             Map<String, Set<BlockPort>> outputPorts,
             Map<String, BlockPort> inputPorts,
             List<String> inputs,
-            List<String> outputs
+            List<String> outputs,
+            String identifier
     ) {
         this.outputPorts.putAll(outputPorts);
         this.inputPorts.putAll(inputPorts);
         this.inputs.addAll(inputs);
         this.outputs.addAll(outputs);
+        this.clazzName = identifier;
     }
 
     public String in(int index){
@@ -64,6 +68,7 @@ public class ConnectionStatus {
                 .withCompound("backward", blp.serializeBackward())
                 .withCompound("inputs", NAMES.serialize(blp.inputsNames()))
                 .withCompound("outputs", NAMES.serialize(blp.outputsNames()))
+                .withCompound("clazz", SerializeUtils.STRING.serialize(blp.getClass().getSimpleName()))
                 .build();
     }
 
@@ -72,7 +77,8 @@ public class ConnectionStatus {
                 BlockLinkPort.deserializeForward(tag.getCompound("forward")),
                 BlockLinkPort.deserializeBackward(tag.getCompound("backward")),
                 NAMES.deserialize(tag.getCompound("inputs")),
-                NAMES.deserialize(tag.getCompound("outputs"))
+                NAMES.deserialize(tag.getCompound("outputs")),
+                SerializeUtils.STRING.deserialize(tag.getCompound("clazz"))
         );
     }
 

@@ -168,8 +168,14 @@ public abstract class NamedComponent extends Component {
         return namedOutputs.getOrDefault(name, -1);
     }
 
-    public int inputId(String name){
+    public int in(String name){
+        ArrayUtils.AssertPresence(namedInputs.keySet(), name);
         return namedInputs.getOrDefault(name, -1);
+    }
+
+    public int out(String name){
+        ArrayUtils.AssertPresence(namedOutputs.keySet(), name);
+        return namedOutputs.getOrDefault(name, -1);
     }
 
     public static NamedComponent combinational(Component raw){

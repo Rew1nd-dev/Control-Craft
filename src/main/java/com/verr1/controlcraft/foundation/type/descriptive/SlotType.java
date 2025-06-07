@@ -164,7 +164,7 @@ public enum SlotType implements Descriptive<SlotType> {
             )
     ),
 
-    IS_SENSOR(true, Component.literal("Is Sensor"),
+    IS_SENSOR(false, Component.literal("Is Sensor"), // special
             literals(
                     "If Camera Is a distance Sensor:",
                     " . Outputs Redstone By Distance"
@@ -234,6 +234,19 @@ public enum SlotType implements Descriptive<SlotType> {
                     "Peripheral Type"
             )
     ),
+
+    INPUT(false, Component.literal("Input"),
+            literals(
+                    "Port input in circuit"
+            )),
+
+    OUTPUT(false, Component.literal("Output"),
+            literals(
+                    "Port output from circuit",
+                    "Will convert to redstone signal to bound face",
+                    "redstone = (output - min) / (max - min) * 15"
+            )),
+
     VALUE(false),
 
     MODE_ANGULAR(false),

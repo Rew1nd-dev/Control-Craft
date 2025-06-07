@@ -48,6 +48,10 @@ public record WorldBlockPos(String dimensionID, BlockPos pos) {
         return server.getLevel(key());
     }
 
+    @Override
+    public String toString() {
+        return "[" + dimensionID + "-" + pos.toShortString() +"]";
+    }
 
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()

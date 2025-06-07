@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.gui.layouts;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.content.gui.layouts.api.SwitchableTab;
 import com.verr1.controlcraft.content.gui.layouts.element.TypedUIPort;
+import com.verr1.controlcraft.content.gui.layouts.element.UnitUIPanel;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.executor.executables.ConditionExecutable;
@@ -68,7 +69,10 @@ public class VerticalFlow implements SwitchableTab {
                     verticalLayout.arrangeElements();
                     debug_init_id++;
                     var task = new ConditionExecutable
-                            .builder(() -> map.values().forEach(NetworkUIPort::readToLayout))
+                            .builder(() -> map.values().forEach(v -> {
+                                        v.readToLayout();
+                                        v.onMessage(Message.POST_READ);
+                            }))
                             .withCondition(() -> !be.handler().isAnyDirty(keys))
                             .withExpirationTicks(40)
                             .withOrElse(
@@ -113,7 +117,9 @@ public class VerticalFlow implements SwitchableTab {
         traverse(verticalLayout, consumer, new Context());
     }
 
-
+    public void onMessage(Message msg){
+        map.values().forEach(p -> p.onMessage(msg));
+    }
 
     public void apply(){
         boundBlockEntity().ifPresent(
@@ -200,6 +206,15 @@ public class VerticalFlow implements SwitchableTab {
 
         public builder withPort(
                 TypedUIPort<?>... port
+        ){
+            for(var p: port){
+                list.add(ImmutablePair.of(p.key(), p));
+            }
+            return this;
+        }
+
+        public builder withPort(
+                UnitUIPanel... port
         ){
             for(var p: port){
                 list.add(ImmutablePair.of(p.key(), p));

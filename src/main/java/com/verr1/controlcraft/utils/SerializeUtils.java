@@ -5,6 +5,7 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
+import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
@@ -175,6 +176,25 @@ public class SerializeUtils {
         };
     }
 
+    public static <F, S> Serializer<Pair<F, S>> ofPair(Serializer<F> firstSerializer, Serializer<S> secondSerializer) {
+        return new Serializer<>() {
+            @Override
+            public CompoundTag serialize(@NotNull Pair<F, S> pair) {
+                CompoundTag tag = new CompoundTag();
+                tag.put("first", firstSerializer.serialize(pair.getFirst()));
+                tag.put("second", secondSerializer.serialize(pair.getSecond()));
+                return tag;
+            }
+
+            @Override
+            public @NotNull Pair<F, S> deserialize(CompoundTag tag) {
+                F first = firstSerializer.deserialize(tag.getCompound("first"));
+                S second = secondSerializer.deserialize(tag.getCompound("second"));
+                return new Pair<>(first, second);
+            }
+        };
+    }
+
     /**
      * Creates a Serializer for List<V> using the provided element Serializer.
      *
@@ -209,6 +229,8 @@ public class SerializeUtils {
             }
         };
     }
+
+
 
     @SuppressWarnings("unchecked") // It's checked
     public static<T extends Enum<?>> Serializer<T> ofEnum(Class<T> enumClazz){

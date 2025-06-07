@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port;
 
+import com.google.common.collect.Sets;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -15,12 +16,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 // for connection recording, forming a graph
 public abstract class BlockLinkPort {
 
-    public static final Set<WorldBlockPos> ALL_BLP = new HashSet<>();
+    public static final Set<WorldBlockPos> ALL_BLP = ConcurrentHashMap.newKeySet();
+    // It used to cause ConcurrentModificationException, I don't know why, so make it synced
 
     public static final SerializeUtils.Serializer<HashMap<BlockPos, String>> POS_NAME_MAP =
             SerializeUtils.ofMap(SerializeUtils.BLOCK_POS, SerializeUtils.STRING);
@@ -64,7 +67,7 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateOutput(PropagateContext watcher, BlockLinkPort blp){
-        if(blp.anyInputChanged())watcher.visit(blp.pos());
+        if(blp.anyOutputChanged())watcher.visit(blp.pos());
         blp.changedOutput().forEach(changedOutput -> {
             double value = blp.retrieveOutput(changedOutput);
             String changedOutputName = blp.outputsNames().get(changedOutput);
@@ -123,10 +126,12 @@ public abstract class BlockLinkPort {
     }
 
     public static void remove(WorldBlockPos pos){
+        ControlCraft.LOGGER.info("remove is called at: {}", pos);
         ALL_BLP.remove(pos);
     }
 
     public static void add(WorldBlockPos pos){
+        ControlCraft.LOGGER.info("add is called at: {}", pos);
         ALL_BLP.add(pos);
     }
 
@@ -173,6 +178,10 @@ public abstract class BlockLinkPort {
         return realTimeComponent.in(index);
     }
 
+    public final int in(String name){
+        return realTimeComponent.in(name);
+    }
+
     public final String out(int index){
         return realTimeComponent.out(index);
     }
@@ -204,6 +213,7 @@ public abstract class BlockLinkPort {
     // should be called by top most input blp
 
     public void onPositiveEdge(){
+        ControlCraft.LOGGER.info("onPositiveEdge called at" + pos());
         realTimeComponent.onPositiveEdge();
         //propagateOutput(new PropagateContext());
     }
@@ -416,17 +426,21 @@ public abstract class BlockLinkPort {
         private final Set<WorldBlockPos> visited = new HashSet<>();
         public int depth = 0;
 
-        public PropagateContext increased(){
-            PropagateContext newContext = new PropagateContext();
-            newContext.depth = depth + 1;
-            return newContext;
+        public PropagateContext(Set<WorldBlockPos> visited, WorldBlockPos newPos) {
+            this.visited.addAll(visited);
+            this.visited.add(newPos);
+        }
+
+
+        public PropagateContext() {
         }
 
         public PropagateContext visit(WorldBlockPos pos){
             EncloseLoopDetection(pos);
-            visited.add(pos);
-            return this;
+            return new PropagateContext(visited, pos);
         }
+
+
 
         private String visitedMessage(){
             StringBuilder sb = new StringBuilder();

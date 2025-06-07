@@ -17,6 +17,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -47,6 +48,23 @@ public class MinecraftUtils {
                 .map(hitResult -> (BlockHitResult) hitResult)
                 .map(BlockHitResult::getDirection)
                 .orElse(null);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static int getPerceivedLightLevel(BlockPos pos) {
+        Minecraft mc = Minecraft.getInstance();
+        Level level = mc.level;
+        if (level == null) {
+            return 0; // 如果世界未加载，返回0或抛出异常
+        }
+
+        if (level.canSeeSky(pos)) {
+            // 方块直接暴露在天空下，返回天空光照
+            return level.getBrightness(LightLayer.SKY, pos);
+        } else {
+            // 方块有遮挡，返回综合光照
+            return level.getRawBrightness(pos, 0);
+        }
     }
 
     @OnlyIn(Dist.CLIENT)

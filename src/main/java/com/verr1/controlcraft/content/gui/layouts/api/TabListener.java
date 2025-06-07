@@ -24,6 +24,8 @@ public interface TabListener{
     record Message(String message){
         public static Message PRE_APPLY = new Message("pre_apply");
         public static Message POST_APPLY = new Message("post_apply");
+        public static Message POST_DO_LAYOUT = new Message("post_do_layout");
+        public static Message POST_READ = new Message("post_READ");
 
         @Override
         public boolean equals(Object o) {
