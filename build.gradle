@@ -263,7 +263,7 @@ dependencies {
     implementation(jarJar("com.bawnorton.mixinsquared:mixinsquared-forge:0.2.0-beta.6")) {
         jarJar.ranged(it, "[0.2.0-beta.6,)")
     }
-    implementation fg.deobf("curse.maven:create-tweaked-controllers-898849:5206625")
+    implementation fg.deobf("curse.maven:create-tweaked-controllers-898849:6252762")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

@@ -51,8 +51,7 @@ public class MixinTweakLinkedControllerAxisPacket {
             ArrayList<Float> axisValues = new ArrayList<>(controlCraft$makeAxis(fullAxis));
 
             for(byte i = 0; i < 10; ++i) {
-                // TODO: blocked by Tweaked on Create 6
-                // axisCouples.add(TweakedLinkedControllerItem.toFrequency(heldItem, i + 15));
+                axisCouples.add(TweakedLinkedControllerItem.toFrequency(heldItem, i + 15));
             }
 
             TweakedLinkedControllerServerHandlerExtension.ReceiveAxis(world, pos, uniqueID, axisCouples, axisValues);
