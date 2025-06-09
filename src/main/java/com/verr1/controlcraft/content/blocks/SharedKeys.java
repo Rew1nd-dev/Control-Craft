@@ -9,6 +9,7 @@ public class SharedKeys {
     public static final NetworkKey TARGET = NetworkKey.create("target");
     public static final NetworkKey LOCK_MODE = NetworkKey.create("lock_mode");
     public static final NetworkKey IS_LOCKED = NetworkKey.create("is_locked");
+    public static final NetworkKey SPEED_LIMIT = NetworkKey.create("speed_limit");
     public static final NetworkKey CONTROLLER = NetworkKey.create("controller_shared");
     public static final NetworkKey CONNECT_CONTEXT = NetworkKey.create("connect_context");
     public static final NetworkKey COMPLIANCE = NetworkKey.create("compliance");

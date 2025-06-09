@@ -16,6 +16,7 @@ public enum UIContents implements Descriptive<UIContents> {
     TARGET(Component.literal("Target"), literals("Target Angle, Velocity, Position Etc.")),
     SELF_OFFSET(Component.literal("Offset"), literals("Rotation Axis Offset For Next Assembly / Connection")),
     COMP_OFFSET(Component.literal("Offset"), literals("Companion Offset For Next Assembly / Connection")),
+    SPEED_LIMIT(Component.literal("Limit"), literals("Maximum Rotational Speed")),
 
     MODE(Component.literal("Mode"), literals("Velocity / Position")),
     CHEAT(Component.literal("Cheat"), literals("Convenience")),
@@ -41,6 +42,7 @@ public enum UIContents implements Descriptive<UIContents> {
     CAMERA_LINK_DUMP(Component.literal("Camera Dump"), literals("Dump Camera Link")),
     CAMERA_LINK_RESET(Component.literal("Camera Reset"), literals("Dump All Camera Link")),
     CAMERA_LINK_VALIDATE(Component.literal("Camera Validate"), literals("Dump Unloaded Or Removed Camera Link")),
+    CAMERA_VIEW_RESET(Component.literal("Camera View Reset"), literals("Reset Camera Ray")),
 
     ASSEMBLY(Component.literal("Assembly"), literals("Assemble Contraption or Ship")),
     DISASSEMBLY(Component.literal("Dis Assembly"), literals("Disassemble Contraption or Ship")),

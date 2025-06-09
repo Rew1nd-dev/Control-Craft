@@ -69,16 +69,26 @@ public class InducerControls {
 
     public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @NotNull  PhysShipWrapper motorShip, @NotNull PhysShipWrapper compShip) {
         if(!motor.free())return;
-        double metric = motor.angleOrSpeed() ?
-                VSMathUtils.get_yc2xc(motorShip, compShip, motor.motorDir(), motor.compDir()) :
-                VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getOmega(), compShip.getOmega(), motor.motorDir(), motor.compDir());
 
 
-        double accel_scale = VSMathUtils.clamp(motor.controller().calculateControlValueScale(motor.angleOrSpeed()), 1000);
+        double angle = VSMathUtils.get_yc2xc(motorShip, compShip, motor.motorDir(), motor.compDir());
+        double speed = VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getOmega(), compShip.getOmega(), motor.motorDir(), motor.compDir());
+
+        double metric = motor.angleOrSpeed() ? angle : speed;
+
+        double accel_clamp = 1000;
+
+        double accel_scale = VSMathUtils.clamp(motor.controller()
+                .calculateWithLimitContext(
+                        motor.angleOrSpeed(),
+                        motor.speedLimit(),
+                        speed
+                ),
+                accel_clamp
+        );
         double control_torque = motor.torque();
-        double scale = scaleOf(compShip.getTransform().getShipToWorldScaling());
-        double scale_5 = Math.pow(scale, 5);
-        double scale_3 = Math.pow(scale, 3);
+
+
         double internal_torque = compShip.getMomentOfInertia().m00() * accel_scale; // * scale_5;
         Vector3dc direction = ValkyrienSkies.set(new Vector3d(), motor.motorDir().getNormal());
         Vector3dc controlTorque_sc = direction.mul((-control_torque + internal_torque) * -1   , new Vector3d()); //

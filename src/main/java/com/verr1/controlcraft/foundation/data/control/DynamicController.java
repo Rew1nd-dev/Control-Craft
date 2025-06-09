@@ -50,6 +50,24 @@ public class DynamicController implements ISerializableDynamicController {
         return angular ? calculateControlValueScaleAngular() : calculateControlValueScaleLinear();
     }
 
+    public double calculateWithLimitContext(boolean angular, double limit, double absVelocity){
+        return angular ? calculateAngularWithLimitContext(limit, absVelocity) : calculateControlValueScaleLinear();
+    }
+
+    public double calculateAngularWithLimitContext(double limit, double absVelocity){
+
+        boolean overSpeed = Math.abs(absVelocity) > limit;
+        boolean approaching = Math.abs(curr_err) < 0.2; // && Math.abs(curr_err) < Math.abs(prev_err);
+
+        double fix_err = MathUtils.radErrFix(curr_err - prev_err);
+
+        double derivative = Math.abs(fix_err) > Math.abs(absVelocity) * ts * 3 ? 0 : d * fix_err / ts; // step detect
+        double proportional = !approaching && overSpeed ? 0 : p * MathUtils.radErrFix(curr_err);
+
+        return (proportional + derivative + i * integral_err);
+
+    }
+
     public DynamicController setPID(double p, double i, double d) {
         setP(p);
         setI(i);

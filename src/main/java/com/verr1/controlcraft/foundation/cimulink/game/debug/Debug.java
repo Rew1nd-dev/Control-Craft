@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 
 public class Debug {
 
-    public static boolean TEST_ENVIRONMENT = true;
+    public static boolean TEST_ENVIRONMENT = false;
 
 
     public static WorldBlockPos MapToDebug(int id){

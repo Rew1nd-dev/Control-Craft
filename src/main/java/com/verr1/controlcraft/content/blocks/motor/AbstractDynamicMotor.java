@@ -61,6 +61,11 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
     private final DirectReceiver receiver = new DirectReceiver();
 
+
+
+    private double speedLimit = 10;
+
+
     protected TargetMode targetMode = TargetMode.VELOCITY;
     protected LockMode lockMode = LockMode.OFF;
     protected CheatMode cheatMode = CheatMode.NONE;
@@ -101,6 +106,9 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public double getTarget(){return controller.getTarget();}
     public boolean isLocked() {return isLocked;}
 
+    public double speedLimit() {return speedLimit;}
+    public void setSpeedLimit(double speedLimit) {this.speedLimit = speedLimit;}
+
     public void setTargetMode(TargetMode targetMode) {
         if(this.targetMode == targetMode)return;
         this.targetMode = targetMode;
@@ -117,44 +125,6 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         setChanged();
     }
 
-    private final List<ExposedFieldWrapper> fields = List.of(
-            new ExposedFieldWrapper(
-                    controlTorque::read,
-                    controlTorque::write,
-                    "Torque",
-                    SlotType.TORQUE
-            ).withSuggestedRange(0, 1000),
-            new ExposedFieldWrapper(
-                    this::getTarget,
-                    this::setTargetAccordingly,
-                    "target",
-                    SlotType.TARGET
-            ).withSuggestedRange(0, Math.PI / 2),
-            new ExposedFieldWrapper(
-                    this::getTarget,
-                    this::setTargetAccordingly,
-                    "target",
-                    SlotType.TARGET$1
-            ).withSuggestedRange(0, Math.PI / 2),
-            new ExposedFieldWrapper(
-                    () -> (isLocked ? 1.0 : 0.0),
-                    (d) -> {
-                        if(d > (double) 1 / 15)tryLock();
-                        else if(d < (double) 1 / 15)tryUnlock();
-                    },
-                    "Locked",
-                    SlotType.IS_LOCKED
-            ),
-            new ExposedFieldWrapper(
-                    () -> (isLocked ? 1.0 : 0.0),
-                    (d) -> {
-                        if(d > (double) 1 / 15)tryLock();
-                        else if(d < (double) 1 / 15)tryUnlock();
-                    },
-                    "Locked",
-                    SlotType.IS_LOCKED$1
-            )
-    );
 
     private DynamicMotorPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
@@ -263,6 +233,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
                 cheatMode.shouldEliminateGravity(),
                 !isLocked(),
                 controlTorque.read(),
+                speedLimit(),
                 getController()
         );
     }
@@ -386,6 +357,11 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
                         new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class)
                 )
                 .dispatchToSync()
+                .register();
+
+        buildRegistry(SPEED_LIMIT)
+                .withBasic(SerializePort.of(this::speedLimit, this::setSpeedLimit, SerializeUtils.DOUBLE))
+                .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 
         buildRegistry(CONTROLLER)

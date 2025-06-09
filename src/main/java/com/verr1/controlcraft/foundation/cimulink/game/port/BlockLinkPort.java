@@ -118,7 +118,11 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateTemporal(){
+        // ControlCraft.LOGGER.info("Staring Propagate Temporal");
+
         ALL_BLP.stream().map(BlockLinkPort::of).forEach(blp -> blp.ifPresent(BlockLinkPort::onPositiveEdge));
+
+        // ControlCraft.LOGGER.info("ForEach is done");
         // Temporal output can be considered as a kind of input in a loop-less directional graph
         ALL_BLP.forEach(wbp -> of(wbp).ifPresent(
                 blp -> propagateCombinational(new PropagateContext(), blp)
@@ -213,7 +217,7 @@ public abstract class BlockLinkPort {
     // should be called by top most input blp
 
     public void onPositiveEdge(){
-        ControlCraft.LOGGER.info("onPositiveEdge called at" + pos());
+        // ControlCraft.LOGGER.info("onPositiveEdge called at" + pos());
         realTimeComponent.onPositiveEdge();
         //propagateOutput(new PropagateContext());
     }

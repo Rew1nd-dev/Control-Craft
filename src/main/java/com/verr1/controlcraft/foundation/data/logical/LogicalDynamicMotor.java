@@ -15,6 +15,7 @@ public record LogicalDynamicMotor(
         boolean eliminateGravity,
         boolean free,
         double torque,
+        double speedLimit,
         DynamicController controller
 ){
 

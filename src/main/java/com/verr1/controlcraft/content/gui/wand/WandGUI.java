@@ -94,22 +94,28 @@ public class WandGUI implements IGuiOverlay {
             .ofNullable(MinecraftUtils.lookingAt())
             .ifPresent(
                 blockEntity -> {
-                    if(blockEntity instanceof DynamicRevoluteMotorBlockEntity || blockEntity instanceof KinematicRevoluteMotorBlockEntity){
-                        currentType = WandModesType.SERVO;
+                    if(isConnecting){
+                        if(blockEntity instanceof DynamicRevoluteMotorBlockEntity || blockEntity instanceof KinematicRevoluteMotorBlockEntity){
+                            currentType = WandModesType.SERVO;
+                        }
+                        if(blockEntity instanceof DynamicJointMotorBlockEntity || blockEntity instanceof KinematicJointMotorBlockEntity){
+                            currentType = WandModesType.JOINT;
+                        }
+                        if(blockEntity instanceof DynamicSliderBlockEntity || blockEntity instanceof KinematicSliderBlockEntity){
+                            currentType = WandModesType.SLIDER;
+                        }
+                        if(blockEntity instanceof AbstractJointBlockEntity){
+                            currentType = WandModesType.HINGE;
+                        }
+                    }else {
+                        currentType = WandModesType.DESTROY;
                     }
-                    if(blockEntity instanceof DynamicJointMotorBlockEntity || blockEntity instanceof KinematicJointMotorBlockEntity){
-                        currentType = WandModesType.JOINT;
-                    }
-                    if(blockEntity instanceof DynamicSliderBlockEntity || blockEntity instanceof KinematicSliderBlockEntity){
-                        currentType = WandModesType.SLIDER;
-                    }
-                    if(blockEntity instanceof AbstractJointBlockEntity){
-                        currentType = WandModesType.HINGE;
-                    }
+
                     if(blockEntity instanceof CimulinkBlockEntity<?>){
                         if(isConnecting) currentType = WandModesType.LINK;
                         else currentType = WandModesType.DELINK;
                     }
+
                 }
             );
     }

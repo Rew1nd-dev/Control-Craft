@@ -5,6 +5,7 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.motor.AbstractDynamicMotor;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
+import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.operatable.IBruteConnectable;
 import com.verr1.controlcraft.foundation.api.operatable.IConstraintHolder;
@@ -64,6 +65,9 @@ public class ServerGenericPacketHandler {
             }
 
         });
+        BlockEntityGetter.INSTANCE
+                .getBlockEntityAt(WorldBlockPos.of(level, pos), CimulinkBlockEntity.class)
+                .ifPresent(BlockEntity::setChanged);
 
     }
 

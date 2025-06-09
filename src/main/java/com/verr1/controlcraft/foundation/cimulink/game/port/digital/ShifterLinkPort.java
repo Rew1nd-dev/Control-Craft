@@ -10,10 +10,10 @@ public class ShifterLinkPort extends BlockLinkPort {
 
 
     private int parallel = 1;
-    private int delay = 1;
+    private int delay = 0;
 
     public ShifterLinkPort(WorldBlockPos portPos) {
-        super(portPos, new Shifter(1, 1));
+        super(portPos, new Shifter(0, 1));
     }
 
 

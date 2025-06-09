@@ -88,6 +88,8 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft
 public class CameraBlockEntity extends OnShipBlockEntity
         implements IPacketHandler, IReceiver, IHaveGoggleInformation
 {
+    public static NetworkKey RESET = NetworkKey.create("reset_view");
+
     public static NetworkKey PITCH = NetworkKey.create("pitch");
     public static NetworkKey YAW = NetworkKey.create("yaw");
     public static NetworkKey IS_ACTIVE_SENSOR = NetworkKey.create("sensor");
@@ -1041,6 +1043,11 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 )
                 .dispatchToSync()
                 .register();
+
+        panel().registerUnit(
+                RESET,
+                this::resetView
+        );
 
         receiver().register(
                 new NumericField(

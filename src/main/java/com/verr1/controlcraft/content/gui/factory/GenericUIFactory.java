@@ -130,6 +130,14 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.CLIP_SHIP, Converter::titleStyle)
         );
 
+        UnitUIPanel reset = new UnitUIPanel(
+                boundAnchorPos,
+                CameraBlockEntity.RESET,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.CAMERA_LINK_RESET, Converter::titleStyle)
+        );
+
         OptionUIField<CameraClipType> entity_ray = new OptionUIField<>(
                 boundAnchorPos,
                 CameraBlockEntity.ENTITY_TYPE,
@@ -148,16 +156,19 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundAnchorPos)
-                                .withPort(CameraBlockEntity.IS_ACTIVE_SENSOR, is_sensor)
-                                .withPort(CameraBlockEntity.RAY_TYPE, cast_ray)
-                                .withPort(CameraBlockEntity.SHIP_TYPE, ship_ray)
-                                .withPort(CameraBlockEntity.ENTITY_TYPE, entity_ray)
+                                .withPort(is_sensor, cast_ray, ship_ray, entity_ray)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
                 .withTab(
                         REDSTONE_TAB,
                         createTerminalDeviceTab(boundAnchorPos)
+                )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundAnchorPos)
+                                .withPort(reset)
+                                .build()
                 )
                 .build();
     }
@@ -450,6 +461,9 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
 
+        var limit = new DoubleUIField(boundPos, SharedKeys.SPEED_LIMIT, Converter.convert(UIContents.SPEED_LIMIT, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d); //, Converter.combine(Math::toDegrees, d -> MathUtils.clampDigit(d, 2)), Math::toRadians
+
+
         Runnable alignLabels = () -> {
             Converter.alignLabel(current_view, lock_view, target);
             Converter.alignLabel(toggle_mode, toggle_cheat, toggle_lock_mode);
@@ -461,14 +475,11 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(SharedKeys.VALUE, current_view)
-                                .withPort(SharedKeys.IS_LOCKED, lock_view)
-                                .withPort(SharedKeys.TARGET, target)
-                                .withPort(SharedKeys.SELF_OFFSET, offset_self)
-                                .withPort(SharedKeys.COMP_OFFSET, offset_comp)
-                                .withPort(SharedKeys.TARGET_MODE, toggle_mode)
-                                .withPort(SharedKeys.CHEAT_MODE, toggle_cheat)
-                                .withPort(SharedKeys.LOCK_MODE, toggle_lock_mode)
+                                .withPort(
+                                        current_view, lock_view, target,
+                                        offset_self, offset_comp, toggle_mode,
+                                        toggle_cheat, toggle_lock_mode
+                                )
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
@@ -478,7 +489,9 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         CONTROLLER_TAB,
-                        createControllerTab(boundPos)
+                        createControllerTabUndone(boundPos)
+                                .withPort(limit)
+                                .build()
                 )
                 .withTab(
                         REMOTE_TAB,
@@ -813,6 +826,14 @@ public class GenericUIFactory {
                         SharedKeys.CONTROLLER,
                         new DynamicControllerUIField(boundPos, 30)
                 ).build();
+    }
+
+    public static VerticalFlow.builder createControllerTabUndone(BlockPos boundPos){
+        return new VerticalFlow.builder(boundPos)
+                .withPort(
+                        SharedKeys.CONTROLLER,
+                        new DynamicControllerUIField(boundPos, 30)
+                );
     }
 
 

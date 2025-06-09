@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.foundation.network.packets.specific;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
+import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
@@ -8,6 +10,7 @@ import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 public class CimulinkLinkPacket extends SimplePacketBase {
@@ -54,7 +57,11 @@ public class CimulinkLinkPacket extends SimplePacketBase {
                                 inputPort.pos(),
                                 inputPort.portName()
                         )
+
                 );
+                BlockEntityGetter.INSTANCE
+                        .getBlockEntityAt(outputPort.pos(), CimulinkBlockEntity.class)
+                        .ifPresent(BlockEntity::setChanged);
             }catch (IllegalArgumentException e){
                 if(context.getSender() == null)return;
                 context.getSender().sendSystemMessage(Component.literal(e.getMessage()));

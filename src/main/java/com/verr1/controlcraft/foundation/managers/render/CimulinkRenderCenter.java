@@ -333,7 +333,7 @@ public class CimulinkRenderCenter {
                     toJOML(inPos.getCenter().add(computeInputPortOffset(inHorizontal, inVertical, inIndex, inCount))).fma(-0.5, inJoml),
                     outJoml,
                     inJoml,
-                    0.1f,
+                    0.067f,
                     20
             );
         }
