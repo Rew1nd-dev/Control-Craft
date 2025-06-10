@@ -4,8 +4,9 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
-public record BlockPort(WorldBlockPos pos, String portName) {
+public record BlockPort(@NotNull WorldBlockPos pos, String portName) {
     public static final BlockPort EMPTY = new BlockPort(WorldBlockPos.NULL, "");
 
     @Override

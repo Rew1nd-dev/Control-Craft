@@ -3,17 +3,15 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.inout;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.Component;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Sink;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Source;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 
 public class InputLinkPort extends BlockLinkPort{
 
     private final Component.Port inputPort = new Component.Port();
 
-    public InputLinkPort(WorldBlockPos portPos) {
-        super(portPos, new Source());
+    public InputLinkPort() {
+        super(new Source());
     }
 
     public double peek(){

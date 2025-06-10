@@ -11,9 +11,9 @@ public class BlockLinkPortTest {
 
 
     public static void connectivityTest(){
-        var or0 = new GateLinkPort(Debug.MapToDebug(0));
-        var or1 = new GateLinkPort(Debug.MapToDebug(1));
-        var or2 = new GateLinkPort(Debug.MapToDebug(2));
+        var or0 = new GateLinkPort();
+        var or1 = new GateLinkPort();
+        var or2 = new GateLinkPort();
 
         // TestEnvBlockLinkWorld.add(or0, or1, or2);
 
@@ -38,7 +38,7 @@ public class BlockLinkPortTest {
         int n = 5;
         FFLinkPort[] ffs = new FFLinkPort[n];
         for(int i = 0; i < ffs.length; i++){
-            ffs[i] = new FFLinkPort(Debug.MapToDebug(i));
+            ffs[i] = new FFLinkPort();
             ffs[i].setCurrentType(FFTypes.D_FF);
             // TestEnvBlockLinkWorld.add(ffs[i]);
             if(i == 0)continue;

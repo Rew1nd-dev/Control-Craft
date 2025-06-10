@@ -5,7 +5,6 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -15,10 +14,8 @@ import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> implements
         IReceiver
@@ -68,8 +65,8 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
     }
 
     @Override
-    protected InputLinkPort create(@NotNull Level level, BlockPos pos) {
-        return new InputLinkPort(WorldBlockPos.of(level, pos));
+    protected InputLinkPort create() {
+        return new InputLinkPort();
     }
 
     @Override

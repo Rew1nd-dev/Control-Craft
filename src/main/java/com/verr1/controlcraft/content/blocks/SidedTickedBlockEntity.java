@@ -20,14 +20,9 @@ public class SidedTickedBlockEntity extends SmartBlockEntity {
     }
 
 
-    public void tickServer(){
-
-    }
-    public void tickClient(){
-
-    }
-    public void tickCommon(){
-    }
+    public void tickServer(){}
+    public void tickClient(){}
+    public void tickCommon(){}
     public void lazyTickServer(){}
     public void lazyTickClient(){}
     public void lazyTickCommon(){}

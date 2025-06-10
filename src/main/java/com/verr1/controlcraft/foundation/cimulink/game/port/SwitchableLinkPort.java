@@ -2,7 +2,6 @@ package com.verr1.controlcraft.foundation.cimulink.game.port;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.Inspectable;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -13,8 +12,8 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
 
     private T currentType;
 
-    protected SwitchableLinkPort(WorldBlockPos portPos, T defaultValue) {
-        super(portPos, defaultValue.inspector().get());
+    protected SwitchableLinkPort(T defaultValue) {
+        super(defaultValue.inspector().get());
         TYPE = SerializeUtils.ofEnum(clazz());
         currentType = defaultValue;
     }

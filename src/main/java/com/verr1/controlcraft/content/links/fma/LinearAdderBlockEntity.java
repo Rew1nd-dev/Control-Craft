@@ -3,17 +3,14 @@ package com.verr1.controlcraft.content.links.fma;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.FMALinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.Coefficients;
 import com.verr1.controlcraft.foundation.data.links.NamedCoeff;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +74,7 @@ public class LinearAdderBlockEntity extends CimulinkBlockEntity<FMALinkPort> {
     }
 
     @Override
-    protected FMALinkPort create(@NotNull Level level, BlockPos pos) {
-        return new FMALinkPort(WorldBlockPos.of(level, pos));
+    protected FMALinkPort create() {
+        return new FMALinkPort();
     }
 }

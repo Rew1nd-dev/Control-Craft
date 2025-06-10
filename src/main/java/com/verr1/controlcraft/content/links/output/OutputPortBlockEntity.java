@@ -5,7 +5,6 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -17,10 +16,8 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -119,8 +116,8 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
     }
 
     @Override
-    protected OutputLinkPort create(@NotNull Level level, BlockPos pos) {
-        return new OutputLinkPort(WorldBlockPos.of(level, pos));
+    protected OutputLinkPort create() {
+        return new OutputLinkPort();
     }
 
     @Override

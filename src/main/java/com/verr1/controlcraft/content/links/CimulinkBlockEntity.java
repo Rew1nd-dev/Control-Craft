@@ -1,14 +1,14 @@
 package com.verr1.controlcraft.content.links;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
-import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
 import com.verr1.controlcraft.foundation.data.links.ValueStatus;
 import com.verr1.controlcraft.foundation.data.render.FancyBezierCurveEntry;
@@ -26,7 +26,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -49,9 +48,30 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     private final T linkPort;
     private final ClientWatcher watcher = new ClientWatcher();
 
+    private final DeferralInitializer lateInitLinkPort = new DeferralInitializer() {
+        @Override
+        void deferralLoad(CompoundTag tag) {
+            try{
+                linkPort().deserialize(tag);
+            }catch (NullPointerException e){
+                ControlCraft.LOGGER.error("linkPort at: " + getBlockPos().toShortString() + " did not initialize linkPort!");
+            }
+        }
+    };
+
+
     @Override
     public final void initialize() {
         super.initialize();
+
+        if(level != null){
+            linkPort.setWorldBlockPos(WorldBlockPos.of(level, getBlockPos()));
+        }else{
+            ControlCraft.LOGGER.warn("link port has not been set pos! at: " + getBlockPos().toShortString() + " because level is null");
+        }
+
+        lateInitLinkPort.load();
+
 
         syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
         initializeExtra();
@@ -62,15 +82,15 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 
     }
 
-    protected abstract T create(@NotNull Level level, BlockPos pos);
+    protected abstract T create();
 
     public CimulinkBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
-        linkPort = create(ControlCraftServer.OVERWORLD, getBlockPos());
+        linkPort = create();
         buildRegistry(SharedKeys.BLP)
                 .withBasic(CompoundTagPort.of(
                         () -> linkPort().serialize(),
-                        t -> linkPort().deserialize(t)
+                        lateInitLinkPort::load
                 ))
                 .register();
 
@@ -145,7 +165,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     }
 
     @OnlyIn(Dist.CLIENT)
-    private boolean beingLookingAt(){
+    private boolean beingLookedAt(){
         BlockPos p = MinecraftUtils.lookingAtPos();
         return p != null && p.equals(getBlockPos());
     }
@@ -177,25 +197,12 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         // tickConnection();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public void tickConnection(){
-        Optional.ofNullable(readClientConnectionStatus())
-                .map(r -> r.inputPorts.keySet())
-                .ifPresent(
-                    s -> s.forEach(
-                        inName -> CimulinkRenderCenter.renderInConnection(
-                                getBlockPos(),
-                                inName
-                        )
-                    )
-                );
-    }
+
 
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
         if(linkPort() == null)return;
-        //TODO: This may cause save loads can't restore links, so change it later
         linkPort().removeInvalid();
         syncForNear(false, SharedKeys.COMPONENT_NAME);
     }
@@ -230,7 +237,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 
     @Override
     public T linkPort(){
-        return linkPort;
+        return Objects.requireNonNull(linkPort);
     }
 
 
@@ -350,23 +357,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         });
     }
 
-    private void tickFlash(){
-        if(!(level instanceof ClientLevel clientLevel))return;
-        cachedKeys.values().forEach(
-                k -> Optional
-                        .ofNullable(ControlCraftClient.CLIENT_CURVE_OUTLINER.retrieveLine(k))
-                        .filter(FancyBezierCurveEntry.class::isInstance)
-                        .map(FancyBezierCurveEntry.class::cast)
-                        .ifPresent(FancyBezierCurveEntry::flash)
-        );
-        /*setLights(
-                                clientLevel.getRawBrightness(getBlockPos(), 0),
-                                clientLevel.getRawBrightness(getBlockPos(), 0)
-                        )*/
-    }
-
     private void tickChangedFlash(List<Integer> changedInput){
-        if(!(level instanceof ClientLevel clientLevel))return;
+        if(!(level instanceof ClientLevel))return;
         ConnectionStatus cs = readClientConnectionStatus();
         if(cs == null)return;
         changedInput.stream().filter(i -> i < cs.inputs.size())
@@ -381,6 +373,24 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     protected void onClientInputChanged(List<Integer> changedInput){
         tickChangedFlash(changedInput);
     }
+
+
+
+    private abstract static class DeferralInitializer{
+
+        CompoundTag savedTag = new CompoundTag();
+
+        void load(CompoundTag savedTag){
+            this.savedTag = savedTag;
+        }
+
+        void load(){
+            deferralLoad(savedTag);
+        }
+
+        abstract void deferralLoad(CompoundTag tag);
+    }
+
 
     private class ClientWatcher{
         ValueStatus cached;
@@ -406,3 +416,21 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         }
     }
 }
+
+
+// TODO:
+// 目前：
+// ConnectionStatus: 保存自己和谁连接，被谁连了 String -> BlockPort, index -> String
+// ValueStatus：端口的值，index -> double
+// RenderCenter： 计算ValueBox，渲染端口
+// Curve：需要输出端的位置
+
+// 一个ClientSide的RenderManager：(inner class)
+// 请求同步cs,vs
+// 类似服务端BlockLinkPort::of，通过BlockPos获取其他cbe的RenderManager
+// 根据cs,vs,获取各种反查函数，如name->index index->name, index->vec3....
+// 管理ValueBox，动态改变其offset，根据cs和vs
+// 监听vs变化，
+// 生成渲染用的BezierCurveEntry
+// 计算客户端玩家正在看着哪个端口
+

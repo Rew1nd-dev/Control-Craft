@@ -14,7 +14,10 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -44,17 +47,29 @@ public abstract class BlockLinkPort {
     private final Map<String, Set<BlockPort>>   forwardView  = Collections.unmodifiableMap(forwardLinks);
     private final Map<String, BlockPort>        backwardView = Collections.unmodifiableMap(backwardLinks);
 
-    private final WorldBlockPos portPos;
+    private WorldBlockPos portPos;
 
     private NamedComponent realTimeComponent;
 
+    // private final BlockEntity owner;
 
     protected BlockLinkPort(WorldBlockPos portPos, NamedComponent initial) {
         this.portPos = portPos;
         realTimeComponent = initial;
         add(portPos);
-        if(Debug.TEST_ENVIRONMENT){
-            TestEnvBlockLinkWorld.add(this);
+    }
+
+    protected BlockLinkPort(NamedComponent initial) {
+        // this.owner = owner;
+        realTimeComponent = initial;
+    }
+
+    public void setWorldBlockPos(WorldBlockPos portPos){
+        if(this.portPos == null){
+            this.portPos = portPos;
+            add(portPos);
+        }else {
+            throw new IllegalCallerException("BlockLinkPort Pos has already been set!");
         }
     }
 
@@ -219,7 +234,6 @@ public abstract class BlockLinkPort {
     public void onPositiveEdge(){
         // ControlCraft.LOGGER.info("onPositiveEdge called at" + pos());
         realTimeComponent.onPositiveEdge();
-        //propagateOutput(new PropagateContext());
     }
 
     public List<Integer> changedOutput(){
@@ -249,7 +263,7 @@ public abstract class BlockLinkPort {
     }
 
     public void deleteInput(String name){
-        ControlCraft.LOGGER.info("deleting invalid input: {}", name);
+        ControlCraft.LOGGER.info("deleting input: {}", name);
         backwardLinks.remove(name);
     }
 
@@ -277,7 +291,7 @@ public abstract class BlockLinkPort {
     }
 
     public void deleteOutput(String name, BlockPort forwardPort){
-        ControlCraft.LOGGER.info("deleting invalid output: {} -> {}", name, forwardPort);
+        ControlCraft.LOGGER.info("deleting output: {} -> {}", name, forwardPort);
         forwardLinks.getOrDefault(name, EMPTY).remove(forwardPort);
         if(forwardLinks.getOrDefault(name, EMPTY).isEmpty())forwardLinks.remove(name);
     }
@@ -322,8 +336,8 @@ public abstract class BlockLinkPort {
                 .toList().forEach(e -> deleteInput(e.getKey()));
     }
 
-    public WorldBlockPos pos(){
-        return portPos;
+    public @NotNull WorldBlockPos pos(){
+        return Objects.requireNonNull(portPos);
     }
 
     public void quit(){
