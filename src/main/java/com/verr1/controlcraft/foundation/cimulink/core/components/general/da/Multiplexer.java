@@ -12,10 +12,10 @@ public class Multiplexer extends Combinational {
 
     private final int bits;
 
-    @SuppressWarnings("unchecked")
+
     public Multiplexer(int n) {
         super(
-                (List<String>) ArrayUtils.flatten(
+                ArrayUtils.flatten(
                         ArrayUtils.createWithPrefix(
                                 "sel_",
                                 n

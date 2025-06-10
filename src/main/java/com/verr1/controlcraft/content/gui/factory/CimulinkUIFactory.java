@@ -144,14 +144,20 @@ public class CimulinkUIFactory {
                 title(UIContents.SHIFTER_PARALLEL)
         );
 
-        Runnable alignLabels = () -> alignLabel(delay, parallel);
+        BooleanUIField async = new BooleanUIField(
+                boundPos,
+                ShifterLinkBlockEntity.ASYNC,
+                title(UIContents.ASYNC_COMPONENT)
+        );
+
+        Runnable alignLabels = () -> alignLabel(delay, parallel, async);
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(name, delay, parallel)
+                                .withPort(name, delay, parallel, async)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )

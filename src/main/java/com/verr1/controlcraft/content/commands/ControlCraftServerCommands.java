@@ -112,6 +112,30 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int outputCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        int index = context.getArgument("portId", Integer.class);
+        double value = context.getArgument("value", Double.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set neglect a block!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        HitResult ht = player.pick(5, 1, false);
+        if(!(ht instanceof BlockHitResult bht)){
+            source.sendFailure(Component.literal("No block Found in your vicinity"));
+            return 0;
+        }
+        BlockLinkPort.of(WorldBlockPos.of(player.serverLevel(), bht.getBlockPos())).ifPresentOrElse(
+                blp -> {
+                    blp.__raw().updateOutput(index, value);
+                    BlockLinkPort.propagateCombinational(new BlockLinkPort.PropagateContext(), blp);
+                },
+                () -> source.sendFailure(Component.literal("BlockLinkPort Not Found"))
+        );
+        return 1;
+    }
+
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
             Commands
@@ -146,6 +170,14 @@ public class ControlCraftServerCommands {
                                                 ControlCraftServerCommands::inputCommand
                                             )
                                     )
+                                )
+                        ).then(lt("out")
+                                .then(arg("portId", IntegerArgumentType.integer())
+                                        .then(arg("value", DoubleArgumentType.doubleArg())
+                                                .executes(
+                                                        ControlCraftServerCommands::outputCommand
+                                                )
+                                        )
                                 )
                         )
         );

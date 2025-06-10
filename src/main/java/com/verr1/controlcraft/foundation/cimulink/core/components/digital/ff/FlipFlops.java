@@ -12,14 +12,26 @@ import java.util.function.Supplier;
 
 public class FlipFlops {
 
-    public static final Supplier<Temporal<Boolean>> RS_FF = () -> new FF11<>(() -> false){
+    public static final Supplier<Temporal<Boolean>> RS_FF = () -> new BooleanTemporal<>(
+            List.of("R", "S"),
+            List.of("Q", "Qb"),
+            () -> false
+    ) {
         @Override
-        protected Pair<Boolean, Boolean> transit(Boolean input, Boolean state) {
-            if (input) {
-                return new Pair<>(true, false); // Set
-            } else {
-                return new Pair<>(false, true); // Reset
+        protected Pair<List<Boolean>, Boolean> transitBoolean(List<Boolean> input, Boolean state) {
+            boolean r = input.get(0);
+            boolean s = input.get(1);
+            boolean nextState = state;
+
+            if (r && !s) {
+                nextState = false; // Reset
+            } else if (!r && s) {
+                nextState = true; // Set
+            } else if (r && s) {
+                nextState = false; // Invalid state, reset
             }
+
+            return new Pair<>(List.of(nextState, !nextState), nextState);
         }
     };
 

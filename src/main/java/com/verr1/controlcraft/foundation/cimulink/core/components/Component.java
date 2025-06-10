@@ -1,5 +1,7 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -84,7 +86,8 @@ public abstract class Component {
         }
     }
 
-    protected void updateOutput(int index, double value){
+    @ApiStatus.Internal
+    public void updateOutput(int index, double value){
         outputs.get(index).update(value);
     }
 

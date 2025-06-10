@@ -68,6 +68,8 @@ public enum UIContents implements Descriptive<UIContents> {
     SHIFTER_DELAY(Component.literal("Delay"), literals("Shifter Delay")),
     SHIFTER_PARALLEL(Component.literal("Parallel"), literals("Shifter Inputs Size")),
 
+    ASYNC_COMPONENT(Component.literal("Async"), literals("Has Explicit Clk Port")),
+
     FMA_COEFFICIENT(Component.literal("Coefficients"), literals("Linear Adder Coefficients")),
 
     FMA_INC(Component.literal("Add Input"), literals("Linear Adder Coefficients")),

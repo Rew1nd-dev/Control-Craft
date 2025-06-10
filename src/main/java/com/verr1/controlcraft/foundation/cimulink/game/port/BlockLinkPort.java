@@ -338,7 +338,7 @@ public abstract class BlockLinkPort {
         removeInvalidOutput();
     }
 
-    protected NamedComponent __raw(){
+    public NamedComponent __raw(){
         return realTimeComponent;
     }
 

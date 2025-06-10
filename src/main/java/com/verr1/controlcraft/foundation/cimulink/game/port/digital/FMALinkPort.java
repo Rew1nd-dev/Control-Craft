@@ -5,7 +5,11 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearA
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.data.links.NamedCoeff;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +17,8 @@ import java.util.List;
 public class FMALinkPort extends BlockLinkPort {
 
     private final List<Double> cachedNewCoefficients = new ArrayList<>(List.of(1.0, 1.0));
+    public static final SerializeUtils.Serializer<List<Double>> COEFF_SERIALIZER =
+            SerializeUtils.ofList(SerializeUtils.DOUBLE);
 
     public FMALinkPort(WorldBlockPos portPos) {
         super(portPos, new LinearAdder(List.of(1.0, 1.0)));
@@ -76,5 +82,22 @@ public class FMALinkPort extends BlockLinkPort {
     @Override
     public NamedComponent create() {
         return new LinearAdder(cachedNewCoefficients);
+    }
+
+
+    @Override
+    public CompoundTag serialize() {
+        return CompoundTagBuilder.create()
+                .withCompound("blp", super.serialize())
+                .withCompound("coeff", COEFF_SERIALIZER.serialize(viewCoefficients()))
+                .build();
+    }
+
+    @Override
+    public void deserialize(CompoundTag tag) {
+        resetCoefficients(
+                COEFF_SERIALIZER.deserialize(tag.getCompound("coeff"))
+        );
+        super.deserialize(tag.getCompound("blp"));
     }
 }

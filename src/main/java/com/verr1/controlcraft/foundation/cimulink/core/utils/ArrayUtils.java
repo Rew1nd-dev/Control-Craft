@@ -62,7 +62,8 @@ public class ArrayUtils {
                 .toList();
     }
 
-    public static List<?> flatten(List<?>... lists){
+    @SafeVarargs
+    public static<T> List<T> flatten(List<T>... lists){
         return Arrays.stream(lists).flatMap(List::stream).toList();
     }
 

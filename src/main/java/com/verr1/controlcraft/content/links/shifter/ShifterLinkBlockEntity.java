@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class ShifterLinkBlockEntity extends CimulinkBlockEntity<ShifterLinkPort> {
     public static final NetworkKey PARALLEL = NetworkKey.create("parallel");
     public static final NetworkKey DELAY = NetworkKey.create("delay");
+    public static final NetworkKey ASYNC = NetworkKey.create("async_shifter");
 
 
     public ShifterLinkBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -39,6 +40,14 @@ public class ShifterLinkBlockEntity extends CimulinkBlockEntity<ShifterLinkPort>
                 .withClient(ClientBuffer.LONG.get())
                 .register();
 
+        buildRegistry(ASYNC)
+                .withBasic(SerializePort.of(
+                        () -> linkPort().async(),
+                        a -> linkPort().setAsync(a),
+                        SerializeUtils.BOOLEAN
+                ))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .register();
 
     }
 

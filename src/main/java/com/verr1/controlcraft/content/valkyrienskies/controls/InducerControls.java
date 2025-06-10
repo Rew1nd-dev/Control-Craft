@@ -27,9 +27,6 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 public class InducerControls {
 
-    public static double SPEED_THRESHOLD = 1200000; // m/s a big number, currently not useful
-    public static double OVER_THRESHOLD_MAX_ACCEL = 0.5; // m/s^2
-
     public static void anchorTickControls(LogicalAnchor anchor, @NotNull PhysShipWrapper physShip) {
 
         Vector3dc p_sc = ValkyrienSkies.set(new Vector3d(), anchor.pos().pos().getCenter());
