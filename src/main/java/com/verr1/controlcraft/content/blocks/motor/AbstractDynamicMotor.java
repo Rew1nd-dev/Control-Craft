@@ -160,6 +160,14 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         lock();
     }
 
+    public void tryLock(boolean toLock){
+        if (toLock){
+            tryLock();
+        }else {
+            tryUnlock();
+        }
+    }
+
     private void lock(){
         if(level == null || level.isClientSide)return;
         if(noCompanionShip() || context.isDirty())return;

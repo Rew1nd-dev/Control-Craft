@@ -73,7 +73,9 @@ public enum UIContents implements Descriptive<UIContents> {
     FMA_COEFFICIENT(Component.literal("Coefficients"), literals("Linear Adder Coefficients")),
 
     FMA_INC(Component.literal("Add Input"), literals("Linear Adder Coefficients")),
-    FMA_DEC(Component.literal("Del Input"), literals("Linear Adder Coefficients"))
+    FMA_DEC(Component.literal("Del Input"), literals("Linear Adder Coefficients")),
+
+    STATUS(Component.literal("Available Ports"), literals("Ports of this plant"))
     ;
 
 

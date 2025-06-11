@@ -12,6 +12,7 @@ import com.verr1.controlcraft.content.links.input.InputPortBlock;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
+import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import net.minecraft.world.level.material.MapColor;
 
@@ -110,6 +111,18 @@ public class CimulinkBlocks {
 
     public static final BlockEntry<ComparatorBlock> COMPARATOR = REGISTRATE
             .block(ComparatorBlock.ID, ComparatorBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+            .transform(customItemModel())
+            .register();
+
+    public static final BlockEntry<ProxyLinkBlock> PROXY = REGISTRATE
+            .block(ProxyLinkBlock.ID, ProxyLinkBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .transform(TagGen.axeOrPickaxe())

@@ -15,6 +15,8 @@ import com.verr1.controlcraft.content.links.mux2.Mux2Block;
 import com.verr1.controlcraft.content.links.mux2.Mux2BlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
+import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlock;
+import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
 import com.verr1.controlcraft.render.CimulinkSocketRenderer;
@@ -68,6 +70,12 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<ComparatorBlockEntity> COMPARATOR_BLOCKENTITY = REGISTRATE
             .blockEntity(ComparatorBlock.ID, ComparatorBlockEntity::new)
             .validBlock(CimulinkBlocks.COMPARATOR)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<ProxyLinkBlockEntity> PROXY_BLOCKENTITY = REGISTRATE
+            .blockEntity(ProxyLinkBlock.ID, ProxyLinkBlockEntity::new)
+            .validBlock(CimulinkBlocks.PROXY)
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 

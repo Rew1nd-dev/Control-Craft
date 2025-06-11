@@ -232,6 +232,26 @@ public class CimulinkUIFactory {
                 .build();
     }
 
+    public static GenericSettingScreen createProxyScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                title(UIContents.NAME)
+        );
+
+        PortStatusUIPort ports = new PortStatusUIPort(boundPos);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, ports)
+                                .build()
+                )
+                .build();
+    }
+
     public static LabelProvider title(Descriptive<?> d){
         return convert(d, Converter::titleStyle);
     }
