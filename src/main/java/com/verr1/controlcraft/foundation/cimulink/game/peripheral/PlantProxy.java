@@ -30,7 +30,7 @@ public class PlantProxy extends NamedComponent {
         this.plant = plant;
         this.inputMapping = List.copyOf(enabledInput);
         this.outputMapping = List.copyOf(enabledOutput);
-        reverseOutputMapping = ArrayUtils.ListOf(plant.m(), -1);
+        reverseOutputMapping = new ArrayList<>(ArrayUtils.ListOf(plant.m(), -1));
         for (int i = 0; i < outputMapping.size(); i++){
             reverseOutputMapping.set(outputMapping.get(i), i);
         }
@@ -59,6 +59,9 @@ public class PlantProxy extends NamedComponent {
 
     @Override
     public void onInputChange(Integer... inputIndexes) {
+        Arrays.stream(inputIndexes).forEach(
+                i -> plant.input(mapIn(i), retrieveInput(i))
+        );
         plant.onInputChange(
                 Arrays.stream(inputIndexes).map(this::mapIn).toArray(Integer[]::new)
         );
@@ -66,7 +69,9 @@ public class PlantProxy extends NamedComponent {
     }
 
     private void updateOutput(){
-        plant.changedOutput().forEach(co -> updateOutput(mapOut(co), plant.retrieveOutput(co)));
+        plant.changedOutput().stream().filter(i -> reverseOutputMapping.get(i) != -1).forEach(
+                co -> updateOutput(mapOut(co), plant.retrieveOutput(co))
+        );
     }
 
     @Override

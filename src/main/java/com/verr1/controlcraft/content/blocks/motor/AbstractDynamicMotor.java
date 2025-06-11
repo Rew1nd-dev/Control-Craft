@@ -7,6 +7,8 @@ import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.DMotorKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.DynamicMotorForceInducer;
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.MotorPlant;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -50,7 +52,8 @@ import java.util.Optional;
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
 
 public abstract class AbstractDynamicMotor extends AbstractMotor implements
-        IHaveGoggleInformation, IControllerProvider, IReceiver, IPacketHandler, IKineticDevice
+        IHaveGoggleInformation, IControllerProvider, IReceiver,
+        IPacketHandler, IKineticDevice, IPlant
 {
     public SynchronizedField<Double> controlTorque = new SynchronizedField<>(0.0);
 
@@ -60,7 +63,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
     private final DirectReceiver receiver = new DirectReceiver();
 
-
+    private final MotorPlant plant = new MotorPlant(this);
 
     private double speedLimit = 10;
 
@@ -69,6 +72,11 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     protected LockMode lockMode = LockMode.OFF;
     protected CheatMode cheatMode = CheatMode.NONE;
     protected boolean reverseCreateInput = false;
+
+    @Override
+    public MotorPlant plant() {
+        return plant;
+    }
 
     @Override
     public DirectReceiver receiver() {
@@ -307,6 +315,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public void destroyConstraints() {
         super.destroyConstraints();
         removeConstraint("fix");
+        controlTorque.write(0.0);
     }
 
     public void setMode(boolean adjustAngle){

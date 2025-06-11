@@ -38,6 +38,11 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
 
     }
 
+    @Override
+    protected void initializeExtra() {
+        super.initializeExtra();
+        updateAttachedPlant();
+    }
 
     public void updateAttachedPlant(){
         NamedComponent plant =

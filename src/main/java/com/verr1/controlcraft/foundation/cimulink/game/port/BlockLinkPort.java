@@ -337,7 +337,11 @@ public abstract class BlockLinkPort {
     }
 
     public @NotNull WorldBlockPos pos(){
-        return Objects.requireNonNull(portPos);
+        if(portPos == null){
+            ControlCraft.LOGGER.error("calling pos() before pos is set!");
+            return WorldBlockPos.NULL;
+        }
+        return portPos;
     }
 
     public void quit(){

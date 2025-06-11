@@ -1,11 +1,16 @@
 package com.verr1.controlcraft.content.links.proxy;
 
 import com.simibubi.create.foundation.gui.ScreenOpener;
+import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ProxyLinkBlock extends CimulinkBlock<ProxyLinkBlockEntity> {
 
@@ -18,6 +23,13 @@ public class ProxyLinkBlock extends CimulinkBlock<ProxyLinkBlockEntity> {
     @Override
     public void displayScreen(BlockPos p) {
         ScreenOpener.open(CimulinkUIFactory.createProxyScreen(p));
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos neighborPos,
+                                boolean isMoving) {
+        if(world.isClientSide)return;
+        withBlockEntityDo(world, pos, ProxyLinkBlockEntity::updateAttachedPlant);
     }
 
     @Override

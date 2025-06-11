@@ -119,21 +119,21 @@ public class PlantProxyLinkPort extends BlockLinkPort {
     public void setAll(ProxyPortStatus status){
         Set<Integer> outCopy = Set.copyOf(enabledOutput);
         Set<Integer> inCopy = Set.copyOf(enabledInput);
-
+        enabledInput.clear();
+        enabledOutput.clear();
         status.statuses().stream()
                 .filter(PortStatus::enabled)
                 .map(PortStatus::name)
                 .forEach(n -> {safeAddOutput(n);safeAddInput(n);});
         // only one will add, because inputNames and outputNames should be different by definition,
         // see NamedComponent::new
-        if(outCopy.size() == enabledOutput.size() && enabledOutput.containsAll(outCopy)){
+        if(         outCopy.size() == enabledOutput.size() && enabledOutput.containsAll(outCopy)
+                &&  inCopy.size() == enabledInput.size() && enabledInput.containsAll(inCopy)
+        ){
             // Nothing changed
             return;
         }
-        if(inCopy.size() == enabledInput.size() && enabledInput.containsAll(inCopy)){
-            // Nothing changed
-            return;
-        }
+
         recreate();
     }
 
