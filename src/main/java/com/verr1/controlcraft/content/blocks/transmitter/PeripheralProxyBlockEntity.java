@@ -97,7 +97,7 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
             String methodName,
             IArguments args) throws LuaException, ExecutionException {
 
-        WorldBlockPos peripheralPos = PeripheralNetwork.valid(new PeripheralNetwork.PeripheralKey(currentProtocol, peripheralName));
+        WorldBlockPos peripheralPos = ControlCraftServer.CC_NETWORK.valid(new PeripheralNetwork.PeripheralKey(currentProtocol, peripheralName));
         if(peripheralPos == null){
             ControlCraft.LOGGER.error("Peripheral Not Found In Network: {}", peripheralName);
             return MethodResult.of(null, "Receiver Not Registered");
@@ -127,7 +127,7 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
                                         String methodName,
                                         IArguments args)
             throws LuaException, ExecutionException {
-        WorldBlockPos peripheralPos = PeripheralNetwork.valid(new PeripheralNetwork.PeripheralKey(currentProtocol, peripheralName));
+        WorldBlockPos peripheralPos = ControlCraftServer.CC_NETWORK.valid(new PeripheralNetwork.PeripheralKey(currentProtocol, peripheralName));
         if(peripheralPos == null){
             ControlCraft.LOGGER.error("Async Peripheral Not Found In Network: {}", peripheralName);
             return MethodResult.of(null, "Receiver Not Registered");

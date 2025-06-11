@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.blocks.receiver;
 
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -187,16 +188,16 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
 
     private void forceOnline(){
         if(level == null || level.isClientSide)return;
-        PeripheralNetwork.forceOnline(holdKey, WorldBlockPos.of(level, getBlockPos()));
+        ControlCraftServer.CC_NETWORK.forceOnline(holdKey, WorldBlockPos.of(level, getBlockPos()));
     }
 
     private void softOnline(){
         if(level == null || level.isClientSide)return;
-        PeripheralNetwork.softOnline(holdKey, WorldBlockPos.of(level, getBlockPos()));
+        ControlCraftServer.CC_NETWORK.softOnline(holdKey, WorldBlockPos.of(level, getBlockPos()));
     }
 
     public void offline(){
-        PeripheralNetwork.offline(holdKey);
+        ControlCraftServer.CC_NETWORK.offline(holdKey);
     }
 
     public boolean forced() {
@@ -208,17 +209,17 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     }
 
     public PeripheralNetwork.PeripheralKey valid(){
-        return PeripheralNetwork.valid(WorldBlockPos.of(level, getBlockPos()));
+        return ControlCraftServer.CC_NETWORK.valid(WorldBlockPos.of(level, getBlockPos()));
     }
 
 
     public boolean isOnline(){
-        return PeripheralNetwork.valid(WorldBlockPos.of(level, getBlockPos())).equals(holdKey);
+        return ControlCraftServer.CC_NETWORK.valid(WorldBlockPos.of(level, getBlockPos())).equals(holdKey);
     }
 
     @Override
     public void tickServer(){
-        PeripheralNetwork.activate(WorldBlockPos.of(level, getBlockPos()));
+        ControlCraftServer.CC_NETWORK.activate(WorldBlockPos.of(level, getBlockPos()));
     }
 
     @Override

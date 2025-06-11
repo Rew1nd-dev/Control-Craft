@@ -48,7 +48,7 @@ public class ControlCraftEvents {
             ControlCraftServer.SERVER_EXECUTOR.tick();
             SpatialLinkManager.tick();
             ChunkManager.tick();
-            PeripheralNetwork.tick();
+            ControlCraftServer.CC_NETWORK.tick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postTick();
         }

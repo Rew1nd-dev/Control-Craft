@@ -60,7 +60,7 @@ public class ControlCraftServerCommands {
         String name = context.getArgument("name", String.class);
         long protocol = context.getArgument("protocol", Long.class);
 
-        PeripheralNetwork.free(new PeripheralNetwork.PeripheralKey(
+        ControlCraftServer.CC_NETWORK.free(new PeripheralNetwork.PeripheralKey(
                 protocol,
                 name
         ));

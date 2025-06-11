@@ -69,6 +69,10 @@ public class CimulinkUIFactory {
                                 .withPort(input)
                                 .build()
                 )
+                .withTab(
+                        REDSTONE_TAB,
+                        createTerminalDeviceTab(boundPos)
+                )
                 .build();
     }
 

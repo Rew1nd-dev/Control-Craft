@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ValueStatus {
+    public static final ValueStatus EMPTY = new ValueStatus();
+
     public static final SerializeUtils.Serializer<List<Double>> VALUES =
             SerializeUtils.ofList(SerializeUtils.DOUBLE);
 

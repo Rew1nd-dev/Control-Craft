@@ -17,15 +17,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PeripheralNetwork {
 
 
-    private static final ConcurrentHashMap<WorldBlockPos, PeripheralKey> p2k = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<PeripheralKey, WorldBlockPos> k2p = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<WorldBlockPos, PeripheralKey> p2k = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<PeripheralKey, WorldBlockPos> k2p = new ConcurrentHashMap<>();
 
-    private static final ConcurrentHashMap<WorldBlockPos, Integer> lives = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<WorldBlockPos, Integer> lives = new ConcurrentHashMap<>();
 
     static int TICKS_BEFORE_EXPIRED = 10;
 
 
-    public static void forceOnline(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
+    public void forceOnline(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
         if(key.equals(PeripheralKey.NULL))return;
         offline(key);
         offline(pos);
@@ -33,25 +33,25 @@ public class PeripheralNetwork {
         activate(pos);
     }
 
-    private static void offlineUnchecked(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
+    private void offlineUnchecked(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
         p2k.remove(pos);
         k2p.remove(key);
     }
 
-    private static void onlineUnchecked(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
+    private void onlineUnchecked(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
         p2k.put(pos, key);
         k2p.put(key, pos);
     }
 
-    public static void offline(@NotNull PeripheralKey key){
+    public void offline(@NotNull PeripheralKey key){
         Optional.ofNullable(k2p.get(key)).ifPresent(pos -> offlineUnchecked(key, pos));
     }
 
-    public static void offline(@NotNull WorldBlockPos pos){
+    public void offline(@NotNull WorldBlockPos pos){
         Optional.ofNullable(p2k.get(pos)).ifPresent(key -> offlineUnchecked(key, pos));
     }
 
-    public static void softOnline(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
+    public void softOnline(@NotNull PeripheralKey key, @NotNull WorldBlockPos pos){
 
         // someone is using this key
         if(k2p.containsKey(key) && !k2p.get(key).equals(pos))return;
@@ -61,12 +61,12 @@ public class PeripheralNetwork {
 
     }
 
-    public static void activate(@NotNull WorldBlockPos pos){
+    public void activate(@NotNull WorldBlockPos pos){
         if(!p2k.containsKey(pos))return;
         lives.put(pos, TICKS_BEFORE_EXPIRED);
     }
 
-    public static void tick(){
+    public void tick(){
         lives.forEach((k, v) -> {
             if(v < 0){
                 offline(k);
@@ -76,16 +76,16 @@ public class PeripheralNetwork {
         lives.entrySet().forEach(e-> e.setValue(e.getValue() - 1));
     }
 
-    public static boolean isRegistered(PeripheralKey key){
+    public boolean isRegistered(PeripheralKey key){
         return k2p.containsKey(key);
     }
 
-    public static boolean isRegistered(WorldBlockPos pos){
+    public boolean isRegistered(WorldBlockPos pos){
         return p2k.containsKey(pos);
     }
 
 
-    public static void free(PeripheralKey key){
+    public void free(PeripheralKey key){
         if(!isRegistered(key))return;
         WorldBlockPos pos = k2p.get(key);
         BlockEntityGetter.INSTANCE.getBlockEntityAt(pos.globalPos(), PeripheralInterfaceBlockEntity.class)
@@ -95,11 +95,11 @@ public class PeripheralNetwork {
                 });
     }
 
-    public static @NotNull PeripheralKey valid(WorldBlockPos pos){
+    public @NotNull PeripheralKey valid(WorldBlockPos pos){
         return p2k.getOrDefault(pos, PeripheralKey.NULL);
     }
 
-    public static @Nullable WorldBlockPos valid(PeripheralKey key) {
+    public @Nullable WorldBlockPos valid(PeripheralKey key) {
         return k2p.getOrDefault(key, null);
     }
 

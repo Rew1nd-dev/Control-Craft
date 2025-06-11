@@ -21,6 +21,7 @@ public class ShifterLinkPort extends BlockLinkPort {
 
 
     public void setParallel(long p){
+        p = Math.min(1, p);
         parallel = (int)p;
         recreate();
     }
@@ -64,9 +65,9 @@ public class ShifterLinkPort extends BlockLinkPort {
 
     @Override
     public void deserialize(CompoundTag tag) {
-        parallel = SerializeUtils.INT.deserialize(tag.getCompound("parallel"));
-        delay = SerializeUtils.INT.deserialize(tag.getCompound("delay"));
-        async = SerializeUtils.BOOLEAN.deserialize(tag.getCompound("async"));
+        if(tag.contains("parallel"))parallel = SerializeUtils.INT.deserialize(tag.getCompound("parallel"));
+        if(tag.contains("delay"))delay = SerializeUtils.INT.deserialize(tag.getCompound("delay"));
+        if(tag.contains("async"))async = SerializeUtils.BOOLEAN.deserialize(tag.getCompound("async"));
         recreate();
         super.deserialize(tag.getCompound("blp"));
     }

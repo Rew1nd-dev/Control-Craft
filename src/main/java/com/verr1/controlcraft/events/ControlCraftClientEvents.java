@@ -37,7 +37,7 @@ public class ControlCraftClientEvents {
         ControlCraftClient.CLIENT_CURVE_OUTLINER.tickOutlines();
         ControlCraftClient.CLIENT_WAND_HANDLER.tick();
         ClientCameraManager.tick();
-        CimulinkRenderCenter.tick();
+        // CimulinkRenderCenter.tick();
     }
 
     @SubscribeEvent

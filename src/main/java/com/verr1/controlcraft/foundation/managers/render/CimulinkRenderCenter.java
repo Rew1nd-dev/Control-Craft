@@ -1,88 +1,32 @@
 package com.verr1.controlcraft.foundation.managers.render;
 
-import com.google.common.base.Objects;
-import com.jozufozu.flywheel.util.transform.TransformStack;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.datafixers.util.Pair;
-import com.simibubi.create.CreateClient;
-import com.simibubi.create.content.redstone.link.LinkBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.utility.AngleHelper;
-import com.simibubi.create.foundation.utility.Iterate;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
-import com.verr1.controlcraft.ControlCraft;
-import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
-import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.foundation.data.links.ClientViewContext;
-import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
-import com.verr1.controlcraft.foundation.data.links.ValueStatus;
-import com.verr1.controlcraft.foundation.data.render.BezierCurveEntry;
-import com.verr1.controlcraft.foundation.data.render.FancyBezierCurveEntry;
-import com.verr1.controlcraft.foundation.data.render.RenderableOutline;
-import com.verr1.controlcraft.utils.MinecraftUtils;
-import it.unimi.dsi.fastutil.Hash;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3dc;
 
 import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 @OnlyIn(Dist.CLIENT)
 public class CimulinkRenderCenter {
-    public static class LinkPortSlot extends ValueBoxTransform.Sided {
-        // transform is set in ValueBox, and state is Blockstate at ValueBox::pos
-
-        private float y = 8;
-        private float x = 3;
-
-        public LinkPortSlot(float x, float y){
-            this.y = y;
-            this.x = x;
-        }
-
-
-        @Override
-        protected Vec3 getSouthLocation() {
-            int signY = direction == Direction.DOWN ? -1 : 1;
-            int signX = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -1;
-            return VecHelper.voxelSpace(8 + signX * x, 8 + signY * y, 8);
-        }
-
-    }
 
 
 
+
+
+
+    /*
+    *
     public static void tick() {
-        tickCurves();
+        // tickCurves();
         Minecraft mc = Minecraft.getInstance();
         HitResult target = mc.hitResult;
         ClientLevel world = mc.level;
@@ -136,8 +80,7 @@ public class CimulinkRenderCenter {
         tip.add(inout.append(label).append(value));
         CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(tip);
     }
-
-    public static Pair<Float, Float> computeLocalOffset(ClientViewContext cvc, ConnectionStatus cs){
+    * public static Pair<Float, Float> computeLocalOffset(ClientViewContext cvc, ConnectionStatus cs){
         if(cvc.isInput()){
             int index = cs.inputs.indexOf(cvc.portName());
             if(index == -1){
@@ -255,6 +198,8 @@ public class CimulinkRenderCenter {
                     winner.portPos
             );
     }
+    *
+    * */
 
     // given a cbe to check and a viewHitVec, return the closest looking port pos and name index
     public static @Nullable ClientViewContext computeContext(
@@ -262,6 +207,7 @@ public class CimulinkRenderCenter {
             @NotNull Vec3 viewHitVec,
             @NotNull Level world
     ){
+        /*
         CimulinkBlockEntity<?> cbe =
                 BlockEntityGetter.getLevelBlockEntityAt(world, cbePos, CimulinkBlockEntity.class)
                 .orElse(null);
@@ -272,14 +218,42 @@ public class CimulinkRenderCenter {
         ComputeContext closestOutput = closestOutput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getFaceCenter());
 
         return compareAndMakeContext(closestInput, closestOutput);
+        * */
+        CimulinkBlockEntity<?> cbe =
+                BlockEntityGetter.getLevelBlockEntityAt(world, cbePos, CimulinkBlockEntity.class)
+                .orElse(null);
+        if(cbe == null)return null;
+        return cbe.renderer().computeContext(viewHitVec);
     }
 
 
     public record ComputeContext(int id, String portName, BlockPos pos, Vec3 portPos, double result, boolean isInput){}
 
 
+/*
+*
+* public static class LinkPortSlot extends ValueBoxTransform.Sided {
+        // transform is set in ValueBox, and state is Blockstate at ValueBox::pos
 
-    public static final ConcurrentHashMap<RenderCurveKey, Integer> CURVE2LIVES = new ConcurrentHashMap<>();
+        private float y = 8;
+        private float x = 3;
+
+        public LinkPortSlot(float x, float y){
+            this.y = y;
+            this.x = x;
+        }
+
+
+        @Override
+        protected Vec3 getSouthLocation() {
+            int signY = direction == Direction.DOWN ? -1 : 1;
+            int signX = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -1;
+            return VecHelper.voxelSpace(8 + signX * x, 8 + signY * y, 8);
+        }
+
+    }
+*
+* public static final ConcurrentHashMap<RenderCurveKey, Integer> CURVE2LIVES = new ConcurrentHashMap<>();
 
     public static void keep(RenderCurveKey k){
         ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier);
@@ -301,8 +275,65 @@ public class CimulinkRenderCenter {
             ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier)
         );
     }
+    * public static class RenderedConnection{
+        public List<Vec3> points;
 
-    public record RenderCurveKey(
+        public RenderedConnection(List<Vec3> points) {
+            this.points = points;
+        }
+
+
+        public static RenderedConnection of(BlockPort out, BlockPort in){
+            CimulinkBlockEntity<?> cbo = CimulinkRenderCenter.of(out.pos().pos());
+            CimulinkBlockEntity<?> cbi = CimulinkRenderCenter.of(in.pos().pos());
+            if(cbo == null || cbi == null) return null;
+            ConnectionStatus cso = cbo.readClientConnectionStatus();
+            ConnectionStatus csi = cbi.readClientConnectionStatus();
+            if(csi == null || cso == null) return null;
+            int indexO = cso.outputs.indexOf(out.portName());
+            Vec3 outPos = cbo.getFaceCenter().add(
+                    computeOutputPortOffset(
+                            cbo.getHorizontal(),
+                            cbo.getVertical(),
+                            indexO,
+                            cso.outputs.size()
+                    )
+            );
+            int indexI = csi.inputs.indexOf(in.portName());
+            Vec3 inPos = cbi.getFaceCenter().add(
+                    computeInputPortOffset(
+                            cbi.getHorizontal(),
+                            cbi.getVertical(),
+                            indexI,
+                            csi.inputs.size()
+                    )
+            );
+            if(indexI == -1 || indexO == -1){
+                ControlCraft.LOGGER.error("Failed to find input or output port index for connection rendering");
+            }
+            return of(outPos, inPos,
+                    cbo.getHorizontal(), cbo.getVertical(),
+                    cbi.getHorizontal(), cbi.getVertical()
+            );
+        }
+
+        public void render(String slot, int ticks, Color color){
+            ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(slot,
+                    points.get(0),
+                    points.get(1),
+                    ticks
+            ).colored(color.getRGB());
+        }
+
+        public static RenderedConnection of(Vec3 out, Vec3 in,
+                                            Direction hOut, Direction vOut,
+                                            Direction hIn, Direction vIn
+        ){
+            return new RenderedConnection(List.of(out, in)); // TODO: implement proper connection rendering
+        }
+
+    }
+    * public record RenderCurveKey(
             BlockPos inPos, int inIndex, int inCount, Direction inDir, Direction inHorizontal, Direction inVertical,
             BlockPos outPos, int outIndex, int outCount, Direction outDir, Direction outHorizontal, Direction outVertical
     ){
@@ -365,6 +396,10 @@ public class CimulinkRenderCenter {
         BlockPort in = new BlockPort(WorldBlockPos.of(Minecraft.getInstance().level, pos), portName);
         Optional.ofNullable(RenderedConnection.of(out, in)).ifPresent(r -> r.render(pos.toShortString() + portName, 40, Color.GREEN));
     }
+* */
+
+
+
 
     public static @Nullable CimulinkBlockEntity<?> of(BlockPos clientPos){
 
@@ -376,63 +411,6 @@ public class CimulinkRenderCenter {
                 .orElse(null);
     }
 
-    public static class RenderedConnection{
-        public List<Vec3> points;
 
-        public RenderedConnection(List<Vec3> points) {
-            this.points = points;
-        }
-
-
-        public static RenderedConnection of(BlockPort out, BlockPort in){
-            CimulinkBlockEntity<?> cbo = CimulinkRenderCenter.of(out.pos().pos());
-            CimulinkBlockEntity<?> cbi = CimulinkRenderCenter.of(in.pos().pos());
-            if(cbo == null || cbi == null) return null;
-            ConnectionStatus cso = cbo.readClientConnectionStatus();
-            ConnectionStatus csi = cbi.readClientConnectionStatus();
-            if(csi == null || cso == null) return null;
-            int indexO = cso.outputs.indexOf(out.portName());
-            Vec3 outPos = cbo.getFaceCenter().add(
-                    computeOutputPortOffset(
-                            cbo.getHorizontal(),
-                            cbo.getVertical(),
-                            indexO,
-                            cso.outputs.size()
-                    )
-            );
-            int indexI = csi.inputs.indexOf(in.portName());
-            Vec3 inPos = cbi.getFaceCenter().add(
-                    computeInputPortOffset(
-                            cbi.getHorizontal(),
-                            cbi.getVertical(),
-                            indexI,
-                            csi.inputs.size()
-                    )
-            );
-            if(indexI == -1 || indexO == -1){
-                ControlCraft.LOGGER.error("Failed to find input or output port index for connection rendering");
-            }
-            return of(outPos, inPos,
-                    cbo.getHorizontal(), cbo.getVertical(),
-                    cbi.getHorizontal(), cbi.getVertical()
-            );
-        }
-
-        public void render(String slot, int ticks, Color color){
-            ControlCraftClient.CLIENT_LERPED_OUTLINER.showLine(slot,
-                    points.get(0),
-                    points.get(1),
-                    ticks
-            ).colored(color.getRGB());
-        }
-
-        public static RenderedConnection of(Vec3 out, Vec3 in,
-                                            Direction hOut, Direction vOut,
-                                            Direction hIn, Direction vIn
-        ){
-            return new RenderedConnection(List.of(out, in)); // TODO: implement proper connection rendering
-        }
-
-    }
 
 }

@@ -42,6 +42,9 @@ public class ConnectionStatus {
         this.inputPorts.putAll(inputPorts);
         this.inputs.addAll(inputs);
         this.outputs.addAll(outputs);
+
+
+
         this.clazzName = identifier;
     }
 

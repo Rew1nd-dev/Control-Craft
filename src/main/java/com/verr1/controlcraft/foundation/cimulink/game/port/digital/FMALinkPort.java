@@ -93,9 +93,11 @@ public class FMALinkPort extends BlockLinkPort {
 
     @Override
     public void deserialize(CompoundTag tag) {
-        resetCoefficients(
-                COEFF_SERIALIZER.deserialize(tag.getCompound("coeff"))
-        );
+        if(tag.contains("coeff")){
+            resetCoefficients(
+                    COEFF_SERIALIZER.deserialize(tag.getCompound("coeff"))
+            );
+        }
         super.deserialize(tag.getCompound("blp"));
     }
 }

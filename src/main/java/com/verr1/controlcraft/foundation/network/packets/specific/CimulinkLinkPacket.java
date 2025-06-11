@@ -52,11 +52,16 @@ public class CimulinkLinkPacket extends SimplePacketBase {
             try{
 
                 BlockLinkPort.of(outputPort.pos()).ifPresent(
-                        blp -> blp.connectTo(
-                                outputPort.portName(),
-                                inputPort.pos(),
-                                inputPort.portName()
-                        )
+                        blp -> {
+                            if(outputPort.pos().pos().getCenter().distanceToSqr(inputPort.pos().pos().getCenter()) > 1e4){
+                                throw new IllegalArgumentException("Ports Are Too Faraway From Each Other");
+                            }
+                            blp.connectTo(
+                                    outputPort.portName(),
+                                    inputPort.pos(),
+                                    inputPort.portName()
+                            );
+                        }
 
                 );
                 BlockEntityGetter.INSTANCE

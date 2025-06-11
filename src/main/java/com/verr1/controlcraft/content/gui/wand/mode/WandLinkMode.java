@@ -60,7 +60,8 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
 
     }
 
-    public void tickLooking(){
+    /*
+    * public void tickLooking(){
         Vec3 lookingAtVec = MinecraftUtils.lookingAtVec();
         BlockPos lookingAtPos = MinecraftUtils.lookingAtPos();
         Level level = Minecraft.getInstance().level;
@@ -70,12 +71,13 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         Color c = cvc.isInput() ? Color.GREEN.darker() : Color.RED.darker();
         ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), "link_looking", 0.4);
         if(cvc.isInput()){
-            CimulinkRenderCenter.renderInConnection(cvc.pos(), cvc.portName());
+            // CimulinkRenderCenter.renderInConnection(cvc.pos(), cvc.portName());
         }else{
-            CimulinkRenderCenter.renderOutConnection(cvc.pos(), cvc.portName());
+            // CimulinkRenderCenter.renderOutConnection(cvc.pos(), cvc.portName());
         }
         // CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(makeHoverTip(cvc));
     }
+    * */
 
     public static List<MutableComponent> makeHoverTip(ClientViewContext cvc){
         MutableComponent in = Component.literal(cvc.portName()).withStyle(s -> s.withColor(ChatFormatting.GREEN));

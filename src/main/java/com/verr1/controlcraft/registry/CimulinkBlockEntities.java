@@ -17,6 +17,7 @@ import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
+import com.verr1.controlcraft.render.CimulinkSocketRenderer;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -25,41 +26,49 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<LogicGateBlockEntity> LOGIC_GATE_BLOCKENTITY = REGISTRATE
             .blockEntity(LogicGateBlock.ID, LogicGateBlockEntity::new)
             .validBlock(CimulinkBlocks.LOGIC_GATE)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<FFBlockEntity> FF_BLOCKENTITY = REGISTRATE
             .blockEntity(FFBlock.ID, FFBlockEntity::new)
             .validBlock(CimulinkBlocks.FF)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<InputPortBlockEntity> INPUT_BLOCKENTITY = REGISTRATE
             .blockEntity(InputPortBlock.ID, InputPortBlockEntity::new)
             .validBlock(CimulinkBlocks.INPUT)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<OutputPortBlockEntity> OUTPUT_BLOCKENTITY = REGISTRATE
             .blockEntity(OutputPortBlock.ID, OutputPortBlockEntity::new)
             .validBlock(CimulinkBlocks.OUTPUT)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<ShifterLinkBlockEntity> SHIFTER_BLOCKENTITY = REGISTRATE
             .blockEntity(ShifterLinkBlock.ID, ShifterLinkBlockEntity::new)
             .validBlock(CimulinkBlocks.SHIFTER)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<LinearAdderBlockEntity> FMA_BLOCKENTITY = REGISTRATE
             .blockEntity(LinearAdderBlock.ID, LinearAdderBlockEntity::new)
             .validBlock(CimulinkBlocks.FMA)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<Mux2BlockEntity> MUX_BLOCKENTITY = REGISTRATE
             .blockEntity(Mux2Block.ID, Mux2BlockEntity::new)
             .validBlock(CimulinkBlocks.MUX)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static final BlockEntityEntry<ComparatorBlockEntity> COMPARATOR_BLOCKENTITY = REGISTRATE
             .blockEntity(ComparatorBlock.ID, ComparatorBlockEntity::new)
             .validBlock(CimulinkBlocks.COMPARATOR)
+            .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
     public static void register(){}

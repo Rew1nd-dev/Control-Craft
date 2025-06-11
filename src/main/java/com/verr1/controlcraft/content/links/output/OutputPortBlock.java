@@ -10,6 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 public class OutputPortBlock extends CimulinkBlock<OutputPortBlockEntity> {
@@ -20,6 +22,7 @@ public class OutputPortBlock extends CimulinkBlock<OutputPortBlockEntity> {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p) {
         ScreenOpener.open(CimulinkUIFactory.createOutputScreen(p));
     }

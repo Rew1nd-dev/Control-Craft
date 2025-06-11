@@ -5,6 +5,6 @@ import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import net.minecraft.world.phys.Vec3;
 
 public interface RenderableOutline {
-    void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera);
+    void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt);
     void tick();
 }

@@ -16,6 +16,8 @@ public class ControlCraftPartialModels {
         CAMERA_YAW = block("camera_yaw"),
         RUDDER_PART = block("rudder"),
 
+        SOCKET = block("socket"),
+
         SPATIAL_CORE = block("spatial_core"),
 
         SLIDER_TOP = block("slider_top"),

@@ -6,6 +6,8 @@ import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class Mux2Block extends CimulinkBlock<Mux2BlockEntity> {
     public static final String ID = "mux";
@@ -15,6 +17,7 @@ public class Mux2Block extends CimulinkBlock<Mux2BlockEntity> {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p) {
         ScreenOpener.open(CimulinkUIFactory.createNameOnlyScreen(p));
     }

@@ -23,6 +23,7 @@ public class LogicGateBlock extends CimulinkBlock<LogicGateBlockEntity> {
         return LogicGateBlockEntity.class;
     }
 
+    @Override
     @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p){
         ScreenOpener.open(CimulinkUIFactory.createGateScreen(p));

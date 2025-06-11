@@ -1,17 +1,20 @@
 package com.verr1.controlcraft.content.links;
 
+import com.mojang.datafixers.util.Pair;
+import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
+import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.data.links.ConnectionStatus;
-import com.verr1.controlcraft.foundation.data.links.ValueStatus;
-import com.verr1.controlcraft.foundation.data.render.FancyBezierCurveEntry;
+import com.verr1.controlcraft.foundation.data.links.*;
+import com.verr1.controlcraft.foundation.data.render.CimulinkWireEntry;
 import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -19,6 +22,7 @@ import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,12 +33,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -46,7 +55,11 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 {
 
     private final T linkPort;
-    private final ClientWatcher watcher = new ClientWatcher();
+    // private final ClientWatcher watcher = new ClientWatcher();
+
+
+    @OnlyIn(Dist.CLIENT)
+    private final Renderer renderer = new Renderer();
 
     private final DeferralInitializer lateInitLinkPort = new DeferralInitializer() {
         @Override
@@ -77,6 +90,10 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         initializeExtra();
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public Renderer renderer() {
+        return renderer;
+    }
 
     protected void initializeExtra(){
 
@@ -180,8 +197,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     public void tickClient() {
         super.tickClient();
         requestValueStatusOnFocus();
-        tickRenderCurves();
-        watcher.tick();
+        // tickRenderCurves();
+        renderer().tick();
     }
 
     @Override
@@ -194,7 +211,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     public void lazyTickClient() {
         super.lazyTickClient();
         requestConnectionStatusOnFocus();
-        // tickConnection();
+        renderer().tickSocketPositions();
+
     }
 
 
@@ -241,7 +259,9 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     }
 
 
-    public boolean __addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+
+    @Override
+    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if(level == null)return false;
         if(isPlayerSneaking){
             tooltip.addAll(makeDetailedToolTip(readClientConnectionStatus(), level));
@@ -249,11 +269,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
             tooltip.addAll(makeToolTip(readClientValueStatus(), readClientConnectionStatus()));
         }
         return true;
-    }
-
-    @Override
-    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        return __addToGoggleTooltip(tooltip, isPlayerSneaking);
     }
 
     public static List<Component> makeToolTip(ValueStatus vs, ConnectionStatus cs){
@@ -319,8 +334,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         return result;
     }
 
-
-    private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new HashMap<>();
+    /*
+private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new HashMap<>();
 
     private void tickRenderCurves(){
         ConnectionStatus cs = readClientConnectionStatus();
@@ -373,25 +388,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     protected void onClientInputChanged(List<Integer> changedInput){
         tickChangedFlash(changedInput);
     }
-
-
-
-    private abstract static class DeferralInitializer{
-
-        CompoundTag savedTag = new CompoundTag();
-
-        void load(CompoundTag savedTag){
-            this.savedTag = savedTag;
-        }
-
-        void load(){
-            deferralLoad(savedTag);
-        }
-
-        abstract void deferralLoad(CompoundTag tag);
-    }
-
-
     private class ClientWatcher{
         ValueStatus cached;
 
@@ -415,6 +411,368 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
             push();
         }
     }
+* */
+
+
+
+
+
+
+    private abstract static class DeferralInitializer{
+
+        CompoundTag savedTag = new CompoundTag();
+
+        void load(CompoundTag savedTag){
+            this.savedTag = savedTag;
+        }
+
+        void load(){
+            deferralLoad(savedTag);
+        }
+
+        abstract void deferralLoad(CompoundTag tag);
+    }
+
+
+
+
+
+    @OnlyIn(Dist.CLIENT)
+    public class Renderer{
+        private final Map<String, RenderCurveKey> cachedKeys = new HashMap<>();
+        ConnectionStatus cachedConnectionStatus = ConnectionStatus.EMPTY;
+
+        ValueStatus cachedCurrentValueStatus = ValueStatus.EMPTY;
+        ValueStatus cachedPreviousValueStatus = ValueStatus.EMPTY;
+
+
+
+        final List<Vec3> socketPositions = Collections.synchronizedList(new ArrayList<>());
+
+        void tickCached(){
+            cachedConnectionStatus = Optional.ofNullable(readClientConnectionStatus()).orElse(ConnectionStatus.EMPTY);
+            cachedPreviousValueStatus = cachedCurrentValueStatus;
+            cachedCurrentValueStatus = Optional.ofNullable(readClientValueStatus()).orElse(ValueStatus.EMPTY);
+        }
+
+        List<Integer> changedInput(){
+            if(cachedCurrentValueStatus == null || cachedPreviousValueStatus == null)return List.of();
+            if(cachedCurrentValueStatus.inputValues.size() != cachedPreviousValueStatus.inputValues.size())return List.of();
+            int size = cachedCurrentValueStatus.inputValues.size();
+            return IntStream.range(0, size)
+                    .filter(i -> !Objects.equals(
+                            cachedCurrentValueStatus.inputValues.get(i),
+                            cachedPreviousValueStatus.inputValues.get(i))
+                    )
+                    .boxed()
+                    .toList();
+        }
+
+        public List<Vec3> socketPositions() {
+            return socketPositions;
+        }
+
+        private void flash(List<Integer> changedInput){
+            if(!(level instanceof ClientLevel))return;
+            changedInput.stream().filter(i -> i < n())
+                    .map(cs().inputs::get)
+                    .map(cachedKeys::get)
+                    .map(ControlCraftClient.CLIENT_CURVE_OUTLINER::retrieveLine)
+                    .filter(CimulinkWireEntry.class::isInstance)
+                    .map(CimulinkWireEntry.class::cast)
+                    .forEach(CimulinkWireEntry::flash);
+        }
+
+        public Vec3 socketRenderOffset(){
+            return toVec3(getDirection().getNormal()).scale(-0.4);
+        }
+
+        void tickSocketPositions(){
+            synchronized (socketPositions) {
+                socketPositions.clear();
+                cs().inputPorts.keySet().forEach(inName -> {
+                    Vec3 offset = computeInputPortOffset(in(inName));
+                    socketPositions.add(offset.add(socketRenderOffset()));
+                });
+                cs().outputPorts.keySet().forEach(outName -> {
+                    Vec3 offset = computeOutputPortOffset(out(outName));
+                    socketPositions.add(offset.add(socketRenderOffset()));
+                });
+            }
+        }
+
+        void tick(){
+            tickCached();
+            tickBox();
+            tickCurve();
+            tickFlash();
+        }
+
+        @NotNull ConnectionStatus cs(){
+            return cachedConnectionStatus;
+        }
+
+        @NotNull ValueStatus vs(){
+            return cachedCurrentValueStatus;
+        }
+
+        int in(String name){
+            return cs().inputs.indexOf(name);
+        }
+
+        int out(String name){
+            return cs().outputs.indexOf(name);
+        }
+
+        int m(){
+            return cs().outputs.size();
+        }
+
+        int n(){
+            return cs().inputs.size();
+        }
+
+
+        public Pair<Float, Float> computeLocalOffset(ClientViewContext cvc){
+            if(cvc.isInput()){
+                int index = cs().inputs.indexOf(cvc.portName());
+                if(index == -1){
+                    ControlCraft.LOGGER.error("Failed to find input port index for rendering");
+                    return Pair.of(0.0f, 0.0f);
+                }
+                return Pair.of(-0.25f, (float)deltaY(index, cs().inputs.size()));
+            }else{
+                int index = cs().outputs.indexOf(cvc.portName());
+                if(index == -1){
+                    ControlCraft.LOGGER.error("Failed to find output port index for rendering");
+                    return Pair.of(0.0f, 0.0f);
+                }
+                return Pair.of(0.25f, (float)deltaY(index, cs().outputs.size()));
+            }
+
+        }
+
+        private static double deltaY(int count, int total){
+            double dy = 1.0 / total;
+            return (total - 1) * dy / 2 - (count * dy);
+        }
+
+        public Vec3 computeOutputPortOffset(int count){
+            double x = 0.25;
+            double y = deltaY(count, m());
+            Vec3 h = MinecraftUtils.toVec3(getHorizontal().getNormal());
+            Vec3 v = MinecraftUtils.toVec3(getVertical().getNormal());
+            return h.scale(x).add(v.scale(y));
+        }
+
+        public Vec3 computeInputPortOffset(int count){
+            double x = -0.25;
+            double y = deltaY(count, n());
+
+            Vec3 h = MinecraftUtils.toVec3(getHorizontal().getNormal());
+            Vec3 v = MinecraftUtils.toVec3(getVertical().getNormal());
+            return h.scale(x).add(v.scale(y));
+        }
+
+        public @Nullable CimulinkRenderCenter.ComputeContext closestInput(Vec3 viewHitVec){
+            int closestIndex = -1;
+            double closestDistance = Double.MAX_VALUE;
+            Vec3 closestVec = null;
+
+            for(int i = 0; i < n(); i++){
+                Vec3 offset = computeInputPortOffset(i);
+                Vec3 pos = center().add(offset);
+                double distance = pos.distanceToSqr(viewHitVec);
+                if(distance < closestDistance){
+                    closestDistance = distance;
+                    closestIndex = i;
+                    closestVec = pos;
+                }
+            }
+
+            if(closestIndex == -1){
+                return null;
+            }
+
+            return new CimulinkRenderCenter.ComputeContext(
+                    closestIndex,
+                    cs().in(closestIndex),
+                    getBlockPos(),
+                    closestVec,
+                    closestDistance,
+                    true
+            );
+        }
+
+        public CimulinkRenderCenter.ComputeContext closestOutput(Vec3 viewHitVec){
+            int closestIndex = -1;
+            double closestDistance = Double.MAX_VALUE;
+            Vec3 closestVec = null;
+
+            for(int i = 0; i < m(); i++){
+                Vec3 offset = computeOutputPortOffset(i);
+                Vec3 pos = center().add(offset);
+                double distance = pos.distanceToSqr(viewHitVec);
+                if(distance < closestDistance){
+                    closestDistance = distance;
+                    closestIndex = i;
+                    closestVec = pos;
+                }
+            }
+            if(closestIndex == -1){
+                return null;
+            }
+            return new CimulinkRenderCenter.ComputeContext(
+                    closestIndex,
+                    cs().out(closestIndex),
+                    getBlockPos(),
+                    closestVec,
+                    closestDistance,
+                    false
+            )
+                    ;
+        }
+
+        private static @Nullable ClientViewContext compareAndMakeContext(
+                @Nullable CimulinkRenderCenter.ComputeContext closestInput,
+                @Nullable CimulinkRenderCenter.ComputeContext closestOutput
+        ){
+            CimulinkRenderCenter.ComputeContext winner = null;
+            if(closestInput == null && closestOutput == null)return null;
+            if(closestInput == null)winner = closestOutput;
+            else if(closestOutput == null)winner = closestInput;
+            else if(closestInput.result() < closestOutput.result())winner = closestInput;
+            else winner = closestOutput;
+
+            return new ClientViewContext(
+                    winner.pos(),
+                    winner.portName(),
+                    winner.isInput(),
+                    winner.portPos()
+            );
+        }
+
+        // given a cbe to check and a viewHitVec, return the closest looking port pos and name index
+        public @Nullable ClientViewContext computeContext(@NotNull Vec3 viewHitVec){
+            CimulinkRenderCenter.ComputeContext closestInput = closestInput(viewHitVec);
+            CimulinkRenderCenter.ComputeContext closestOutput = closestOutput(viewHitVec);
+
+            return compareAndMakeContext(closestInput, closestOutput);
+        }
+
+        public @Nullable Vec3 outPosition(String name){
+            int index = out(name);
+            if(index == -1)return null;
+            Vec3 offset = computeOutputPortOffset(index);
+            return center().add(offset);
+        }
+
+        public @Nullable Vec3 inPosition(String name){
+            int index = in(name);
+            if(index == -1)return null;
+            Vec3 offset = computeInputPortOffset(index);
+            return center().add(offset);
+        }
+
+        public Vec3 center(){
+            return getBlockPos().getCenter();
+        }
+
+        public Direction facing(){
+            return getDirection();
+        }
+
+        public void tickCurve(){
+            cs().inputPorts.forEach((inName, value) -> {
+                Vec3 inPosition = inPosition(inName);
+                Direction inDir = facing();
+                if(inPosition == null)return;
+                BlockPos outPos = value.pos().pos();
+                CimulinkBlockEntity<?>.Renderer ord = of(outPos);
+                if(ord == null)return;
+                String outName = value.portName();
+                Direction outDir = ord.facing();
+                Vec3 outPosition = ord.outPosition(outName);
+                if(outPosition == null)return;
+
+                BlockPort inPort = new BlockPort(WorldBlockPos.of(level, getBlockPos()), inName);
+                BlockPort outPort = new BlockPort(WorldBlockPos.of(level, outPos), outName);
+
+                var k = new RenderCurveKey(inPort, outPort, inPosition, outPosition, inDir, outDir);
+
+                ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier);
+
+                cachedKeys.put(inName, k);
+            });
+        }
+
+        public void tickFlash(){
+            flash(changedInput());
+        }
+
+        public static CimulinkBlockEntity<?>.Renderer of(BlockPos clientPos){
+            return BlockEntityGetter.getLevelBlockEntityAt(
+                            Minecraft.getInstance().level,
+                            clientPos,
+                            CimulinkBlockEntity.class
+                    )
+                    .map(CimulinkBlockEntity::renderer)
+                    .orElse(null);
+        }
+
+        public void tickBox() {
+            if(!beingLookedAt())return;
+
+            HitResult target = Minecraft.getInstance().hitResult;
+
+            if (!(target instanceof BlockHitResult result) || level == null)
+                return;
+
+            if(result.getDirection() != facing())return;
+
+            ClientViewContext cvc = computeContext(target.getLocation());
+            if(cvc == null)return;
+
+            String portName = cvc.portName();
+            ValueStatus vs = readClientValueStatus();
+
+            double val = -1;
+            if(vs != null){
+                try{
+                    val = cvc.isInput() ?
+                            vs.inputValues.get(in(cvc.portName()))
+                            :
+                            vs.outputValues.get(out(cvc.portName()));
+                }catch (IndexOutOfBoundsException ignored) {}
+            }
+
+            AABB bb = new AABB(Vec3.ZERO, Vec3.ZERO).inflate(.15f);
+            MutableComponent label = Component.literal(portName + " ");
+            MutableComponent inout = cvc.isInput() ? Component.literal("Input: ") : Component.literal("Output: ");
+            MutableComponent value = Component.literal("[" + "%.4f".formatted(val) + "]").withStyle(s -> s.withUnderlined(true).withColor(ChatFormatting.DARK_AQUA));
+
+            ValueBox box = new ValueBox(label, bb, getBlockPos());
+            var xy = computeLocalOffset(cvc);
+            LinkPortSlot transform =
+                    (LinkPortSlot)new LinkPortSlot(
+                            xy.getFirst() * 16,
+                            xy.getSecond() * 16
+                    ).fromSide(getDirection()); //
+
+            CreateClient.OUTLINER
+                    .showValueBox(getBlockPos(), box.transform(transform))
+                    .highlightFace(result.getDirection());
+
+
+
+            List<MutableComponent> tip = new ArrayList<>();
+            tip.add(inout.append(label).append(value));
+            CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(tip);
+        }
+
+    }
+
+
 }
 
 

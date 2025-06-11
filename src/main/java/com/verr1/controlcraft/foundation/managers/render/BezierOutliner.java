@@ -53,7 +53,7 @@ public class BezierOutliner {
     public void renderOutlines(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         outlines.forEach((key, entry) -> {
             RenderableOutline outline = entry.getOutline();
-            outline.render(ms, buffer, camera);
+            outline.render(ms, buffer, camera, pt);
         });
     }
 

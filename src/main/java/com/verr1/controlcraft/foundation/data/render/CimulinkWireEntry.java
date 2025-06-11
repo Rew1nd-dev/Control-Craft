@@ -2,14 +2,16 @@ package com.verr1.controlcraft.foundation.data.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
+import com.verr1.controlcraft.registry.ControlCraftPartialModels;
+import com.verr1.controlcraft.render.CachedBufferer;
 import com.verr1.controlcraft.utils.BezierCurve;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
@@ -18,7 +20,7 @@ import org.joml.Vector3dc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FancyBezierCurveEntry implements RenderableOutline {
+public class CimulinkWireEntry implements RenderableOutline {
     private final Vector3dc start;
     private final Vector3dc end;
     private final Vector3dc startDirection;
@@ -37,7 +39,7 @@ public class FancyBezierCurveEntry implements RenderableOutline {
     List<Vector3dc> binormals = new ArrayList<>();
     List<Vector3dc[]> squareVertices = new ArrayList<>();
 
-    public FancyBezierCurveEntry(
+    public CimulinkWireEntry(
             Vector3dc start,
             Vector3dc end,
             Vector3dc startDirection,
@@ -62,14 +64,14 @@ public class FancyBezierCurveEntry implements RenderableOutline {
     }
 
     // 设置光照
-    public FancyBezierCurveEntry setLights(float lightStart, float lightEnd) {
+    public CimulinkWireEntry setLights(float lightStart, float lightEnd) {
         this.lightStart = Math.max(0, Math.min(1, lightStart));
         this.lightEnd = Math.max(0, Math.min(1, lightEnd));
         return this;
     }
 
     // 启动闪烁
-    public FancyBezierCurveEntry flash() {
+    public CimulinkWireEntry flash() {
         if(this.flashFrame != -1)return this;
         this.flashFrame = 0;
         return this;
@@ -127,7 +129,7 @@ public class FancyBezierCurveEntry implements RenderableOutline {
         }
     }
 
-    public void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
+    public void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         ms.pushPose();
         ms.translate(-camera.x, -camera.y, -camera.z);
 
@@ -162,7 +164,11 @@ public class FancyBezierCurveEntry implements RenderableOutline {
         );
 
         ms.popPose();
+
+
+
     }
+
 
     public void renderInto(
             VertexConsumer consumer,
