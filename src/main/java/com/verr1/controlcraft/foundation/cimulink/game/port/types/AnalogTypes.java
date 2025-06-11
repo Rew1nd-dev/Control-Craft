@@ -8,8 +8,13 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
+import static com.verr1.controlcraft.utils.ComponentUtils.literals;
+
 public enum AnalogTypes implements Inspectable<NamedComponent>, Descriptive<AnalogTypes> {
-    ;
+    MIN(ComponentInstances.MIN, literals("Output the minimum value of 2 inputs")),
+    MAX(ComponentInstances.MAX, literals("Output the maximum value of 2 inputs")),
+    PRODUCT(ComponentInstances.PRODUCT, literals("Output the product of 2 inputs")),
+    ANGLE_FIX(ComponentInstances.ANGLE_FIX, literals("Coerce the input into (-pi, pi)"));
 
 
     private final ComponentInstances.Inspector<NamedComponent> inspector;
@@ -37,4 +42,7 @@ public enum AnalogTypes implements Inspectable<NamedComponent>, Descriptive<Anal
     public ComponentInstances.Inspector<NamedComponent> inspector() {
         return inspector;
     }
+
+    public static void register(){}
+
 }

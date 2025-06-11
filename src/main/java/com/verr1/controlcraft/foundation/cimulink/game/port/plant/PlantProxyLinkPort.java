@@ -25,6 +25,7 @@ public class PlantProxyLinkPort extends BlockLinkPort {
     }
 
     public void setPlant(@Nullable NamedComponent plant){
+        if(this.plant == plant)return;
         this.plant = plant == null ? EMPTY : plant;
         enabledInput.clear();
         enabledOutput.clear();

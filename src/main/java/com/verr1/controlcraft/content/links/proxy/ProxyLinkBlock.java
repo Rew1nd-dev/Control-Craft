@@ -6,6 +6,7 @@ import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -29,6 +30,14 @@ public class ProxyLinkBlock extends CimulinkBlock<ProxyLinkBlockEntity> {
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos neighborPos,
                                 boolean isMoving) {
         if(world.isClientSide)return;
+        Direction direction = Direction.fromDelta(
+                neighborPos.getX() - pos.getX(),
+                neighborPos.getY() - pos.getY(),
+                neighborPos.getZ() - pos.getZ()
+        );
+
+        if(direction == null)return;
+        if(direction != state.getValue(FACING).getOpposite())return;
         withBlockEntityDo(world, pos, ProxyLinkBlockEntity::updateAttachedPlant);
     }
 

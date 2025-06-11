@@ -4,5 +4,8 @@
   "vscontrolcraft.controlcraft_guide.landing_text": "Break Newton's law -- Now your machine defines gravity!",
   "wand.gui.cycle": "Cycle",
   "tooltip.description": "Description",
-  "tooltip.forthisoption": "For This Option"
+  "tooltip.forthisoption": "For This Option",
+
+  "key.controlcraft.link": "link last camera",
+  "key.categories.controlcraft" : "Control Craft"
 }

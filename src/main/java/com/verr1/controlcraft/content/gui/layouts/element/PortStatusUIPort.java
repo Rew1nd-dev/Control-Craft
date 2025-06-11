@@ -70,6 +70,8 @@ public class PortStatusUIPort extends ListUIPort<PortStatus, ProxyPortStatus>{
             layoutToFill.addChild(widgets.get(i).label, line.get(), 0);
             layoutToFill.addChild(widgets.get(i).field, line.getAndIncrement(), 1);
         });
+
+        layoutToFill.columnSpacing(4).rowSpacing(2);
     }
 
     private void setVisibility(){

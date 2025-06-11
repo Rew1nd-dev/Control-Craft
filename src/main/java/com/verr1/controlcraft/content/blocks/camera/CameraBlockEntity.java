@@ -282,6 +282,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
         if(newSignal != lastOutputSignal){
             receivedSignalChanged = true;
             lastOutputSignal = newSignal;
+            setChanged();
         }
 
     }

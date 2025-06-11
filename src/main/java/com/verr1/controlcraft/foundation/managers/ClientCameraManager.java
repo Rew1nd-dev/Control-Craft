@@ -29,7 +29,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft
 
 @OnlyIn(Dist.CLIENT)
 public class ClientCameraManager {
-
+    private static BlockPos lastSuccessfulLinkCameraPos = null;
 
     private static BlockPos LinkCameraPos = null;
 
@@ -70,7 +70,13 @@ public class ClientCameraManager {
 
     public static void linkDirect(BlockPos cameraPos){
         LinkCameraPos = cameraPos;
+        lastSuccessfulLinkCameraPos = cameraPos;
         Minecraft.getInstance().options.bobView().set(false);
+    }
+
+    public static void linkLast(){
+        if(lastSuccessfulLinkCameraPos == null)return;
+        linkWithAck(lastSuccessfulLinkCameraPos);
     }
 
     public static void linkWithAck(BlockPos cameraPos){

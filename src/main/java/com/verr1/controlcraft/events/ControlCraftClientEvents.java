@@ -3,18 +3,10 @@ package com.verr1.controlcraft.events;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.CreateClient;
-import com.simibubi.create.content.contraptions.actors.seat.ContraptionPlayerPassengerRotation;
-import com.simibubi.create.content.contraptions.minecart.CouplingRenderer;
-import com.simibubi.create.content.trains.entity.CarriageCouplingRenderer;
-import com.simibubi.create.content.trains.track.TrackBlockOutline;
-import com.simibubi.create.content.trains.track.TrackTargetingClient;
 import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
-import com.verr1.controlcraft.foundation.managers.WorldRenderHandler;
-import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,17 +19,32 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import static com.verr1.controlcraft.registry.ControlCraftAllKeyBindings.LINK_LAST_CAMERA;
+
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ControlCraftClientEvents {
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event){
-        ControlCraftClient.CLIENT_EXECUTOR.tick();
-        ControlCraftClient.CLIENT_LERPED_OUTLINER.tickOutlines();
-        ControlCraftClient.CLIENT_CURVE_OUTLINER.tickOutlines();
-        ControlCraftClient.CLIENT_WAND_HANDLER.tick();
-        ClientCameraManager.tick();
+
+        if (event.phase == TickEvent.Phase.START){
+            ControlCraftClient.CLIENT_EXECUTOR.tick();
+            ControlCraftClient.CLIENT_LERPED_OUTLINER.tickOutlines();
+            ControlCraftClient.CLIENT_CURVE_OUTLINER.tickOutlines();
+            ControlCraftClient.CLIENT_WAND_HANDLER.tick();
+            ClientCameraManager.tick();
+        }
+
+
         // CimulinkRenderCenter.tick();
+
+
+        if (event.phase == TickEvent.Phase.END) { // Only call code once as the tick event is called twice every tick
+            while (LINK_LAST_CAMERA.get().consumeClick()) {
+                ClientCameraManager.linkLast();
+            }
+        }
+
     }
 
     @SubscribeEvent
@@ -72,6 +79,10 @@ public class ControlCraftClientEvents {
         boolean pressed = !(event.getAction() == 0);
 
         ControlCraftClient.CLIENT_WAND_HANDLER.onKeyInput(key, pressed);
+
+
+
+
     }
 
     @SubscribeEvent

@@ -2,11 +2,17 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
 
 public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
+
+    private final int delay;
+    private final int parallel;
 
     public AsyncShifter(
             int delay,
@@ -20,6 +26,8 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
                 ArrayUtils.createOutputNames(parallel),
                 () -> new AsyncShifter.AsyncShifterQueue(delay, parallel)
         );
+        this.delay = delay;
+        this.parallel = parallel;
     }
 
     public int clk(){
@@ -43,6 +51,20 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
 
 
         return new Pair<>(state.values(), state);
+    }
+
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("delay", SerializeUtils.INT.serialize(delay))
+                .withCompound("parallel", SerializeUtils.INT.serialize(parallel))
+                .build();
+    }
+
+    public static AsyncShifter deserialize(CompoundTag tag){
+        return new AsyncShifter(
+                SerializeUtils.INT.deserializeOrElse(tag.getCompound("delay"), 0),
+                SerializeUtils.INT.deserializeOrElse(tag.getCompound("parallel"), 1)
+        );
     }
 
     public static class AsyncShifterQueue{

@@ -81,6 +81,7 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
         if(newSignal != lastOutputSignal){
             receivedSignalChanged = true;
             lastOutputSignal = newSignal;
+            setChanged();
         }
 
     }

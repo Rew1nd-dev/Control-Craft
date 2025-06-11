@@ -4,9 +4,14 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.MathUtils;
+import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Functions {
 
@@ -33,15 +38,29 @@ public class Functions {
         }
     };
 
-
+    public static final Supplier<FunctionN> ANGLE_FIX = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(MathUtils.radErrFix(inputs.get(0)));
+        }
+    };
 
 
 
     public static abstract class FunctionN extends Combinational {
+        private final int n;
 
         public FunctionN(int n) {
             super(ArrayUtils.createInputNames(n), ArrayUtils.SINGLE_OUTPUT);
+            this.n = n;
         }
+
+        public CompoundTag serialize(){
+            return CompoundTagBuilder.create()
+                    .withCompound("n", SerializeUtils.INT.serialize(n))
+                    .build();
+        }
+        // Functions Constants like PRODUCT, MIN, MAX are actually deserializers
 
     }
 

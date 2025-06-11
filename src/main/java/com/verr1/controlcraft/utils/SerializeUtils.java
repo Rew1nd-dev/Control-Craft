@@ -464,6 +464,12 @@ public class SerializeUtils {
         CompoundTag serialize(@NotNull T obj);
 
         @NotNull T deserialize(CompoundTag tag);
+
+        default T deserializeOrElse(CompoundTag tag, T orElse){
+            if(tag.isEmpty())return orElse;
+            return deserialize(tag);
+        }
+
     }
 
 
