@@ -4,6 +4,8 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
+import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
@@ -12,7 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FMALinkPort extends BlockLinkPort {
+public class FMALinkPort extends BlockLinkPort implements ICompilable<LinearAdder> {
 
     private final List<Double> cachedNewCoefficients = new ArrayList<>(List.of(1.0, 1.0));
     public static final SerializeUtils.Serializer<List<Double>> COEFF_SERIALIZER =
@@ -99,5 +101,16 @@ public class FMALinkPort extends BlockLinkPort {
             );
         }
         super.deserialize(tag.getCompound("blp"));
+    }
+
+
+    @Override
+    public LinearAdder component() {
+        return (LinearAdder)__raw();
+    }
+
+    @Override
+    public CimulinkFactory.Factory<LinearAdder> factory() {
+        return CimulinkFactory.FMA;
     }
 }

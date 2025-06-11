@@ -45,6 +45,9 @@ public class Functions {
         }
     };
 
+    public static int deserializeN(CompoundTag tag){
+        return SerializeUtils.INT.deserialize(tag.getCompound("n"));
+    }
 
 
     public static abstract class FunctionN extends Combinational {
@@ -60,6 +63,8 @@ public class Functions {
                     .withCompound("n", SerializeUtils.INT.serialize(n))
                     .build();
         }
+
+
         // Functions Constants like PRODUCT, MIN, MAX are actually deserializers
 
     }

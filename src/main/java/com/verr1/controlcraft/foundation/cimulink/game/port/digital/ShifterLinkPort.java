@@ -4,11 +4,14 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.AsyncShifter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
+import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
 
-public class ShifterLinkPort extends BlockLinkPort {
+public class ShifterLinkPort extends BlockLinkPort implements ISummarizable {
 
 
     private boolean async = false;
@@ -70,5 +73,15 @@ public class ShifterLinkPort extends BlockLinkPort {
         if(tag.contains("async"))async = SerializeUtils.BOOLEAN.deserialize(tag.getCompound("async"));
         recreate();
         super.deserialize(tag.getCompound("blp"));
+    }
+
+
+
+    @Override
+    public Summary summary() {
+        if(async){
+            return CimulinkFactory.ASYNC_SHIFTER.summarize(__raw());
+        }
+        return CimulinkFactory.SHIFTER.summarize(__raw());
     }
 }

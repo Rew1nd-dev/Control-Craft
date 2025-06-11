@@ -3,11 +3,17 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
 
 public class Shifter extends Temporal<Shifter.ShifterQueue> {
+
+    private final int delay;
+    private final int parallel;
 
 
     public Shifter(
@@ -19,6 +25,9 @@ public class Shifter extends Temporal<Shifter.ShifterQueue> {
                 ArrayUtils.createOutputNames(parallel),
                 () -> new ShifterQueue(delay, parallel)
         );
+
+        this.delay = delay;
+        this.parallel = parallel;
     }
 
     @Override
@@ -26,6 +35,20 @@ public class Shifter extends Temporal<Shifter.ShifterQueue> {
         state.shift(input);
         List<Double> out = state.values();
         return new Pair<>(out, state);
+    }
+
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("delay", SerializeUtils.INT.serialize(delay))
+                .withCompound("parallel", SerializeUtils.INT.serialize(parallel))
+                .build();
+    }
+
+    public static Shifter deserialize(CompoundTag tag){
+        return new Shifter(
+                SerializeUtils.INT.deserializeOrElse(tag.getCompound("delay"), 0),
+                SerializeUtils.INT.deserializeOrElse(tag.getCompound("parallel"), 1)
+        );
     }
 
     public static class ShifterQueue{

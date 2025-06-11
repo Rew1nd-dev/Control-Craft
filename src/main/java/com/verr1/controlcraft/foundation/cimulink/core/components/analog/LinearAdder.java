@@ -4,7 +4,10 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +15,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class LinearAdder extends Combinational {
+    private static final SerializeUtils.Serializer<List<Double>> COEFF =
+            SerializeUtils.ofList(SerializeUtils.DOUBLE);
 
     private final ArrayList<Double> coefficients;
     private final List<Double> coefficientsView;
@@ -51,6 +56,18 @@ public class LinearAdder extends Combinational {
 
     public List<Pair<String, Double>> viewNamedCoefficients(){
         return IntStream.range(0, n()).mapToObj(i -> new Pair<>(in(i), coefficients.get(i))).toList();
+    }
+
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("coeff", COEFF.serialize(coefficients))
+                .build();
+    }
+
+    public static LinearAdder deserialize(CompoundTag tag){
+        return new LinearAdder(
+                COEFF.deserialize(tag.getCompound("coeff"))
+        );
     }
 
     @Override

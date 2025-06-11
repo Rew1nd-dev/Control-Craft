@@ -15,7 +15,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public record WorldBlockPos(String dimensionID, BlockPos pos) {
+public record WorldBlockPos(String dimensionID, BlockPos pos){
 
     public static final WorldBlockPos NULL = new WorldBlockPos("null", BlockPos.ZERO);
 
@@ -66,5 +66,6 @@ public record WorldBlockPos(String dimensionID, BlockPos pos) {
         long posLong = SerializeUtils.LONG.deserialize(tag.getCompound("pos"));
         return new WorldBlockPos(dim, BlockPos.of(posLong));
     }
+
 
 }

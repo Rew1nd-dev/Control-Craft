@@ -5,6 +5,9 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.digital.Decode
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.List;
 
@@ -53,6 +56,18 @@ public class Multiplexer extends Combinational {
         List<Double> dat = inputs.subList(bits, inputs.size());
 
         return List.of(transformInternal(sel, dat));
+    }
+
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("bits", SerializeUtils.INT.serialize(bits))
+                .build();
+    }
+
+    public static Multiplexer deserialize(CompoundTag tag){
+        return new Multiplexer(
+                SerializeUtils.INT.deserializeOrElse(tag.getCompound("bits"), 1)
+        );
     }
 
     protected Double transformInternal(List<Boolean> sel, List<Double> dat) {

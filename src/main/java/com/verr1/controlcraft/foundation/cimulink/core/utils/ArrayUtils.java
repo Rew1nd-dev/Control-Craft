@@ -43,7 +43,7 @@ public class ArrayUtils {
         }
     }
 
-    public static<T extends Comparable<T>> void AssertDifferent(Collection<T> c0, Collection<T> c1) throws IllegalArgumentException{
+    public static<T> void AssertDifferent(Collection<T> c0, Collection<T> c1) throws IllegalArgumentException{
         for (T t: c0){
             if(c1.contains(t)){
                 throw new IllegalArgumentException("Object: " + t + " is duplicate in both Sets: " + c0 + " " + c1);
