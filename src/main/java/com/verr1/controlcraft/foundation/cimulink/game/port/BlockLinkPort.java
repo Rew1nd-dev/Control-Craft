@@ -145,13 +145,14 @@ public abstract class BlockLinkPort {
     }
 
     public static void remove(WorldBlockPos pos){
-        ControlCraft.LOGGER.info("remove is called at: {}", pos);
+        // ControlCraft.LOGGER.info("remove is called at: {}", pos);
         ALL_BLP.remove(pos);
     }
 
     public static void add(WorldBlockPos pos){
-        ControlCraft.LOGGER.info("add is called at: {}", pos);
+        // ControlCraft.LOGGER.info("add is called at: {}", pos);
         ALL_BLP.add(pos);
+
     }
 
     public static void validate(){

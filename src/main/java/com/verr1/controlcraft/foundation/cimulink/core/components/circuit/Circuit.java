@@ -6,6 +6,8 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.Component;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.PlaceHolder;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPort;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +26,7 @@ public class Circuit extends NamedComponent {
 
     List<List<Integer>> propagateMap;
 
-
+    CircuitNbt circuitNbt;
 
     // Contract: The First And Second Component Should Be Circuit Input And Output Component,
     // But Initializing Helper Needs "this", So Put A PlaceHolder At Builder
@@ -48,9 +50,20 @@ public class Circuit extends NamedComponent {
         this.propagateMap = new ArrayList<>();
 
         computePropagateMap();
+    }
 
+    public CompoundTag serialize(){
+        if(circuitNbt == null)throw new RuntimeException("circuit is not built with nbt context!");
+        return circuitNbt.serialize();
+    }
 
+    public static Circuit deserialize(CompoundTag tag){
+        return CircuitNbt.deserialize(tag).buildCircuit();
+    }
 
+    public Circuit withBuildContext(CircuitNbt nbt){
+        this.circuitNbt = nbt;
+        return this;
     }
 
     private void computePropagateMap(){

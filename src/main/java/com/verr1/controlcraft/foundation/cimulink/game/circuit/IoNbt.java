@@ -15,7 +15,7 @@ public record IoNbt(boolean isInput, String ioName, String componentName, String
                 .build();
     }
 
-    public IoNbt deserialize(CompoundTag tag){
+    public static IoNbt deserialize(CompoundTag tag){
         return new IoNbt(
                 SerializeUtils.BOOLEAN.deserialize(tag.getCompound("isInput")),
                 SerializeUtils.STRING.deserialize(tag.getCompound("ioName")),

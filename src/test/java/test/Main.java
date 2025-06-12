@@ -1,5 +1,6 @@
 package test;
 
+import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import test.game.BlockLinkPortTest;
 import test.game.FactoryTest;
 import test.module.Packaging;
@@ -14,7 +15,9 @@ public class Main {
         // Packaging.packageTest_1();
         // BlockLinkPortTest.loopTest();
 
-        FactoryTest.loadAndReload();
+        Debug.TEST_ENVIRONMENT = true;
+
+        FactoryTest.buildTag();
 
     }
 

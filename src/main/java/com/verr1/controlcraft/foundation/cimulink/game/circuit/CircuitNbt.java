@@ -5,10 +5,34 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circui
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitConstructor;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 
 import java.util.List;
+import java.util.logging.Level;
 
 public class CircuitNbt {
+    private static final SerializeUtils.Serializer<List<ComponentNbt>> SUMMARY_SERIALIZER =
+            SerializeUtils.ofList(SerializeUtils.of(
+                    ComponentNbt::serialize, ComponentNbt::deserialize
+            ));
+
+    private static final SerializeUtils.Serializer<List<ConnectionNbt>> CONNECTION_SERIALIZER =
+            SerializeUtils.ofList(SerializeUtils.of(
+                    ConnectionNbt::serialize, ConnectionNbt::deserialize
+            ));
+
+    private static final SerializeUtils.Serializer<List<IoNbt>> IO_SERIALIZER =
+            SerializeUtils.ofList(SerializeUtils.of(
+                    IoNbt::serialize, IoNbt::deserialize
+            ));
+
+    public static final CircuitNbt EMPTY_CONTEXT = new CircuitNbt(List.of(), List.of(), List.of());
+    public static final Circuit EMPTY_CIRCUIT = EMPTY_CONTEXT.buildCircuit();
+
     List<ComponentNbt> componentSummaries;
     List<ConnectionNbt> connectionNbts;
     List<IoNbt> inOuts;
@@ -55,8 +79,29 @@ public class CircuitNbt {
             }
         }
 
-        return constructor.build();
+        return constructor.build().withBuildContext(this);
 
+    }
+
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("summary", SUMMARY_SERIALIZER.serialize(componentSummaries))
+                .withCompound("connections", CONNECTION_SERIALIZER.serialize(connectionNbts))
+                .withCompound("inOuts", IO_SERIALIZER.serialize(inOuts))
+                .build();
+    }
+
+    public static CircuitNbt deserialize(CompoundTag tag) {
+        return new CircuitNbt(
+                SUMMARY_SERIALIZER.deserialize(tag.getCompound("summary")),
+                CONNECTION_SERIALIZER.deserialize(tag.getCompound("connections")),
+                IO_SERIALIZER.deserialize(tag.getCompound("inOuts"))
+        );
+    }
+
+
+    public static CircuitNbt compile(ServerLevel level, BlockPos ul, BlockPos lr){
+        return null;
     }
 
 }

@@ -4,23 +4,36 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.AsyncShifter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.ff.*;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.Gates;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class CimulinkFactory {
 
-    public static final Map<String, Factory<? extends NamedComponent>> REGISTRY = new HashMap<>();
+    public static final Map<String, Factory<?>> REGISTRY = new HashMap<>();
 
     private static final String PREFIX = "cimulink:";
+
+    public static final Factory<Circuit> CIRCUIT = register(
+            SerializeUtils.of(
+                    Circuit::serialize,
+                    Circuit::deserialize
+            ),
+            Circuit.class,
+            defaultID("circuit")
+    );
 
     public static final Factory<Comparator> COMPARATOR = register(
         createParamLess(Comparator::new),
@@ -162,6 +175,12 @@ public class CimulinkFactory {
         return factory;
     }
 
+    private static ComponentDeserializer register(
+            Function<Summary, NamedComponent> deserializeFunc
+    ){
+        throw new NotImplementedException();
+    }
+
     private static String defaultID(String name){
         return PREFIX + name;
     }
@@ -188,7 +207,26 @@ public class CimulinkFactory {
 
     public static void register(){}
 
-    public static class Factory<T extends NamedComponent>{
+    public interface ComponentDeserializer{
+        NamedComponent deserialize(CompoundTag tag);
+    }
+
+    public static class CircuitFactory implements ComponentDeserializer{
+        public static final String ID = defaultID("circuit");
+
+
+        public CompoundTag serialize(CircuitNbt nbt){
+            return nbt.serialize();
+        }
+
+
+        @Override
+        public NamedComponent deserialize(CompoundTag tag) {
+            return CircuitNbt.deserialize(tag).buildCircuit();
+        }
+    }
+
+    public static class Factory<T extends NamedComponent> implements ComponentDeserializer{
         SerializeUtils.Serializer<T> serializer;
         Class<T> clazz;
         String ID;
@@ -209,6 +247,11 @@ public class CimulinkFactory {
                     ID,
                     serializer.serialize(clazz.cast(component))
             );
+        }
+
+        @Override
+        public NamedComponent deserialize(CompoundTag tag) {
+            return serializer.deserialize(tag);
         }
     }
 

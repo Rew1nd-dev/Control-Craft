@@ -1,11 +1,20 @@
 package test.game;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitTagBuilder;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
+import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
+import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.*;
+import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
@@ -18,7 +27,35 @@ import java.util.function.UnaryOperator;
 
 public class FactoryTest {
 
+    public static void buildTag(){
+        FMALinkPort fma = new FMALinkPort();
+        InputLinkPort input = new InputLinkPort();
+        OutputLinkPort output = new OutputLinkPort();
+        ShifterLinkPort shifter = new ShifterLinkPort();
 
+        fma.setName("fma");
+        input.setName("global_i");
+        output.setName("global_o");
+        shifter.setName("shifter");
+
+        TestEnvBlockLinkWorld.add(fma, input, output, shifter);
+
+        fma.setCoefficients(List.of(0.0, 1.0));
+
+        input.connectTo(input.out(0), fma.pos(), fma.in(0));
+        fma.connectTo(fma.out(0), output.pos(), output.in(0));
+        fma.connectTo(fma.out(0), shifter.pos(), shifter.in(0));
+        shifter.connectTo(shifter.out(0), fma.pos(), fma.in(1));
+
+        CircuitNbt nbt = CircuitTagBuilder.of(List.of(fma, input, output, shifter)).buildNbt();
+
+        Circuit circuit = (Circuit) nbt.buildCircuit().withName("circuit");
+
+        CircuitDebugger debugger = new CircuitDebugger(circuit);
+
+        debugger.printConnections();
+
+    }
 
     public static void loadAndReload(){
 
