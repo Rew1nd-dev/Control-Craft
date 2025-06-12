@@ -186,6 +186,8 @@ public class CimulinkFactory {
         );
     }
 
+    public static void register(){}
+
     public static class Factory<T extends NamedComponent>{
         SerializeUtils.Serializer<T> serializer;
         Class<T> clazz;

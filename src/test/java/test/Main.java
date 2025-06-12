@@ -1,6 +1,7 @@
 package test;
 
 import test.game.BlockLinkPortTest;
+import test.game.FactoryTest;
 import test.module.Packaging;
 
 public class Main {
@@ -10,8 +11,11 @@ public class Main {
 
         // CircuitConnectivityTest.propagateMapTest();
         // Module.dcTest();
-        Packaging.packageTest_1();
+        // Packaging.packageTest_1();
         // BlockLinkPortTest.loopTest();
+
+        FactoryTest.loadAndReload();
+
     }
 
 

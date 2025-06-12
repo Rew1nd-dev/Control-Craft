@@ -17,6 +17,7 @@ public class FlipFlops {
             List.of("Q", "Qb"),
             () -> false
     ) {
+        private final String ID = "RS";
         @Override
         protected Pair<List<Boolean>, Boolean> transitBoolean(List<Boolean> input, Boolean state) {
             boolean r = input.get(0);
@@ -36,6 +37,7 @@ public class FlipFlops {
     };
 
     public static final Supplier<Temporal<Boolean>> D_FF = () -> new FF11<>(() -> false){
+        private final String ID = "D";
         @Override
         protected Pair<Boolean, Boolean> transit(Boolean input, Boolean state) {
             return new Pair<>(input, false);
@@ -43,6 +45,7 @@ public class FlipFlops {
     };
 
     public static final Supplier<Temporal<Boolean>> T_FF = () -> new FF11<>(() -> false){
+        private final String ID = "T";
         @Override
         protected Pair<Boolean, Boolean> transit(Boolean input, Boolean state) {
             return new Pair<>(!input, false);
@@ -54,6 +57,7 @@ public class FlipFlops {
             List.of("Q", "Qb"),
             () -> false
     ) {
+        private final String ID = "JK";
         @Override
         protected Pair<List<Boolean>, Boolean> transitBoolean(List<Boolean> input, Boolean state) {
             boolean j = input.get(0);

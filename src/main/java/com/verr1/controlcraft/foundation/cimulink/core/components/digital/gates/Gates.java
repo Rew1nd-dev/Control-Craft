@@ -15,6 +15,7 @@ public class Gates {
 
 
     public static final Function<Integer, Gate> AND = n -> new Gate(n) {
+        private final String ID = "AND";
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return inputs.stream().allMatch(b -> b);
@@ -22,6 +23,7 @@ public class Gates {
     };
 
     public static final Function<Integer, Gate> OR = n -> new Gate(n) {
+        private final String ID = "OR";
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return inputs.stream().anyMatch(b -> b);
@@ -29,6 +31,7 @@ public class Gates {
     };
 
     public static final Function<Integer, Gate> XOR = n -> new Gate(n) {
+        private final String ID = "XOR";
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return inputs.stream().filter(b -> b).count() % 2 == 1;
@@ -36,6 +39,7 @@ public class Gates {
     };
 
     public static final Function<Integer, Gate> NOT = n -> new Gate(1) {
+        private final String ID = "NOT";
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return !inputs.get(0);
@@ -43,6 +47,7 @@ public class Gates {
     };
 
     public static final Function<Integer, Gate> NAND = n -> new Gate(n) {
+        private final String ID = "NAND";
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return !inputs.stream().allMatch(b -> b);

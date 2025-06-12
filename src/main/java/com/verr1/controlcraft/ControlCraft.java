@@ -3,6 +3,7 @@ package com.verr1.controlcraft;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
+import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import com.verr1.controlcraft.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -87,6 +88,7 @@ public class ControlCraft
         ControlCraftItems.register();
         ControlCraftMenuTypes.register();
         ControlCraftDataGen.registerEnumDescriptions();
+        CimulinkFactory.register();
 
 
         Configurator.setLevel("org.valkryienskies.core.impl.networking", Level.ERROR);
@@ -135,6 +137,7 @@ public class ControlCraft
         ControlCraftItems.register();
         ControlCraftMenuTypes.register();
         ControlCraftDataGen.registerEnumDescriptions();
+        CimulinkFactory.register();
         // ControlCraftAttachments.register();
 
         // AttachmentRegistry.register();

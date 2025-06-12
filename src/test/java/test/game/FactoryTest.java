@@ -1,0 +1,89 @@
+package test.game;
+
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
+import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
+import com.verr1.controlcraft.foundation.cimulink.game.port.digital.*;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
+import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import org.apache.commons.lang3.function.TriFunction;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
+
+public class FactoryTest {
+
+
+
+    public static void loadAndReload(){
+
+        BiFunction<FFTypes, FFLinkPort, FFLinkPort> changeType = (t, ff) -> {ff.setCurrentType(t); return ff;};
+
+        BiFunction<List<Double>, FMALinkPort, FMALinkPort> changeCoeff = (coeffs, fma) -> {
+            fma.setCoefficients(coeffs);
+            return fma;
+        };
+
+        BiFunction<GateTypes, GateLinkPort, GateLinkPort> changeGate = (t, gate) -> {
+            gate.setCurrentType(t);
+            return gate;
+        };
+
+        TriFunction<Integer, Integer, ShifterLinkPort, ShifterLinkPort> changeParallelDelay = (
+                parallel,
+                delay,
+                shifter
+        ) -> {
+            shifter.setParallel(parallel);
+            shifter.setDelay(delay);
+            return shifter;
+        };
+
+        BiFunction<Boolean, ShifterLinkPort, ShifterLinkPort> changeAsync = (async, shifter) -> {
+            shifter.setAsync(async);
+            return shifter;
+        };
+
+        List<ISummarizable> components = List.of(
+                new ComparatorLinkPort(),
+                changeType.apply(FFTypes.D_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.T_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.RS_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.JK_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.ASYNC_D_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.ASYNC_T_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.ASYNC_JK_FF, new FFLinkPort()),
+                changeType.apply(FFTypes.ASYNC_RS_FF, new FFLinkPort()),
+                changeCoeff.apply(List.of(1.0), new FMALinkPort()),
+                changeCoeff.apply(List.of(1.0, 2.0), new FMALinkPort()),
+                changeCoeff.apply(List.of(1.0, 2.0, 3.0), new FMALinkPort()),
+                changeGate.apply(GateTypes.AND, new GateLinkPort()),
+                changeGate.apply(GateTypes.OR, new GateLinkPort()),
+                changeGate.apply(GateTypes.XOR, new GateLinkPort()),
+                changeGate.apply(GateTypes.NOT, new GateLinkPort()),
+                new Mux2LinkPort(),
+                changeAsync.apply(true, changeParallelDelay.apply(1, 1, new ShifterLinkPort())),
+                changeAsync.apply(true, changeParallelDelay.apply(0, 1, new ShifterLinkPort())),
+                changeAsync.apply(true, changeParallelDelay.apply(1, 2, new ShifterLinkPort())),
+                changeAsync.apply(false, changeParallelDelay.apply(1, 1, new ShifterLinkPort())),
+                changeAsync.apply(false, changeParallelDelay.apply(0, 1, new ShifterLinkPort())),
+                changeAsync.apply(false, changeParallelDelay.apply(1, 2, new ShifterLinkPort()))
+        );
+
+        List<NamedComponent> restore = new ArrayList<>();
+
+        components.forEach(c -> {
+            Summary summary = c.summary();
+            restore.add(CimulinkFactory.restore(summary, NamedComponent.class));
+        });
+
+
+
+    }
+
+}
