@@ -3,16 +3,12 @@ package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitConstructor;
-import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 
 import java.util.List;
-import java.util.logging.Level;
 
 public class CircuitNbt {
     private static final SerializeUtils.Serializer<List<ComponentNbt>> SUMMARY_SERIALIZER =
@@ -99,9 +95,5 @@ public class CircuitNbt {
         );
     }
 
-
-    public static CircuitNbt compile(ServerLevel level, BlockPos ul, BlockPos lr){
-        return null;
-    }
 
 }

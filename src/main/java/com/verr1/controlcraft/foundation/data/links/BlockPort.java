@@ -17,6 +17,11 @@ public record BlockPort(@NotNull WorldBlockPos pos, String portName) {
     }
 
     @Override
+    public String toString() {
+        return "Name: " + portName + " at: " + pos.pos().toShortString();
+    }
+
+    @Override
     public int hashCode() {
         return pos.hashCode() ^ portName().hashCode();
     }

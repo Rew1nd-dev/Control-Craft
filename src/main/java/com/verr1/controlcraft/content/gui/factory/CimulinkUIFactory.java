@@ -54,6 +54,11 @@ public class CimulinkUIFactory {
     }
 
     public static GenericSettingScreen createInputScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
         DoubleUIField input = new DoubleUIField(
                 boundPos,
@@ -66,7 +71,7 @@ public class CimulinkUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(input)
+                                .withPort(name, input)
                                 .build()
                 )
                 .withTab(
@@ -77,6 +82,11 @@ public class CimulinkUIFactory {
     }
 
     public static GenericSettingScreen createOutputScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
         DoubleUIView input = new DoubleUIView(
                 boundPos,
@@ -89,7 +99,7 @@ public class CimulinkUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(input)
+                                .withPort(name, input)
                                 .build()
                 )
                 .withTab(

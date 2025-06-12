@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.registry;
 
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
+import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
+import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlockEntity;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
@@ -76,6 +78,12 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<ProxyLinkBlockEntity> PROXY_BLOCKENTITY = REGISTRATE
             .blockEntity(ProxyLinkBlock.ID, ProxyLinkBlockEntity::new)
             .validBlock(CimulinkBlocks.PROXY)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<CircuitBlockEntity> CIRCUIT_BLOCKENTITY = REGISTRATE
+            .blockEntity(CircuitBlock.ID, CircuitBlockEntity::new)
+            .validBlock(CimulinkBlocks.CIRCUIT)
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 

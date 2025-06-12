@@ -6,6 +6,9 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -38,6 +41,27 @@ public class CircuitTagBuilder {
         ArrayUtils.AssertDifferent(normals.keySet(), inputs.keySet());
         ArrayUtils.AssertDifferent(outputs.keySet(), inputs.keySet());
         ArrayUtils.AssertDifferent(normals.keySet(), outputs.keySet());
+    }
+
+    public static @NotNull CircuitNbt compile(ServerLevel level, BlockPos ul, BlockPos lr){
+        int x1 = Math.min(ul.getX(), lr.getX());
+        int y1 = Math.min(ul.getY(), lr.getY());
+        int z1 = Math.min(ul.getZ(), lr.getZ());
+        int x2 = Math.max(ul.getX(), lr.getX());
+        int y2 = Math.max(ul.getY(), lr.getY());
+        int z2 = Math.max(ul.getZ(), lr.getZ());
+        List<BlockLinkPort> blps = new ArrayList<>();
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                for (int z = z1; z <= z2; z++) {
+
+                    WorldBlockPos wbp = WorldBlockPos.of(level, new BlockPos(x, y, z));
+                    BlockLinkPort.of(wbp).ifPresent(blps::add);
+                }
+            }
+        }
+
+        return CircuitTagBuilder.of(blps).buildNbt();
     }
 
     public CircuitNbt buildNbt(){

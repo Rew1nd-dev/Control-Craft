@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.verr1.controlcraft.content.blocks.loader.ChunkLoaderBlock;
+import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
@@ -123,6 +124,18 @@ public class CimulinkBlocks {
 
     public static final BlockEntry<ProxyLinkBlock> PROXY = REGISTRATE
             .block(ProxyLinkBlock.ID, ProxyLinkBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+            .transform(customItemModel())
+            .register();
+
+    public static final BlockEntry<CircuitBlock> CIRCUIT = REGISTRATE
+            .block(CircuitBlock.ID, CircuitBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .transform(TagGen.axeOrPickaxe())

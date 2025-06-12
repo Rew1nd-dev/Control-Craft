@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.verr1.controlcraft.content.items.AweInWandItem;
 import com.verr1.controlcraft.content.items.CameraLinkItem;
+import com.verr1.controlcraft.content.items.CircuitCompilerItem;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -23,6 +24,12 @@ public class ControlCraftItems {
             .model(AssetLookup.existingItemModel())
             .properties(p -> p.stacksTo(1))
             .lang("Camera Link")
+            .register();
+
+    public static final ItemEntry<CircuitCompilerItem> CIRCUIT_COMPILER = REGISTRATE.item("compiler", CircuitCompilerItem::new)
+            .model(AssetLookup.existingItemModel())
+            .properties(p -> p.stacksTo(1))
+            .lang("Circuit Compiler")
             .register();
 
     public static void register(){
