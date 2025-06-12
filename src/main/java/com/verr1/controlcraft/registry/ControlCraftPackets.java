@@ -40,6 +40,7 @@ public enum ControlCraftPackets {
     SYNC_BLOCKENTITY_SERVER(SyncBlockEntityServerPacket.class, SyncBlockEntityServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
     REMOTE(RemotePacket.class, RemotePacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIMULINK_LINK(CimulinkLinkPacket.class, CimulinkLinkPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    CIMULINK_COMPILE(CimulinkCompilePacket.class, CimulinkCompilePacket::new, NetworkDirection.PLAY_TO_SERVER),
     ;
 
 

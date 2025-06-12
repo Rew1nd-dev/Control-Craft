@@ -170,6 +170,8 @@ public class WandGUI implements IGuiOverlay {
             case DISCONNECT_ALL:
                 currentType = WandModesType.DESTROY_ALL;
                 break;
+            case COMPILE:
+                currentType = WandModesType.COMPILE;
         }
         shouldSetModeByLooking = (mode == WandGUIModesType.CONNECT || mode == WandGUIModesType.DISCONNECT);
         isConnecting = (mode == WandGUIModesType.CONNECT);

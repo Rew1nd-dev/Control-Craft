@@ -9,6 +9,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.digital.ff.*;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.Gates;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
+import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -33,6 +34,15 @@ public class CimulinkFactory {
             ),
             Circuit.class,
             defaultID("circuit")
+    );
+
+    public static final Factory<DirectCurrent> DC = register(
+            SerializeUtils.of(
+                    DirectCurrent::serialize,
+                    DirectCurrent::deserialize
+            ),
+            DirectCurrent.class,
+            defaultID("direct_current")
     );
 
     public static final Factory<Comparator> COMPARATOR = register(

@@ -1,9 +1,10 @@
-package com.verr1.controlcraft.foundation.redstone;
+package com.verr1.controlcraft.foundation.cimulink.game.misc;
 
 import com.simibubi.create.foundation.gui.menu.GhostItemMenu;
-import com.verr1.controlcraft.content.blocks.terminal.TerminalBlockEntity;
-import com.verr1.controlcraft.content.blocks.terminal.WrappedChannel;
 import com.verr1.controlcraft.content.gui.container.PageItemSlot;
+import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
+import com.verr1.controlcraft.content.links.circuit.WrappedChannel;
+import com.verr1.controlcraft.foundation.redstone.TerminalMenu;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,35 +15,34 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import static com.verr1.controlcraft.content.gui.screens.TerminalScreen.LINE_BLOCK;
 
-public class TerminalMenu extends GhostItemMenu<WrappedChannel> {
+public class CircuitWirelessMenu extends GhostItemMenu<WrappedChannel> {
 
-    public TerminalMenu(MenuType<?> type, int id, Inventory inv, FriendlyByteBuf extraData) {
+
+    public CircuitWirelessMenu(MenuType<?> type, int id, Inventory inv, FriendlyByteBuf extraData) {
         super(type, id, inv, extraData);
     }
 
-    public TerminalMenu(MenuType<?> type, int id, Inventory inv, WrappedChannel packet) {
-        super(type, id, inv, packet);
+    protected CircuitWirelessMenu(MenuType<?> type, int id, Inventory inv, WrappedChannel contentHolder) {
+        super(type, id, inv, contentHolder);
     }
 
-    public static TerminalMenu create(int id, Inventory inv, WrappedChannel packet) {
-        return new TerminalMenu(ControlCraftMenuTypes.TERMINAL.get(), id, inv, packet);
+    public static CircuitWirelessMenu create(int id, Inventory inv, WrappedChannel packet){
+        return new CircuitWirelessMenu(ControlCraftMenuTypes.CIRCUIT.get(), id, inv, packet);
+    }
+
+    @Override
+    protected ItemStackHandler createGhostInventory() {
+        return CircuitBlockEntity.getFrequencyItems(contentHolder);
+    }
+
+    @Override
+    protected boolean allowRepeats() {
+        return true;
     }
 
     @Override
     protected WrappedChannel createOnClient(FriendlyByteBuf extraData) {
         return new WrappedChannel(extraData);
-    }
-
-    @Override
-    protected ItemStackHandler createGhostInventory() {
-        return TerminalBlockEntity.getFrequencyItems(contentHolder);
-    }
-
-
-    public void setPage(int page){
-        slots.stream().filter(PageItemSlot.class::isInstance).map(PageItemSlot.class::cast).forEach(
-                s -> s.setActive(s.page == page)
-        );
     }
 
     @Override
@@ -67,21 +67,6 @@ public class TerminalMenu extends GhostItemMenu<WrappedChannel> {
             }
 
         }
-
-
-
-
-
-    }
-
-    @Override
-    protected void saveData(WrappedChannel contentHolder) {
-        contentHolder.serialize(ghostInventory.serializeNBT());
-    }
-
-    @Override
-    protected boolean allowRepeats() {
-        return true;
     }
 
     @Override
@@ -94,5 +79,10 @@ public class TerminalMenu extends GhostItemMenu<WrappedChannel> {
     @Override
     public boolean stillValid(Player playerIn) {
         return true;
+    }
+
+    @Override
+    protected void saveData(WrappedChannel contentHolder) {
+        contentHolder.serialize(ghostInventory.serializeNBT());
     }
 }

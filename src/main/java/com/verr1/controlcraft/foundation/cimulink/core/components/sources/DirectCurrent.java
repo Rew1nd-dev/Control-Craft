@@ -1,5 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.sources;
 
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.nbt.CompoundTag;
+
 public class DirectCurrent extends SignalGenerator<Double> {
 
     private double dc = 0;
@@ -22,4 +26,19 @@ public class DirectCurrent extends SignalGenerator<Double> {
     protected Double next(Double $) {
         return this.dc;
     }
+
+    public double dc() {
+        return dc;
+    }
+
+    public CompoundTag serialize(){
+        return CompoundTagBuilder.create()
+                .withCompound("dc", SerializeUtils.DOUBLE.serialize(dc))
+                .build();
+    }
+
+    public static DirectCurrent deserialize(CompoundTag tag) {
+        return new DirectCurrent(SerializeUtils.DOUBLE.deserialize(tag.getCompound("dc")));
+    }
+
 }

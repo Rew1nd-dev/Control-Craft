@@ -6,6 +6,8 @@ import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class CircuitBlock extends CimulinkBlock<CircuitBlockEntity> {
     public static final String ID = "circuit";
@@ -15,6 +17,7 @@ public class CircuitBlock extends CimulinkBlock<CircuitBlockEntity> {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p) {
         ScreenOpener.open(CimulinkUIFactory.createNameOnlyScreen(p));
     }

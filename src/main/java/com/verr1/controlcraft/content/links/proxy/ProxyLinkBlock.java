@@ -12,6 +12,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ProxyLinkBlock extends CimulinkBlock<ProxyLinkBlockEntity> {
 
@@ -21,6 +23,7 @@ public class ProxyLinkBlock extends CimulinkBlock<ProxyLinkBlockEntity> {
         super(p);
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void displayScreen(BlockPos p) {
         ScreenOpener.open(CimulinkUIFactory.createProxyScreen(p));
