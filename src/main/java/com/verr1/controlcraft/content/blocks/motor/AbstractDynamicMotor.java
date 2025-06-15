@@ -74,7 +74,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     protected boolean reverseCreateInput = false;
 
     @Override
-    public MotorPlant plant() {
+    public @NotNull MotorPlant plant() {
         return plant;
     }
 
@@ -249,7 +249,9 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
                 !isLocked(),
                 controlTorque.read(),
                 speedLimit(),
-                getController()
+                getController(),
+                this::setCachedServoAngle,
+                this::setCachedServoAngularVelocity
         );
     }
 

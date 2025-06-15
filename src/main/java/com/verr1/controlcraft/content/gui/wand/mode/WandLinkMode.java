@@ -47,7 +47,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
 
     public static @Nullable ClientViewContext computeContext(WandSelection ws){
         if(Minecraft.getInstance().level == null)return null;
-        return CimulinkRenderCenter.computeContext(ws.pos(), ws.location(), Minecraft.getInstance().level);
+        return CimulinkRenderCenter.computeContextUntransformed(ws.pos(), ws.location(), Minecraft.getInstance().level);
     }
 
 

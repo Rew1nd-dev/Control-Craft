@@ -1,28 +1,106 @@
 {
   "variants": {
-    "facing=down": {
-      "model": "vscontrolcraft:block/logic_gates/block",
+    "facing=down,gate_type=and": {
+      "model": "vscontrolcraft:block/logic_gates/and",
       "x": 180
     },
-    "facing=east": {
-      "model": "vscontrolcraft:block/logic_gates/block",
+    "facing=down,gate_type=not": {
+      "model": "vscontrolcraft:block/logic_gates/not",
+      "x": 180
+    },
+    "facing=down,gate_type=or": {
+      "model": "vscontrolcraft:block/logic_gates/or",
+      "x": 180
+    },
+    "facing=down,gate_type=xor": {
+      "model": "vscontrolcraft:block/logic_gates/xor",
+      "x": 180
+    },
+    "facing=east,gate_type=and": {
+      "model": "vscontrolcraft:block/logic_gates/and",
       "x": 90,
       "y": 90
     },
-    "facing=north": {
-      "model": "vscontrolcraft:block/logic_gates/block",
+    "facing=east,gate_type=not": {
+      "model": "vscontrolcraft:block/logic_gates/not",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,gate_type=or": {
+      "model": "vscontrolcraft:block/logic_gates/or",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,gate_type=xor": {
+      "model": "vscontrolcraft:block/logic_gates/xor",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,gate_type=and": {
+      "model": "vscontrolcraft:block/logic_gates/and",
       "x": 90
     },
-    "facing=south": {
-      "model": "vscontrolcraft:block/logic_gates/block",
+    "facing=north,gate_type=not": {
+      "model": "vscontrolcraft:block/logic_gates/not",
+      "x": 90
+    },
+    "facing=north,gate_type=or": {
+      "model": "vscontrolcraft:block/logic_gates/or",
+      "x": 90
+    },
+    "facing=north,gate_type=xor": {
+      "model": "vscontrolcraft:block/logic_gates/xor",
+      "x": 90
+    },
+    "facing=south,gate_type=and": {
+      "model": "vscontrolcraft:block/logic_gates/and",
       "x": 90,
       "y": 180
     },
-    "facing=up": {
-      "model": "vscontrolcraft:block/logic_gates/block"
+    "facing=south,gate_type=not": {
+      "model": "vscontrolcraft:block/logic_gates/not",
+      "x": 90,
+      "y": 180
     },
-    "facing=west": {
-      "model": "vscontrolcraft:block/logic_gates/block",
+    "facing=south,gate_type=or": {
+      "model": "vscontrolcraft:block/logic_gates/or",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,gate_type=xor": {
+      "model": "vscontrolcraft:block/logic_gates/xor",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,gate_type=and": {
+      "model": "vscontrolcraft:block/logic_gates/and"
+    },
+    "facing=up,gate_type=not": {
+      "model": "vscontrolcraft:block/logic_gates/not"
+    },
+    "facing=up,gate_type=or": {
+      "model": "vscontrolcraft:block/logic_gates/or"
+    },
+    "facing=up,gate_type=xor": {
+      "model": "vscontrolcraft:block/logic_gates/xor"
+    },
+    "facing=west,gate_type=and": {
+      "model": "vscontrolcraft:block/logic_gates/and",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,gate_type=not": {
+      "model": "vscontrolcraft:block/logic_gates/not",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,gate_type=or": {
+      "model": "vscontrolcraft:block/logic_gates/or",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,gate_type=xor": {
+      "model": "vscontrolcraft:block/logic_gates/xor",
       "x": 90,
       "y": 270
     }

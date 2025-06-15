@@ -4,7 +4,7 @@ import com.simibubi.create.foundation.gui.widget.Label;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.api.TitleLabelProvider;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
-import com.verr1.controlcraft.content.gui.layouts.element.TypedUIPort;
+import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
 import com.verr1.controlcraft.content.gui.layouts.api.ISerializableSchedule;
 import com.verr1.controlcraft.foundation.data.control.PID;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;

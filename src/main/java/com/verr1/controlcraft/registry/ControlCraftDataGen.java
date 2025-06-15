@@ -8,6 +8,7 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.SensorTypes;
 import com.verr1.controlcraft.foundation.type.descriptive.GroupPolicy;
 import com.verr1.controlcraft.foundation.type.descriptive.LerpType;
 import com.verr1.controlcraft.foundation.type.descriptive.*;
@@ -80,6 +81,7 @@ public class ControlCraftDataGen {
         GateTypes.register();
         FFTypes.register();
         AnalogTypes.register();
+        SensorTypes.register();
     }
 
 }

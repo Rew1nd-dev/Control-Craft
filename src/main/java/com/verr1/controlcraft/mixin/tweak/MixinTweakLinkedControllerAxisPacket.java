@@ -2,30 +2,23 @@ package com.verr1.controlcraft.mixin.tweak;
 
 
 import com.getitemfromblock.create_tweaked_controllers.block.TweakedLecternControllerBlockEntity;
-import com.getitemfromblock.create_tweaked_controllers.controller.ControllerRedstoneOutput;
-import com.getitemfromblock.create_tweaked_controllers.controller.TweakedLinkedControllerServerHandler;
 import com.getitemfromblock.create_tweaked_controllers.item.TweakedLinkedControllerItem;
 import com.getitemfromblock.create_tweaked_controllers.packet.TweakedLinkedControllerAxisPacket;
-import com.simibubi.create.Create;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
-import com.verr1.controlcraft.content.compact.tweak.TweakedLinkedControllerServerHandlerExtension;
+import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
-
-import static com.getitemfromblock.create_tweaked_controllers.controller.TweakedLinkedControllerServerHandler.receivedAxes;
 
 @Mixin(TweakedLinkedControllerAxisPacket.class)
 public class MixinTweakLinkedControllerAxisPacket {

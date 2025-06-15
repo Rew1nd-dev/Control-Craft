@@ -1,11 +1,10 @@
 package com.verr1.controlcraft.content.blocks.terminal;
 
-import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
-import com.verr1.controlcraft.content.compact.tweak.$IRedstoneLinkable;
+import com.verr1.controlcraft.content.compact.tweak.impl.$IRedstoneLinkable;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;

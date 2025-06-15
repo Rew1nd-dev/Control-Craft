@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.network.handler;
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.api.Slot;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -48,6 +50,21 @@ public class NetworkHandler {
         ClientBuffer<?> clientBuffer = duplex.get(key).rx;
         if(clazz.isAssignableFrom(clientBuffer.getClazz())){
             ((ClientBuffer<T>) clientBuffer).setBuffer(value);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> void writeClientBuffer(NetworkKey key, @NotNull Object value){
+        if(!duplex.containsKey(key))return;
+        ClientBuffer<?> clientBuffer = duplex.get(key).rx;
+        if( value.getClass().isAssignableFrom(clientBuffer.getClazz())){
+            ((ClientBuffer<T>) clientBuffer).setBuffer((T) value);
+        }else{
+            ControlCraft.LOGGER.warn(
+                    "Tried to write value of type {} to client buffer of type {}, but they are not compatible.",
+                    value.getClass().getName(),
+                    clientBuffer.getClazz().getName()
+            );
         }
     }
 

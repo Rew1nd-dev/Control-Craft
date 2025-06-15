@@ -1,12 +1,20 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port;
 
-import com.google.common.collect.Sets;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
+import com.verr1.controlcraft.foundation.cimulink.game.exceptions.EncloseLoopException;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
@@ -14,19 +22,47 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 // for connection recording, forming a graph
 public abstract class BlockLinkPort {
 
+    public static boolean RUN_AT_PHYSICS_THREAD = false;
+
     public static final Set<WorldBlockPos> ALL_BLP = ConcurrentHashMap.newKeySet();
-    // It used to cause ConcurrentModificationException, I don't know why, so make it synced
+
+
+    private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> cache = CacheBuilder.newBuilder()
+            .maximumSize(1024)
+            .refreshAfterWrite(2, TimeUnit.SECONDS)
+            .build(
+                    new CacheLoader<>() {
+                        @Override
+                        public @NotNull ListenableFuture<Optional<BlockLinkPort>> reload(
+                                @NotNull WorldBlockPos key,
+                                @NotNull Optional<BlockLinkPort> oldValue
+                        ) throws Exception {
+                            ListenableFutureTask<Optional<BlockLinkPort>> task = ListenableFutureTask.create(() -> load(key));
+                            ControlCraftServer.getMainThreadExecutor().execute(task);
+                            return task;
+                        }
+
+                        @Override
+                        public @NotNull Optional<BlockLinkPort> load(@NotNull WorldBlockPos pos) throws Exception {
+                            return BlockEntityGetter.INSTANCE
+                                    .getBlockEntityAt(
+                                            pos.globalPos(),
+                                            ILinkableBlock.class
+                                    ).map(ILinkableBlock::linkPort);
+                        }
+                    });
+
+    // make it concurrent
 
     public static final SerializeUtils.Serializer<HashMap<BlockPos, String>> POS_NAME_MAP =
             SerializeUtils.ofMap(SerializeUtils.BLOCK_POS, SerializeUtils.STRING);
@@ -52,6 +88,47 @@ public abstract class BlockLinkPort {
     private NamedComponent realTimeComponent;
 
     // private final BlockEntity owner;
+
+    private static boolean onMainThread(){
+        return Thread.currentThread() == ControlCraftServer.INSTANCE.getRunningThread();
+    }
+
+    public static Optional<CimulinkBlockEntity<?>> ofBlockEntity(WorldBlockPos pos){
+        return BlockEntityGetter.get()
+                .getBlockEntityAt(pos, CimulinkBlockEntity.class)
+                .map(be -> (CimulinkBlockEntity<?>) be);
+    }
+
+    public static Optional<BlockLinkPort> of(WorldBlockPos pos){
+        if(Debug.TEST_ENVIRONMENT){
+            return debugOf(pos);
+        }
+        if(onMainThread()){
+            cachedOf(pos); // refresh cache
+            return mainOf(pos);
+        }else {
+            return cachedOf(pos);
+        }
+    }
+
+    private static Optional<BlockLinkPort> debugOf(WorldBlockPos pos){
+        return TestEnvBlockLinkWorld.get(pos);
+    }
+
+    private static Optional<BlockLinkPort> mainOf(WorldBlockPos pos){
+        return BlockEntityGetter.get()
+                .getBlockEntityAt(pos, ILinkableBlock.class)
+                .map(ILinkableBlock::linkPort);
+    }
+
+    private static Optional<BlockLinkPort> cachedOf(WorldBlockPos pos){
+        try{
+            return cache.get(pos);
+        }catch (Exception e){
+            ControlCraft.LOGGER.error("Error loading BlockLinkPort at {}: {}", pos, e.getMessage());
+            return Optional.empty();
+        }
+    }
 
     protected BlockLinkPort(WorldBlockPos portPos, NamedComponent initial) {
         this.portPos = portPos;
@@ -82,28 +159,36 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateOutput(PropagateContext watcher, BlockLinkPort blp){
-        if(blp.anyOutputChanged())watcher.visit(blp.pos());
+        // if(blp.anyOutputChanged())watcher.visit(blp.pos());
         blp.changedOutput().forEach(changedOutput -> {
             double value = blp.retrieveOutput(changedOutput);
             String changedOutputName = blp.outputsNames().get(changedOutput);
 
             blp.forwardLinks().getOrDefault(changedOutputName, EMPTY).stream().collect(Collectors.groupingBy(
-                    BlockPort::pos, // 按 BlockPos 分组
-                    HashMap::new,   // 使用 HashMap 作为容器
+                    BlockPort::pos, // group by BlockPos
+                    HashMap::new,   // contained by HashMap
                     Collectors.mapping(
-                            BlockPort::portName, // 提取 String 值
-                            Collectors.toList() // 收集到 Set<String>
+                            BlockPort::portName, // get String
+                            Collectors.toList() // collect to Set<String>
                     )
             )).forEach((worldBlockPos, portNames) -> {
-                of(worldBlockPos).ifPresent(nextBlp -> {
+                // filter out uninitialized blps, skip
+                of(worldBlockPos)
+                .filter(BlockLinkPort::isInitialized)
+                .ifPresent(nextBlp -> {
                     try{
                         portNames.forEach(n -> nextBlp.input(n, value));
 
-                        propagateCombinational(watcher, nextBlp);
+                        // found output ports that need to propagate, should visit this current port
+                        propagateCombinational(watcher.visit(blp.pos()), nextBlp);
+
                     }catch (IllegalArgumentException e){
-                        System.out.println("Error during propagation: " + e);
+                        // System.out.println("Error during propagation: " + e);
+
+                        ControlCraft.LOGGER.error("Error during propagation: {}", e.toString());
+                    }catch (EncloseLoopException e){
+                        ControlCraft.LOGGER.warn("Enclosed loop detected: {}", e.getMessage());
                         blp.removeAllLinks();
-                        // ControlCraft.LOGGER.error("Error during propagation: {}", e.toString());
                     }
 
                 });
@@ -116,8 +201,8 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateCombinational(PropagateContext watcher, BlockLinkPort blp){
-        // detecting possible loop
-
+        // don't propagate if the blp is not initialized
+        if(!blp.isInitialized())return;
         // input changed, Component transit itself and update to output
         propagateInput(blp);
         // for all changed outputs, propagate to linked blp
@@ -133,13 +218,14 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateTemporal(){
-        // ControlCraft.LOGGER.info("Staring Propagate Temporal");
-
         ALL_BLP.stream().map(BlockLinkPort::of).forEach(blp -> blp.ifPresent(BlockLinkPort::onPositiveEdge));
 
-        // ControlCraft.LOGGER.info("ForEach is done");
         // Temporal output can be considered as a kind of input in a loop-less directional graph
-        ALL_BLP.forEach(wbp -> of(wbp).ifPresent(
+        ALL_BLP
+            .forEach(wbp -> of(wbp)
+            // filter out uninitialized ports
+            .filter(BlockLinkPort::isInitialized)
+            .ifPresent(
                 blp -> propagateCombinational(new PropagateContext(), blp)
         ));
     }
@@ -162,11 +248,23 @@ public abstract class BlockLinkPort {
     }
 
 
-    public static void postTick(){
+    public static void postMainTick(){
+        if(RUN_AT_PHYSICS_THREAD)return;
         propagateTemporal();
     }
 
+    public static void postPhysicsTick(){
+        if(!RUN_AT_PHYSICS_THREAD)return;
+        try{
+            propagateTemporal();
+        }catch (Exception e){
+            ControlCraft.LOGGER.error("Error during physics tick propagation: {}", e.getMessage());
+        }
+    }
 
+    public boolean isInitialized(){
+        return portPos != null;
+    }
 
     public int n(){
         return realTimeComponent.n();
@@ -208,6 +306,10 @@ public abstract class BlockLinkPort {
 
     public final List<String> inputsNames(){
         return realTimeComponent.inputs();
+    }
+
+    public final List<String> inputsNamesExcludeSignals(){
+        return realTimeComponent.inputs().stream().filter(s -> !s.contains("@")).toList();
     }
 
     public final List<String> outputsNames(){
@@ -264,7 +366,7 @@ public abstract class BlockLinkPort {
     }
 
     public void deleteInput(String name){
-        ControlCraft.LOGGER.info("deleting input: {}", name);
+        ControlCraft.LOGGER.info("deleting input: {} at: {}", name, pos());
         backwardLinks.remove(name);
     }
 
@@ -292,30 +394,14 @@ public abstract class BlockLinkPort {
     }
 
     public void deleteOutput(String name, BlockPort forwardPort){
-        ControlCraft.LOGGER.info("deleting output: {} -> {}", name, forwardPort);
+        ControlCraft.LOGGER.info("deleting output: {} -> {} at: {}", name, forwardPort, pos());
         forwardLinks.getOrDefault(name, EMPTY).remove(forwardPort);
         if(forwardLinks.getOrDefault(name, EMPTY).isEmpty())forwardLinks.remove(name);
     }
 
     public void deleteOutput(String name){
+        ControlCraft.LOGGER.info("deleting all output: {} at: {}", name, pos());
         forwardLinks.remove(name);
-    }
-
-    public void removeInvalidOutput(){
-        forwardLinks.entrySet().stream().flatMap(e ->
-            e.getValue().stream().map(bp -> new Pair<>(e.getKey(), bp))
-        ).filter(e -> {
-            String outputName = e.getFirst();
-            BlockPort bp = e.getSecond();
-            BlockLinkPort blp = of(bp.pos()).orElse(null);
-            if(blp == null)return true;
-            return !blp.backwardLinks()
-                    .getOrDefault(bp.portName(), BlockPort.EMPTY)
-                    .equals(new BlockPort(pos(), outputName)); // if the output is not in the blp, it is invalid
-        })
-        .toList()
-        .forEach(e -> deleteOutput(e.getFirst(), e.getSecond()));
-
     }
 
     public void removeAllLinks(){
@@ -323,23 +409,118 @@ public abstract class BlockLinkPort {
         outputsNames().forEach(this::disconnectOutput);
     }
 
+    public void removeInvalidOutput(){
+        forwardLinks.entrySet().stream().flatMap(e ->
+            e.getValue().stream().map(bp -> new Pair<>(e.getKey(), bp))
+        ).filter(e -> {
+
+            if(!ready(e.getSecond().pos())){
+                ControlCraft.LOGGER.info("block at: {} is not loaded fully, output: {} -> {}, skipping output check", pos(), e.getFirst(), e.getSecond());
+                return false; // if the block is loaded, it is valid
+            }
+
+            String outputName = e.getFirst();
+            BlockPort bp = e.getSecond();
+            BlockLinkPort blp = of(bp.pos()).orElse(null);
+
+            if(blp == null){
+                ControlCraft.LOGGER.info("found null blp at: {} output: {} bp: {}", pos(), outputName, bp);
+                return true;
+            }
+
+            /*
+            * if(!ofBlockEntity(bp.pos()).map(CimulinkBlockEntity::initialized)
+                    .orElseThrow(() -> new RuntimeException("How Can This Be be null? at: " + bp.pos()))
+            ){
+                ControlCraft.LOGGER.info("be at: {} haven't been initialized when checking output: {} ->: {}", bp.pos(), outputName, bp);
+                return false;
+            }
+            * */
+
+            boolean test = !blp.backwardLinks()
+                    .getOrDefault(bp.portName(), BlockPort.EMPTY)
+                    .equals(new BlockPort(pos(), outputName));
+
+            // blp input port does not include this output port
+            if(test){
+                ControlCraft.LOGGER.info("output: {} -> {} is invalid at: {}, blp links: {}", outputName, bp.portName(), pos(), blp.backwardLinks());
+                return true;
+            }
+
+            return false;
+        })
+        .toList()
+        .forEach(e -> {
+            ControlCraft.LOGGER.info("call delete output from validation: {}", e);
+            deleteOutput(e.getFirst(), e.getSecond());
+        });
+
+    }
+
     public void removeInvalidInput(){
         // List<String> invalidInputs = new ArrayList<>();
         backwardLinks.entrySet().stream().filter(e -> {
+
+            if(!ready(e.getValue().pos())){
+                ControlCraft.LOGGER.info("block at: {} is not loaded fully, skipping input check", e.getValue().pos());
+                return false;
+            }
+
             String inputName = e.getKey();
             BlockPort bp = e.getValue();
             BlockLinkPort blp = of(bp.pos()).orElse(null);
-            if(blp == null)return true;
-            return !blp.forwardLinks()
+
+            if(blp == null){
+                ControlCraft.LOGGER.info("found null blp at: {} input: {} bp: {} when checking {}", bp.pos(), inputName, bp, pos());
+                return true;
+            }
+
+            /*
+            if(!ofBlockEntity(bp.pos())
+                    .map(CimulinkBlockEntity::initialized)
+                    .orElseThrow(() -> new RuntimeException("How Can This Be be null? at: " + bp.pos()))
+            ){
+                ControlCraft.LOGGER.info("be at: {} haven't been initialized when checking input: {} <-: {}", bp.pos(), inputName, bp);
+                return false;
+            }
+            * */
+
+            boolean test = !blp.forwardLinks()
                     .getOrDefault(bp.portName(), EMPTY)
-                    .contains(new BlockPort(pos(), inputName)); // if the input is not in the blp, it is invalid
+                    .contains(new BlockPort(pos(), inputName));
+            // blp output port does not include this input port
+            if(test){
+                ControlCraft.LOGGER.info("input: {} -> {} is invalid at: {}, blp links: {}", bp.portName(), inputName, pos(), blp.forwardLinks());
+                return true;
+            }
+            return false; // if the input is not in the blp, it is invalid
         })
-                .toList().forEach(e -> deleteInput(e.getKey()));
+        .toList()
+        .forEach(e -> {
+            ControlCraft.LOGGER.info("call delete input from validation: {}", e.getKey());
+            deleteInput(e.getKey());
+        });
+    }
+
+    public static boolean ready(WorldBlockPos wbp){
+        if(!BlockEntityGetter.INSTANCE.isLoaded(wbp)){
+            ControlCraft.LOGGER.info("ready() call --> state: unloaded at: {}", wbp);
+            return false;
+        }
+        Optional<CimulinkBlockEntity<?>> oc = ofBlockEntity(wbp);
+        if(oc.isPresent()){
+            boolean initialized = oc.get().initialized();
+            if(!initialized){
+                ControlCraft.LOGGER.info("ready() call --> state: uninitialized at: {}", wbp);
+            }
+            return initialized;
+        }
+        return true; // continue check then we will see blp == null, which means this port is invalid
     }
 
     public @NotNull WorldBlockPos pos(){
         if(portPos == null){
-            ControlCraft.LOGGER.error("calling pos() before pos is set!");
+            ControlCraft.LOGGER.warn("calling pos() before pos is set!");
             return WorldBlockPos.NULL;
         }
         return portPos;
@@ -353,6 +534,7 @@ public abstract class BlockLinkPort {
 
 
     public void removeInvalid(){
+        if(portPos == null)return;
         removeInvalidInput();
         removeInvalidOutput();
     }
@@ -377,14 +559,7 @@ public abstract class BlockLinkPort {
         backwardLinks.put(inputName, new BlockPort(pos, outputPort));
     }
 
-    public static Optional<BlockLinkPort> of(WorldBlockPos pos){
-        if(Debug.TEST_ENVIRONMENT){
-            return TestEnvBlockLinkWorld.get(pos);
-        }
-        return BlockEntityGetter.get()
-                .getBlockEntityAt(pos, ILinkableBlock.class)
-                .map(ILinkableBlock::linkPort);
-    }
+
 
 
     public abstract NamedComponent create();
@@ -408,6 +583,7 @@ public abstract class BlockLinkPort {
         return CompoundTagBuilder.create()
                 .withCompound("forward", serializeForward())
                 .withCompound("backward", serializeBackward())
+                .withCompound("name", SerializeUtils.STRING.serialize(name()))
                 .build();
     }
 
@@ -423,7 +599,16 @@ public abstract class BlockLinkPort {
         return FORWARD.serialize(forwardLinks);
     }
 
-
+    public void modifyWithOffset(BlockPos offset){
+        Map<String, BlockPort> backwardLinksNew = new HashMap<>();
+        Map<String, Set<BlockPort>> forwardLinksNew = new HashMap<>();
+        backwardLinks.forEach((k, v) -> backwardLinksNew.put(k, v.offset(offset)));
+        forwardLinks.forEach((k, vs) -> forwardLinksNew.put(k, vs.stream().map(v -> v.offset(offset)).collect(Collectors.toSet())));
+        backwardLinks.clear();
+        forwardLinks.clear();
+        backwardLinks.putAll(backwardLinksNew);
+        forwardLinks.putAll(forwardLinksNew);
+    }
 
     public static Map<String, Set<BlockPort>> deserializeForward(CompoundTag tag){
         return FORWARD.deserialize(tag);
@@ -442,6 +627,7 @@ public abstract class BlockLinkPort {
         backwardLinks.clear();
         forwardLinks.putAll(deserializeForward(tag.getCompound("forward")));
         backwardLinks.putAll(deserializeBackward(tag.getCompound("backward")));
+        setName(SerializeUtils.STRING.deserializeOrElse(tag.getCompound("name"), realTimeComponent.getClass().getSimpleName()));
     }
 
     public static class PropagateContext{
@@ -460,10 +646,15 @@ public abstract class BlockLinkPort {
 
         public PropagateContext visit(WorldBlockPos pos){
             EncloseLoopDetection(pos);
+            AssertValidPos(pos);
             return new PropagateContext(visited, pos);
         }
 
-
+        public void AssertValidPos(WorldBlockPos pos){
+            if(pos.equals(WorldBlockPos.NULL)){
+                throw new IllegalArgumentException("Invalid WorldBlockPos When Propagating: " + pos);
+            }
+        }
 
         private String visitedMessage(){
             StringBuilder sb = new StringBuilder();
@@ -475,11 +666,17 @@ public abstract class BlockLinkPort {
             try{
                 ArrayUtils.AssertAbsence(visited, pos);
             }catch (Exception e){
-                throw new IllegalArgumentException("Enclosed Loop Detected: " + visitedMessage());
+                throw new EncloseLoopException("Enclosed Loop Detected: |" + visitedMessage());
             }
 
         }
 
+    }
+
+    public static void onClose(){
+        ALL_BLP.clear();
+        cache.invalidateAll();
+        RUN_AT_PHYSICS_THREAD = false;
     }
 
 }

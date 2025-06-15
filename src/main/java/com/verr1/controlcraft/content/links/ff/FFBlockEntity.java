@@ -6,6 +6,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -20,12 +21,17 @@ public class FFBlockEntity extends CimulinkBlockEntity<FFLinkPort> {
         buildRegistry(FF_TYPE)
                 .withBasic(SerializePort.of(
                         () -> linkPort().getCurrentType(),
-                        t ->  linkPort().setCurrentType(t),
+                        this::setCurrentType,
                         SerializeUtils.ofEnum(FFTypes.class)
                 ))
                 .withClient(ClientBuffer.of(FFTypes.class))
                 .runtimeOnly()
                 .register();
+    }
+
+    public void setCurrentType(FFTypes t){
+        linkPort().setCurrentType(t);
+        MinecraftUtils.updateBlockState(level, getBlockPos(), getBlockState().setValue(FFBlock.TYPE, t));
     }
 
     @Override

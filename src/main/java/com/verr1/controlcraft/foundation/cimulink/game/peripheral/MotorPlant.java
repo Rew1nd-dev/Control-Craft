@@ -22,7 +22,7 @@ public class MotorPlant extends NamedComponent {
     ) {
         super(
                 List.of("target", "lock", "torque"),
-                List.of("current")
+                List.of("current", "angle", "omega")
         );
         this.plant = plant;
 
@@ -34,7 +34,7 @@ public class MotorPlant extends NamedComponent {
 
     @Override
     public List<Integer> propagateTo(int inputIndex) {
-        return List.of(0);
+        return List.of(0, 1, 2);
     }
 
     @Override
@@ -44,6 +44,10 @@ public class MotorPlant extends NamedComponent {
 
     @Override
     public void onPositiveEdge() {
-        updateOutput(0, plant.getController().getValue());
+        updateOutput(List.of(
+                plant.getController().getValue(),
+                plant.getCachedServoAngle(),
+                plant.getCachedServoAngularVelocity()
+        ));
     }
 }

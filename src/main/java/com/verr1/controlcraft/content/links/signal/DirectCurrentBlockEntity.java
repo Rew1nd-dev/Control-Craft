@@ -23,6 +23,7 @@ public class DirectCurrentBlockEntity extends CimulinkBlockEntity<DirectCurrentP
                         t -> linkPort().setValue(t),
                         SerializeUtils.DOUBLE
                 ))
+                .runtimeOnly()
                 .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 

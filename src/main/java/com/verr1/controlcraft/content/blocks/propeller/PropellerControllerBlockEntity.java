@@ -5,6 +5,9 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.PropellerForceInducer;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PropellerPlant;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -45,7 +48,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
-        IPacketHandler, IHaveGoggleInformation, IReceiver
+        IPacketHandler, IHaveGoggleInformation, IReceiver, IPlant
 {
     public boolean hasAttachedPropeller = false;
 
@@ -58,7 +61,7 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
     private PropellerControllerPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
 
-
+    private final PropellerPlant plant;
 
     private final DirectReceiver receiver = new DirectReceiver();
 
@@ -103,6 +106,8 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
 
     public PropellerControllerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
+
+        plant = new PropellerPlant(this);
 
         buildRegistry(SharedKeys.VALUE)
             .withBasic(SerializePort.of(rotationalSpeed::read, rotationalSpeed::write, SerializeUtils.DOUBLE))
@@ -229,5 +234,10 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
             double speed = packet.getDoubles().get(0);
             setTargetSpeed(speed);
         }
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }

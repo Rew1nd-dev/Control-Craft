@@ -34,6 +34,10 @@ public class ComponentInstances {
     public static final Inspector<NamedComponent> MAX = Inspector.of(() -> Functions.MAX.apply(2));
     public static final Inspector<NamedComponent> MIN = Inspector.of(() -> Functions.MIN.apply(2));
     public static final Inspector<NamedComponent> ANGLE_FIX = Inspector.of(Functions.ANGLE_FIX::get);
+    public static final Inspector<NamedComponent> POWER = Inspector.of(Functions.POWER::get);
+    public static final Inspector<NamedComponent> SIN = Inspector.of(Functions.SIN::get);
+    public static final Inspector<NamedComponent> COS = Inspector.of(Functions.COS::get);
+    public static final Inspector<NamedComponent> TAN = Inspector.of(Functions.TAN::get);
 
 
 

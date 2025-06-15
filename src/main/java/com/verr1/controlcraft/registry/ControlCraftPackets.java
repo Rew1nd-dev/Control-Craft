@@ -41,6 +41,7 @@ public enum ControlCraftPackets {
     REMOTE(RemotePacket.class, RemotePacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIMULINK_LINK(CimulinkLinkPacket.class, CimulinkLinkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIMULINK_COMPILE(CimulinkCompilePacket.class, CimulinkCompilePacket::new, NetworkDirection.PLAY_TO_SERVER),
+    CIRCUIT_SETTINGS(CircuitSettingsPacket.class, CircuitSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),
     ;
 
 

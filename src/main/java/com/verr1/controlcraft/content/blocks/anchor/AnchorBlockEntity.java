@@ -32,6 +32,7 @@ public class AnchorBlockEntity extends OnShipBlockEntity
     public static NetworkKey ROTATIONAL_RESISTANCE = NetworkKey.create("rotational_resistance");
     public static NetworkKey RESISTANCE_AT_POS =  NetworkKey.create("air_resistance_at_pos");
     public static NetworkKey GRAVITY_AT_POS =  NetworkKey.create("extra_gravity_at_pos");
+    public static NetworkKey SQUARE_DRAG = NetworkKey.create("square_drag");
 
     public double getAirResistance() {
         return airResistance;
@@ -57,10 +58,15 @@ public class AnchorBlockEntity extends OnShipBlockEntity
         this.rotationalResistance = rotationalResistance;
     }
 
-    public double airResistance = 0;
-    public double extraGravity = 0;
-    public double rotationalResistance = 0;
-    public boolean airResistanceAtPos = false;
+    private double airResistance = 0;
+    private double extraGravity = 0;
+    private double rotationalResistance = 0;
+    private boolean airResistanceAtPos = false;
+    private boolean squareDrag = false;
+
+    public boolean squareDrag() {return squareDrag;}
+
+    public void setSquareDrag(boolean squareDrag) {this.squareDrag = squareDrag;}
 
     public boolean isExtraGravityAtPos() {
         return extraGravityAtPos;
@@ -82,23 +88,6 @@ public class AnchorBlockEntity extends OnShipBlockEntity
 
     public AnchorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        /*
-       registerFieldReadWriter(
-                SerializeUtils.ReadWriter.of(this::getAirResistance, this::setAirResistance, SerializeUtils.DOUBLE, AIR_RESISTANCE), Side.SHARED
-        );
-        registerFieldReadWriter(
-                SerializeUtils.ReadWriter.of(this::getExtraGravity, this::setExtraGravity, SerializeUtils.DOUBLE, EXTRA_GRAVITY), Side.SHARED
-        );
-        registerFieldReadWriter(
-                SerializeUtils.ReadWriter.of(this::getRotationalResistance, this::setExtraGravity, SerializeUtils.DOUBLE, ROTATIONAL_RESISTANCE), Side.SHARED
-        );
-        registerFieldReadWriter(
-                SerializeUtils.ReadWriter.of(this::isAirResistanceAtPos, this::setAirResistanceAtPos, SerializeUtils.BOOLEAN, RESISTANCE_AT_POS), Side.SHARED
-        );
-        registerFieldReadWriter(
-                SerializeUtils.ReadWriter.of(this::isExtraGravityAtPos, this::setExtraGravityAtPos, SerializeUtils.BOOLEAN, GRAVITY_AT_POS), Side.SHARED
-        );
-        * */
         buildRegistry(AIR_RESISTANCE)
                 .withBasic(SerializePort.of(this::getAirResistance, this::setAirResistance, SerializeUtils.DOUBLE))
                 .withClient(new ClientBuffer<>(SerializeUtils.DOUBLE, Double.class)).register();
@@ -119,6 +108,9 @@ public class AnchorBlockEntity extends OnShipBlockEntity
                 .withBasic(SerializePort.of(this::isExtraGravityAtPos, this::setExtraGravityAtPos, SerializeUtils.BOOLEAN))
                 .withClient(new ClientBuffer<>(SerializeUtils.BOOLEAN, Boolean.class)).register();
 
+        buildRegistry(SQUARE_DRAG)
+                .withBasic(SerializePort.of(this::squareDrag, this::setSquareDrag, SerializeUtils.BOOLEAN))
+                .withClient(new ClientBuffer<>(SerializeUtils.BOOLEAN, Boolean.class)).register();
 
     }
 
@@ -162,7 +154,8 @@ public class AnchorBlockEntity extends OnShipBlockEntity
                 rotationalResistance,
                 WorldBlockPos.of(level, getBlockPos()),
                 isAirResistanceAtPos(),
-                isExtraGravityAtPos()
+                isExtraGravityAtPos(),
+                squareDrag()
         );
     }
 

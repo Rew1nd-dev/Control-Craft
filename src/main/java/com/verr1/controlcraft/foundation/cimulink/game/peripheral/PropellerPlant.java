@@ -22,7 +22,7 @@ public class PropellerPlant extends NamedComponent {
     ) {
         super(
                 List.of("target"),
-                List.of("")
+                List.of()
         );
         this.plant = plant;
 

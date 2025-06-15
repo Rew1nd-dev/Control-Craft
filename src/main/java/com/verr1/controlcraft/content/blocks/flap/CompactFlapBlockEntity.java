@@ -14,7 +14,12 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
+import com.verr1.controlcraft.content.cctweaked.peripheral.CompactFlapPeripheral;
+import com.verr1.controlcraft.content.cctweaked.peripheral.FlapBearingPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.FlapPlant;
 import com.verr1.controlcraft.foundation.data.*;
 import com.verr1.controlcraft.foundation.data.logical.LogicalFlap;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -25,6 +30,8 @@ import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -32,10 +39,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 
 import java.util.Optional;
 
@@ -43,7 +52,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CompactFlapBlockEntity extends OnShipBlockEntity implements
-        IReceiver, IBearingBlockEntity
+        IReceiver, IBearingBlockEntity, IPlant
 {
 
     public SynchronizedField<Double> angle = new SynchronizedField<>(0.0);
@@ -56,7 +65,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     private final DirectReceiver receiver = new DirectReceiver();
 
-
+    private final FlapPlant plant;
 
     private double offset = 0.0;
 
@@ -66,14 +75,27 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     private double resistRatio = 30.0;
     private double liftRatio = 150.0;
 
-    private Vector3dc cachedRelative = new Vector3d(0, 0, 0);
-
     protected LerpedFloat clientAnimatedAngle = LerpedFloat.angular();
 
+    private CompactFlapPeripheral peripheral;
+    private LazyOptional<IPeripheral> peripheralCap;
+
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if(cap == Capabilities.CAPABILITY_PERIPHERAL){
+            if(this.peripheral == null){
+                this.peripheral = new CompactFlapPeripheral(this);
+            }
+            if(peripheralCap == null || !peripheralCap.isPresent())
+                peripheralCap = LazyOptional.of(() -> this.peripheral);
+            return peripheralCap.cast();
+        }
+        return super.getCapability(cap, side);
+    }
 
     public CompactFlapBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-
+        plant = new FlapPlant(this);
         buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
@@ -148,6 +170,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 new DirectReceiver.InitContext(SlotType.DEGREE, Couple.create(0.0, 1.0)),
                 8
         );
+    }
+
+    public void setAttackAngle(double angle){
+        this.angle.write(angle);
     }
 
     @Override
@@ -269,9 +295,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
 
-    public Vector3dc getRelative() {
-        return cachedRelative;
-    }
+
 
     @Override
     public String name() {
@@ -395,7 +419,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         setChanged();
         BlockPos anchor = worldPosition.relative(blockState.getValue(BearingBlock.FACING));
         physicalWing.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
-        if (!level.isClientSide) {
+        if (level != null && !level.isClientSide) {
             sendData();
         }
     }
@@ -428,11 +452,16 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public void setAngle(float v) {
-        setAngle((double)v);
+        setVisualAngle((double)v);
     }
 
 
-    public void setAngle(double forcedAngle) {
+    public void setVisualAngle(double forcedAngle) {
         visualAngle = MathUtils.angleReset((float) forcedAngle);
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }

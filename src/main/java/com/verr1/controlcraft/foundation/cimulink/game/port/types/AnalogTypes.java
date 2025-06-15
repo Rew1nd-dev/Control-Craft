@@ -14,7 +14,11 @@ public enum AnalogTypes implements Inspectable<NamedComponent>, Descriptive<Anal
     MIN(ComponentInstances.MIN, literals("Output the minimum value of 2 inputs")),
     MAX(ComponentInstances.MAX, literals("Output the maximum value of 2 inputs")),
     PRODUCT(ComponentInstances.PRODUCT, literals("Output the product of 2 inputs")),
-    ANGLE_FIX(ComponentInstances.ANGLE_FIX, literals("Coerce the input into (-pi, pi)"));
+    ANGLE_FIX(ComponentInstances.ANGLE_FIX, literals("Coerce the input into (-pi, pi)")),
+    POWER(ComponentInstances.POWER, literals("Output i_0 raised to the power of i_1")),
+    SIN(ComponentInstances.SIN, literals("Output the sine of the input")),
+    COS(ComponentInstances.COS, literals("Output the cosine of the input")),
+    TAN(ComponentInstances.TAN, literals("Output the tangent of the input"));
 
 
     private final ComponentInstances.Inspector<NamedComponent> inspector;

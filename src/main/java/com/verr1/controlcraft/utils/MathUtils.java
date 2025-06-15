@@ -151,7 +151,7 @@ public class MathUtils {
         ));
     }
 
-    public static Vector3d safeNormalize(Vector3d hvt) {
+    public static Vector3d safeNormalize(Vector3dc hvt) {
         double length = hvt.length();
         if (length == 0) {
             return new Vector3d(0, 0, 0);

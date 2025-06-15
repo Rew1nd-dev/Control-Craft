@@ -1,0 +1,11 @@
+package com.verr1.controlcraft.content.compact.tweak;
+
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+
+public interface ITweakedControllerComponentGetter {
+
+    NamedComponent tweakedControllerPlant(ServerLevel level, BlockPos pos);
+
+}

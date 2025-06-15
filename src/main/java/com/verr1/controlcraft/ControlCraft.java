@@ -3,7 +3,9 @@ package com.verr1.controlcraft;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
+import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.ponder.CimulinkPonderIndex;
 import com.verr1.controlcraft.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -89,6 +91,7 @@ public class ControlCraft
         ControlCraftMenuTypes.register();
         ControlCraftDataGen.registerEnumDescriptions();
         CimulinkFactory.register();
+        // CimulinkPonderIndex.register();
 
 
         Configurator.setLevel("org.valkryienskies.core.impl.networking", Level.ERROR);
@@ -96,7 +99,7 @@ public class ControlCraft
         Configurator.setLevel("org.valkryienskies.physics.networking", Level.ERROR);
 
 
-
+        TweakControllerCompact.init();
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
 
@@ -138,8 +141,9 @@ public class ControlCraft
         ControlCraftMenuTypes.register();
         ControlCraftDataGen.registerEnumDescriptions();
         CimulinkFactory.register();
+        // CimulinkPonderIndex.register();
         // ControlCraftAttachments.register();
-
+        TweakControllerCompact.init();
         // AttachmentRegistry.register();
 
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());

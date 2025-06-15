@@ -9,6 +9,8 @@ import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlockEntity;
+import com.verr1.controlcraft.content.links.func.FunctionsBlock;
+import com.verr1.controlcraft.content.links.func.FunctionsBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlock;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
@@ -19,8 +21,12 @@ import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlock;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
+import com.verr1.controlcraft.content.links.sensor.SensorBlock;
+import com.verr1.controlcraft.content.links.sensor.SensorBlockEntity;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
+import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
+import com.verr1.controlcraft.content.links.signal.DirectCurrentBlockEntity;
 import com.verr1.controlcraft.render.CimulinkSocketRenderer;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
@@ -84,6 +90,24 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<CircuitBlockEntity> CIRCUIT_BLOCKENTITY = REGISTRATE
             .blockEntity(CircuitBlock.ID, CircuitBlockEntity::new)
             .validBlock(CimulinkBlocks.CIRCUIT)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<DirectCurrentBlockEntity> DC_BLOCKENTITY = REGISTRATE
+            .blockEntity(DirectCurrentBlock.ID, DirectCurrentBlockEntity::new)
+            .validBlock(CimulinkBlocks.DC)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<FunctionsBlockEntity> FUNCTIONS_BLOCKENTITY = REGISTRATE
+            .blockEntity(FunctionsBlock.ID, FunctionsBlockEntity::new)
+            .validBlock(CimulinkBlocks.FUNCTIONS)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<SensorBlockEntity> SENSOR_BLOCKENTITY = REGISTRATE
+            .blockEntity(SensorBlock.ID, SensorBlockEntity::new)
+            .validBlock(CimulinkBlocks.SENSOR)
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 

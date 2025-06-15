@@ -4,6 +4,9 @@ import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.JetForceInducer;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.JetPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -41,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class JetBlockEntity extends OnShipBlockEntity implements
-        IReceiver, IPacketHandler, IHaveGoggleInformation
+        IReceiver, IPacketHandler, IHaveGoggleInformation, IPlant
 {
 
     public SynchronizedField<Double> horizontalAngle = new SynchronizedField<>(0.0);
@@ -57,6 +60,8 @@ public class JetBlockEntity extends OnShipBlockEntity implements
 
     private JetPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
+
+    private final JetPlant plant;
 
     private final DirectReceiver receiver = new DirectReceiver();
 
@@ -206,7 +211,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
 
     public JetBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-
+        plant = new JetPlant(this);
         buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
@@ -282,7 +287,11 @@ public class JetBlockEntity extends OnShipBlockEntity implements
     @Override
     @OnlyIn(Dist.CLIENT)
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        return receiver().makeToolTip(tooltip, isPlayerSneaking)
-        ;
+        return receiver().makeToolTip(tooltip, isPlayerSneaking);
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }

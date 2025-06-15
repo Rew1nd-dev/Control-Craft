@@ -19,6 +19,17 @@ public class SidedTickedBlockEntity extends SmartBlockEntity {
 
     }
 
+    public void initializeServer(){}
+    public void initializeClient(){}
+    public void initializeCommon(){}
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        initializeCommon();
+        if(level != null && level.isClientSide)initializeClient();
+        else initializeServer();
+    }
 
     public void tickServer(){}
     public void tickClient(){}
@@ -41,4 +52,15 @@ public class SidedTickedBlockEntity extends SmartBlockEntity {
         else tickServer();
     }
 
+    public void removeServer() {}
+    public void removeClient() {}
+    public void removeCommon() {}
+
+    @Override
+    public void remove() {
+        super.remove();
+        removeCommon();
+        if(level != null && level.isClientSide)removeClient();
+        else removeServer();
+    }
 }

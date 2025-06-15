@@ -37,6 +37,7 @@ public enum UIContents implements Descriptive<UIContents> {
 
     ANCHOR_RESISTANCE_AT_POS(Component.literal("Resist At Pos"), literals("Resistance Apply To Block Instead Of COM")),
     ANCHOR_EXTRA_GRAVITY_AT_POS(Component.literal("Gravity At Pos"), literals("Extra Gravity Apply To Block Instead Of COM")),
+    ANCHOR_SQUARE_DRAG(Component.literal("Square Drag"), literals("Apply Square Drag Instead Of Linear")),
 
     CAMERA_LINK_ACCEPT(Component.literal("Camera Link"), literals("Link To Camera")),
     CAMERA_LINK_DUMP(Component.literal("Camera Dump"), literals("Dump Camera Link")),
@@ -62,6 +63,8 @@ public enum UIContents implements Descriptive<UIContents> {
     GATE_TYPES(Component.literal("Type"), literals("Logic Gate Types")),
     FF_TYPES(Component.literal("Type"), literals("Flip Flop Types")),
 
+    FUNCTIONS_TYPES(Component.literal("Type"), literals("Functions Types")),
+
     LINK_INPUT(Component.literal("Input"), literals("Input Port Value")),
     LINK_OUTPUT(Component.literal("Output"), literals("Output Port Value")),
 
@@ -75,7 +78,11 @@ public enum UIContents implements Descriptive<UIContents> {
     FMA_INC(Component.literal("Add Input"), literals("Linear Adder Coefficients")),
     FMA_DEC(Component.literal("Del Input"), literals("Linear Adder Coefficients")),
 
-    STATUS(Component.literal("Available Ports"), literals("Ports of this plant"))
+    STATUS(Component.literal("Available Ports"), literals("Ports of this plant")),
+
+    SENSOR_SETTINGS(Component.literal("Sensor Settings"), literals("Settings for the sensor")),
+    SENSOR_TYPE(Component.literal("Type"), literals("Which metric to measure")),
+    SENSOR_LOCAL(Component.literal("Local"), literals("Transform vector to local coordinate")),
     ;
 
 

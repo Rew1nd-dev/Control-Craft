@@ -8,7 +8,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
@@ -24,6 +27,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ControlCraftServerCommands {
@@ -65,6 +69,49 @@ public class ControlCraftServerCommands {
                 name
         ));
 
+        return 1;
+    }
+
+    private static int circuitThreadCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        boolean bl = context.getArgument("physics", Boolean.class);
+        BlockLinkPort.RUN_AT_PHYSICS_THREAD = bl;
+        source.sendSuccess(bl ?
+                () -> Component.literal("Circuit thread is set to physics thread.")
+                :
+                () -> Component.literal("Circuit thread is set to main thread."), false
+        );
+
+        return 1;
+    }
+
+    private static int observeCircuitCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set neglect a block!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        HitResult ht = player.pick(5, 1, false);
+        if(!(ht instanceof BlockHitResult bht)){
+            source.sendFailure(Component.literal("No block Found in your vicinity"));
+            return 0;
+        }
+        BlockLinkPort.of(WorldBlockPos.of(player.serverLevel(), bht.getBlockPos())).filter(blp -> blp instanceof CircuitLinkPort).ifPresentOrElse(
+                blp -> {
+                    if(!(blp.__raw() instanceof Circuit circuit)){
+                        source.sendFailure(Component.literal("blp does not have a circuit yet"));
+                        return;
+                    }
+                    CircuitDebugger debugger = new CircuitDebugger(circuit);
+                    List<String> connections = debugger.printConnectionsAsString();
+                    connections.forEach(s -> {
+                        source.sendSuccess(() -> Component.literal(s), false);
+                    });
+                    debugger.printConnections(); // at log
+                },
+                () -> source.sendFailure(Component.literal("BlockLinkPort Not Found"))
+        );
         return 1;
     }
 
@@ -178,6 +225,23 @@ public class ControlCraftServerCommands {
                                                         ControlCraftServerCommands::outputCommand
                                                 )
                                         )
+                                )
+                        ).then(lt("tick-at-physics-thread")
+                                .then(arg("physics", BoolArgumentType.bool())
+                                        .executes(
+                                                ControlCraftServerCommands::circuitThreadCommand
+                                        )
+                                )
+                        ).then(lt("clear-attachments")
+                                .executes(
+                                        context -> {
+                                            clearAllAttachments();
+                                            return 1;
+                                        }
+                                )
+                        ).then(lt("observe-circuit")
+                                .executes(
+                                        ControlCraftServerCommands::observeCircuitCommand
                                 )
                         )
         );

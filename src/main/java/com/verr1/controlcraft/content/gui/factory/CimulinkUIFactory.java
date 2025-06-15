@@ -5,14 +5,17 @@ import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.layouts.element.*;
+import com.verr1.controlcraft.content.gui.layouts.element.general.*;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
 import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlockEntity;
+import com.verr1.controlcraft.content.links.func.FunctionsBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlockEntity;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
@@ -117,6 +120,34 @@ public class CimulinkUIFactory {
                 boundPos,
                 FFBlockEntity.FF_TYPE,
                 FFTypes.class,
+                convert(UIContents.FF_TYPES, Converter::titleStyle)
+        );
+
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, type)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createFunctionsScreen(BlockPos boundPos){
+
+        OptionUIField<AnalogTypes> type = new OptionUIField<>(
+                boundPos,
+                FunctionsBlockEntity.FUNCTIONS,
+                AnalogTypes.class,
                 convert(UIContents.FF_TYPES, Converter::titleStyle)
         );
 
@@ -282,6 +313,27 @@ public class CimulinkUIFactory {
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
                                 .withPort(name, input)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createSensorScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+        SensorUIPort sensor = new SensorUIPort(boundPos);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name)
+                                .withPort(sensor)
                                 .build()
                 )
                 .build();

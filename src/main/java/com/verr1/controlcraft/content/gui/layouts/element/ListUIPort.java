@@ -1,14 +1,13 @@
 package com.verr1.controlcraft.content.gui.layouts.element;
 
-import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
+import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
-import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class ListUIPort<V, T> extends TypedUIPort<T>{
+public abstract class ListUIPort<V, T> extends TypedUIPort<T> {
 
     final Function<T, List<V>> extractor;
     final Function<List<V>, T> restorer;

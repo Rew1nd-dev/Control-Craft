@@ -9,7 +9,11 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
+import com.verr1.controlcraft.foundation.redstone.DirectSlotControl;
+import com.verr1.controlcraft.foundation.redstone.DirectSlotGroup;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
+import com.verr1.controlcraft.foundation.type.descriptive.GroupPolicy;
+import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
@@ -56,6 +60,14 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
                 new DirectReceiver.InitContext(SlotType.INPUT, Couple.create(0.0, 1.0)),
                 6
         );
+
+        //receiver -> group 0 -> slot 0
+        DirectSlotGroup dsg = receiver().view().get(0);
+        DirectSlotControl dsc = dsg.view().get(0);
+        dsc.direction = SlotDirection.ALL;
+        dsc.min_max = Couple.create(0.0, 15.0);
+        dsg.setPolicy(GroupPolicy.SUM);
+
     }
 
     @Override

@@ -6,16 +6,12 @@ import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.Phantom;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -110,6 +106,16 @@ public class MinecraftUtils {
         AtomicInteger maxLen = new AtomicInteger(0);
         descriptive.forEach(c -> {
             int len = Minecraft.getInstance().font.width(c.asComponent().copy().withStyle(Converter::optionStyle));
+            if(len > maxLen.get()) maxLen.set(len);
+        });
+        return maxLen.get();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static int maxTitleLength(List<String> descriptive){
+        AtomicInteger maxLen = new AtomicInteger(0);
+        descriptive.forEach(c -> {
+            int len = Minecraft.getInstance().font.width(Component.literal(c).withStyle(Converter::titleStyle));
             if(len > maxLen.get()) maxLen.set(len);
         });
         return maxLen.get();

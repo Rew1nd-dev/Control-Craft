@@ -11,6 +11,9 @@
     "vscontrolcraft:mux",
     "vscontrolcraft:comparator",
     "vscontrolcraft:link_proxy",
-    "vscontrolcraft:circuit"
+    "vscontrolcraft:circuit",
+    "vscontrolcraft:dc",
+    "vscontrolcraft:functions",
+    "vscontrolcraft:link_sensor"
   ]
 }

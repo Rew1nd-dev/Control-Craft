@@ -268,8 +268,8 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
         menu.setPage(index);
     }
 
-    private void writeCurrent(){
-        if(validIndex(currentIndex)) block.write(data.get(currentIndex));
+    private void writeCurrent() {
+        if (validIndex(currentIndex)) block.write(data.get(currentIndex));
     }
 
     private void read(int index){

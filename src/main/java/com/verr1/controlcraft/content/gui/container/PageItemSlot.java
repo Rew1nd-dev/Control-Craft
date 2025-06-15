@@ -7,6 +7,7 @@ public class PageItemSlot extends SlotItemHandler {
 
     protected boolean active = true;
     public int page = 0;
+    public int line = 0;
 
     public PageItemSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
         super(itemHandler, index, xPosition, yPosition);
@@ -19,6 +20,11 @@ public class PageItemSlot extends SlotItemHandler {
 
     public PageItemSlot withPage(int page){
         this.page = page;
+        return this;
+    }
+
+    public PageItemSlot withLine(int line){
+        this.line = line;
         return this;
     }
 

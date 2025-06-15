@@ -1,28 +1,210 @@
 {
   "variants": {
-    "facing=down": {
-      "model": "vscontrolcraft:block/ff/block",
+    "facing=down,ff_types=async_d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
       "x": 180
     },
-    "facing=east": {
-      "model": "vscontrolcraft:block/ff/block",
+    "facing=down,ff_types=async_jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 180
+    },
+    "facing=down,ff_types=async_rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 180
+    },
+    "facing=down,ff_types=async_t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 180
+    },
+    "facing=down,ff_types=d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
+      "x": 180
+    },
+    "facing=down,ff_types=jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 180
+    },
+    "facing=down,ff_types=rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 180
+    },
+    "facing=down,ff_types=t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 180
+    },
+    "facing=east,ff_types=async_d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
       "x": 90,
       "y": 90
     },
-    "facing=north": {
-      "model": "vscontrolcraft:block/ff/block",
+    "facing=east,ff_types=async_jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,ff_types=async_rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,ff_types=async_t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,ff_types=d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,ff_types=jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,ff_types=rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,ff_types=t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,ff_types=async_d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
       "x": 90
     },
-    "facing=south": {
-      "model": "vscontrolcraft:block/ff/block",
+    "facing=north,ff_types=async_jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90
+    },
+    "facing=north,ff_types=async_rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90
+    },
+    "facing=north,ff_types=async_t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90
+    },
+    "facing=north,ff_types=d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
+      "x": 90
+    },
+    "facing=north,ff_types=jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90
+    },
+    "facing=north,ff_types=rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90
+    },
+    "facing=north,ff_types=t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90
+    },
+    "facing=south,ff_types=async_d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
       "x": 90,
       "y": 180
     },
-    "facing=up": {
-      "model": "vscontrolcraft:block/ff/block"
+    "facing=south,ff_types=async_jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90,
+      "y": 180
     },
-    "facing=west": {
-      "model": "vscontrolcraft:block/ff/block",
+    "facing=south,ff_types=async_rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,ff_types=async_t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,ff_types=d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,ff_types=jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,ff_types=rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,ff_types=t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,ff_types=async_d_ff": {
+      "model": "vscontrolcraft:block/ff/d"
+    },
+    "facing=up,ff_types=async_jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk"
+    },
+    "facing=up,ff_types=async_rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs"
+    },
+    "facing=up,ff_types=async_t_ff": {
+      "model": "vscontrolcraft:block/ff/t"
+    },
+    "facing=up,ff_types=d_ff": {
+      "model": "vscontrolcraft:block/ff/d"
+    },
+    "facing=up,ff_types=jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk"
+    },
+    "facing=up,ff_types=rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs"
+    },
+    "facing=up,ff_types=t_ff": {
+      "model": "vscontrolcraft:block/ff/t"
+    },
+    "facing=west,ff_types=async_d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=async_jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=async_rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=async_t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=d_ff": {
+      "model": "vscontrolcraft:block/ff/d",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=jk_ff": {
+      "model": "vscontrolcraft:block/ff/jk",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=rs_ff": {
+      "model": "vscontrolcraft:block/ff/rs",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,ff_types=t_ff": {
+      "model": "vscontrolcraft:block/ff/t",
       "x": 90,
       "y": 270
     }

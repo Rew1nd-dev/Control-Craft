@@ -26,6 +26,10 @@ public class ControlCraftItems {
             .lang("Camera Link")
             .register();
 
+    static {
+        REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.CIMULINK);
+    }
+
     public static final ItemEntry<CircuitCompilerItem> CIRCUIT_COMPILER = REGISTRATE.item("compiler", CircuitCompilerItem::new)
             .model(AssetLookup.existingItemModel())
             .properties(p -> p.stacksTo(1))

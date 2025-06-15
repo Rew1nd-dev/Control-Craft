@@ -22,7 +22,7 @@ public class CircuitWirelessMenu extends GhostItemMenu<WrappedChannel> {
         super(type, id, inv, extraData);
     }
 
-    protected CircuitWirelessMenu(MenuType<?> type, int id, Inventory inv, WrappedChannel contentHolder) {
+    public CircuitWirelessMenu(MenuType<?> type, int id, Inventory inv, WrappedChannel contentHolder) {
         super(type, id, inv, contentHolder);
     }
 
@@ -45,6 +45,18 @@ public class CircuitWirelessMenu extends GhostItemMenu<WrappedChannel> {
         return new WrappedChannel(extraData);
     }
 
+    public void setPage(int page){
+        slots.stream().filter(PageItemSlot.class::isInstance).map(PageItemSlot.class::cast).forEach(
+                s -> s.setActive(s.page == page)
+        );
+    }
+
+    public void setPage(int page, int maxLine){
+        slots.stream().filter(PageItemSlot.class::isInstance).map(PageItemSlot.class::cast).forEach(
+                s -> s.setActive(s.page == page && s.line < maxLine)
+        );
+    }
+
     @Override
     protected void addSlots() {
         addPlayerSlots(40 + 8, 131 + 24);
@@ -61,6 +73,7 @@ public class CircuitWirelessMenu extends GhostItemMenu<WrappedChannel> {
                     if(slot >= ghostInventory.getSlots())break;
                     addSlot(new PageItemSlot(ghostInventory, slot++, x + column * 18, y + row * 18)
                             .withPage(p)
+                            .withLine(row)
                             .active(p == 0)
                     );
                 }

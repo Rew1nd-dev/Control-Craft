@@ -2,8 +2,9 @@ package com.verr1.controlcraft.content.gui.layouts;
 
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.content.gui.layouts.api.SwitchableTab;
-import com.verr1.controlcraft.content.gui.layouts.element.TypedUIPort;
-import com.verr1.controlcraft.content.gui.layouts.element.UnitUIPanel;
+import com.verr1.controlcraft.content.gui.layouts.element.MultipleTypedUIPort;
+import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
+import com.verr1.controlcraft.content.gui.layouts.element.general.UnitUIPanel;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.executor.executables.ConditionExecutable;
@@ -30,8 +31,8 @@ import static com.verr1.controlcraft.ControlCraftClient.CLIENT_EXECUTOR;
 
 public class VerticalFlow implements SwitchableTab {
     private final GridLayout verticalLayout = new GridLayout();
-    private final HashMap<NetworkKey, NetworkUIPort<?>> map = new HashMap<>();
-    private final List<NetworkKey> entries; // this is meant to preserve the input order
+    private final List<NetworkKey> map;
+    private final List<? extends NetworkUIPort<?>> entries; // this is meant to preserve the input order
     private final BlockPos boundBlockEntityPos;
 
     private final Runnable preDoLayout;
@@ -39,18 +40,20 @@ public class VerticalFlow implements SwitchableTab {
 
     VerticalFlow(
             BlockPos boundPos,
-            List<Pair<NetworkKey,
-                    NetworkUIPort<?>>> entries, Runnable preDoLayout){
+            List<NetworkKey> keys,
+            List<? extends NetworkUIPort<?>> entries,
+            Runnable preDoLayout
+    ){
         this.boundBlockEntityPos = boundPos;
-        this.entries = entries.stream().map(Pair::getLeft).toList();
+        this.entries = entries;
         this.preDoLayout = preDoLayout;
-        entries.forEach(e -> map.put(e.getLeft(), e.getRight()));
+        this.map = keys;
     }
 
     public static int debug_init_id = 0;
 
     public void onScreenInit(){
-        map.values().forEach(NetworkUIPort::onScreenInit);
+        entries.forEach(NetworkUIPort::onScreenInit);
         syncUI();
     }
 
@@ -60,16 +63,16 @@ public class VerticalFlow implements SwitchableTab {
         if(p == null)return;
         boundBlockEntity().ifPresentOrElse(
                 be -> {
-                    NetworkKey[] keys = map.keySet().toArray(NetworkKey[]::new);
+                    NetworkKey[] keys = map.toArray(NetworkKey[]::new);
                     be.handler().request(keys);
                     be.handler().setDirty(keys);
                     AtomicInteger row = new AtomicInteger();
-                    entries.forEach(port -> verticalLayout.addChild(map.get(port).layout(), row.getAndIncrement(), 0, 1, 2));
+                    entries.forEach(port -> verticalLayout.addChild(port.layout(), row.getAndIncrement(), 0, 1, 2));
                     verticalLayout.rowSpacing(4);
                     verticalLayout.arrangeElements();
                     debug_init_id++;
                     var task = new ConditionExecutable
-                            .builder(() -> map.values().forEach(v -> {
+                            .builder(() -> entries.forEach(v -> {
                                         v.readToLayout();
                                         v.onMessage(Message.POST_READ);
                             }))
@@ -87,22 +90,22 @@ public class VerticalFlow implements SwitchableTab {
 
     @Override
     public void onActivatedTab(){
-        map.values().forEach(NetworkUIPort::onActivatedTab);
+        entries.forEach(NetworkUIPort::onActivatedTab);
     }
 
     @Override
     public void onRemovedTab() {
-        map.values().forEach(NetworkUIPort::onRemovedTab);
+        entries.forEach(NetworkUIPort::onRemovedTab);
     }
 
     @Override
     public void onScreenTick() {
-        map.values().forEach(NetworkUIPort::onScreenTick);
+        entries.forEach(NetworkUIPort::onScreenTick);
     }
 
     @Override
     public void onAddRenderable(Collection<AbstractWidget> toAdd) {
-        map.values().forEach(p -> p.onAddRenderable(toAdd));
+        entries.forEach(p -> p.onAddRenderable(toAdd));
     }
 
 
@@ -118,18 +121,18 @@ public class VerticalFlow implements SwitchableTab {
     }
 
     public void onMessage(Message msg){
-        map.values().forEach(p -> p.onMessage(msg));
+        entries.forEach(p -> p.onMessage(msg));
     }
 
     public void apply(){
         boundBlockEntity().ifPresent(
             be -> {
-                map.values().forEach(p -> p.onMessage(Message.PRE_APPLY));
-                NetworkKey[] keys = map.keySet().toArray(NetworkKey[]::new);
+                entries.forEach(p -> p.onMessage(Message.PRE_APPLY));
+                NetworkKey[] keys = map.toArray(NetworkKey[]::new);
                 // be.activateLock(keys); // maybe not needed
-                map.values().forEach(NetworkUIPort::writeFromLayout);
+                entries.forEach(NetworkUIPort::writeFromLayout);
                 be.handler().syncToServer(keys);
-                map.values().forEach(p -> p.onMessage(Message.POST_APPLY));
+                entries.forEach(p -> p.onMessage(Message.POST_APPLY));
             }
         );
     }
@@ -180,7 +183,9 @@ public class VerticalFlow implements SwitchableTab {
 
     public static class builder{
         BlockPos pos;
-        List<Pair<NetworkKey, NetworkUIPort<?>>> list = new ArrayList<>();
+        List<NetworkUIPort<?>> ports = new ArrayList<>();
+        List<NetworkKey> keys = new ArrayList<>();
+
         Runnable preDoLayout = () -> {};
 
         public builder(BlockPos pos){
@@ -188,7 +193,7 @@ public class VerticalFlow implements SwitchableTab {
         }
 
         public VerticalFlow build(){
-            return new VerticalFlow(pos, list, preDoLayout);
+            return new VerticalFlow(pos, keys, ports, preDoLayout);
         }
 
         public builder withPreDoLayout(Runnable postDoLayout){
@@ -200,7 +205,8 @@ public class VerticalFlow implements SwitchableTab {
                 NetworkKey key,
                 NetworkUIPort<?> port
         ){
-            list.add(ImmutablePair.of(key, port));
+            this.keys.add(key);
+            this.ports.add(port);
             return this;
         }
 
@@ -208,7 +214,7 @@ public class VerticalFlow implements SwitchableTab {
                 TypedUIPort<?>... port
         ){
             for(var p: port){
-                list.add(ImmutablePair.of(p.key(), p));
+                withPort(p.key(), p);
             }
             return this;
         }
@@ -217,10 +223,18 @@ public class VerticalFlow implements SwitchableTab {
                 UnitUIPanel... port
         ){
             for(var p: port){
-                list.add(ImmutablePair.of(p.key(), p));
+                this.keys.add(p.key());
+                this.ports.add(p);
             }
             return this;
         }
+
+        public builder withPort(MultipleTypedUIPort mt){
+            keys.addAll(mt.keys());
+            ports.add(mt);
+            return this;
+        }
+
 
     }
 

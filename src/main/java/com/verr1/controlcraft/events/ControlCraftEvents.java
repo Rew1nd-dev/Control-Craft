@@ -1,14 +1,12 @@
 package com.verr1.controlcraft.events;
 
 import com.verr1.controlcraft.ControlCraftServer;
-import com.verr1.controlcraft.content.legacy.NetworkManager;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
-import com.verr1.controlcraft.content.compact.tweak.TweakedLinkedControllerServerHandlerExtension;
+import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
 import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
-import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
@@ -50,7 +48,7 @@ public class ControlCraftEvents {
             ChunkManager.tick();
             ControlCraftServer.CC_NETWORK.tick();
         } else if (event.phase == TickEvent.Phase.END) {
-            BlockLinkPort.postTick();
+            BlockLinkPort.postMainTick();
         }
 
     }
@@ -95,10 +93,12 @@ public class ControlCraftEvents {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         ConstraintCenter.onServerStopping(event.getServer());
+        BlockLinkPort.onClose();
     }
 
     public static void onPhysicsTickStart(){
         ComputerCraftDelegation.lockDelegateThread();
+        BlockLinkPort.postPhysicsTick();
     }
 
     public static void onPhysicsTickEnd(){

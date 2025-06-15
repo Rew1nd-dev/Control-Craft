@@ -6,12 +6,14 @@ import com.verr1.controlcraft.foundation.cimulink.game.ComponentInstances;
 import com.verr1.controlcraft.foundation.type.descriptive.GroupPolicy;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 
-public enum GateTypes implements Inspectable<BooleanCombinational>, Descriptive<GateTypes> {
+public enum GateTypes implements Inspectable<BooleanCombinational>, Descriptive<GateTypes>, StringRepresentable {
     AND(ComponentInstances.AND2, literals("2->1 AND Gate")),
     OR(ComponentInstances.OR2, literals("2->1 OR Gate")),
     XOR(ComponentInstances.XOR2, literals("2->1 XOR Gate")),
@@ -48,4 +50,9 @@ public enum GateTypes implements Inspectable<BooleanCombinational>, Descriptive<
     }
 
     public static void register(){}
+
+    @Override
+    public @NotNull String getSerializedName() {
+        return name().toLowerCase();
+    }
 }

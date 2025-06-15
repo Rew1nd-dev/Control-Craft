@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.links.signal;
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
+import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -10,8 +11,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class DirectCurrentBlock extends CimulinkBlock<DirectCurrentBlockEntity> {
 
+    public static final String ID = "dc";
 
-    protected DirectCurrentBlock(Properties p) {
+    public DirectCurrentBlock(Properties p) {
         super(p);
     }
 
@@ -28,6 +30,6 @@ public class DirectCurrentBlock extends CimulinkBlock<DirectCurrentBlockEntity> 
 
     @Override
     public BlockEntityType<? extends DirectCurrentBlockEntity> getBlockEntityType() {
-        return null;
+        return CimulinkBlockEntities.DC_BLOCKENTITY.get();
     }
 }

@@ -34,16 +34,31 @@ public class CircuitCompilerItem extends Item {
 
             if(player == null)return InteractionResult.FAIL;
 
+            CompoundTag nbt = stack.getOrCreateTag();
             // 检查NBT数据是否存在
+            if (player.isShiftKeyDown()) {
+                nbt.remove("circuitNbt");
+            } else if (nbt.contains("circuitNbt")) {
+                // 这里可以添加放置电路的逻辑
+                CompoundTag circuitNbt = nbt.getCompound("circuitNbt");
+                CircuitNbt nbtHolder = CircuitNbt.deserialize(circuitNbt);
 
+                BlockEntityGetter.getLevelBlockEntityAt(world, pos, CircuitBlockEntity.class)
+                        .ifPresentOrElse(
+                                cbe -> cbe.loadCircuit(nbtHolder),
+                                () -> player.sendSystemMessage(Component.literal("No circuit block found at the selected position."))
+                        );
+
+            }
 
 
 
         }
         return InteractionResult.PASS;
     }
-
-    @Override
+/*
+*
+* @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Player player = context.getPlayer();
         if(context.getLevel().isClientSide)return InteractionResult.SUCCESS; // 在客户端直接返回成功
@@ -147,5 +162,8 @@ public class CircuitCompilerItem extends Item {
         TO_COMPILE,
         TO_PLACE,
     }
+*
+* */
+
 
 }

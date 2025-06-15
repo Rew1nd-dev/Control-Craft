@@ -20,6 +20,7 @@ import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
+import org.valkyrienskies.core.impl.game.ships.DummyShipWorldServer;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -108,6 +109,7 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
                 .filter(ServerLevel.class::isInstance)
                 .map(ServerLevel.class::cast)
                 .map(ValkyrienSkies::getShipWorld)
+                .filter(sw -> !(sw instanceof DummyShipWorldServer))
                 .map(ServerShipWorldCore::getDimensionToGroundBodyIdImmutable)
                 .map(m -> m.get(getDimensionID()))
                 .orElse(-1L);

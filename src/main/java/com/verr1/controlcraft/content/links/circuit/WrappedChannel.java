@@ -19,8 +19,8 @@ public class WrappedChannel {
                     IoData::deserialize
             ));
 
-    final BlockPos pos;
-    final List<IoData> ioDatas = new ArrayList<>();
+    public final BlockPos pos;
+    public final List<IoData> ioDatas = new ArrayList<>();
     private final CompoundTag inventoryTag = new CompoundTag();
 
     public void overrideData(List<CircuitBlockEntity.WirelessIO> ios){

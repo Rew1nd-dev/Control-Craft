@@ -6,16 +6,21 @@ import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
 
-public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> extends BlockLinkPort {
+import java.util.function.Function;
+
+public abstract class SwitchableLinkPort<T extends Enum<?>> extends BlockLinkPort {
 
     private final SerializeUtils.Serializer<T> TYPE;
 
     private T currentType;
 
-    protected SwitchableLinkPort(T defaultValue) {
-        super(defaultValue.inspector().get());
+    private final Function<T, NamedComponent> factory;
+
+    protected SwitchableLinkPort(T defaultValue, Function<T, NamedComponent> factory) {
+        super(factory.apply(defaultValue));
         TYPE = SerializeUtils.ofEnum(clazz());
         currentType = defaultValue;
+        this.factory = factory;
     }
 
     protected abstract Class<T> clazz();
@@ -23,9 +28,7 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
     public void setCurrentType(T type){
         if(type == currentType)return;
         currentType = type;
-        String preservedName = name();
         recreate();
-        setName(preservedName);
     }
 
     public T getCurrentType() {
@@ -34,12 +37,13 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
 
     @Override
     public NamedComponent create() {
-        return currentType.inspector().get();
+        return factory.apply(currentType);
     }
 
     @Override
     public CompoundTag serialize() {
-        return CompoundTagBuilder.create().withCompound("blp", serializeLinks())
+        return CompoundTagBuilder.create()
+                .withCompound("blp", super.serialize())
                 .withCompound("current_type", TYPE.serializeNullable(currentType))
                 .build();
     }
@@ -47,7 +51,7 @@ public abstract class SwitchableLinkPort<T extends Enum<?> & Inspectable<?>> ext
     @Override
     public void deserialize(CompoundTag tag){
         setCurrentType(TYPE.deserialize(tag.getCompound("current_type")));
-        deserializeLinks(tag.getCompound("blp"));
+        super.deserialize(tag.getCompound("blp"));
     }
 
 

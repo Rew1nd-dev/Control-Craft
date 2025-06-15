@@ -5,6 +5,7 @@
 		"1": "vscontrolcraft:block/ff/model1",
 		"particle": "vscontrolcraft:block/ff/model"
 	},
+	"render_type": "cutout",
 	"elements": [
 		{
 			"from": [2, 0, 2],

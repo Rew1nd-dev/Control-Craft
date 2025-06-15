@@ -1,7 +1,7 @@
 package com.verr1.controlcraft;
 
 
-import com.verr1.controlcraft.content.compact.tweak.RedstoneLinkNetworkHandlerExtension;
+import com.verr1.controlcraft.content.compact.tweak.impl.RedstoneLinkNetworkHandlerExtension;
 import com.verr1.controlcraft.foundation.executor.Executor;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import net.minecraft.server.MinecraftServer;
@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.jetbrains.annotations.NotNull;
 
 public class ControlCraftServer {
     public static MinecraftServer INSTANCE;

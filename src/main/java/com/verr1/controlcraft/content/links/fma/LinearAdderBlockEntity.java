@@ -44,6 +44,7 @@ public class LinearAdderBlockEntity extends CimulinkBlockEntity<FMALinkPort> {
                         this::setCoefficients,
                         COEFF_SERIALIZER
                 ))
+                .runtimeOnly()
                 .withClient(new ClientBuffer<>(COEFF_SERIALIZER, Coefficients.class))
                 .register();
 

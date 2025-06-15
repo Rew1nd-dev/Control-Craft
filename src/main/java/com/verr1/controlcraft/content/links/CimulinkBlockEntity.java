@@ -7,7 +7,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
+import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
+import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
@@ -19,11 +21,13 @@ import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.VSGetterUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+// import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -40,6 +44,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -48,15 +54,17 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
 
-public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends NetworkBlockEntity implements
+public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShipBlockEntity implements
         ILinkableBlock, IHaveHoveringInformation
 {
 
     private final T linkPort;
     // private final ClientWatcher watcher = new ClientWatcher();
-
+    private boolean isInitialized = false;
 
     @OnlyIn(Dist.CLIENT)
     private final Renderer renderer = new Renderer();
@@ -72,10 +80,27 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
         }
     };
 
+    private final DeferralInitializer lateInitVModCompact = new DeferralInitializer() {
+        @Override
+        void deferralLoad(CompoundTag tag) {
+            VSchematicCompactCenter.PostCimulinkReadVModCompact(CimulinkBlockEntity.this, tag);
+        }
+    };
+
+    protected void initializeEarly(){
+
+    }
 
     @Override
-    public final void initialize() {
-        super.initialize();
+    protected void readExtra(CompoundTag compound) {
+        lateInitVModCompact.load(compound);
+    }
+
+    @Override
+    public final void initializeServer() {
+        super.initializeServer();
+
+        initializeEarly();
 
         if(level != null){
             linkPort.setWorldBlockPos(WorldBlockPos.of(level, getBlockPos()));
@@ -83,11 +108,16 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
             ControlCraft.LOGGER.warn("link port has not been set pos! at: " + getBlockPos().toShortString() + " because level is null");
         }
 
-        lateInitLinkPort.load();
-
-
-        syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
+        lateInitLinkPort.load(); // restore connections
+        lateInitVModCompact.load(); // load with vmod compact (offset all links)
         initializeExtra();
+        isInitialized = true;
+        syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
+        ControlCraft.LOGGER.info("be at {} finish initialization", getBlockPos().toShortString());
+    }
+
+    public boolean initialized(){
+        return isInitialized;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -110,13 +140,14 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
                         lateInitLinkPort::load
                 ))
                 .register();
-
+        // this will be done in link ports serializations
         buildRegistry(SharedKeys.COMPONENT_NAME)
                 .withBasic(SerializePort.of(
                         this::name,
                         this::setName,
                         SerializeUtils.STRING
                 ))
+                .runtimeOnly()
                 .withClient(ClientBuffer.STRING.get())
                 .dispatchToSync()
                 .register();
@@ -202,8 +233,8 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void removeServer() {
+        super.removeServer();
         linkPort().quit();
     }
 
@@ -235,11 +266,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends Netwo
 
     public String readClientComponentName(){
         return handler().readClientBuffer(SharedKeys.COMPONENT_NAME, String.class);
-    }
-
-    public @NotNull Direction getDirection(){
-        if(getBlockState().hasProperty(BlockStateProperties.FACING)) return getBlockState().getValue(BlockStateProperties.FACING);
-        return Direction.UP;
     }
 
     public Direction getVertical(){
@@ -418,7 +444,7 @@ private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new 
 
 
 
-    private abstract static class DeferralInitializer{
+    protected abstract static class DeferralInitializer{
 
         CompoundTag savedTag = new CompoundTag();
 
@@ -473,7 +499,7 @@ private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new 
         }
 
         private void flash(List<Integer> changedInput){
-            if(!(level instanceof ClientLevel))return;
+            if(level ==null || !level.isClientSide)return;
             changedInput.stream().filter(i -> i < n())
                     .map(cs().inputs::get)
                     .map(cachedKeys::get)
@@ -540,25 +566,50 @@ private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new 
                     ControlCraft.LOGGER.error("Failed to find input port index for rendering");
                     return Pair.of(0.0f, 0.0f);
                 }
-                return Pair.of(-0.25f, (float)deltaY(index, cs().inputs.size()));
+                return Pair.of(
+                        -(float)deltaX(index, cs().inputs.size()),
+                        (float)deltaY(index, cs().inputs.size())
+                );
             }else{
                 int index = cs().outputs.indexOf(cvc.portName());
                 if(index == -1){
                     ControlCraft.LOGGER.error("Failed to find output port index for rendering");
                     return Pair.of(0.0f, 0.0f);
                 }
-                return Pair.of(0.25f, (float)deltaY(index, cs().outputs.size()));
+                return Pair.of(
+                         (float)deltaX(index, cs().outputs.size()),
+                         (float)deltaY(index, cs().outputs.size())
+                );
             }
 
         }
+        private static final int MAX_INPUTS_PER_COLUMN = 4;
+
+        private static double deltaX(int count, int total){
+            int div = count / MAX_INPUTS_PER_COLUMN; // which column
+            int m_1 = (total / MAX_INPUTS_PER_COLUMN + 1); // column count
+            double dx = 0.5 / m_1;
+            return 0.35 - div * dx;
+        }
 
         private static double deltaY(int count, int total){
+            /*
             double dy = 1.0 / total;
             return (total - 1) * dy / 2 - (count * dy);
+            * */
+            int total_mod = total % MAX_INPUTS_PER_COLUMN;
+
+            int m_1 = count < total - total_mod ? MAX_INPUTS_PER_COLUMN : total_mod; // row count
+
+            int mod = (count % MAX_INPUTS_PER_COLUMN);
+
+            double dy = 1.0 / m_1;
+
+            return (m_1 - 1) * dy / 2 - (mod * dy);
         }
 
         public Vec3 computeOutputPortOffset(int count){
-            double x = 0.25;
+            double x = deltaX(count, m());//0.25;
             double y = deltaY(count, m());
             Vec3 h = MinecraftUtils.toVec3(getHorizontal().getNormal());
             Vec3 v = MinecraftUtils.toVec3(getVertical().getNormal());
@@ -566,8 +617,8 @@ private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new 
         }
 
         public Vec3 computeInputPortOffset(int count){
-            double x = -0.25;
-            double y = deltaY(count, n());
+            double x = -deltaX(count, m());//-0.25;
+            double y =  deltaY(count, n());
 
             Vec3 h = MinecraftUtils.toVec3(getHorizontal().getNormal());
             Vec3 v = MinecraftUtils.toVec3(getVertical().getNormal());
@@ -652,8 +703,19 @@ private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new 
             );
         }
 
+        public Vec3 transformIfIncludeShip(Vec3 wc){
+            Ship s = getShipOn();
+            return Optional.ofNullable(s)
+                    .map(Ship::getWorldToShip)
+                    .map(t -> t.transformPosition(toJOML(wc)))
+                    .map(ValkyrienSkies::toMinecraft)
+                    .orElse(wc);
+        }
+
+
         // given a cbe to check and a viewHitVec, return the closest looking port pos and name index
-        public @Nullable ClientViewContext computeContext(@NotNull Vec3 viewHitVec){
+        public @Nullable ClientViewContext computeContext(@NotNull Vec3 viewHitVec, boolean transform){
+            viewHitVec = transform ? transformIfIncludeShip(viewHitVec): viewHitVec;
             CimulinkRenderCenter.ComputeContext closestInput = closestInput(viewHitVec);
             CimulinkRenderCenter.ComputeContext closestOutput = closestOutput(viewHitVec);
 
@@ -730,7 +792,7 @@ private final Map<String, CimulinkRenderCenter.RenderCurveKey> cachedKeys = new 
 
             if(result.getDirection() != facing())return;
 
-            ClientViewContext cvc = computeContext(target.getLocation());
+            ClientViewContext cvc = computeContext(target.getLocation(), true);
             if(cvc == null)return;
 
             String portName = cvc.portName();

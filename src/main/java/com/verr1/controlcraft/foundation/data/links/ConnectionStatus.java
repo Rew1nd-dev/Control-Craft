@@ -69,7 +69,7 @@ public class ConnectionStatus {
         return CompoundTagBuilder.create()
                 .withCompound("forward", blp.serializeForward())
                 .withCompound("backward", blp.serializeBackward())
-                .withCompound("inputs", NAMES.serialize(blp.inputsNames()))
+                .withCompound("inputs", NAMES.serialize(blp.inputsNamesExcludeSignals()))
                 .withCompound("outputs", NAMES.serialize(blp.outputsNames()))
                 .withCompound("clazz", SerializeUtils.STRING.serialize(blp.getClass().getSimpleName()))
                 .build();

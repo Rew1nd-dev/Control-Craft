@@ -240,7 +240,7 @@ public enum SlotType implements Descriptive<SlotType> {
                     "Port input in circuit"
             )),
 
-    OUTPUT(false, Component.literal("Output"),
+    OUTPUT(true, Component.literal("Output"), // in order to hide min and max
             literals(
                     "Port output from circuit",
                     "Will convert to redstone signal to bound face",

@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.links.proxy;
 
+import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -11,6 +12,7 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -18,11 +20,7 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
 
     public static final NetworkKey ALL_STATUS = NetworkKey.create("proxy_all_status");
     // public static final NetworkKey OUT_STATUS = NetworkKey.create("proxy_out_status");
-    public static final SerializeUtils.Serializer<ProxyPortStatus> PROXY_PORT =
-            SerializeUtils.of(
-                    ProxyPortStatus::serialize,
-                    ProxyPortStatus::deserialize
-            );
+
 
 
     public ProxyLinkBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -31,20 +29,17 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
                 .withBasic(SerializePort.of(
                         () -> linkPort().viewAll(),
                         s -> linkPort().setAll(s),
-                        PROXY_PORT
+                        PlantProxyLinkPort.PROXY_PORT
                 ))
-                .withClient(new ClientBuffer<>(PROXY_PORT, ProxyPortStatus.class))
+                .runtimeOnly()
+                .withClient(new ClientBuffer<>(PlantProxyLinkPort.PROXY_PORT, ProxyPortStatus.class))
                 .register();
 
     }
 
-    @Override
-    protected void initializeExtra() {
-        super.initializeExtra();
-        updateAttachedPlant();
-    }
-
+    // no need to call this at initialize(), since it will be called at linkPort()
     public void updateAttachedPlant(){
+        if(!(level instanceof ServerLevel serverLevel))return;
         NamedComponent plant =
         BlockEntityGetter.getLevelBlockEntityAt(
                     level,
@@ -52,7 +47,11 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
                     IPlant.class
                 )
                 .map(IPlant::plant)
-                .orElse(null);
+                .orElseGet(() ->
+                    TweakControllerCompact.tweakedControllerPlant(
+                        serverLevel,
+                        getBlockPos().relative(getDirection().getOpposite()))
+                );
 
         linkPort().setPlant(plant);
     }
@@ -61,6 +60,6 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
 
     @Override
     protected PlantProxyLinkPort create() {
-        return new PlantProxyLinkPort();
+        return new PlantProxyLinkPort(this);
     }
 }

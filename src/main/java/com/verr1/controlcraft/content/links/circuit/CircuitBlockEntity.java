@@ -7,9 +7,14 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
+import com.verr1.controlcraft.foundation.cimulink.game.misc.CircuitWirelessMenu;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.foundation.redstone.TerminalMenu;
+import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
+import com.verr1.controlcraft.registry.ControlCraftPackets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -18,6 +23,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
@@ -37,9 +43,13 @@ import static java.lang.Math.min;
 public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> implements MenuProvider {
 
     public static final NetworkKey CIRCUIT = NetworkKey.create("circuit");
+    public static final NetworkKey CHANNEL = NetworkKey.create("channel");
+    public static final NetworkKey WRAPPER = NetworkKey.create("wrapper");
 
-    private static final int MAX_CHANNEL_SIZE = 8;
+    private static final int MAX_CHANNEL_SIZE = 24;
+
     private final List<WirelessIO> io = new ArrayList<>(ArrayUtils.ListOf(MAX_CHANNEL_SIZE, WirelessIO::new));
+
     private int validSize = 0;
 
     private final WrappedChannel wrapper;
@@ -47,13 +57,18 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     public CircuitBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         wrapper = new WrappedChannel(pos);
-
-        buildRegistry(CIRCUIT)
+/*
+*       buildRegistry(CIRCUIT)
                 .withBasic(SerializePort.of(
                         () -> linkPort().serialize(),
                         t -> linkPort().deserialize(t)
                 ))
                 .register();
+* */
+
+
+        buildRegistry(WRAPPER).withBasic(CompoundTagPort.of(wrapper::saveToTag, wrapper::loadFromTag)).register();
+        buildRegistry(CHANNEL).withBasic(CompoundTagPort.of(this::serializeIo, this::deserializeIo)).register();
     }
 
     public void openScreen(Player player){
@@ -71,9 +86,10 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         updateIOName();
     }
 
+
     private void updateIOName(){
         AtomicInteger ioIndex = new AtomicInteger(0);
-        linkPort().inputsNames()
+        linkPort().inputsNamesExcludeSignals()
             .forEach(s -> {
                 int ioId = ioIndex.get();
                 if(ioId >= io.size())return;
@@ -112,10 +128,38 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         });
     }
 
+    private CompoundTag serializeIo(){
+        CompoundTag tag = new CompoundTag();
+        for (int i = 0; i < MAX_CHANNEL_SIZE; i++) {
+            WirelessIO wirelessIO = io.get(i);
+            tag.put("io" + i, wirelessIO.serialize());
+        }
+        return tag;
+    }
+
+    private void deserializeIo(CompoundTag tag){
+        for (int i = 0; i < MAX_CHANNEL_SIZE; i++) {
+            WirelessIO wirelessIO = io.get(i);
+            wirelessIO.deserialize(tag.getCompound("io" + i));
+        }
+    }
+
     @Override
     protected void initializeExtra() {
         super.initializeExtra();
         addToNetwork();
+        updateIOName();
+    }
+
+    public void setWithIoSettings(List<IoSettings> settings){
+        int size = Math.min(settings.size(), io.size());
+        for (int i = 0; i < size; i++){
+            IoSettings setting = settings.get(i);
+            WirelessIO wirelessIO = io.get(i);
+            wirelessIO.enabled = setting.enabled();
+            wirelessIO.minMax = Couple.create(setting.min(), setting.max());
+        }
+
     }
 
     @Override
@@ -132,14 +176,35 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         addToNetwork();
     }
 
+    public void setFrequency(){
+        List<Couple<RedstoneLinkNetworkHandler.Frequency>> newKeys = new ArrayList<>();
+        for(int i = 0; i < wrapper.ioDatas.size(); i++){
+            newKeys.add(toFrequency(wrapper, i));
+        }
+        updateKeys(newKeys);
+        setChanged();
+    }
+
     @Override
-    public Component getDisplayName() {
+    public void tickServer() {
+        super.tickServer();
+        updateTransmission();
+    }
+
+    public void updateTransmission(){
+        io.stream().filter(io -> io.enabled && !io.isInput).forEach(wirelessIO -> {
+            REDSTONE_LINK_NETWORK_HANDLER.updateNetworkOf(level, wirelessIO);
+        });
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
         return Component.literal("circuit");
     }
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int id, @NotNull Inventory inv, @NotNull Player player) {
-        return null;
+        return new CircuitWirelessMenu(ControlCraftMenuTypes.CIRCUIT.get(), id, inv, wrapper);
     }
 
     public static ItemStackHandler getFrequencyItems(WrappedChannel contentHolder) {
@@ -170,12 +235,12 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
     public class WirelessIO implements IRedstoneLinkable {
         public Couple<RedstoneLinkNetworkHandler.Frequency> key = EMPTY_FREQUENCY;
-        public int strength;
+
 
         public int lastReceivedStrength = 0;
 
         public boolean isInput;
-        public String ioName;
+        public String ioName = "";
         public boolean isRedundant = true;
 
         public boolean enabled;
@@ -186,7 +251,18 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public int getTransmittedStrength() {
-            if(!isInput) return strength;
+            if(!isInput && !isRedundant) {
+                try{
+                    /*
+                    double ratio = (out - minMax.getFirst()) / (minMax.getSecond() - minMax.getFirst());
+                    return (int) (ratio * 15.0);
+                    * */
+                    double out = linkPort().output(ioName);
+                    return (int)out;
+                } catch (Exception e){
+                    ControlCraft.LOGGER.error("Error while getting transmitted strength for circuit: {}", e.getMessage());
+                }
+            }
             return 0;
         }
 
@@ -223,6 +299,27 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
                 ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
             }
 
+        }
+
+        public CompoundTag serialize(){
+            CompoundTag tag = new CompoundTag();
+            tag.put("key",  key.serializeEach(e -> e.getStack().serializeNBT()));
+            tag.putString("ioName", ioName);
+            tag.putBoolean("isInput", isInput);
+            tag.putBoolean("isRedundant", isRedundant);
+            tag.putBoolean("enabled", enabled);
+            tag.putDouble("min", minMax.getFirst());
+            tag.putDouble("max", minMax.getSecond());
+            return tag;
+        }
+
+        public void deserialize(CompoundTag tag){
+            key = Couple.deserializeEach(tag.getList("key", 10), e -> RedstoneLinkNetworkHandler.Frequency.of(ItemStack.of(e)));
+            ioName = tag.getString("ioName");
+            isInput = tag.getBoolean("isInput");
+            isRedundant = tag.getBoolean("isRedundant");
+            enabled = tag.getBoolean("enabled");
+            minMax = Couple.create(tag.getDouble("min"), tag.getDouble("max"));
         }
 
         @Override

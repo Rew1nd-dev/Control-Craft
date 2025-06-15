@@ -8,7 +8,7 @@ import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import com.verr1.controlcraft.content.blocks.kinetic.resistor.KineticResistorBlockEntity;
 import com.verr1.controlcraft.content.blocks.propeller.PropellerBlockEntity;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
-import com.verr1.controlcraft.content.legacy.PeripheralInterfaceBlockEntity_;
+import com.verr1.controlcraft.content.gui.layouts.element.general.*;
 import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlockEntity;
 import com.verr1.controlcraft.content.gui.layouts.element.*;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
@@ -17,10 +17,8 @@ import com.verr1.controlcraft.content.gui.layouts.preset.TerminalDeviceUIField;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
 import com.verr1.controlcraft.content.gui.layouts.preset.DynamicControllerUIField;
 import com.verr1.controlcraft.content.gui.layouts.preset.SpatialScheduleUIField;
-import com.verr1.controlcraft.content.legacy.TerminalDeviceUIField__;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
-import com.verr1.controlcraft.foundation.api.delegate.ITerminalDevice;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.*;
@@ -89,19 +87,24 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.ANCHOR_EXTRA_GRAVITY_AT_POS, Converter::titleStyle)
         );
 
+        BooleanUIField square_drag = new BooleanUIField(
+                boundAnchorPos,
+                AnchorBlockEntity.SQUARE_DRAG,
+                Converter.convert(UIContents.ANCHOR_SQUARE_DRAG, Converter::titleStyle)
+        );
+
         Converter.alignLabel(air_resist, extra_gravity, rot_damp);
-        Converter.alignLabel(resist_at_pos, gravity_at_pos);
+        Converter.alignLabel(resist_at_pos, gravity_at_pos, square_drag);
 
         return new GenericSettingScreen.builder(boundAnchorPos)
                 .withRenderedStack(ControlCraftBlocks.ANCHOR_BLOCK.asStack())
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundAnchorPos)
-                                .withPort(AnchorBlockEntity.AIR_RESISTANCE, air_resist)
-                                .withPort(AnchorBlockEntity.EXTRA_GRAVITY, extra_gravity)
-                                .withPort(AnchorBlockEntity.ROTATIONAL_RESISTANCE, rot_damp)
-                                .withPort(AnchorBlockEntity.RESISTANCE_AT_POS, resist_at_pos)
-                                .withPort(AnchorBlockEntity.GRAVITY_AT_POS, gravity_at_pos)
+                                .withPort(
+                                        air_resist, extra_gravity, rot_damp,
+                                        resist_at_pos, gravity_at_pos, square_drag
+                                )
                                 .build()
                 )
                 .build();

@@ -207,23 +207,23 @@ public class CimulinkRenderCenter {
             @NotNull Vec3 viewHitVec,
             @NotNull Level world
     ){
-        /*
         CimulinkBlockEntity<?> cbe =
                 BlockEntityGetter.getLevelBlockEntityAt(world, cbePos, CimulinkBlockEntity.class)
                 .orElse(null);
         if(cbe == null)return null;
-        ConnectionStatus cs = cbe.readClientConnectionStatus();
-        if(cs == null)return null;
-        ComputeContext closestInput = closestInput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getFaceCenter());
-        ComputeContext closestOutput = closestOutput(cs, viewHitVec, cbe.getHorizontal(), cbe.getVertical(), cbe.getFaceCenter());
+        return cbe.renderer().computeContext(viewHitVec, true);
+    }
 
-        return compareAndMakeContext(closestInput, closestOutput);
-        * */
+    public static @Nullable ClientViewContext computeContextUntransformed(
+            @NotNull BlockPos cbePos,
+            @NotNull Vec3 viewHitVec,
+            @NotNull Level world
+    ){
         CimulinkBlockEntity<?> cbe =
                 BlockEntityGetter.getLevelBlockEntityAt(world, cbePos, CimulinkBlockEntity.class)
-                .orElse(null);
+                        .orElse(null);
         if(cbe == null)return null;
-        return cbe.renderer().computeContext(viewHitVec);
+        return cbe.renderer().computeContext(viewHitVec, false);
     }
 
 

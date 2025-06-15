@@ -24,6 +24,7 @@ public class ShifterLinkBlockEntity extends CimulinkBlockEntity<ShifterLinkPort>
                         p -> linkPort().setParallel(p),
                         SerializeUtils.LONG
                 ))
+                .runtimeOnly()
                 .withClient(ClientBuffer.LONG.get())
                 .register();
 
@@ -33,6 +34,7 @@ public class ShifterLinkBlockEntity extends CimulinkBlockEntity<ShifterLinkPort>
                         p -> linkPort().setDelay(p),
                         SerializeUtils.LONG
                 ))
+                .runtimeOnly()
                 .withClient(ClientBuffer.LONG.get())
                 .register();
 
@@ -42,6 +44,7 @@ public class ShifterLinkBlockEntity extends CimulinkBlockEntity<ShifterLinkPort>
                         a -> linkPort().setAsync(a),
                         SerializeUtils.BOOLEAN
                 ))
+                .runtimeOnly()
                 .withClient(ClientBuffer.BOOLEAN.get())
                 .register();
 

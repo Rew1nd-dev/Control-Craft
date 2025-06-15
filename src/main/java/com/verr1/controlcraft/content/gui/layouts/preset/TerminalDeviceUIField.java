@@ -5,7 +5,7 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
-import com.verr1.controlcraft.content.gui.layouts.element.TypedUIPort;
+import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
 import com.verr1.controlcraft.content.gui.widgets.DescriptiveScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.foundation.redstone.*;

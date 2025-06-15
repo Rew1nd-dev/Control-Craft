@@ -1,5 +1,7 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port.plant;
 
+import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Sink;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -7,11 +9,20 @@ import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.links.PortStatus;
 import com.verr1.controlcraft.foundation.data.links.ProxyPortStatus;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class PlantProxyLinkPort extends BlockLinkPort {
+
+    public static final SerializeUtils.Serializer<ProxyPortStatus> PROXY_PORT =
+            SerializeUtils.of(
+                    ProxyPortStatus::serialize,
+                    ProxyPortStatus::deserialize
+            );
 
     private final NamedComponent EMPTY = new Sink();
 
@@ -20,12 +31,18 @@ public class PlantProxyLinkPort extends BlockLinkPort {
     Set<Integer> enabledInput = new HashSet<>();
     Set<Integer> enabledOutput = new HashSet<>();
 
-    public PlantProxyLinkPort() {
+    private final ProxyLinkBlockEntity be;
+
+    public PlantProxyLinkPort(ProxyLinkBlockEntity be) {
         super(new Sink());
+        this.be = be;
     }
 
     public void setPlant(@Nullable NamedComponent plant){
         if(this.plant == plant)return;
+
+        ControlCraft.LOGGER.debug("Setting plant in PlantProxyLinkPort: {} at: {}", plant, be.getBlockPos());
+
         this.plant = plant == null ? EMPTY : plant;
         enabledInput.clear();
         enabledOutput.clear();
@@ -147,6 +164,21 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         );
     }
 
+    @Override
+    public CompoundTag serialize() {
+        return CompoundTagBuilder.create()
+                .withCompound("blp", super.serialize())
+                .withCompound("status", PROXY_PORT.serialize(viewAll()))
+                .build();
+    }
 
-
+    @Override
+    public void deserialize(CompoundTag tag) {
+        be.updateAttachedPlant(); // set plant
+        ControlCraft.LOGGER.debug("Deserializing PlantProxyLinkPort");
+        setAll(PROXY_PORT.deserialize(tag.getCompound("status"))); // set status
+        ControlCraft.LOGGER.debug("Deserializing status");
+        super.deserialize(tag.getCompound("blp")); // restore links
+        ControlCraft.LOGGER.debug("Deserializing links");
+    }
 }

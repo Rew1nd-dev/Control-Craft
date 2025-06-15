@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.data.links;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +20,10 @@ public record BlockPort(@NotNull WorldBlockPos pos, String portName) {
     @Override
     public String toString() {
         return "Name: " + portName + " at: " + pos.pos().toShortString();
+    }
+
+    public BlockPort offset(BlockPos offsetPos){
+        return new BlockPort(new WorldBlockPos(pos.dimensionID(), pos.pos().offset(offsetPos)), portName);
     }
 
     @Override

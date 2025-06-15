@@ -9,7 +9,11 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
+import com.verr1.controlcraft.foundation.redstone.DirectSlotControl;
+import com.verr1.controlcraft.foundation.redstone.DirectSlotGroup;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
+import com.verr1.controlcraft.foundation.type.descriptive.GroupPolicy;
+import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -40,6 +44,7 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
                         $ -> {},
                         SerializeUtils.DOUBLE
                 ))
+                .runtimeOnly()
                 .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 
@@ -62,6 +67,12 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
                 ),
                 new DirectReceiver.InitContext(SlotType.OUTPUT, Couple.create(0.0, 1.0))
         );
+
+
+        DirectSlotControl dsc = receiver().view().get(0).view().get(0);
+        dsc.direction = SlotDirection.ALL;
+
+
     }
 
 
@@ -77,7 +88,7 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
                 Math.abs(d - a) / (Math.abs(a - b) + 1e-8), 1
         );
 
-        int newSignal = (int)(ratio * 15);
+        int newSignal = (int)d; // (int)(ratio * 15);
         if(newSignal != lastOutputSignal){
             receivedSignalChanged = true;
             lastOutputSignal = newSignal;

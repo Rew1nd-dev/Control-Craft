@@ -2,32 +2,47 @@ package com.verr1.controlcraft.foundation.data.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
-import com.verr1.controlcraft.registry.ControlCraftPartialModels;
-import com.verr1.controlcraft.render.CachedBufferer;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.BezierCurve;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
+import org.joml.*;
+import org.valkyrienskies.core.api.ships.ClientShip;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.api.ships.properties.ShipTransform;
+import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CimulinkWireEntry implements RenderableOutline {
     private final Vector3dc start;
     private final Vector3dc end;
+
+    private final Vector3d start_wc = new Vector3d();
+    private final Vector3d end_wc = new Vector3d();
+
     private final Vector3dc startDirection;
     private final Vector3dc endDirection;
+
+    private final Vector3d startDirection_wc = new Vector3d();
+    private final Vector3d endDirection_wc = new Vector3d();
+
     private final int segments;
     private final float width;
-    private final List<Vector3d> points;
+    private final List<Vector3d> offsets = new ArrayList<>();
+
+    private boolean shouldAlwaysRecreate = false;
 
     // 新增变量
     private float lightStart = 0.3f; // 起点光照，默认全亮
@@ -53,13 +68,58 @@ public class CimulinkWireEntry implements RenderableOutline {
         this.endDirection = endDirection;
         this.segments = segments;
         this.width = width;
-        this.points = BezierCurve.calculateCubicBezier(
-                start,
-                start.add(startDirection, new Vector3d()),
-                end.add(endDirection, new Vector3d()),
-                end,
+        checkAlways();
+        recreate();
+    }
+
+
+    private void clearAll(){
+        offsets.clear();
+        tangents.clear();
+        normals.clear();
+        binormals.clear();
+        squareVertices.clear();
+    }
+
+    public void checkAlways() {
+        Ship s0 = ValkyrienSkies.getShipManagingBlock(Minecraft.getInstance().level, BlockPos.containing(toMinecraft(start)));
+        Ship s1 = ValkyrienSkies.getShipManagingBlock(Minecraft.getInstance().level, BlockPos.containing(toMinecraft(end)));
+        if(s0 == null || s1 == null){
+            shouldAlwaysRecreate = !(s0 == null && s1 == null);
+            return;
+        }
+        shouldAlwaysRecreate = s0.getId() != s1.getId();
+    }
+
+    public void calculateWorldCoordinate(){
+        if(!shouldAlwaysRecreate){
+            start_wc.set(start);
+            end_wc.set(end);
+            startDirection_wc.set(startDirection);
+            endDirection_wc.set(endDirection);
+            return;
+        }
+        Matrix4dc transform_start = transformAt(start);
+        start_wc.set(transform_start.transformPosition(start, new Vector3d()));
+        startDirection_wc.set(transform_start.transformDirection(startDirection, new Vector3d()));
+
+
+        Matrix4dc transform_end = transformAt(end);
+
+        end_wc.set(transform_end.transformPosition(end, new Vector3d()));
+        endDirection_wc.set(transform_end.transformDirection(endDirection, new Vector3d()));
+    }
+
+    private void recreate(){
+        clearAll();
+        calculateWorldCoordinate();
+        this.offsets.addAll(BezierCurve.calculateCubicBezier(
+                new Vector3d(),
+                startDirection_wc,
+                end_wc.sub(start_wc, new Vector3d()).add(endDirection_wc, new Vector3d()),
+                end_wc.sub(start_wc, new Vector3d()),
                 segments
-        );
+        ));
         createVertices();
     }
 
@@ -88,15 +148,15 @@ public class CimulinkWireEntry implements RenderableOutline {
     }
 
     private void createVertices() {
-        if (points.size() < 2) return;
-        for (int i = 0; i < points.size(); i++) {
+        if (offsets.size() < 2) return;
+        for (int i = 0; i < offsets.size(); i++) {
             Vector3d tangent;
             if (i == 0) {
-                tangent = points.get(1).sub(points.get(0), new Vector3d()).normalize();
-            } else if (i == points.size() - 1) {
-                tangent = points.get(i).sub(points.get(i - 1), new Vector3d()).normalize();
+                tangent = offsets.get(1).sub(offsets.get(0), new Vector3d()).normalize();
+            } else if (i == offsets.size() - 1) {
+                tangent = offsets.get(i).sub(offsets.get(i - 1), new Vector3d()).normalize();
             } else {
-                tangent = points.get(i + 1).sub(points.get(i - 1), new Vector3d()).normalize();
+                tangent = offsets.get(i + 1).sub(offsets.get(i - 1), new Vector3d()).normalize();
             }
             tangents.add(tangent);
         }
@@ -115,8 +175,8 @@ public class CimulinkWireEntry implements RenderableOutline {
             binormals.add(binormal);
         }
 
-        for (int i = 0; i < points.size(); i++) {
-            Vector3dc point = points.get(i);
+        for (int i = 0; i < offsets.size(); i++) {
+            Vector3dc point = offsets.get(i);
             Vector3dc normal = normals.get(i);
             Vector3dc binormal = binormals.get(i);
             float halfWidth = width / 2;
@@ -133,31 +193,23 @@ public class CimulinkWireEntry implements RenderableOutline {
         ms.pushPose();
         ms.translate(-camera.x, -camera.y, -camera.z);
 
-        Minecraft mc = Minecraft.getInstance();
-        Level level = mc.level;
+        if (shouldAlwaysRecreate)recreate();
+
         float[] lightLevels = new float[segments]; // 存储每个 segment 的光照
-        boolean useInterpolated = true;
-        if (level != null && !useInterpolated) {
-            // 获取实际世界光照
-            for (int i = 0; i < points.size() - 1; i++) {
-                Vector3dc p1 = points.get(i);
-                Vector3dc p2 = points.get(i + 1);
-                Vector3dc mid = p1.add(p2, new Vector3d()).mul(0.5);
-                BlockPos pos = new BlockPos((int) mid.x(), (int) mid.y(), (int) mid.z());
-                int light = MinecraftUtils.getPerceivedLightLevel(pos);
-                lightLevels[i] = light / 15.0f; // 转换为 0-1 范围
-            }
-        } else {
-            // 使用插值光照
-            for (int i = 0; i < segments; i++) {
-                float t = (float) i / (segments - 1);
-                lightLevels[i] = lightStart + (lightEnd - lightStart) * t;
-            }
+        for (int i = 0; i < segments; i++) {
+            float t = (float) i / (segments - 1);
+            lightLevels[i] = lightStart + (lightEnd - lightStart) * t;
         }
 
-        renderInto(
-                buffer.getBuffer(RenderType.debugFilledBox()),
-                ms.last().pose(),
+        // When start and end located at different ship, the position is already transformed
+        Matrix4dc transform = transformAt(start);
+        Matrix4dc renderTransform = new Matrix4d(ms.last().pose());
+        Matrix4dc coupled = new Matrix4d(renderTransform).mul(transform, new Matrix4d());
+
+        renderIntoTransformed(
+                buffer.getBuffer(RenderType.debugFilledBox()), // buffer.getBuffer(RenderTypes.getOutlineTranslucent(AllSpecialTextures.BLANK.getLocation(), true)), //
+                shouldAlwaysRecreate ? renderTransform : coupled,//transform.mul(ms.last().pose(), new Matrix4f()),//
+                coupled.transformPosition(start, new Vector3d()),
                 0xFF00FFFF, // 默认颜色：青色
                 0xFFFF00FF, // 闪烁颜色：紫色
                 lightLevels
@@ -169,6 +221,24 @@ public class CimulinkWireEntry implements RenderableOutline {
 
     }
 
+    public static Matrix4dc transformAt(Vector3dc v){
+        return  Optional.ofNullable(ValkyrienSkies.getShipManagingBlock(Minecraft.getInstance().level, BlockPos.containing(toMinecraft(v))))
+                .map(ship -> (ClientShip)ship)
+                .map(ClientShip::getRenderTransform)
+                .map(ShipTransform::getShipToWorld)
+                .orElse(new Matrix4d());
+    }
+
+    public static Matrix4fc convertToMatrix4fc(Matrix4dc matrix4dc) {
+        // 创建一个 float 数组来存储矩阵元素
+        float[] data = new float[16];
+        // 将 Matrix4dc 的元素复制到 float 数组中
+        matrix4dc.get(data, 0);
+        // 使用 float 数组创建一个 Matrix4f 对象
+        Matrix4f matrix4f = new Matrix4f().set(data);
+        // 返回 Matrix4f 对象，它实现了 Matrix4fc 接口
+        return matrix4f;
+    }
 
     public void renderInto(
             VertexConsumer consumer,
@@ -184,7 +254,7 @@ public class CimulinkWireEntry implements RenderableOutline {
         float fg = (flashColor >> 8 & 255) / 255f;
         float fb = (flashColor & 255) / 255f;
 
-        for (int i = 0; i < points.size() - 1; i++) {
+        for (int i = 0; i < offsets.size() - 1; i++) {
             Vector3dc[] curr = squareVertices.get(i);
             Vector3dc[] next = squareVertices.get(i + 1);
 
@@ -242,9 +312,167 @@ public class CimulinkWireEntry implements RenderableOutline {
         }
     }
 
+    public void renderIntoTransformed(
+            VertexConsumer consumer,
+            Matrix4dc matrix,
+            Vector3dc transformedStart,
+            int color,
+            int flashColor,
+            float[] lightLevels
+    ) {
+        float r = (color >> 16 & 255) / 255f;
+        float g = (color >> 8 & 255) / 255f;
+        float b = (color & 255) / 255f;
+        float fr = (flashColor >> 16 & 255) / 255f;
+        float fg = (flashColor >> 8 & 255) / 255f;
+        float fb = (flashColor & 255) / 255f;
+
+        for (int i = 0; i < offsets.size() - 1; i++) {
+            Vector3dc[] curr = squareVertices.get(i);
+            Vector3dc[] next = squareVertices.get(i + 1);
+
+            // 判断是否为闪烁 segment
+            boolean isFlashing = (flashFrame == i);
+            float lr = isFlashing ? fr : r;
+            float lg = isFlashing ? fg : g;
+            float lb = isFlashing ? fb : b;
+
+            // 应用光照
+            float light = lightLevels[i];
+            lr *= light;
+            lg *= light;
+            lb *= light;
+            // 上面
+            addVertex(consumer, matrix.transformDirection(curr[0], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 右上
+            addVertex(consumer, matrix.transformDirection(next[0], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个右上
+            addVertex(consumer, matrix.transformDirection(next[1], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个右下
+            addVertex(consumer, matrix.transformDirection(curr[0], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 右上
+            addVertex(consumer, matrix.transformDirection(next[1], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个右下
+            addVertex(consumer, matrix.transformDirection(curr[1], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 右下
+
+            // 下面
+            addVertex(consumer, matrix.transformDirection(curr[2], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 左下
+            addVertex(consumer, matrix.transformDirection(next[2], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个左下
+            addVertex(consumer, matrix.transformDirection(next[3], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个左上
+            addVertex(consumer, matrix.transformDirection(curr[2], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 左下
+            addVertex(consumer, matrix.transformDirection(next[3], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个左上
+            addVertex(consumer, matrix.transformDirection(curr[3], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 左上
+
+            // 左面
+            addVertex(consumer, matrix.transformDirection(curr[3], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 左上
+            addVertex(consumer, matrix.transformDirection(next[3], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个左上
+            addVertex(consumer, matrix.transformDirection(next[0], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个右上
+            addVertex(consumer, matrix.transformDirection(curr[3], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 左上
+            addVertex(consumer, matrix.transformDirection(next[0], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个右上
+            addVertex(consumer, matrix.transformDirection(curr[0], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 右上
+
+            // 右面
+            addVertex(consumer, matrix.transformDirection(curr[1], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 右下
+            addVertex(consumer, matrix.transformDirection(next[1], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个右下
+            addVertex(consumer, matrix.transformDirection(next[2], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个左下
+            addVertex(consumer, matrix.transformDirection(curr[1], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 右下
+            addVertex(consumer, matrix.transformDirection(next[2], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 下一个左下
+            addVertex(consumer, matrix.transformDirection(curr[2], new Vector3d()).add(transformedStart, new Vector3d()), lr, lg, lb); // 左下
+
+            /*
+             *
+
+
+
+             * */
+
+        }
+    }
+
+    public void renderIntoTransparent(
+            VertexConsumer consumer,
+            Matrix4f matrix,
+            int color,
+            int flashColor,
+            float[] lightLevels
+    ) {
+        float r = (color >> 16 & 255) / 255f;
+        float g = (color >> 8 & 255) / 255f;
+        float b = (color & 255) / 255f;
+        float fr = (flashColor >> 16 & 255) / 255f;
+        float fg = (flashColor >> 8 & 255) / 255f;
+        float fb = (flashColor & 255) / 255f;
+
+        for (int i = 0; i < offsets.size() - 1; i++) {
+            Vector3dc[] curr = squareVertices.get(i);
+            Vector3dc[] next = squareVertices.get(i + 1);
+
+            // 判断是否为闪烁 segment
+            boolean isFlashing = (flashFrame == i);
+            float lr = isFlashing ? fr : r;
+            float lg = isFlashing ? fg : g;
+            float lb = isFlashing ? fb : b;
+
+            // 应用光照
+            float light = lightLevels[i];
+            lr *= light;
+            lg *= light;
+            lb *= light;
+
+            // 将 float 光照值转换为整数 lightmap 值（0-255 范围，乘以 15 表示最大亮度）
+            int lightmap = (int) (light * 15);
+
+            // 上面（法线指向 +Y）
+            addVertex(consumer, matrix, curr[0], lr, lg, lb, 0, 1, 0, lightmap); // 右上
+            addVertex(consumer, matrix, next[0], lr, lg, lb, 0, 1, 0, lightmap); // 下一个右上
+            addVertex(consumer, matrix, next[1], lr, lg, lb, 0, 1, 0, lightmap); // 下一个右下
+            addVertex(consumer, matrix, curr[0], lr, lg, lb, 0, 1, 0, lightmap); // 右上
+            addVertex(consumer, matrix, next[1], lr, lg, lb, 0, 1, 0, lightmap); // 下一个右下
+            addVertex(consumer, matrix, curr[1], lr, lg, lb, 0, 1, 0, lightmap); // 右下
+
+            // 下面（法线指向 -Y）
+            addVertex(consumer, matrix, curr[2], lr, lg, lb, 0, -1, 0, lightmap); // 左下
+            addVertex(consumer, matrix, next[2], lr, lg, lb, 0, -1, 0, lightmap); // 下一个左下
+            addVertex(consumer, matrix, next[3], lr, lg, lb, 0, -1, 0, lightmap); // 下一个左上
+            addVertex(consumer, matrix, curr[2], lr, lg, lb, 0, -1, 0, lightmap); // 左下
+            addVertex(consumer, matrix, next[3], lr, lg, lb, 0, -1, 0, lightmap); // 下一个左上
+            addVertex(consumer, matrix, curr[3], lr, lg, lb, 0, -1, 0, lightmap); // 左上
+
+            // 左面（法线指向 -X）
+            addVertex(consumer, matrix, curr[3], lr, lg, lb, -1, 0, 0, lightmap); // 左上
+            addVertex(consumer, matrix, next[3], lr, lg, lb, -1, 0, 0, lightmap); // 下一个左上
+            addVertex(consumer, matrix, next[0], lr, lg, lb, -1, 0, 0, lightmap); // 下一个右上
+            addVertex(consumer, matrix, curr[3], lr, lg, lb, -1, 0, 0, lightmap); // 左上
+            addVertex(consumer, matrix, next[0], lr, lg, lb, -1, 0, 0, lightmap); // 下一个右上
+            addVertex(consumer, matrix, curr[0], lr, lg, lb, -1, 0, 0, lightmap); // 右上
+
+            // 右面（法线指向 +X）
+            addVertex(consumer, matrix, curr[1], lr, lg, lb, 1, 0, 0, lightmap); // 右下
+            addVertex(consumer, matrix, next[1], lr, lg, lb, 1, 0, 0, lightmap); // 下一个右下
+            addVertex(consumer, matrix, next[2], lr, lg, lb, 1, 0, 0, lightmap); // 下一个左下
+            addVertex(consumer, matrix, curr[1], lr, lg, lb, 1, 0, 0, lightmap); // 右下
+            addVertex(consumer, matrix, next[2], lr, lg, lb, 1, 0, 0, lightmap); // 下一个左下
+            addVertex(consumer, matrix, curr[2], lr, lg, lb, 1, 0, 0, lightmap); // 左下
+        }
+    }
+
     private static void addVertex(VertexConsumer consumer, Matrix4f matrix, Vector3dc pos, float r, float g, float b) {
         consumer.vertex(matrix, (float) pos.x(), (float) pos.y(), (float) pos.z())
                 .color(r, g, b, 1.0f)
+                .endVertex();
+
+    }
+
+    private static void addVertex(VertexConsumer consumer, Vector3dc pos, float r, float g, float b) {
+        consumer.vertex((float) pos.x(), (float) pos.y(), (float) pos.z())
+                .color(r, g, b, 1.0f)
+                .endVertex();
+
+    }
+
+    private static void addVertex(VertexConsumer consumer, Matrix4f matrix, Vector3dc pos,
+                                  float r, float g, float b, float nx, float ny, float nz, int lightmap) {
+        consumer.vertex(matrix, (float) pos.x(), (float) pos.y(), (float) pos.z())  // 顶点位置
+                .color(r, g, b, 1.0f)                                       // 颜色
+                .uv(0, 0)                                                   // 默认纹理坐标
+                .overlayCoords(OverlayTexture.NO_OVERLAY)                   // 默认 Overlay 坐标
+                .uv2(lightmap)                                              // Lightmap 坐标
+                .normal(nx, ny, nz)                                         // 法线
                 .endVertex();
     }
 }

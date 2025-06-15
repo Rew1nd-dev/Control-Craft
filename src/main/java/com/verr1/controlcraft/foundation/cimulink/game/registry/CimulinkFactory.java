@@ -2,6 +2,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.registry;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.AsyncShifter;
+import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Functions;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
@@ -107,6 +108,81 @@ public class CimulinkFactory {
             LinearAdder.class,
             defaultID("fma")
     );
+
+    public static final Factory<Functions.FunctionN> PRODUCT = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.PRODUCT.apply(Functions.deserializeN(t))
+            ),
+            Functions.FunctionN.class,
+            defaultID("product")
+    );
+
+public static final Factory<Functions.FunctionN> MAX = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.MAX.apply(Functions.deserializeN(t))
+            ),
+            Functions.FunctionN.class,
+            defaultID("max")
+    );
+
+    public static final Factory<Functions.FunctionN> MIN = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.MIN.apply(Functions.deserializeN(t))
+            ),
+            Functions.FunctionN.class,
+            defaultID("min")
+    );
+
+
+    public static final Factory<Functions.FunctionN> ANGLE_FIX = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.ANGLE_FIX.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("angle_fix")
+    );
+
+    public static final Factory<Functions.FunctionN> POWER = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.POWER.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("power")
+    );
+
+    public static final Factory<Functions.FunctionN> SIN = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.SIN.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("sin")
+    );
+
+    public static final Factory<Functions.FunctionN> COS = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.COS.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("cos")
+    );
+
+    public static final Factory<Functions.FunctionN> TAN = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.TAN.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("tan")
+    );
+
+
 
     public static final Factory<Gates.Gate> AND_N = register(
             SerializeUtils.of(

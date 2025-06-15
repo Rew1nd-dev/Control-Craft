@@ -39,7 +39,12 @@ public class InducerControls {
         Vector3dc omega = physShip.getOmega();
         Vector3dc abs_velocity = velocity.add(omega.cross(r_sc_resistance, new Vector3d()), new Vector3d());
 
-        Vector3dc fAirResistance = abs_velocity.mul(-anchor.airResist() * physShip.getMass(), new Vector3d());
+        Vector3dc v_dir = MathUtils.safeNormalize(abs_velocity);
+        double v_scale = abs_velocity.length();
+
+        double scale = anchor.squareDrag() ? v_scale * v_scale : v_scale;
+
+        Vector3dc fAirResistance = v_dir.mul(scale, new Vector3d()).mul(-anchor.airResist() * physShip.getMass());
         Vector3dc fExtraGravity = new Vector3d(0, -physShip.getMass(), 0).mul(anchor.extraGravity());
 
 
@@ -70,6 +75,9 @@ public class InducerControls {
 
         double angle = VSMathUtils.get_yc2xc(motorShip, compShip, motor.motorDir(), motor.compDir());
         double speed = VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getOmega(), compShip.getOmega(), motor.motorDir(), motor.compDir());
+
+        motor.speedCallBack().accept(speed);
+        motor.angleCallBack().accept(angle);
 
         double metric = motor.angleOrSpeed() ? angle : speed;
 

@@ -3,11 +3,12 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.digital;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.Gates;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
+import com.verr1.controlcraft.foundation.cimulink.game.port.InspectableLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.SwitchableLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 
-public class GateLinkPort extends SwitchableLinkPort<GateTypes> implements ICompilable<Gates.Gate> {
+public class GateLinkPort extends InspectableLinkPort<GateTypes> implements ICompilable<Gates.Gate> {
     public GateLinkPort() {
         super(GateTypes.AND);
     }

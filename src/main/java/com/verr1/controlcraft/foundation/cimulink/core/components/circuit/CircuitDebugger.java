@@ -124,8 +124,20 @@ public class CircuitDebugger {
         }
     }
 
+    public static List<String> PrintConnectionsAsString(Collection<ConnectionId> connectionIds){
+        List<String> connections = new ArrayList<>();
+        for (var c: connectionIds){
+            connections.add("out: " + c.cpo() + " in: " + c.cpi() + " wid: " + c.wireId);
+        }
+        return connections;
+    }
+
     public void printConnections(){
         PrintConnections(observeConnections());
+    }
+
+    public List<String> printConnectionsAsString(){
+        return PrintConnectionsAsString(observeConnections());
     }
 
     public void printPropagation(){

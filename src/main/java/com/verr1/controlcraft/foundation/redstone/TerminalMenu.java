@@ -45,6 +45,12 @@ public class TerminalMenu extends GhostItemMenu<WrappedChannel> {
         );
     }
 
+    public void setPage(int page, int maxLine){
+        slots.stream().filter(PageItemSlot.class::isInstance).map(PageItemSlot.class::cast).forEach(
+                s -> s.setActive(s.page == page && s.line < maxLine)
+        );
+    }
+
     @Override
     protected void addSlots() {
         addPlayerSlots(40 + 8, 131 + 24);
@@ -61,6 +67,7 @@ public class TerminalMenu extends GhostItemMenu<WrappedChannel> {
                     if(slot >= ghostInventory.getSlots())break;
                     addSlot(new PageItemSlot(ghostInventory, slot++, x + column * 18, y + row * 18)
                             .withPage(p)
+                            .withLine(row)
                             .active(p == 0)
                     );
                 }

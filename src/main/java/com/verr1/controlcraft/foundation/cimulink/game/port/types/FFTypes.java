@@ -6,12 +6,14 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.general.Tempor
 import com.verr1.controlcraft.foundation.cimulink.game.ComponentInstances;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 
-public enum FFTypes implements Inspectable<NamedComponent>, Descriptive<FFTypes> {
+public enum FFTypes implements Inspectable<NamedComponent>, Descriptive<FFTypes>, StringRepresentable {
     T_FF(ComponentInstances.T_FF, literals("1->1 T Flip-Flop")),
     D_FF(ComponentInstances.D_FF, literals("1->1 D Flip-Flop")),
     JK_FF(ComponentInstances.JK_FF, literals("2->2 JK Flip-Flop")),
@@ -50,5 +52,10 @@ public enum FFTypes implements Inspectable<NamedComponent>, Descriptive<FFTypes>
 
     public static void register(){
 
+    }
+
+    @Override
+    public @NotNull String getSerializedName() {
+        return name().toLowerCase();
     }
 }

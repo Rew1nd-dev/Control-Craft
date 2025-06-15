@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +71,16 @@ public class BlockEntityGetter {
         }
     }
 
+    public boolean isLoaded(WorldBlockPos wbp){
+        return of(wbp)
+                .map(s -> s.isLoaded(wbp.pos()))
+                .orElse(false);
+    }
+
+    public Optional<ServerLevel> of(WorldBlockPos wbp){
+        return Optional
+                .ofNullable(server.getLevel(wbp.globalPos().dimension()));
+    }
 
     public static <T> Optional<T> getLevelBlockEntityAt(@Nullable Level world, @NotNull BlockPos pos, Class<T> clazz){
         return Optional.ofNullable(world)

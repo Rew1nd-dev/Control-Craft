@@ -6,6 +6,7 @@ import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
 import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.data.SynchronizedField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.api.operatable.IBruteConnectable;
@@ -53,6 +54,9 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
     public ConnectContext context = ConnectContext.EMPTY;
     protected Vector3d selfOffset = new Vector3d();
     protected Vector3d compOffset = new Vector3d();
+
+    private final SynchronizedField<Double> cachedAngle = new SynchronizedField<>(0.0);
+    private final SynchronizedField<Double> cachedVelocity = new SynchronizedField<>(0.0);
 
     public AbstractMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -116,6 +120,14 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         Vector3dc w_cmp = cmp.omega();
         return VSMathUtils.get_dyc2xc(m_own, w_own, w_cmp,  getServoDirection(), getCompanionShipAlign());
     }
+
+    public double getCachedServoAngle(){return cachedAngle.read();}
+
+    public double getCachedServoAngularVelocity(){return cachedVelocity.read();}
+
+    public void setCachedServoAngle(double value){cachedAngle.write(value);}
+
+    public void setCachedServoAngularVelocity(double value){cachedVelocity.write(value);}
 
     public Vector3d getCompOffset() {
         return compOffset;

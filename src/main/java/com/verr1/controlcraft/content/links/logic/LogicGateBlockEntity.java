@@ -1,11 +1,14 @@
 package com.verr1.controlcraft.content.links.logic;
 
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.GateLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -26,13 +29,18 @@ public class LogicGateBlockEntity extends CimulinkBlockEntity<GateLinkPort> {
         buildRegistry(GATE_TYPE)
             .withBasic(SerializePort.of(
                 () -> linkPort().getCurrentType(),
-                t ->  linkPort().setCurrentType(t),
+                    this::setCurrentType,
                 SerializeUtils.ofEnum(GateTypes.class)
             ))
             .withClient(ClientBuffer.of(GateTypes.class))
             .runtimeOnly()
             .register();
 
+    }
+
+    public void setCurrentType(GateTypes t){
+        linkPort().setCurrentType(t);
+        MinecraftUtils.updateBlockState(level, getBlockPos(), getBlockState().setValue(LogicGateBlock.TYPE, t));
     }
 
     @Override

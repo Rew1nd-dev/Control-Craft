@@ -8,6 +8,9 @@ import com.verr1.controlcraft.content.create.DSliderKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.DynamicSliderForceInducer;
 import com.verr1.controlcraft.foundation.api.delegate.IControllerProvider;
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SliderPlant;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -57,12 +60,14 @@ import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
 // @SuppressWarnings("unused")
 public class DynamicSliderBlockEntity extends AbstractSlider implements
         IControllerProvider, IHaveGoggleInformation,
-        IReceiver, IPacketHandler, IKineticDevice
+        IReceiver, IPacketHandler, IKineticDevice,
+        IPlant
 {
 
 
     public SynchronizedField<Double> controlForce = new SynchronizedField<>(0.0);
 
+    private final SliderPlant plant;
 
     private boolean isLocked = false;
 
@@ -178,7 +183,13 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         setChanged();
     }
 
-
+    public void tryLock(boolean toLock){
+        if(toLock){
+            lock();
+        }else{
+            unlock();
+        }
+    }
 
     public void lock(){
         if(level == null || level.isClientSide)return;
@@ -260,7 +271,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
 
     public DynamicSliderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-
+        plant = new SliderPlant(this);
         buildRegistry(CHEAT_MODE)
                 .withBasic(SerializePort.of(this::getCheatMode, this::setCheatMode, SerializeUtils.ofEnum(CheatMode.class)))
                 .withClient(ClientBuffer.of(CheatMode.class))
@@ -478,5 +489,10 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
     @Override
     public IKineticPeripheral peripheral() {
         return kineticPeripheral;
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }
