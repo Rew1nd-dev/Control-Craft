@@ -600,6 +600,7 @@ public abstract class BlockLinkPort {
     }
 
     public void modifyWithOffset(BlockPos offset){
+        ControlCraft.LOGGER.info("modifying with offset: " + offset.toShortString());
         Map<String, BlockPort> backwardLinksNew = new HashMap<>();
         Map<String, Set<BlockPort>> forwardLinksNew = new HashMap<>();
         backwardLinks.forEach((k, v) -> backwardLinksNew.put(k, v.offset(offset)));

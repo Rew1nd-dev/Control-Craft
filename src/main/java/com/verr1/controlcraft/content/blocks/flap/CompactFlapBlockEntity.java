@@ -284,7 +284,6 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     private void syncAttachInducer(){
-        if(level == null || level.isClientSide)return;
         Optional
                 .ofNullable(getLoadedServerShip())
                 .map(FlapForceInducer::getOrCreate)
@@ -326,11 +325,13 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     private void tickAnimationData(){
-
-
-        if(level == null || !level.isClientSide)return;
-        clientAnimatedAngle.chase(angle.read(), 0.1, LerpedFloat.Chaser.EXP);
+        clientAnimatedAngle.chase(angle.read() + offset, 0.1, LerpedFloat.Chaser.EXP);
         clientAnimatedAngle.tickChaser();
+    }
+
+    private static double angleFix(Direction direction, double realAngle){
+        return direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ?
+                realAngle  : -realAngle;
     }
 
     protected ControlledContraptionEntity physicalWing;
@@ -389,10 +390,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     protected void applyRotation() {
         if(level == null)return;
-        float wingAngle = level.isClientSide ? clientAnimatedAngle.getValue() : (float) visualAngle;
+        float wingAngle = level.isClientSide ? clientAnimatedAngle.getValue() : angle.read().floatValue();
         if (physicalWing == null)
             return;
-        physicalWing.setAngle(wingAngle);
+        physicalWing.setAngle((float) angleFix(getDirection(), wingAngle));
         BlockState blockState = getBlockState();
         if (blockState.hasProperty(BlockStateProperties.FACING))
             physicalWing.setRotationAxis(

@@ -38,6 +38,7 @@ public class CimulinkBlocks {
                     LogicGateBlock.GateDataGenerator.generate()
             )
             .item()
+            .lang("Logic Gates")
             .transform(customItemModel())
             .register();
 
@@ -50,6 +51,7 @@ public class CimulinkBlocks {
                     FFBlock.FFDataGenerator.generate()
             )
             .item()
+            .lang("Flip Flops")
             .transform(customItemModel())
             .register();
 
@@ -62,6 +64,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Input Port")
             .transform(customItemModel())
             .register();
 
@@ -74,6 +77,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Output Port")
             .transform(customItemModel())
             .register();
 
@@ -86,6 +90,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Shift Register")
             .transform(customItemModel())
             .register();
 
@@ -98,6 +103,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Linear Adder")
             .transform(customItemModel())
             .register();
 
@@ -110,6 +116,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("2-1 Multiplexer")
             .transform(customItemModel())
             .register();
 
@@ -122,6 +129,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Comparator")
             .transform(customItemModel())
             .register();
 
@@ -134,6 +142,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Plant Proxy")
             .transform(customItemModel())
             .register();
 
@@ -146,6 +155,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Compiled Circuit")
             .transform(customItemModel())
             .register();
 
@@ -158,6 +168,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Const Source")
             .transform(customItemModel())
             .register();
 
@@ -170,6 +181,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Functions")
             .transform(customItemModel())
             .register();
 
@@ -182,6 +194,7 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
+            .lang("Physics Pose Sensor")
             .transform(customItemModel())
             .register();
 
