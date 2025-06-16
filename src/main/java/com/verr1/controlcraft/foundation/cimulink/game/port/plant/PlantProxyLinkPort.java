@@ -7,21 +7,22 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Sink;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
-import com.verr1.controlcraft.foundation.data.links.PortStatus;
-import com.verr1.controlcraft.foundation.data.links.ProxyPortStatus;
+import com.verr1.controlcraft.foundation.data.links.StringBoolean;
+import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class PlantProxyLinkPort extends BlockLinkPort {
 
-    public static final SerializeUtils.Serializer<ProxyPortStatus> PROXY_PORT =
+    public static final SerializeUtils.Serializer<StringBooleans> PROXY_PORT =
             SerializeUtils.of(
-                    ProxyPortStatus::serialize,
-                    ProxyPortStatus::deserialize
+                    StringBooleans::serialize,
+                    StringBooleans::deserialize
             );
 
     private final NamedComponent EMPTY = new Sink();
@@ -33,14 +34,15 @@ public class PlantProxyLinkPort extends BlockLinkPort {
 
     private final ProxyLinkBlockEntity be;
 
-    public PlantProxyLinkPort(ProxyLinkBlockEntity be) {
+    public PlantProxyLinkPort(@NotNull ProxyLinkBlockEntity be) {
         super(new Sink());
         this.be = be;
     }
 
+
+
     public void setPlant(@Nullable NamedComponent plant){
         if(this.plant == plant)return;
-
         ControlCraft.LOGGER.debug("Setting plant in PlantProxyLinkPort: {} at: {}", plant, be.getBlockPos());
 
         this.plant = plant == null ? EMPTY : plant;
@@ -73,12 +75,12 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         setEnabledOutput(plant.out(name), enable);
     }
 
-    public ProxyPortStatus viewInput(){
-        List<PortStatus> ps = plant.inputs()
+    public StringBooleans viewInput(){
+        List<StringBoolean> ps = plant.inputs()
                 .stream()
-                .map(inName -> new PortStatus(inName, enabledInput.contains(plant.in(inName))))
+                .map(inName -> new StringBoolean(inName, enabledInput.contains(plant.in(inName))))
                 .toList();
-        return new ProxyPortStatus(ps);
+        return new StringBooleans(ps);
     }
 
     private void safeAddInput(String name){
@@ -91,12 +93,12 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         enabledOutput.add(plant.out(name));
     }
 
-    public void setInput(ProxyPortStatus status){
+    public void setInput(StringBooleans status){
         Set<Integer> copy = Set.copyOf(enabledInput);
         enabledInput.clear();
         status.statuses().stream()
-                .filter(PortStatus::enabled)
-                .map(PortStatus::name)
+                .filter(StringBoolean::enabled)
+                .map(StringBoolean::name)
                 .forEach(this::safeAddInput);
 
         if(copy.size() == enabledInput.size() && enabledInput.containsAll(copy)){
@@ -106,12 +108,12 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         recreate();
     }
 
-    public void setOutput(ProxyPortStatus status){
+    public void setOutput(StringBooleans status){
         Set<Integer> copy = Set.copyOf(enabledOutput);
         enabledOutput.clear();
         status.statuses().stream()
-                .filter(PortStatus::enabled)
-                .map(PortStatus::name)
+                .filter(StringBoolean::enabled)
+                .map(StringBoolean::name)
                 .forEach(this::safeAddOutput);
 
         if(copy.size() == enabledOutput.size() && enabledOutput.containsAll(copy)){
@@ -122,26 +124,26 @@ public class PlantProxyLinkPort extends BlockLinkPort {
     }
 
 
-    public ProxyPortStatus viewOutput(){
-        List<PortStatus> ps = plant.outputs()
+    public StringBooleans viewOutput(){
+        List<StringBoolean> ps = plant.outputs()
                 .stream()
-                .map(outName -> new PortStatus(outName, enabledOutput.contains(plant.out(outName))))
+                .map(outName -> new StringBoolean(outName, enabledOutput.contains(plant.out(outName))))
                 .toList();
-        return new ProxyPortStatus(ps);
+        return new StringBooleans(ps);
     }
 
-    public ProxyPortStatus viewAll(){
-        return new ProxyPortStatus(ArrayUtils.flatten(viewInput().statuses(), viewOutput().statuses()));
+    public StringBooleans viewAll(){
+        return new StringBooleans(ArrayUtils.flatten(viewInput().statuses(), viewOutput().statuses()));
     }
 
-    public void setAll(ProxyPortStatus status){
+    public void setAll(StringBooleans status){
         Set<Integer> outCopy = Set.copyOf(enabledOutput);
         Set<Integer> inCopy = Set.copyOf(enabledInput);
         enabledInput.clear();
         enabledOutput.clear();
         status.statuses().stream()
-                .filter(PortStatus::enabled)
-                .map(PortStatus::name)
+                .filter(StringBoolean::enabled)
+                .map(StringBoolean::name)
                 .forEach(n -> {safeAddOutput(n);safeAddInput(n);});
         // only one will add, because inputNames and outputNames should be different by definition,
         // see NamedComponent::new
@@ -174,7 +176,7 @@ public class PlantProxyLinkPort extends BlockLinkPort {
 
     @Override
     public void deserialize(CompoundTag tag) {
-        be.updateAttachedPlant(); // set plant
+        // be.updateAttachedPlant(); // set plant
         ControlCraft.LOGGER.debug("Deserializing PlantProxyLinkPort");
         setAll(PROXY_PORT.deserialize(tag.getCompound("status"))); // set status
         ControlCraft.LOGGER.debug("Deserializing status");

@@ -124,7 +124,6 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
             data.min = ParseUtils.tryParseDouble(minField.getValue());
             data.max = ParseUtils.tryParseDouble(maxField.getValue());
             data.enabled = toggleField.selected();
-
         }
 
 

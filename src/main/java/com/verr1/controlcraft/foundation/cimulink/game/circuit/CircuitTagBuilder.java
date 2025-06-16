@@ -43,7 +43,7 @@ public class CircuitTagBuilder {
         ArrayUtils.AssertDifferent(normals.keySet(), outputs.keySet());
     }
 
-    public static @NotNull CircuitNbt compile(ServerLevel level, BlockPos ul, BlockPos lr){
+    public static @NotNull CircuitNbt compile(ServerLevel level, BlockPos ul, BlockPos lr) throws IllegalArgumentException{
         int x1 = Math.min(ul.getX(), lr.getX());
         int y1 = Math.min(ul.getY(), lr.getY());
         int z1 = Math.min(ul.getZ(), lr.getZ());
@@ -64,7 +64,7 @@ public class CircuitTagBuilder {
         return CircuitTagBuilder.of(blps).buildNbt();
     }
 
-    public CircuitNbt buildNbt(){
+    public CircuitNbt buildNbt() throws IllegalArgumentException{
         connectionNbts = new ArrayList<>();
         inOuts = new ArrayList<>();
         componentSummaries = new ArrayList<>();

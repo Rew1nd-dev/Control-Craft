@@ -10,11 +10,15 @@ import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.misc.CircuitWirelessMenu;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
+import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.redstone.TerminalMenu;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.SerializeUtils;
+import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -42,11 +46,23 @@ import static java.lang.Math.min;
 
 public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> implements MenuProvider {
 
+    public static SerializeUtils.Serializer<List<CircuitPortStatus>> CPS_SER =
+            SerializeUtils.ofList(
+                    SerializeUtils.of(
+                            CircuitPortStatus::serialize,
+                            CircuitPortStatus::deserialize
+                    )
+            );
+
+    public static SerializeUtils.Serializer<Pair<List<CircuitPortStatus>, List<CircuitPortStatus>>> PAIR_SER =
+            SerializeUtils.ofPair(CPS_SER);
+
     public static final NetworkKey CIRCUIT = NetworkKey.create("circuit");
     public static final NetworkKey CHANNEL = NetworkKey.create("channel");
     public static final NetworkKey WRAPPER = NetworkKey.create("wrapper");
 
     private static final int MAX_CHANNEL_SIZE = 24;
+
 
     private final List<WirelessIO> io = new ArrayList<>(ArrayUtils.ListOf(MAX_CHANNEL_SIZE, WirelessIO::new));
 
@@ -57,15 +73,16 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     public CircuitBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         wrapper = new WrappedChannel(pos);
-/*
-*       buildRegistry(CIRCUIT)
-                .withBasic(SerializePort.of(
-                        () -> linkPort().serialize(),
-                        t -> linkPort().deserialize(t)
-                ))
-                .register();
-* */
 
+        buildRegistry(CIRCUIT).withBasic(
+                CompoundTagPort.of(
+                        () -> PAIR_SER.serialize(linkPort().viewStatus()),
+                        t -> linkPort().setStatus(PAIR_SER.deserialize(t))
+                )
+            )
+                .withClient(ClientBuffer.UNIT.get())
+                .runtimeOnly()
+                .register();
 
         buildRegistry(WRAPPER).withBasic(CompoundTagPort.of(wrapper::saveToTag, wrapper::loadFromTag)).register();
         buildRegistry(CHANNEL).withBasic(CompoundTagPort.of(this::serializeIo, this::deserializeIo)).register();

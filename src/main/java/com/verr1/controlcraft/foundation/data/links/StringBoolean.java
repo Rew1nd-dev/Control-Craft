@@ -4,7 +4,7 @@ import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
 
-public record PortStatus(String name, boolean enabled) {
+public record StringBoolean(String name, boolean enabled) {
 
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()
@@ -13,8 +13,8 @@ public record PortStatus(String name, boolean enabled) {
                 .build();
     }
 
-    public static PortStatus deserialize(CompoundTag tag){
-        return new PortStatus(
+    public static StringBoolean deserialize(CompoundTag tag){
+        return new StringBoolean(
                 SerializeUtils.STRING.deserialize(tag.getCompound("name")),
                 SerializeUtils.BOOLEAN.deserialize(tag.getCompound("enabled"))
         );

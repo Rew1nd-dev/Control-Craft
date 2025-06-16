@@ -36,6 +36,27 @@ public class PlantProxy extends NamedComponent {
         }
     }
 
+    public static PlantProxy of(
+            NamedComponent plant,
+            List<String> enabledInput,
+            List<String> enabledOutput
+    ) {
+        /*
+        The constructor below will actually do the following:
+        enabledInput.forEach(i -> ArrayUtils.AssertRange(i, plant.n()));
+        enabledInput.forEach(i -> ArrayUtils.AssertRange(i, plant.n()));
+        * */
+        return new PlantProxy(
+                plant,
+                enabledInput.stream().map(plant::in).toList(),
+                enabledOutput.stream().map(plant::out).toList()
+        );
+    }
+
+    public NamedComponent plant(){
+        return plant;
+    }
+
     @Override
     public List<Integer> propagateTo(int proxyIn) {
         return plant.propagateTo(mapIn(proxyIn)).stream().map(this::mapOut).toList();

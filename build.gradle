@@ -232,7 +232,7 @@ dependencies {
 
     // minecraftLibrary("org.jgrapht:jgrapht-core:1.5.2")
 
-    implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:0.9")){
+    implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:1.2")){
         jarJar.ranged(it, "[0.0,)")
     }
 

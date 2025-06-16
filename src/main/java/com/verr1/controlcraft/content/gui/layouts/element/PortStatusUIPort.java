@@ -1,33 +1,27 @@
 package com.verr1.controlcraft.content.gui.layouts.element;
 
 import com.simibubi.create.foundation.gui.widget.Label;
-import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
-import com.verr1.controlcraft.foundation.data.NetworkKey;
-import com.verr1.controlcraft.foundation.data.links.NamedCoeff;
-import com.verr1.controlcraft.foundation.data.links.PortStatus;
-import com.verr1.controlcraft.foundation.data.links.ProxyPortStatus;
+import com.verr1.controlcraft.foundation.data.links.StringBoolean;
+import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
-import com.verr1.controlcraft.utils.ParseUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory.title;
 import static com.verr1.controlcraft.content.gui.factory.Converter.alignLabel;
 
-public class PortStatusUIPort extends ListUIPort<PortStatus, ProxyPortStatus>{
+public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
     private final int max_size = 6;
     private int currentSize = 0;
     private final List<NameEnableWidget> widgets =
@@ -41,21 +35,21 @@ public class PortStatusUIPort extends ListUIPort<PortStatus, ProxyPortStatus>{
         super(
                 boundPos,
                 ProxyLinkBlockEntity.ALL_STATUS,
-                ProxyPortStatus.class,
-                ProxyPortStatus.EMPTY,
-                ProxyPortStatus::statuses,
-                ProxyPortStatus::new
+                StringBooleans.class,
+                StringBooleans.EMPTY,
+                StringBooleans::statuses,
+                StringBooleans::new
         );
         label = title(UIContents.STATUS).toDescriptiveLabel();
     }
 
     @Override
-    protected List<PortStatus> readList() {
+    protected List<StringBoolean> readList() {
         return IntStream.range(0, currentSize).mapToObj(widgets::get).map(NameEnableWidget::read).toList();
     }
 
     @Override
-    protected void writeList(List<PortStatus> value) {
+    protected void writeList(List<StringBoolean> value) {
         currentSize = value.size();
         int size = Math.min(max_size, value.size());
         IntStream.range(0, size).forEach(i -> widgets.get(i).write(value.get(i)));
@@ -102,13 +96,13 @@ public class PortStatusUIPort extends ListUIPort<PortStatus, ProxyPortStatus>{
         }
 
 
-        public PortStatus read(){
+        public StringBoolean read(){
             String name = label.text.getString();
             boolean value = field.selected();
-            return new PortStatus(name, value);
+            return new StringBoolean(name, value);
         }
 
-        public void write(PortStatus ps){
+        public void write(StringBoolean ps){
             label.setText(Component.literal(ps.name()));
             field.setSelected(ps.enabled());
         }

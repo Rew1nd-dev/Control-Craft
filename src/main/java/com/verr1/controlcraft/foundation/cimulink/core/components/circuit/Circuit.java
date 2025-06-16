@@ -28,7 +28,7 @@ public class Circuit extends NamedComponent {
 
     CircuitNbt circuitNbt;
 
-    // Contract: The First And Second Component Should Be Circuit Input And Output Component,
+
     // But Initializing Helper Needs "this", So Put A PlaceHolder At Builder
     Circuit(
             List<String> inputNames, List<String> outputNames,
@@ -64,6 +64,15 @@ public class Circuit extends NamedComponent {
     public Circuit withBuildContext(CircuitNbt nbt){
         this.circuitNbt = nbt;
         return this;
+    }
+
+    // this excludes helper input ports for SignalGenerator
+    public List<String> inputNamesValid(){
+        return inputs().stream().filter(s -> !s.contains("@")).toList();
+    }
+
+    public List<Integer> inputsValid(){
+        return inputNamesValid().stream().map(n -> namedInputs().get(n)).toList();
     }
 
     private void computePropagateMap(){

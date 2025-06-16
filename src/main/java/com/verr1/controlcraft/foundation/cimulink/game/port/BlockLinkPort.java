@@ -155,7 +155,11 @@ public abstract class BlockLinkPort {
     }
 
     public void setName(String name){
-        realTimeComponent.withName(name);
+        try{
+            realTimeComponent.withName(name);
+        }catch (IllegalArgumentException ignored){
+
+        }
     }
 
     public static void propagateOutput(PropagateContext watcher, BlockLinkPort blp){
@@ -566,6 +570,7 @@ public abstract class BlockLinkPort {
 
     public final void recreate(){
         realTimeComponent = create();
+        ControlCraft.LOGGER.info("calling recreate() at: {}", pos());
         inputsNames().forEach(this::disconnectInput);
         outputsNames().forEach(this::disconnectOutput);
     }
@@ -628,7 +633,11 @@ public abstract class BlockLinkPort {
         backwardLinks.clear();
         forwardLinks.putAll(deserializeForward(tag.getCompound("forward")));
         backwardLinks.putAll(deserializeBackward(tag.getCompound("backward")));
-        setName(SerializeUtils.STRING.deserializeOrElse(tag.getCompound("name"), realTimeComponent.getClass().getSimpleName()));
+        setName(SerializeUtils.STRING.deserializeOrElse(
+                tag.getCompound("name"),
+                Optional.of(realTimeComponent.getClass().getSimpleName()).filter(s -> !s.isEmpty())
+                        .orElse(realTimeComponent.getClass().getSuperclass().getSimpleName())
+        ));
     }
 
     public static class PropagateContext{

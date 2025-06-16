@@ -16,6 +16,14 @@ public enum TabType implements Descriptive<TabType> {
             literal("Generic")
     ),
 
+    ADVANCE(
+            literals(
+                    "Advanced Settings",
+                    "For Detail Monitoring"
+                ),
+            literal("Advanced")
+    ),
+
     REDSTONE(
             literals("Expose Property To Redstone Input"),
             literal("Redstone")

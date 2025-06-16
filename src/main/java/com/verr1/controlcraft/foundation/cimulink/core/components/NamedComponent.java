@@ -119,6 +119,7 @@ public abstract class NamedComponent extends Component {
     }
 
 
+
     public double retrieveOutput(String name) {
         ArrayUtils.AssertPresence(outputs, name);
         return super.retrieveOutput(namedOutputs.get(name));
@@ -135,8 +136,8 @@ public abstract class NamedComponent extends Component {
     }
 
     public double peekInput(String name) {
-        ArrayUtils.AssertPresence(outputs, name);
-        return super.peekInput(namedOutputs.get(name));
+        ArrayUtils.AssertPresence(inputs, name);
+        return super.peekInput(namedInputs.get(name));
     }
 
     public List<String> propagateTo(String name) {

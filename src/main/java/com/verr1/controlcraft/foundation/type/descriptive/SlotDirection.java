@@ -11,6 +11,8 @@ import java.util.List;
 import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 
 public enum SlotDirection implements Descriptive<SlotDirection> {
+
+
     UP,
     DOWN,
     NORTH,

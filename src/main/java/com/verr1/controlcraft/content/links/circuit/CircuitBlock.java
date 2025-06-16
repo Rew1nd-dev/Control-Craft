@@ -26,7 +26,7 @@ public class CircuitBlock extends CimulinkBlock<CircuitBlockEntity> {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p) {
-        ScreenOpener.open(CimulinkUIFactory.createNameOnlyScreen(p));
+        ScreenOpener.open(CimulinkUIFactory.createCircuitScreen(p));
     }
 
     @Override

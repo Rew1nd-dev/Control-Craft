@@ -61,11 +61,13 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
                 6
         );
 
-        //receiver -> group 0 -> slot 0
         DirectSlotGroup dsg = receiver().view().get(0);
-        DirectSlotControl dsc = dsg.view().get(0);
-        dsc.direction = SlotDirection.ALL;
-        dsc.min_max = Couple.create(0.0, 15.0);
+        //receiver -> group 0 -> slot 0
+        for(int i = 0; i < 6; i++){
+            DirectSlotControl dsc = dsg.view().get(i);
+            dsc.direction = SlotDirection.values()[i];
+            dsc.min_max = Couple.create(0.0, 15.0);
+        }
         dsg.setPolicy(GroupPolicy.SUM);
 
     }

@@ -195,6 +195,25 @@ public class SerializeUtils {
         };
     }
 
+    public static <T> Serializer<Pair<T, T>> ofPair(Serializer<T> serializer) {
+        return new Serializer<>() {
+            @Override
+            public CompoundTag serialize(@NotNull Pair<T, T> pair) {
+                CompoundTag tag = new CompoundTag();
+                tag.put("first", serializer.serialize(pair.getFirst()));
+                tag.put("second", serializer.serialize(pair.getSecond()));
+                return tag;
+            }
+
+            @Override
+            public @NotNull Pair<T, T> deserialize(CompoundTag tag) {
+                T first = serializer.deserialize(tag.getCompound("first"));
+                T second = serializer.deserialize(tag.getCompound("second"));
+                return new Pair<>(first, second);
+            }
+        };
+    }
+
     /**
      * Creates a Serializer for List<V> using the provided element Serializer.
      *

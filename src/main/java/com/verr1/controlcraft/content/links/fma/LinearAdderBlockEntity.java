@@ -4,7 +4,7 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.FMALinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.Coefficients;
-import com.verr1.controlcraft.foundation.data.links.NamedCoeff;
+import com.verr1.controlcraft.foundation.data.links.StringDouble;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -17,13 +17,13 @@ import java.util.List;
 
 public class LinearAdderBlockEntity extends CimulinkBlockEntity<FMALinkPort> {
 
-    public static final SerializeUtils.Serializer<NamedCoeff> NAMED_COEFF_SERIALIZER =
+    public static final SerializeUtils.Serializer<StringDouble> NAMED_COEFF_SERIALIZER =
             SerializeUtils.of(
-                    NamedCoeff::serialize,
-                    NamedCoeff::deserialize
+                    StringDouble::serialize,
+                    StringDouble::deserialize
             );
 
-    public static final SerializeUtils.Serializer<List<NamedCoeff>> COEFF_LIST_SERIALIZER =
+    public static final SerializeUtils.Serializer<List<StringDouble>> COEFF_LIST_SERIALIZER =
             SerializeUtils.ofList(NAMED_COEFF_SERIALIZER);
 
     public static final SerializeUtils.Serializer<Coefficients> COEFF_SERIALIZER =
@@ -67,11 +67,11 @@ public class LinearAdderBlockEntity extends CimulinkBlockEntity<FMALinkPort> {
     }
 
     public void setCoefficients(Coefficients coeffs){
-        linkPort().setNamedCoefficients(coeffs.content().stream().map(NamedCoeff::mapToPair).toList());
+        linkPort().setNamedCoefficients(coeffs.content().stream().map(StringDouble::mapToPair).toList());
     }
 
     public Coefficients viewCoefficients(){
-        return new Coefficients(linkPort().viewNamedCoefficients().stream().map(NamedCoeff::fromPair).toList());
+        return new Coefficients(linkPort().viewNamedCoefficients().stream().map(StringDouble::fromPair).toList());
     }
 
     @Override

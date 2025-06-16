@@ -54,6 +54,8 @@ public class GenericUIFactory {
 
     public static Descriptive<TabType> REMOTE_TAB = Converter.convert(TabType.REMOTE, s -> s, s -> s, s -> s.withColor(ChatFormatting.GOLD).withBold(true).withItalic(true));
 
+    public static Descriptive<TabType> ADVANCE_TAB = Converter.convert(TabType.CONTROLLER, s -> s, s -> s, s -> s.withColor(ChatFormatting.GOLD).withBold(true).withItalic(true));
+
 
     public static GenericSettingScreen createAnchorScreen(BlockPos boundAnchorPos){
 
@@ -480,8 +482,7 @@ public class GenericUIFactory {
                         new VerticalFlow.builder(boundPos)
                                 .withPort(
                                         current_view, lock_view, target,
-                                        offset_self, offset_comp, toggle_mode,
-                                        toggle_cheat, toggle_lock_mode
+                                        toggle_mode, toggle_cheat, toggle_lock_mode
                                 )
                                 .withPreDoLayout(alignLabels)
                                 .build()
@@ -491,9 +492,9 @@ public class GenericUIFactory {
                         createTerminalDeviceTab(boundPos)
                 )
                 .withTab(
-                        CONTROLLER_TAB,
+                        ADVANCE_TAB,
                         createControllerTabUndone(boundPos)
-                                .withPort(limit)
+                                .withPort(limit, offset_self, offset_comp)
                                 .build()
                 )
                 .withTab(

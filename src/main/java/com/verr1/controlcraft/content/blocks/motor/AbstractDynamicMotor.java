@@ -114,7 +114,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public boolean isLocked() {return isLocked;}
 
     public double speedLimit() {return speedLimit;}
-    public void setSpeedLimit(double speedLimit) {this.speedLimit = speedLimit;}
+    public void setSpeedLimit(double speedLimit) {this.speedLimit = Math.max(speedLimit, 2);}
 
     public void setTargetMode(TargetMode targetMode) {
         if(this.targetMode == targetMode)return;

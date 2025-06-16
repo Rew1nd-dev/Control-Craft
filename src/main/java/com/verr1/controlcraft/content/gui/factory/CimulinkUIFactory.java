@@ -256,6 +256,26 @@ public class CimulinkUIFactory {
                 .build();
     }
 
+    public static GenericSettingScreen createCircuitScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                title(UIContents.NAME)
+        );
+
+        CircuitUIPort circuit = new CircuitUIPort(boundPos);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.CIRCUIT.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, circuit)
+                                .build()
+                )
+                .build();
+    }
+
     public static GenericSettingScreen createNameOnlyScreen(BlockPos boundPos){
         StringUIField name = new StringUIField(
                 boundPos,

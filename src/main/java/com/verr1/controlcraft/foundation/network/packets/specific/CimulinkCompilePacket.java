@@ -41,8 +41,8 @@ public class CimulinkCompilePacket extends SimplePacketBase {
             ServerPlayer player = context.getSender();
             if(player == null)return;
             ServerLevel level = player.serverLevel();
-            CircuitNbt nbt = CircuitTagBuilder.compile(level, sel0, sel1);
             try{
+                CircuitNbt nbt = CircuitTagBuilder.compile(level, sel0, sel1);
                 CompoundTag tag = new CompoundTag();
                 tag.put("circuitNbt", nbt.serialize());
                 tag.put("sel0", SerializeUtils.BLOCK_POS.serialize(sel0));

@@ -51,6 +51,10 @@ public class ArrayUtils {
         }
     }
 
+    public static<T> boolean isSame(Collection<T> c0, Collection<T> c1){
+        return c0.size() == c1.size() && c0.containsAll(c1);
+    }
+
     public static <T> List<T> ListOf(int n, T defaultValue){
         return IntStream.range(0, n)
                 .mapToObj(i -> defaultValue)

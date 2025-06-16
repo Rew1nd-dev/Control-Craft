@@ -29,7 +29,9 @@ public enum WandGUIModesType implements Descriptive<WandGUIModesType> {
             )),
     COMPILE(literals(
             "Select 2 Diagonal Corners To Select An Area",
-            "Right Click Air To Confirm"
+            "Right Click Air To Confirm, Creates a packaged subsystem",
+            "Input Port And Output Port Will Be Convert to Subsystem io port",
+            "Uncompilable:| Proxy | Sensor |"
     ))
     ;
 

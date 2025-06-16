@@ -7,10 +7,9 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.plant.PlantProxyLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
-import com.verr1.controlcraft.foundation.data.links.ProxyPortStatus;
+import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -32,7 +31,7 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
                         PlantProxyLinkPort.PROXY_PORT
                 ))
                 .runtimeOnly()
-                .withClient(new ClientBuffer<>(PlantProxyLinkPort.PROXY_PORT, ProxyPortStatus.class))
+                .withClient(new ClientBuffer<>(PlantProxyLinkPort.PROXY_PORT, StringBooleans.class))
                 .register();
 
     }

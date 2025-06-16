@@ -5,7 +5,7 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
 import net.minecraft.nbt.CompoundTag;
 
-public record NamedCoeff(String name, Double coeff) {
+public record StringDouble(String name, Double coeff) {
     public CompoundTag serialize() {
         return CompoundTagBuilder.create()
                 .withCompound("name", SerializeUtils.STRING.serialize(name))
@@ -13,17 +13,17 @@ public record NamedCoeff(String name, Double coeff) {
                 .build();
     }
 
-    public static NamedCoeff deserialize(CompoundTag tag) {
+    public static StringDouble deserialize(CompoundTag tag) {
         String name = SerializeUtils.STRING.deserialize(tag.getCompound("name"));
         Double coeff = SerializeUtils.DOUBLE.deserialize(tag.getCompound("coeff"));
-        return new NamedCoeff(name, coeff);
+        return new StringDouble(name, coeff);
     }
 
     public Pair<String, Double> mapToPair() {
         return new Pair<>(name, coeff);
     }
 
-    public static NamedCoeff fromPair(Pair<String, Double> pair) {
-        return new NamedCoeff(pair.getFirst(), pair.getSecond());
+    public static StringDouble fromPair(Pair<String, Double> pair) {
+        return new StringDouble(pair.getFirst(), pair.getSecond());
     }
 }

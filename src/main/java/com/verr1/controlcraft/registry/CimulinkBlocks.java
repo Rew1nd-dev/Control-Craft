@@ -38,8 +38,9 @@ public class CimulinkBlocks {
                     LogicGateBlock.GateDataGenerator.generate()
             )
             .item()
-            .lang("Logic Gates")
+
             .transform(customItemModel())
+            .lang("Logic Gates")
             .register();
 
     public static final BlockEntry<FFBlock> FF = REGISTRATE
@@ -51,8 +52,9 @@ public class CimulinkBlocks {
                     FFBlock.FFDataGenerator.generate()
             )
             .item()
-            .lang("Flip Flops")
+
             .transform(customItemModel())
+            .lang("Flip Flops")
             .register();
 
     public static final BlockEntry<InputPortBlock> INPUT = REGISTRATE
@@ -64,8 +66,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Input Port")
+
             .transform(customItemModel())
+            .lang("Input Port")
             .register();
 
     public static final BlockEntry<OutputPortBlock> OUTPUT = REGISTRATE
@@ -77,8 +80,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Output Port")
+
             .transform(customItemModel())
+            .lang("Output Port")
             .register();
 
     public static final BlockEntry<ShifterLinkBlock> SHIFTER = REGISTRATE
@@ -90,8 +94,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Shift Register")
+
             .transform(customItemModel())
+            .lang("Shift Register")
             .register();
 
     public static final BlockEntry<LinearAdderBlock> FMA = REGISTRATE
@@ -103,8 +108,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Linear Adder")
+
             .transform(customItemModel())
+            .lang("Linear Adder")
             .register();
 
     public static final BlockEntry<Mux2Block> MUX = REGISTRATE
@@ -116,8 +122,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("2-1 Multiplexer")
+
             .transform(customItemModel())
+            .lang("2-1 Multiplexer")
             .register();
 
     public static final BlockEntry<ComparatorBlock> COMPARATOR = REGISTRATE
@@ -129,8 +136,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Comparator")
+
             .transform(customItemModel())
+            .lang("Comparator")
             .register();
 
     public static final BlockEntry<ProxyLinkBlock> PROXY = REGISTRATE
@@ -142,8 +150,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Plant Proxy")
+
             .transform(customItemModel())
+            .lang("Plant Interface")
             .register();
 
     public static final BlockEntry<CircuitBlock> CIRCUIT = REGISTRATE
@@ -155,8 +164,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Compiled Circuit")
+
             .transform(customItemModel())
+            .lang("Uncompiled Circuit")
             .register();
 
     public static final BlockEntry<DirectCurrentBlock> DC = REGISTRATE
@@ -168,8 +178,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Const Source")
+
             .transform(customItemModel())
+            .lang("Const Source")
             .register();
 
     public static final BlockEntry<FunctionsBlock> FUNCTIONS = REGISTRATE
@@ -181,8 +192,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Functions")
+
             .transform(customItemModel())
+            .lang("Functions")
             .register();
 
     public static final BlockEntry<SensorBlock> SENSOR = REGISTRATE
@@ -194,8 +206,9 @@ public class CimulinkBlocks {
                     BlockStateGen.directionalBlockProvider(true)
             )
             .item()
-            .lang("Physics Pose Sensor")
+
             .transform(customItemModel())
+            .lang("Inertial Measurement Unit")
             .register();
 
     public static void register(){}

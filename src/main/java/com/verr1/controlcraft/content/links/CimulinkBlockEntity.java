@@ -88,7 +88,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     };
 
     protected void initializeEarly(){
-
+        setChanged();
     }
 
     @Override

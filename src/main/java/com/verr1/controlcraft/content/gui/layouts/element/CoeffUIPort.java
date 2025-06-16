@@ -1,13 +1,11 @@
 package com.verr1.controlcraft.content.gui.layouts.element;
 
 import com.simibubi.create.foundation.gui.widget.Label;
-import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.data.links.Coefficients;
-import com.verr1.controlcraft.foundation.data.links.NamedCoeff;
-import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.data.links.StringDouble;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.utils.ParseUtils;
 import net.minecraft.client.Minecraft;
@@ -17,16 +15,14 @@ import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory.title;
 import static com.verr1.controlcraft.content.gui.factory.Converter.alignLabel;
 
-public class CoeffUIPort extends ListUIPort<NamedCoeff, Coefficients>{
+public class CoeffUIPort extends ListUIPort<StringDouble, Coefficients>{
     private final int max_size = 6;
     private int currentSize = 0;
     private final List<NameCoeffWidget> widgets = ArrayUtils.ListOf(max_size, () -> NameCoeffWidget.create(Minecraft.getInstance().font));
@@ -43,12 +39,12 @@ public class CoeffUIPort extends ListUIPort<NamedCoeff, Coefficients>{
     }
 
     @Override
-    protected List<NamedCoeff> readList() {
+    protected List<StringDouble> readList() {
         return IntStream.range(0, currentSize).mapToObj(widgets::get).map(NameCoeffWidget::read).toList();
     }
 
     @Override
-    protected void writeList(List<NamedCoeff> value) {
+    protected void writeList(List<StringDouble> value) {
         currentSize = value.size();
         int size = Math.min(max_size, value.size());
         IntStream.range(0, size).forEach(i -> widgets.get(i).write(value.get(i)));
@@ -95,13 +91,13 @@ public class CoeffUIPort extends ListUIPort<NamedCoeff, Coefficients>{
             );
         }
 
-        public NamedCoeff read(){
+        public StringDouble read(){
             String name = label.text.getString();
             String value = field.getValue();
-            return new NamedCoeff(name, ParseUtils.tryParseDouble(value));
+            return new StringDouble(name, ParseUtils.tryParseDouble(value));
         }
 
-        public void write(NamedCoeff nc){
+        public void write(StringDouble nc){
             label.setText(Component.literal(nc.name()));
             field.setValue("%.4f".formatted(nc.coeff()));
         }
