@@ -47,6 +47,7 @@ public class ControlCraftEvents {
             SpatialLinkManager.tick();
             ChunkManager.tick();
             ControlCraftServer.CC_NETWORK.tick();
+            BlockLinkPort.preMainTick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();
         }
@@ -98,7 +99,7 @@ public class ControlCraftEvents {
 
     public static void onPhysicsTickStart(){
         ComputerCraftDelegation.lockDelegateThread();
-        BlockLinkPort.postPhysicsTick();
+        BlockLinkPort.prePhysicsTick();
     }
 
     public static void onPhysicsTickEnd(){

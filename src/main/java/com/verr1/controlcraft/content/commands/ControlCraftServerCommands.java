@@ -13,6 +13,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circui
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
@@ -58,6 +59,11 @@ public class ControlCraftServerCommands {
                                         )
                             )
                 );
+    }
+
+    private static int saveAllConstraintsCommand(CommandContext<CommandSourceStack> $){
+        ConstraintCenter.saveAll();
+        return 1;
     }
 
     private static int freeCommand(CommandContext<CommandSourceStack> context){
@@ -206,7 +212,11 @@ public class ControlCraftServerCommands {
                         lt("debug-count-fake-player").executes(
                                 ControlCraftServerCommands::countFPCommand
                         )
-                    )
+                ).then(
+                        lt("save-all-constraints").executes(
+                                ControlCraftServerCommands::saveAllConstraintsCommand
+                        )
+                )
         );
         dispatcher.register(
                 Commands.literal("cimulink")

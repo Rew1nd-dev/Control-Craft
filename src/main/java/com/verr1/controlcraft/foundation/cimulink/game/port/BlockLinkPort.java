@@ -5,12 +5,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.components.sources.SignalGenerator;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
@@ -37,7 +38,7 @@ public abstract class BlockLinkPort {
     public static final Set<WorldBlockPos> ALL_BLP = ConcurrentHashMap.newKeySet();
 
 
-    private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> cache = CacheBuilder.newBuilder()
+    private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> CACHE = CacheBuilder.newBuilder()
             .maximumSize(1024)
             .refreshAfterWrite(2, TimeUnit.SECONDS)
             .build(
@@ -46,14 +47,14 @@ public abstract class BlockLinkPort {
                         public @NotNull ListenableFuture<Optional<BlockLinkPort>> reload(
                                 @NotNull WorldBlockPos key,
                                 @NotNull Optional<BlockLinkPort> oldValue
-                        ) throws Exception {
+                        ) {
                             ListenableFutureTask<Optional<BlockLinkPort>> task = ListenableFutureTask.create(() -> load(key));
                             ControlCraftServer.getMainThreadExecutor().execute(task);
                             return task;
                         }
 
                         @Override
-                        public @NotNull Optional<BlockLinkPort> load(@NotNull WorldBlockPos pos) throws Exception {
+                        public @NotNull Optional<BlockLinkPort> load(@NotNull WorldBlockPos pos) {
                             return BlockEntityGetter.INSTANCE
                                     .getBlockEntityAt(
                                             pos.globalPos(),
@@ -86,6 +87,8 @@ public abstract class BlockLinkPort {
     private WorldBlockPos portPos;
 
     private NamedComponent realTimeComponent;
+
+    private boolean initialized = false;
 
     // private final BlockEntity owner;
 
@@ -123,7 +126,7 @@ public abstract class BlockLinkPort {
 
     private static Optional<BlockLinkPort> cachedOf(WorldBlockPos pos){
         try{
-            return cache.get(pos);
+            return CACHE.get(pos);
         }catch (Exception e){
             ControlCraft.LOGGER.error("Error loading BlockLinkPort at {}: {}", pos, e.getMessage());
             return Optional.empty();
@@ -163,7 +166,6 @@ public abstract class BlockLinkPort {
     }
 
     public static void propagateOutput(PropagateContext watcher, BlockLinkPort blp){
-        // if(blp.anyOutputChanged())watcher.visit(blp.pos());
         blp.changedOutput().forEach(changedOutput -> {
             double value = blp.retrieveOutput(changedOutput);
             String changedOutputName = blp.outputsNames().get(changedOutput);
@@ -173,10 +175,10 @@ public abstract class BlockLinkPort {
                     HashMap::new,   // contained by HashMap
                     Collectors.mapping(
                             BlockPort::portName, // get String
-                            Collectors.toList() // collect to Set<String>
+                            Collectors.toList()  // collect to Set<String>
                     )
             )).forEach((worldBlockPos, portNames) -> {
-                // filter out uninitialized blps, skip
+                // filter out uninitialized blps
                 of(worldBlockPos)
                 .filter(BlockLinkPort::isInitialized)
                 .ifPresent(nextBlp -> {
@@ -184,12 +186,17 @@ public abstract class BlockLinkPort {
                         portNames.forEach(n -> nextBlp.input(n, value));
 
                         // found output ports that need to propagate, should visit this current port
-                        propagateCombinational(watcher.visit(blp.pos()), nextBlp);
+                        // After temporal update their output, they got changedOutput() not empty() already
+                        // A temporal A0 may propagate its output to another temporal A1's input, although it won't cause
+                        // immediate output change, but A1 still get non-empty changedOutput(), so propagation
+                        // won't stop, which may cause watcher to mis judge a loop
+                        // so stops whenever the nextBlp is temporal
+                        if(nextBlp.isCombinational()) {
+                            propagateCombinational(watcher.visit(blp.pos()), nextBlp);
+                        }
 
                     }catch (IllegalArgumentException e){
-                        // System.out.println("Error during propagation: " + e);
-
-                        ControlCraft.LOGGER.error("Error during propagation: {}", e.toString());
+                        ControlCraft.LOGGER.error("Error during propagation when trying propagate to:{}, exception: {}", nextBlp, e.toString());
                     }catch (EncloseLoopException e){
                         ControlCraft.LOGGER.warn("Enclosed loop detected: {}", e.getMessage());
                         blp.removeAllLinks();
@@ -198,6 +205,11 @@ public abstract class BlockLinkPort {
                 });
             });
         });
+    }
+
+    @Override
+    public String toString() {
+        return "[" + pos().pos().toShortString() + "| " + name() + "]";
     }
 
     public static void propagateInput(BlockLinkPort blp){
@@ -213,25 +225,52 @@ public abstract class BlockLinkPort {
         propagateOutput(watcher, blp);
     }
 
+    // Splitting propagateGlobalInput() and propagateTemporal at PreTick() and PostTick() respectively, because
+    // in a positive edge detector circuit, the changes of some combinational output lasts only between stage 0 - stage 2
+    // Such change will be handled correctly when temporal update their input at stage 2, after which such output may change back
+    // to what it is before stage 0
+    // In this case, players won't see the visual feedback because between game ticks, the port value looks like remaining the same
+
+    public static void propagateGlobalInput(){
+        // stage 0
+        // propagate changes caused by input link ports
+        // after each propagateCombinational() done in forEach(), all components except input link port should
+        // have their output up-to-date
+        // so only input link ports are actually propagated, which means this will be equivalent to
+        // ALL_BLP.forEach(wbp -> of(wbp).filter(BlockLinkPort::isSignal).ifPresent(blp -> blp.propagateInput()));
+        ALL_BLP
+        .forEach(wbp -> of(wbp)
+        // filter out uninitialized ports
+        .filter(BlockLinkPort::isInitialized)
+        .ifPresent(
+                blp -> propagateCombinational(new PropagateContext(), blp)
+        ));
+    }
+
+    public static void propagateTemporal(){
+
+        // stage 2
+        // Temporal samples their input and update output, while combinational stay unchanged
+        ALL_BLP.stream().map(BlockLinkPort::of).forEach(blp -> blp.ifPresent(BlockLinkPort::onPositiveEdge));
+
+        // stage 3
+        // Temporal output can be considered as a kind of input in a loop-less directional graph
+        // Propagate changes caused by temporal outputs
+        ALL_BLP
+            .forEach(wbp -> of(wbp)
+            .filter(BlockLinkPort::isInitialized)
+            //.filter(BlockLinkPort::isNotSignal)
+            .ifPresent(
+                blp -> propagateCombinational(new PropagateContext(), blp)
+        ));
+    }
+
     public boolean anyOutputChanged(){
         return realTimeComponent.anyOutputChanged();
     }
 
     public boolean anyInputChanged(){
         return realTimeComponent.anyInputChanged();
-    }
-
-    public static void propagateTemporal(){
-        ALL_BLP.stream().map(BlockLinkPort::of).forEach(blp -> blp.ifPresent(BlockLinkPort::onPositiveEdge));
-
-        // Temporal output can be considered as a kind of input in a loop-less directional graph
-        ALL_BLP
-            .forEach(wbp -> of(wbp)
-            // filter out uninitialized ports
-            .filter(BlockLinkPort::isInitialized)
-            .ifPresent(
-                blp -> propagateCombinational(new PropagateContext(), blp)
-        ));
     }
 
     public static void remove(WorldBlockPos pos){
@@ -251,15 +290,29 @@ public abstract class BlockLinkPort {
         ALL_BLP.forEach(wbp -> of(wbp).ifPresent(BlockLinkPort::removeInvalid));
     }
 
+    public boolean isCombinational(){
+        return __raw() instanceof Combinational;
+    }
+
+    public boolean isNotSignal(){
+        return !(__raw() instanceof SignalGenerator<?>);
+    }
 
     public static void postMainTick(){
         if(RUN_AT_PHYSICS_THREAD)return;
         propagateTemporal();
     }
 
-    public static void postPhysicsTick(){
+    public static void preMainTick(){
+        if(RUN_AT_PHYSICS_THREAD)return;
+        propagateGlobalInput();
+    }
+
+
+    public static void prePhysicsTick(){
         if(!RUN_AT_PHYSICS_THREAD)return;
         try{
+            propagateGlobalInput();
             propagateTemporal();
         }catch (Exception e){
             ControlCraft.LOGGER.error("Error during physics tick propagation: {}", e.getMessage());
@@ -267,7 +320,11 @@ public abstract class BlockLinkPort {
     }
 
     public boolean isInitialized(){
-        return portPos != null;
+        return initialized;
+    }
+
+    public void setInitialized(){
+        initialized = true;
     }
 
     public int n(){
@@ -538,7 +595,7 @@ public abstract class BlockLinkPort {
 
 
     public void removeInvalid(){
-        if(portPos == null)return;
+        if(!isInitialized())return;
         removeInvalidInput();
         removeInvalidOutput();
     }
@@ -598,6 +655,7 @@ public abstract class BlockLinkPort {
 
     public void deserialize(CompoundTag tag){
         deserializeLinks(tag);
+        setInitialized();
     }
 
     public CompoundTag serializeForward(){
@@ -642,10 +700,10 @@ public abstract class BlockLinkPort {
 
     public static class PropagateContext{
         private final int MAX_DEPTH = 128;
-        private final Set<WorldBlockPos> visited = new HashSet<>();
+        private final ArrayList<WorldBlockPos> visited = new ArrayList<>();
         public int depth = 0;
 
-        public PropagateContext(Set<WorldBlockPos> visited, WorldBlockPos newPos) {
+        public PropagateContext(List<WorldBlockPos> visited, WorldBlockPos newPos) {
             this.visited.addAll(visited);
             this.visited.add(newPos);
         }
@@ -668,7 +726,7 @@ public abstract class BlockLinkPort {
 
         private String visitedMessage(){
             StringBuilder sb = new StringBuilder();
-            visited.stream().map(WorldBlockPos::pos).forEach(p -> sb.append(p.toShortString()).append("|"));
+            visited.stream().map(BlockLinkPort::of).forEach(sb::append);
             return sb.toString();
         }
 
@@ -676,6 +734,7 @@ public abstract class BlockLinkPort {
             try{
                 ArrayUtils.AssertAbsence(visited, pos);
             }catch (Exception e){
+                visited.add(pos);
                 throw new EncloseLoopException("Enclosed Loop Detected: |" + visitedMessage());
             }
 
@@ -685,7 +744,7 @@ public abstract class BlockLinkPort {
 
     public static void onClose(){
         ALL_BLP.clear();
-        cache.invalidateAll();
+        CACHE.invalidateAll();
         RUN_AT_PHYSICS_THREAD = false;
     }
 

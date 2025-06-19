@@ -176,7 +176,7 @@ public class PlantProxyLinkPort extends BlockLinkPort {
 
     @Override
     public void deserialize(CompoundTag tag) {
-        // be.updateAttachedPlant(); // set plant
+        be.updateAttachedPlant(); // set plant
         ControlCraft.LOGGER.debug("Deserializing PlantProxyLinkPort");
         setAll(PROXY_PORT.deserialize(tag.getCompound("status"))); // set status
         ControlCraft.LOGGER.debug("Deserializing status");

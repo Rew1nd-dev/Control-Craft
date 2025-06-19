@@ -15,17 +15,18 @@ public class InputLinkPort extends BlockLinkPort{
     }
 
     public double peek(){
-        return inputPort.peek();
+        return __raw().peekOutput(0);
     }
 
     public void input(double value){
-        inputPort.update(value);
+        // inputPort.update(value);
+        ((Source)__raw()).setInput(value);
     }
 
     public void tick(){
-        if(!inputPort.dirty())return;
-        ((Source)__raw()).setInput(inputPort.retrieve());
-        propagateCombinational(new PropagateContext(), this);
+        // if(!inputPort.dirty())return;
+
+        // propagateCombinational(new PropagateContext(), this);
     }
 
 
