@@ -38,6 +38,8 @@ public class ComponentInstances {
     public static final Inspector<NamedComponent> SIN = Inspector.of(Functions.SIN::get);
     public static final Inspector<NamedComponent> COS = Inspector.of(Functions.COS::get);
     public static final Inspector<NamedComponent> TAN = Inspector.of(Functions.TAN::get);
+    public static final Inspector<NamedComponent> ABS = Inspector.of(Functions.ABS::get);
+    public static final Inspector<NamedComponent> DIV = Inspector.of(Functions.DIV::get);
 
 
 

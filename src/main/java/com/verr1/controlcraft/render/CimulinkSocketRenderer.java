@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRender
 import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.content.links.CimulinkRenderer;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -33,7 +34,7 @@ public class CimulinkSocketRenderer<T extends CimulinkBlockEntity<?>> extends Sa
             int overlay
     ) {
         BlockState state = be.getBlockState();
-        List<Vec3> sockets = List.copyOf(be.renderer().socketPositions());
+        List<Vec3> sockets = List.copyOf(((CimulinkRenderer)be.renderer()).socketPositions());
         SuperByteBuffer socketBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.SOCKET, state);
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());
 

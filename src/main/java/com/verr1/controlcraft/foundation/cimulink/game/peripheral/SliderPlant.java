@@ -8,22 +8,34 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SliderPlant extends NamedComponent {
+public class SliderPlant extends Plant {
     private final DynamicSliderBlockEntity dsb;
+
+
+
+    public SliderPlant(DynamicSliderBlockEntity plant) {
+
+        super(new builder()
+                .in("target", plant::setTarget)
+                .in("lock", l -> plant.tryLock(l > 0.5))
+                .in("force", plant::setOutputForce)
+                .out("current", () -> plant.getController().getValue())
+                .out("distance", plant::getSlideDistance)
+
+        );
+
+        this.dsb = plant;
+    }
+
+    public DynamicSliderBlockEntity plant(){return dsb;}
+
+    /*
 
     private final List<Consumer<Double>> inputHandlers = List.of(
             t -> plant().setTarget(t),
             l -> plant().tryLock(l > 0.5),
             f -> plant().setOutputForce(f)
     );
-
-    public SliderPlant(DynamicSliderBlockEntity dsb) {
-        super(
-                List.of("target", "lock", "torque"),
-                List.of("current", "distance")
-        );
-        this.dsb = dsb;
-    }
 
     @Override
     public List<Integer> propagateTo(int inputIndex) {
@@ -46,5 +58,8 @@ public class SliderPlant extends NamedComponent {
                 plant().getSlideDistance()
         ));
     }
+    * */
+
+
 
 }

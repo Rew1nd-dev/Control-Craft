@@ -91,40 +91,32 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
     public final Map<String, Object> clipEntity(){
         EntityHitResult hitResult = getTarget().clipEntity(Entity::isAlive);
         if(hitResult == null)return null;
-        return Map.of(
-                "hit", Map.of(
-                        "x", hitResult.getLocation().x,
-                        "y", hitResult.getLocation().y,
-                        "z", hitResult.getLocation().z
-                ),
-                "type", hitResult.getEntity().getType().toString(),
-                "name", hitResult.getEntity().getName().getString()
-        );
+        return CCUtils.parse(hitResult);
     }
 
     @LuaFunction(mainThread = true)
-    public final Map<String, Object> clipBlockDetail(){
+    public final Map<String, Object> clipBlock(){
         BlockHitResult hitResult = getTarget().clipBlock(true);
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult, getTarget().getLevel());
     }
 
     @LuaFunction(mainThread = true)
-    public final Map<String, Object> clipEntityDetail(){
+    public final Map<String, Object> clipAllEntity(){
         EntityHitResult hitResult = getTarget().clipEntity((e) -> true);
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult);
     }
 
     @LuaFunction(mainThread = true)
-    public final Map<String, Object> clipShipDetail(){
+    public final Map<String, Object> clipShip(){
         ShipHitResult hitResult = getTarget().clipShip();
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult);
     }
 
     @LuaFunction(mainThread = true)
-    public final Map<String, Object> clipPlayerDetail(){
+    public final Map<String, Object> clipPlayer(){
         EntityHitResult hitResult = getTarget().clipServerPlayer();
         if(hitResult == null)return null;
         return CCUtils.parse(hitResult);
@@ -235,14 +227,7 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
                 new Vector3d(x_1, y_1, z_1)
         );
         if(p == null)return null;
-        return Map.of(
-                "hit", Map.of(
-                        "x", p.getLocation().x,
-                        "y", p.getLocation().y,
-                        "z", p.getLocation().z
-                ),
-                "direction", p.getDirection().name()
-        );
+        return CCUtils.parse(p);
     }
 
 

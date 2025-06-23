@@ -35,19 +35,23 @@ public class VerticalFlow implements SwitchableTab {
     private final List<? extends NetworkUIPort<?>> entries; // this is meant to preserve the input order
     private final BlockPos boundBlockEntityPos;
 
-    private final Runnable preDoLayout;
+    // private final Runnable preDoLayout;
+    private final List<SwitchableTabListener> listeners;
+
     private Component title;
 
     VerticalFlow(
             BlockPos boundPos,
             List<NetworkKey> keys,
             List<? extends NetworkUIPort<?>> entries,
-            Runnable preDoLayout
+            // Runnable preDoLayout,
+            List<SwitchableTabListener> listeners
     ){
         this.boundBlockEntityPos = boundPos;
         this.entries = entries;
-        this.preDoLayout = preDoLayout;
+        // this.preDoLayout = preDoLayout;
         this.map = keys;
+        this.listeners = listeners;
     }
 
     public static int debug_init_id = 0;
@@ -108,6 +112,9 @@ public class VerticalFlow implements SwitchableTab {
         entries.forEach(p -> p.onAddRenderable(toAdd));
     }
 
+    public void onMessage(Message msg){
+        entries.forEach(p -> p.onMessage(msg));
+    }
 
     private void traverse(LayoutElement root, BiConsumer<WidgetContext, LayoutElement> consumer, Context context){
         consumer.accept(new WidgetContext(context.layer, root.getClass()), root);
@@ -120,9 +127,7 @@ public class VerticalFlow implements SwitchableTab {
         traverse(verticalLayout, consumer, new Context());
     }
 
-    public void onMessage(Message msg){
-        entries.forEach(p -> p.onMessage(msg));
-    }
+
 
     public void apply(){
         boundBlockEntity().ifPresent(
@@ -161,7 +166,7 @@ public class VerticalFlow implements SwitchableTab {
 
     @Override
     public void doLayout(@NotNull ScreenRectangle screenRectangle) {
-        preDoLayout.run();
+        listeners.forEach(SwitchableTabListener::onDoLayout);
         this.verticalLayout.setX(screenRectangle.left() + 6);
         this.verticalLayout.setY(screenRectangle.top() + 6);
         this.verticalLayout.arrangeElements();
@@ -186,18 +191,31 @@ public class VerticalFlow implements SwitchableTab {
         List<NetworkUIPort<?>> ports = new ArrayList<>();
         List<NetworkKey> keys = new ArrayList<>();
 
-        Runnable preDoLayout = () -> {};
+        // Runnable preDoLayout = () -> {};
+
+        List<SwitchableTabListener> listeners = new ArrayList<>();
 
         public builder(BlockPos pos){
             this.pos = pos;
         }
 
         public VerticalFlow build(){
-            return new VerticalFlow(pos, keys, ports, preDoLayout);
+            return new VerticalFlow(pos, keys, ports, listeners);
         }
 
         public builder withPreDoLayout(Runnable postDoLayout){
-            this.preDoLayout = postDoLayout;
+            // this.preDoLayout = postDoLayout;
+            listeners.add(new SwitchableTabListener() {
+                @Override
+                public void onDoLayout() {
+                    postDoLayout.run();
+                }
+            });
+            return this;
+        }
+
+        public builder withListener(SwitchableTabListener listener){
+            this.listeners.add(listener);
             return this;
         }
 

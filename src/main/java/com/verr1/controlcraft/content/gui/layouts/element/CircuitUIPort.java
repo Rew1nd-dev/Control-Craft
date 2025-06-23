@@ -78,6 +78,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     }
 
     private void read(int index) {
+        if (!validIndex(index))return;
         block.read(data.get(index));
     }
 

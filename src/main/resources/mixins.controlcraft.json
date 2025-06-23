@@ -10,6 +10,7 @@
     "camera.MixinChunkMap",
     "camera.MixinChunkMap$TrackedEntity",
     "camera.MixinServerPlayer",
+    "cbc.MixinCannonMountBlockEntity",
     "tweak.MixinTweakedLecternControllerBlockEntity",
     "tweak.MixinTweakLinkedControllerAxisPacket"
   ],

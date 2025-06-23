@@ -8,22 +8,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class PropellerPlant extends NamedComponent {
+public class PropellerPlant extends Plant {
 
 
     private final PropellerControllerBlockEntity plant;
 
-    private final List<Consumer<Double>> inputHandlers = List.of(
-            t -> plant().setTargetSpeed(t)
-    );
+
 
     public PropellerPlant(
             PropellerControllerBlockEntity plant
     ) {
-        super(
-                List.of("target"),
-                List.of()
+        super(new builder()
+                .in("target", plant::setTargetSpeed)
         );
+
         this.plant = plant;
 
     }
@@ -31,6 +29,12 @@ public class PropellerPlant extends NamedComponent {
     private PropellerControllerBlockEntity plant(){
         return plant;
     }
+
+
+    /*
+    private final List<Consumer<Double>> inputHandlers = List.of(
+            t -> plant().setTargetSpeed(t)
+    );
 
     @Override
     public List<Integer> propagateTo(int inputIndex) {
@@ -46,4 +50,6 @@ public class PropellerPlant extends NamedComponent {
     public void onPositiveEdge() {
         // updateOutput(0, plant.getTargetSpeed());
     }
+    * */
+
 }

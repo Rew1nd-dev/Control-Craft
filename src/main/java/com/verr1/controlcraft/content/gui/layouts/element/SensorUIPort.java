@@ -53,7 +53,7 @@ public class SensorUIPort extends MultipleTypedUIPort{
                         .map(c -> c.copy().withStyle(Converter::optionStyle))
                         .ifPresent(v -> {
                             value.setTextOnly(v);
-                            if(it == SensorTypes.ROTATION){
+                            if(it == SensorTypes.ROTATION || it == SensorTypes.EULER_YXZ){
                                 localCheckbox.setSelected(false);
                                 localCheckbox.visible = false;
                                 localTitle.visible = false;

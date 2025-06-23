@@ -98,5 +98,57 @@
   {
     "block": "vscontrolcraft:compact_flap",
     "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:logic_gates",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:ff",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:input_link",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:output_link",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:shifter",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:fma",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:mux",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:comparator",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:link_proxy",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:circuit",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:dc",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:functions",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:link_sensor",
+    "mass": 1.0
   }
 ]

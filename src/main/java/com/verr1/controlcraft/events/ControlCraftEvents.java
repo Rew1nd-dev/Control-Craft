@@ -4,6 +4,7 @@ import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
 import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
 import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
@@ -48,6 +49,7 @@ public class ControlCraftEvents {
             ChunkManager.tick();
             ControlCraftServer.CC_NETWORK.tick();
             BlockLinkPort.preMainTick();
+            SpeedControllerPlant.ASYNC_SCHEDULER.tick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();
         }

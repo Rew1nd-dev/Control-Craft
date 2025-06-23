@@ -16,6 +16,8 @@ import java.util.function.Function;
 
 public class BasicUIField<T> extends TypedUIPort<T> implements TitleLabelProvider {
 
+
+
     protected final FormattedLabel title;
     protected final EditBox field;
 
@@ -68,4 +70,6 @@ public class BasicUIField<T> extends TypedUIPort<T> implements TitleLabelProvide
     public Label title() {
         return title;
     }
+
+    public EditBox field() {return field;}
 }

@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.executor;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.api.operatable.Executable;
 import com.verr1.controlcraft.foundation.executor.executables.DeferralExecutable;
 import com.verr1.controlcraft.foundation.executor.executables.IntervalExecutable;
@@ -46,6 +47,11 @@ public class Executor {
 
 
     public void executeLater(Runnable task, int tick){
+        if(tick <= 0){
+            ControlCraft.LOGGER.warn(
+                    "task will probably be neglected because deferral tick is <= 0, " +
+                    "set tick = 1 if you want it to execute next tick");
+        }
         common.add(new DeferralExecutable(task, tick));
     }
 
@@ -55,7 +61,20 @@ public class Executor {
 
 
     public void executeLater(String name, Runnable task, int tick){
+        if(tick <= 0){
+            ControlCraft.LOGGER.warn(
+                    "task will probably be neglected because deferral tick is <= 0, " +
+                    "set tick = 1 if you want it to execute next tick task key: {}", name);
+        }
         named.put(name, new DeferralExecutable(task, tick));
+    }
+
+    public void execute(String name, Runnable task){
+        executeLater(name, task, 1);
+    }
+
+    public void execute(Runnable task){
+        executeLater(task, 1);
     }
 
     public void executeOnSchedule(String name, Runnable task, int interval, int cycles){

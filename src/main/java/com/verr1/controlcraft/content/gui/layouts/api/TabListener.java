@@ -9,15 +9,15 @@ import java.util.Collection;
 
 public interface TabListener{
 
-    void onActivatedTab();
+    default void onActivatedTab(){};
 
-    void onRemovedTab();
+    default void onRemovedTab(){};
 
-    void onScreenTick();
+    default void onScreenTick(){};
 
     default void onMessage(Message msg){};
 
-    void onAddRenderable(Collection<AbstractWidget> toAdd);
+    default void onAddRenderable(Collection<AbstractWidget> toAdd){};
 
     default void onClose(){}
 

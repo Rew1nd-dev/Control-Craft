@@ -11,6 +11,7 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.SignalGenerator;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
@@ -23,6 +24,7 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -104,27 +106,27 @@ public abstract class BlockLinkPort {
 
     public static Optional<BlockLinkPort> of(WorldBlockPos pos){
         if(Debug.TEST_ENVIRONMENT){
-            return debugOf(pos);
+            return ofDebug(pos);
         }
         if(onMainThread()){
-            cachedOf(pos); // refresh cache
-            return mainOf(pos);
+            ofCache(pos); // refresh cache
+            return ofActual(pos);
         }else {
-            return cachedOf(pos);
+            return ofCache(pos);
         }
     }
 
-    private static Optional<BlockLinkPort> debugOf(WorldBlockPos pos){
+    private static Optional<BlockLinkPort> ofDebug(WorldBlockPos pos){
         return TestEnvBlockLinkWorld.get(pos);
     }
 
-    private static Optional<BlockLinkPort> mainOf(WorldBlockPos pos){
+    private static Optional<BlockLinkPort> ofActual(WorldBlockPos pos){
         return BlockEntityGetter.get()
                 .getBlockEntityAt(pos, ILinkableBlock.class)
                 .map(ILinkableBlock::linkPort);
     }
 
-    private static Optional<BlockLinkPort> cachedOf(WorldBlockPos pos){
+    private static Optional<BlockLinkPort> ofCache(WorldBlockPos pos){
         try{
             return CACHE.get(pos);
         }catch (Exception e){
@@ -133,14 +135,15 @@ public abstract class BlockLinkPort {
         }
     }
 
+    /*
     protected BlockLinkPort(WorldBlockPos portPos, NamedComponent initial) {
         this.portPos = portPos;
         realTimeComponent = initial;
         add(portPos);
     }
+    * */
 
     protected BlockLinkPort(NamedComponent initial) {
-        // this.owner = owner;
         realTimeComponent = initial;
     }
 
@@ -196,9 +199,11 @@ public abstract class BlockLinkPort {
                         }
 
                     }catch (IllegalArgumentException e){
-                        ControlCraft.LOGGER.error("Error during propagation when trying propagate to:{}, exception: {}", nextBlp, e.toString());
+                        ControlCraft.LOGGER.error("Error during propagation when trying propagate to:{}, exception: {}", nextBlp, e);
                     }catch (EncloseLoopException e){
-                        ControlCraft.LOGGER.warn("Enclosed loop detected: {}", e.getMessage());
+                        ControlCraft.LOGGER.error("Enclosed loop detected: ", e);
+                        BlockEntityGetter.playerAround(blp.pos(), 5).forEach(s ->
+                                s.sendSystemMessage(Component.literal("Enclosed Loop Detected, A loop must contain at least one temporal circuit (shifter, ff etc)")));
                         blp.removeAllLinks();
                     }
 
@@ -291,7 +296,7 @@ public abstract class BlockLinkPort {
     }
 
     public boolean isCombinational(){
-        return __raw() instanceof Combinational;
+        return !(__raw() instanceof Temporal<?>);
     }
 
     public boolean isNotSignal(){

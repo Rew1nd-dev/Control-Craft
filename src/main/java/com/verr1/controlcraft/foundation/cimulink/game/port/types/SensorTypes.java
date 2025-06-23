@@ -11,7 +11,9 @@ import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 public enum SensorTypes implements Descriptive<SensorTypes> {
     OMEGA(literals("Angular Velocity Sensor")),
     VELOCITY(literals("Velocity Sensor")),
-    ROTATION(literals("Rotation Sensor"));
+    ROTATION(literals("Rotation Sensor")),
+    EULER_YXZ(literals("Euler Angle Sensor, Y:yaw -> X:pitch -> Z:roll")),
+    ;
 
 
     SensorTypes(List<Component> description) {

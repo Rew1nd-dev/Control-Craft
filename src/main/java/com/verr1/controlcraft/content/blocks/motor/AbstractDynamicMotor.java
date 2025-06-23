@@ -72,6 +72,11 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     protected LockMode lockMode = LockMode.OFF;
     protected CheatMode cheatMode = CheatMode.NONE;
     protected boolean reverseCreateInput = false;
+    private DynamicMotorPeripheral peripheral;
+    private LazyOptional<IPeripheral> peripheralCap;
+    private final DMotorKineticPeripheral kineticPeripheral = new DMotorKineticPeripheral(this);
+
+
 
     @Override
     public @NotNull MotorPlant plant() {
@@ -117,8 +122,9 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public void setSpeedLimit(double speedLimit) {this.speedLimit = Math.max(speedLimit, 2);}
 
     public void setTargetMode(TargetMode targetMode) {
-        if(this.targetMode == targetMode)return;
         this.targetMode = targetMode;
+        /*
+        // if(this.targetMode == targetMode)return;
         // delay this because client screen will also call to set PID values of last mode
         Runnable task = () -> {if(targetMode == TargetMode.POSITION){
             controller.PID(DEFAULT_POSITION_MODE_PARAMS);
@@ -129,15 +135,9 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
         if(level == null || level.isClientSide)return;
         ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
+        * */
         setChanged();
     }
-
-
-    private DynamicMotorPeripheral peripheral;
-    private LazyOptional<IPeripheral> peripheralCap;
-
-
-    private final DMotorKineticPeripheral kineticPeripheral = new DMotorKineticPeripheral(this);
 
     @Override
     public DMotorKineticPeripheral peripheral() {
@@ -285,7 +285,10 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public void lockCheck(){
         if(lockMode != LockMode.ON)return;
         if(targetMode == TargetMode.POSITION){
-            if(Math.abs(getServoAngle() - getTarget()) < 1e-3){
+            double compliance = isLocked() ? 5e-3 : 1e-3;
+            // avoid locking at the edge of compliance which may unlock accidentally
+            // when the companion ship is ongoing a strike
+            if(Math.abs(getServoAngle() - getTarget()) < compliance){
                 tryLock();
             }else{
                 tryUnlock();
@@ -323,13 +326,16 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public void setMode(boolean adjustAngle){
         targetMode = adjustAngle ? TargetMode.POSITION : TargetMode.VELOCITY;
         // delay a bit because client screen will also call to set PID values of last mode
+        // Now I make ui side change their pid input automatically when mode changes, so no need to change here
+        /*
         Runnable task = () -> {if(adjustAngle){
             getController().PID(DEFAULT_POSITION_MODE_PARAMS);
         }else{
             getController().PID(DEFAULT_VELOCITY_MODE_PARAMS);
         }};
 
-        if(level != null && !level.isClientSide) ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
+        if(level != null && !level.isClientSide) ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 2);
+        * */
 
         setChanged();
     }

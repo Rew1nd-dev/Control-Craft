@@ -3,16 +3,19 @@ package com.verr1.controlcraft.foundation;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +78,12 @@ public class BlockEntityGetter {
         return of(wbp)
                 .map(s -> s.isLoaded(wbp.pos()))
                 .orElse(false);
+    }
+
+    public static List<ServerPlayer> playerAround(WorldBlockPos wbp, double radius){
+        return Optional.ofNullable(wbp.level(ControlCraftServer.INSTANCE)).
+                map(s -> s.getPlayers(p -> p.position().distanceTo(wbp.pos().getCenter()) < radius))
+                .orElse(List.of());
     }
 
     public Optional<ServerLevel> of(WorldBlockPos wbp){

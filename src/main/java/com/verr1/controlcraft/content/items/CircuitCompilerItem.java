@@ -3,22 +3,28 @@ package com.verr1.controlcraft.content.items;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitTagBuilder;
-import com.verr1.controlcraft.utils.CompoundTagBuilder;
-import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import net.minecraftforge.fml.loading.FMLPaths;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 public class CircuitCompilerItem extends Item {
+
+    public static final Path CIMULINKS = FMLPaths.GAMEDIR.get().resolve("cimulinks");
 
     public CircuitCompilerItem(Properties p_41383_) {
         super(p_41383_);
@@ -36,9 +42,7 @@ public class CircuitCompilerItem extends Item {
 
             CompoundTag nbt = stack.getOrCreateTag();
             // 检查NBT数据是否存在
-            if (player.isShiftKeyDown()) {
-                nbt.remove("circuitNbt");
-            } else if (nbt.contains("circuitNbt")) {
+            if (nbt.contains("circuitNbt")) {
                 // 这里可以添加放置电路的逻辑
                 CompoundTag circuitNbt = nbt.getCompound("circuitNbt");
                 CircuitNbt nbtHolder = CircuitNbt.deserialize(circuitNbt);
@@ -46,16 +50,43 @@ public class CircuitCompilerItem extends Item {
                 BlockEntityGetter.getLevelBlockEntityAt(world, pos, CircuitBlockEntity.class)
                         .ifPresentOrElse(
                                 cbe -> cbe.loadCircuit(nbtHolder),
-                                () -> player.sendSystemMessage(Component.literal("No circuit block found at the selected position."))
+                                () -> player.sendSystemMessage(Component.literal("Not a circuit block found at the selected position."))
                         );
 
             }
-
-
-
         }
         return InteractionResult.PASS;
     }
+
+
+    public static void save(String saveName, ItemStack stack){
+        Path file = CIMULINKS.resolve(saveName).toAbsolutePath();
+        CompoundTag data = stack.getOrCreateTag();
+        try{
+            Files.createDirectories(CIMULINKS);
+            try(OutputStream out = Files.newOutputStream(file, StandardOpenOption.CREATE)){
+                NbtIo.writeCompressed(data, out);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void load(String saveName, ItemStack stack){
+        Path file = CIMULINKS.resolve(saveName).toAbsolutePath();
+
+        try(InputStream in = Files.newInputStream(file, StandardOpenOption.CREATE)){
+            CompoundTag tag = NbtIo.readCompressed(in);
+            stack.setTag(tag);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+
 /*
 *
 * @Override

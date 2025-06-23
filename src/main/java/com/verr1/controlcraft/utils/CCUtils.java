@@ -101,7 +101,7 @@ public class CCUtils {
         }
         return Vec3.ZERO;
     }
-
+    // EntityHitResult
     public static Map<String, Object> parse(EntityHitResult hitResult){
         return Map.of(
                 "hit", dumpVec3(ValkyrienSkies.set(new Vector3d(), hitResult.getLocation())),
@@ -111,7 +111,7 @@ public class CCUtils {
                 "position", dumpVec3(ValkyrienSkies.set(new Vector3d(), hitResult.getEntity().getEyePosition()))
         );
     }
-
+    // EntityResult
     public static Map<String, Object> parse(Entity entity){
         return Map.of(
                 "type", entity.getType().toString(),
@@ -121,7 +121,7 @@ public class CCUtils {
                 "position", dumpVec3(ValkyrienSkies.set(new Vector3d(), entity.getEyePosition()))
         );
     }
-
+    // blockHitResult
     public static Map<String, Object> parse(BlockHitResult hitResult){
         return Map.of(
                 "hit", Map.of(
@@ -132,7 +132,7 @@ public class CCUtils {
                 "direction", hitResult.getDirection().getName().toUpperCase()
         );
     }
-
+    // shipHitResult
     public static Map<String, Object> parse(ShipHitResult hitResult){
         return Map.of(
                 "hit", dumpVec3(ValkyrienSkies.set(new Vector3d(), hitResult.hitLocation())),
@@ -141,7 +141,7 @@ public class CCUtils {
                 "AABB", dumpAABB(hitResult.ship().getShipAABB())
         );
     }
-
+    // blockDetailResult
     public static Map<String, Object> parse(BlockHitResult hitResult, Level level){
         return Map.of(
                 "hit", dumpVec3(ValkyrienSkies.set(new Vector3d(), hitResult.getLocation())),
@@ -150,7 +150,7 @@ public class CCUtils {
                 "shipHitResult", parseShipHitResult(hitResult.getBlockPos(), level)
         );
     }
-
+    // shipResult
     public static Map<String, Object> parseShipHitResult(BlockPos pos, Level level){
         Ship ship = VSGameUtilsKt.getShipObjectManagingPos(level, pos);
         if(ship == null)return Map.of();

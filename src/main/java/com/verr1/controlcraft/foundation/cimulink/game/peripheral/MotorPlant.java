@@ -7,22 +7,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class MotorPlant extends NamedComponent {
+public class MotorPlant extends Plant {
 
     private final AbstractDynamicMotor plant;
 
-    private final List<Consumer<Double>> inputHandlers = List.of(
-            t -> plant().getController().setTarget(t),
-            l -> plant().tryLock(l > 0.5),
-            t -> plant().setOutputTorque(t)
-    );
+
 
     public MotorPlant(
             AbstractDynamicMotor plant
     ) {
         super(
-                List.of("target", "lock", "torque"),
-                List.of("current", "angle", "omega")
+                new builder()
+                        .in("target", t -> plant.getController().setTarget(t))
+                        .in("lock", l -> plant.tryLock(l > 0.5))
+                        .in("torque", plant::setOutputTorque)
+                        .out("current", () -> plant.getController().getValue())
+                        .out("angle", plant::getCachedServoAngle)
+                        .out("omega", plant::getCachedServoAngularVelocity)
         );
         this.plant = plant;
 
@@ -32,9 +33,16 @@ public class MotorPlant extends NamedComponent {
         return plant;
     }
 
+/*
+private final List<Consumer<Double>> inputHandlers = List.of(
+            t -> plant().getController().setTarget(t),
+            l -> plant().tryLock(l > 0.5),
+            t -> plant().setOutputTorque(t)
+    );
+
     @Override
     public List<Integer> propagateTo(int inputIndex) {
-        return List.of(0, 1, 2);
+        return List.of();
     }
 
     @Override
@@ -50,4 +58,6 @@ public class MotorPlant extends NamedComponent {
                 plant.getCachedServoAngularVelocity()
         ));
     }
+* */
+
 }

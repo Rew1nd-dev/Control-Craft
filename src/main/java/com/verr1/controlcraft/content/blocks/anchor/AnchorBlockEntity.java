@@ -14,6 +14,7 @@ import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +40,7 @@ public class AnchorBlockEntity extends OnShipBlockEntity
     }
 
     public void setAirResistance(double airResistance) {
-        this.airResistance = airResistance;
+        this.airResistance = MathUtils.clamp(airResistance, 0, 1);
     }
 
     public double getExtraGravity() {
@@ -55,7 +56,7 @@ public class AnchorBlockEntity extends OnShipBlockEntity
     }
 
     public void setRotationalResistance(double rotationalResistance) {
-        this.rotationalResistance = rotationalResistance;
+        this.rotationalResistance = MathUtils.clamp(rotationalResistance, 0, 1);
     }
 
     private double airResistance = 0;

@@ -29,12 +29,25 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
 
     private final DirectReceiver receiver = new DirectReceiver();
 
+    private final Cooldown neighborCooldown = new Cooldown();
+
+
+    private void inputWithCooldown(double t){
+        linkPort().input(t);
+        neighborCooldown.activateCooldown();
+    }
+
+    private void inputCooldownBlocked(double t){
+        if(!neighborCooldown.activated())linkPort().input(t);
+    }
+
+
     public InputPortBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         buildRegistry(INPUT)
                 .withBasic(SerializePort.of(
                         () -> linkPort().peek(),
-                        t -> linkPort().input(t),
+                        this::inputWithCooldown,
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
@@ -54,7 +67,7 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
         receiver().register(
                 new NumericField(
                         () -> linkPort().peek(),
-                        t -> linkPort().input(t),
+                        this::inputCooldownBlocked,
                         "input"
                 ),
                 new DirectReceiver.InitContext(SlotType.INPUT, Couple.create(0.0, 1.0)),
@@ -76,6 +89,7 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
     public void tickServer() {
         super.tickServer();
         linkPort().tick();
+        neighborCooldown.tickCooldown();
     }
 
     @Override
@@ -87,4 +101,21 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
     public DirectReceiver receiver() {
         return receiver;
     }
+
+    private static class Cooldown{
+        private int neighborInputCooldown = 0;
+
+        private void tickCooldown(){
+            if(neighborInputCooldown > 0)neighborInputCooldown--;
+        }
+
+        private void activateCooldown(){
+            neighborInputCooldown = 2;
+        }
+
+        private boolean activated(){
+            return neighborInputCooldown > 0;
+        }
+    }
+
 }

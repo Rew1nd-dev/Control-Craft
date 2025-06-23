@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.items.CircuitCompilerItem;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
@@ -17,10 +18,13 @@ import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
+import com.verr1.controlcraft.registry.ControlCraftItems;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -189,12 +193,46 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int saveCircuitCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        String saveName = context.getArgument("saveName", String.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set save a circuit!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+        if(!stack.is(ControlCraftItems.CIRCUIT_COMPILER.get())){
+            source.sendFailure(Component.literal("No compiler found in your main hand"));
+            return 0;
+        }
+        CircuitCompilerItem.save(saveName, stack);
+        return 1;
+    }
+
+    public static int loadCircuitCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        String saveName = context.getArgument("saveName", String.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set save a circuit!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+        if(!stack.is(ControlCraftItems.CIRCUIT_COMPILER.get())){
+            source.sendFailure(Component.literal("No compiler found in your main hand"));
+            return 0;
+        }
+        CircuitCompilerItem.load(saveName, stack);
+        return 1;
+    }
+
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
             Commands
                 .literal("controlcraft")
                 .then(
-                    LiteralArgumentBuilder.<CommandSourceStack>literal("clear-attachment")
+                    lt("clear-attachment")
                         .executes(
                                 context -> {
                                     clearAllAttachments();
@@ -222,40 +260,36 @@ public class ControlCraftServerCommands {
                 Commands.literal("cimulink")
                         .then(lt("in")
                             .then(arg("portId", IntegerArgumentType.integer())
-                                    .then(arg("value", DoubleArgumentType.doubleArg())
-                                            .executes(
-                                                ControlCraftServerCommands::inputCommand
-                                            )
-                                    )
-                                )
+                            .then(arg("value", DoubleArgumentType.doubleArg())
+                            .executes(
+                                ControlCraftServerCommands::inputCommand
+                            )))
                         ).then(lt("out")
-                                .then(arg("portId", IntegerArgumentType.integer())
-                                        .then(arg("value", DoubleArgumentType.doubleArg())
-                                                .executes(
-                                                        ControlCraftServerCommands::outputCommand
-                                                )
-                                        )
-                                )
+                            .then(arg("portId", IntegerArgumentType.integer())
+                            .then(arg("value", DoubleArgumentType.doubleArg())
+                            .executes(
+                                    ControlCraftServerCommands::outputCommand
+                            )))
                         ).then(lt("tick-at-physics-thread")
-                                .then(arg("physics", BoolArgumentType.bool())
-                                        .executes(
-                                                ControlCraftServerCommands::circuitThreadCommand
-                                        )
-                                )
-                        ).then(lt("clear-attachments")
-                                .executes(
-                                        context -> {
-                                            clearAllAttachments();
-                                            return 1;
-                                        }
-                                )
+                            .then(arg("physics", BoolArgumentType.bool())
+                            .executes(
+                                    ControlCraftServerCommands::circuitThreadCommand
+                            ))
                         ).then(lt("observe-circuit")
-                                .executes(
-                                        ControlCraftServerCommands::observeCircuitCommand
-                                )
+                            .executes(
+                                    ControlCraftServerCommands::observeCircuitCommand
+                            )
+                        ).then(lt("save-circuit")
+                            .then(arg("saveName", StringArgumentType.string())
+                                .executes(ControlCraftServerCommands::saveCircuitCommand))
+                        ).then(lt("load-circuit")
+                            .then(arg("saveName", StringArgumentType.string())
+                                .executes(ControlCraftServerCommands::loadCircuitCommand))
                         )
         );
     }
+
+
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {

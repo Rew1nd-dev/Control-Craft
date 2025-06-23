@@ -5,6 +5,7 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.PlantGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.plant.PlantProxyLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.StringBooleans;
@@ -39,19 +40,7 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
     // no need to call this at initialize(), since it will be called at linkPort()
     public void updateAttachedPlant(){
         if(!(level instanceof ServerLevel serverLevel))return;
-        NamedComponent plant =
-        BlockEntityGetter.getLevelBlockEntityAt(
-                    level,
-                    getBlockPos().relative(getDirection().getOpposite()),
-                    IPlant.class
-                )
-                .map(IPlant::plant)
-                .orElseGet(() ->
-                    TweakControllerCompact.tweakedControllerPlant(
-                        serverLevel,
-                        getBlockPos().relative(getDirection().getOpposite()))
-                );
-
+        NamedComponent plant = PlantGetter.get(serverLevel, getBlockPos().relative(getDirection().getOpposite()));
         linkPort().setPlant(plant);
     }
 

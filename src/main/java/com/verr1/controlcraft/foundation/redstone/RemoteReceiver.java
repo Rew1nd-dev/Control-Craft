@@ -97,7 +97,7 @@ public class RemoteReceiver {
                 .toList();
 
         double thisValue = control.latestValue();
-        control.mutableField.apply(policyMap.get(groupId).mapping.apply(all, thisValue));
+        control.mutableField.apply(policyMap.getOrDefault(groupId, GroupPolicy.EXCLUSIVE).mapping.apply(all, thisValue));
     }
 
 

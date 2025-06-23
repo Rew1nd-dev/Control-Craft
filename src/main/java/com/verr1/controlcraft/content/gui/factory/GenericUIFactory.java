@@ -6,6 +6,7 @@ import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import com.verr1.controlcraft.content.blocks.kinetic.resistor.KineticResistorBlockEntity;
+import com.verr1.controlcraft.content.blocks.motor.AbstractDynamicMotor;
 import com.verr1.controlcraft.content.blocks.propeller.PropellerBlockEntity;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
 import com.verr1.controlcraft.content.gui.layouts.element.general.*;
@@ -54,7 +55,7 @@ public class GenericUIFactory {
 
     public static Descriptive<TabType> REMOTE_TAB = Converter.convert(TabType.REMOTE, s -> s, s -> s, s -> s.withColor(ChatFormatting.GOLD).withBold(true).withItalic(true));
 
-    public static Descriptive<TabType> ADVANCE_TAB = Converter.convert(TabType.CONTROLLER, s -> s, s -> s, s -> s.withColor(ChatFormatting.GOLD).withBold(true).withItalic(true));
+    public static Descriptive<TabType> ADVANCE_TAB = Converter.convert(TabType.ADVANCE, s -> s, s -> s, s -> s.withColor(ChatFormatting.GOLD).withBold(true).withItalic(true));
 
 
     public static GenericSettingScreen createAnchorScreen(BlockPos boundAnchorPos){
@@ -424,7 +425,7 @@ public class GenericUIFactory {
 
         var target = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d); //, Converter.combine(Math::toDegrees, d -> MathUtils.clampDigit(d, 2)), Math::toRadians
 
-        var toggle_mode = new OptionUIField<>(boundPos, SharedKeys.TARGET_MODE, TargetMode.class, Converter.convert(UIContents.MODE, Converter::titleStyle));
+        var pid = new DynamicControllerUIField(boundPos, 30);
 
         var toggle_cheat = new OptionUIField<>(boundPos, SharedKeys.CHEAT_MODE, CheatMode.class, Converter.convert(UIContents.CHEAT, Converter::titleStyle));
 
@@ -432,6 +433,19 @@ public class GenericUIFactory {
 
         var offset_self = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 25);
         var offset_comp = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
+
+        var toggle_mode = new OptionUIField<>(
+                boundPos,
+                SharedKeys.TARGET_MODE,
+                TargetMode.class,
+                Converter.convert(UIContents.MODE, Converter::titleStyle)
+        ).onOptionSwitch(newValue -> {
+            if(newValue == TargetMode.VELOCITY){
+                pid.setPIDField(AbstractDynamicMotor.DEFAULT_VELOCITY_MODE_PARAMS);
+            }else{
+                pid.setPIDField(AbstractDynamicMotor.DEFAULT_POSITION_MODE_PARAMS);
+            }
+        });
 
 
         var asm = new UnitUIPanel(
@@ -493,8 +507,8 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         ADVANCE_TAB,
-                        createControllerTabUndone(boundPos)
-                                .withPort(limit, offset_self, offset_comp)
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(pid, limit, offset_self, offset_comp)
                                 .build()
                 )
                 .withTab(
@@ -527,7 +541,20 @@ public class GenericUIFactory {
 
         var target = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d);
 
-        var toggle_mode = new OptionUIField<>(boundPos, SharedKeys.TARGET_MODE, TargetMode.class, Converter.convert(UIContents.MODE, Converter::titleStyle));
+        var pid = new DynamicControllerUIField(boundPos, 30);
+
+        var toggle_mode = new OptionUIField<>(
+                boundPos,
+                SharedKeys.TARGET_MODE,
+                TargetMode.class,
+                Converter.convert(UIContents.MODE, Converter::titleStyle)
+        ).onOptionSwitch(newValue -> {
+            if(newValue == TargetMode.VELOCITY){
+                pid.setPIDField(AbstractDynamicMotor.DEFAULT_VELOCITY_MODE_PARAMS);
+            }else{
+                pid.setPIDField(AbstractDynamicMotor.DEFAULT_POSITION_MODE_PARAMS);
+            }
+        });
 
         var toggle_cheat = new OptionUIField<>(boundPos, SharedKeys.CHEAT_MODE, CheatMode.class, new CheatMode[]{CheatMode.NONE, CheatMode.NO_REPULSE} , Converter.convert(UIContents.CHEAT, Converter::titleStyle));
 
@@ -591,7 +618,9 @@ public class GenericUIFactory {
                 )
                 .withTab(
                         CONTROLLER_TAB,
-                        createControllerTab(boundPos)
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(pid)
+                                .build()
                 )
                 .withTab(
                         REMOTE_TAB,

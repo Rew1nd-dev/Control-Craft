@@ -1,20 +1,35 @@
 package com.verr1.controlcraft.content.compact.tweak.impl;
 
 import com.getitemfromblock.create_tweaked_controllers.block.TweakedLecternControllerBlockEntity;
-import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.Plant;
 
 import java.util.List;
 
-public class TweakControllerPlant extends NamedComponent {
+public class TweakControllerPlant extends Plant {
 
     private final TweakedLecternControllerBlockEntity lectern;
 
     public TweakControllerPlant(TweakedLecternControllerBlockEntity lectern) {
-        super(List.of(), List.of("lx", "ly", "rx", "ry", "lt", "rt"));
+        super(new builder()
+                .out("lx", () -> (double)lectern.GetAxis(0))
+                .out("ly", () -> (double)lectern.GetAxis(1))
+                .out("rx", () -> (double)lectern.GetAxis(2))
+                .out("ry", () -> (double)lectern.GetAxis(3))
+                .out("lt", () -> (double)lectern.GetAxis(4))
+                .out("rt", () -> (double)lectern.GetAxis(5))
+        );
+        /*super(List.of(), List.of("lx", "ly", "rx", "ry", "lt", "rt"));     */
+
         this.lectern = lectern;
     }
 
-    @Override
+
+    public TweakedLecternControllerBlockEntity plant(){
+        return lectern;
+    }
+
+    /*
+    * @Override
     public List<Integer> propagateTo(int inputIndex) {
         return List.of();
     }
@@ -35,4 +50,5 @@ public class TweakControllerPlant extends NamedComponent {
                 (double)lectern.GetAxis(5)
         ));
     }
+    * */
 }

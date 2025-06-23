@@ -24,6 +24,13 @@ public class Functions {
         }
     };
 
+    public static final Supplier<FunctionN> DIV = () -> new FunctionN(2) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(MathUtils.safeDiv(inputs.get(0), inputs.get(1)));
+        }
+    };
+
     public static final Function<Integer, FunctionN> MAX = n -> new FunctionN(n) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
@@ -62,6 +69,13 @@ public class Functions {
             }
 
 
+        }
+    };
+
+    public static final Supplier<FunctionN> ABS = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(Math.abs(inputs.get(0)));
         }
     };
 

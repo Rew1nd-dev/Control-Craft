@@ -118,7 +118,16 @@ public class CimulinkFactory {
             defaultID("product")
     );
 
-public static final Factory<Functions.FunctionN> MAX = register(
+    public static final Factory<Functions.FunctionN> DIV = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.DIV.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("divide")
+    );
+
+    public static final Factory<Functions.FunctionN> MAX = register(
             SerializeUtils.of(
                     Functions.FunctionN::serialize,
                     t -> Functions.MAX.apply(Functions.deserializeN(t))
@@ -153,6 +162,15 @@ public static final Factory<Functions.FunctionN> MAX = register(
             ),
             Functions.FunctionN.class,
             defaultID("power")
+    );
+
+    public static final Factory<Functions.FunctionN> ABS = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.ABS.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("abs")
     );
 
     public static final Factory<Functions.FunctionN> SIN = register(

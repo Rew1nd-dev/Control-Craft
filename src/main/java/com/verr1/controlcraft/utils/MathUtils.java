@@ -24,6 +24,16 @@ public class MathUtils {
         return clamp(value, -max, max);
     }
 
+    public static double safeDiv(double x, double y){
+        if(Math.abs(y) < eps && Math.abs(x) < eps){
+            return 0;
+        }
+        if(Math.abs(y) < eps){
+            return x > 0 ? 1e20 : -1e20;
+        }
+        return x / y;
+    }
+
     public static double clamp1(double x){
         return Math.atan(x) / Math.PI * 0.5;
     }

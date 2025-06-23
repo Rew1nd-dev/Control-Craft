@@ -28,6 +28,9 @@ public class DynamicControllerUIField extends TypedUIPort<CompoundTag> implement
     FormattedLabel pLabel = convert(SlotType.P, Converter::pidStyle).toDescriptiveLabel();
     FormattedLabel iLabel = convert(SlotType.I, Converter::pidStyle).toDescriptiveLabel();
     FormattedLabel dLabel = convert(SlotType.D, Converter::pidStyle).toDescriptiveLabel();
+
+
+
     EditBox pField;
     EditBox iField;
     EditBox dField;
@@ -86,9 +89,27 @@ public class DynamicControllerUIField extends TypedUIPort<CompoundTag> implement
         return pid;
     }
 
+    public void setPIDField(PID pid){
+        pField.setValue("" + pid.p());
+        iField.setValue("" + pid.i());
+        dField.setValue("" + pid.d());
+    }
+
     @Override
     public Label title() {
         return title;
+    }
+
+    public EditBox pField() {
+        return pField;
+    }
+
+    public EditBox iField() {
+        return iField;
+    }
+
+    public EditBox dField() {
+        return dField;
     }
 
     @Override

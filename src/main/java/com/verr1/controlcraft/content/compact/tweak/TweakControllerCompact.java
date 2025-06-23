@@ -12,8 +12,8 @@ public class TweakControllerCompact {
 
     public static ITweakedControllerComponentGetter getter;
 
-    public static @Nullable NamedComponent tweakedControllerPlant(ServerLevel level, BlockPos pos){
-        if(getter == null)return null;
+    public static @Nullable NamedComponent tweakedControllerPlant(ServerLevel level, BlockPos pos) {
+        if (getter == null) return null;
         return getter.tweakedControllerPlant(level, pos);
     }
 

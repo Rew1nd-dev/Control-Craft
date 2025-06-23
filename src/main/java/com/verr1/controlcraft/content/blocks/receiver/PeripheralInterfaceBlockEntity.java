@@ -154,12 +154,19 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
                                 .getOpposite()
                                 .getNormal()
                 );
+        IPeripheral peripheral = PeripheralGetter.get(
+                (ServerLevel) level,
+                attachedPos,
+                attachedDirection
+        );
+        /*
         IPeripheral peripheral = Peripherals.getPeripheral(
                 (ServerLevel)level,
                 attachedPos,
                 attachedDirection,
                 () -> {}
         );
+        * */
         attachedPeripheral = peripheral;
         if(attachedPeripheral == null)return;
         methods.clear();

@@ -165,6 +165,7 @@ public class TerminalBlockEntity extends OnShipBlockEntity implements
     @Override
     public void initialize() {
         super.initialize();
+        syncWithAttached();
         addToNetwork();
     }
 

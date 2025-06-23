@@ -16,15 +16,22 @@ import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPort<T> implements TitleLabelProvider {
+
+
 
     FormattedLabel title;
     FormattedLabel value = new FormattedLabel(0, 0, Component.literal("LLLLL"));
     DescriptiveScrollInput<T> options;
 
+    List<SwitchListener<T>> onOptionSwitch = new ArrayList<>();
 
     public OptionUIField(BlockPos boundPos, NetworkKey key, Class<T> clazz, LabelProvider titleText) {
         super(boundPos, key, clazz, tryGetDefault(clazz));
@@ -50,18 +57,34 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
         return null;
     }
 
+    public OptionUIField<T> onOptionSwitch(SwitchListener<T> listener){
+        onOptionSwitch.add(listener);
+        return this;
+    }
+
     public FormattedLabel valueLabel() {
         return value;
     }
 
     protected void lateInit(){
         options.valueCalling(
-                it -> Optional.of(it)
-                        .map(ComponentLike::asComponent)
-                        .map(c -> c.copy().withStyle(Converter::optionStyle))
-                        .ifPresent(value::setTextOnly)
+                it -> {
+                    Optional.of(it)
+                            .map(ComponentLike::asComponent)
+                            .map(c -> c.copy().withStyle(Converter::optionStyle))
+                            .ifPresent(value::setTextOnly);
+                    onOptionSwitch.forEach(o -> o.onSwitch(it));
+                }
         );
         setMaxLength();
+    }
+
+    public FormattedLabel value() {
+        return value;
+    }
+
+    public DescriptiveScrollInput<T> options() {
+        return options;
     }
 
     private void setMaxLength(){
@@ -105,5 +128,11 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
     public Label[] titles() {
         return new Label[]{title, value};
     }
+
+    @FunctionalInterface
+    public interface SwitchListener<T>{
+        void onSwitch(T newValue);
+    }
+
 
 }

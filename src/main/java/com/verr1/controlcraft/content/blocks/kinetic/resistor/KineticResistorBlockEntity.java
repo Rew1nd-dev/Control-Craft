@@ -2,8 +2,13 @@ package com.verr1.controlcraft.content.blocks.kinetic.resistor;
 
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.infrastructure.config.AllConfigs;
+import com.simibubi.create.infrastructure.config.CKinetics;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.ResistorPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -20,11 +25,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
 public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
-        IReceiver, INetworkHandle
+        IReceiver, INetworkHandle, IPlant
 {
     public static final NetworkKey RATIO = NetworkKey.create("ratio");
 
@@ -33,6 +39,8 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
     private final DirectReceiver receiver = new DirectReceiver();
 
     private final NetworkHandler handler = new NetworkHandler(this);
+
+    private final ResistorPlant plant = new ResistorPlant(this);
 
     @Override
     public DirectReceiver receiver() {
@@ -104,7 +112,7 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
     }
 
     private void setRatioOnly(double ratio){
-        this.ratio = MathUtils.clamp(ratio, 1);
+        this.ratio = MathUtils.clamp(ratio, 2);
         setChanged();
     }
 
@@ -117,7 +125,10 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
     }
 
     public float clampedModifier(){
-        float newSpeed = getTheoreticalSpeed() * (float) ratio;
+        if(Math.abs(getTheoreticalSpeed()) < 1e-4){
+            return 0.0f;
+        }
+        float newSpeed = Math.min(getTheoreticalSpeed() * (float) ratio, AllConfigs.server().kinetics.maxRotationSpeed.get());
         return ((int) newSpeed) / getTheoreticalSpeed();
     }
 
@@ -141,5 +152,10 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
     @Override
     public NetworkHandler handler() {
         return handler;
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }

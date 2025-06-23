@@ -141,4 +141,28 @@ public class SpatialScheduleUIField extends TypedUIPort<CompoundTag> implements
     public Label[] titles() {
         return new Label[]{qdLabel, qiLabel, qpLabel, pdLabel, piLabel, ppLabel};
     }
+
+    public EditBox qpField() {
+        return qpField;
+    }
+
+    public EditBox qiField() {
+        return qiField;
+    }
+
+    public EditBox qdField() {
+        return qdField;
+    }
+
+    public EditBox ppField() {
+        return ppField;
+    }
+
+    public EditBox piField() {
+        return piField;
+    }
+
+    public EditBox pdField() {
+        return pdField;
+    }
 }

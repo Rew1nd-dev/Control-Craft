@@ -24,6 +24,8 @@ public class FunctionsLinkPort extends InspectableLinkPort<AnalogTypes> implemen
             case MIN -> CimulinkFactory.MIN.summarize(__raw());
             case MAX -> CimulinkFactory.MAX.summarize(__raw());
             case PRODUCT -> CimulinkFactory.PRODUCT.summarize(__raw());
+            case DIV -> CimulinkFactory.DIV.summarize(__raw());
+            case ABS -> CimulinkFactory.ABS.summarize(__raw());
             case ANGLE_FIX -> CimulinkFactory.ANGLE_FIX.summarize(__raw());
             case POWER -> CimulinkFactory.POWER.summarize(__raw());
             case SIN -> CimulinkFactory.SIN.summarize(__raw());

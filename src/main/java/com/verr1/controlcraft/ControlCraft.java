@@ -3,6 +3,7 @@ package com.verr1.controlcraft;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
+import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import com.verr1.controlcraft.ponder.CimulinkPonderIndex;
@@ -100,6 +101,7 @@ public class ControlCraft
 
 
         TweakControllerCompact.init();
+        CreateBigCannonsCompact.init();
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
 
@@ -144,6 +146,7 @@ public class ControlCraft
         // CimulinkPonderIndex.register();
         // ControlCraftAttachments.register();
         TweakControllerCompact.init();
+        CreateBigCannonsCompact.init();
         // AttachmentRegistry.register();
 
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
