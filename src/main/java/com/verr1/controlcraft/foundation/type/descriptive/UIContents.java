@@ -83,6 +83,8 @@ public enum UIContents implements Descriptive<UIContents> {
     SENSOR_SETTINGS(Component.literal("Sensor Settings"), literals("Settings for the sensor")),
     SENSOR_TYPE(Component.literal("Type"), literals("Which metric to measure")),
     SENSOR_LOCAL(Component.literal("Local"), literals("Transform vector to local coordinate")),
+
+    PLACE_HOLDER(Component.literal(""), literals(""))
     ;
 
 

@@ -36,6 +36,13 @@ public class CimulinkRenderer implements IRenderer{
 
     private final CimulinkBlockEntity<?> cbe;
 
+    private int lazyTickCounter = 0;
+    private static final int  lazyTick = 6;
+
+
+
+    private double socketRenderOffset = 0.4;
+
     private final Map<String, RenderCurveKey> cachedKeys = new HashMap<>();
     ConnectionStatus cachedConnectionStatus = ConnectionStatus.EMPTY;
 
@@ -73,6 +80,10 @@ public class CimulinkRenderer implements IRenderer{
         return socketPositions;
     }
 
+    public void setSocketRenderOffset(double socketRenderOffset) {
+        this.socketRenderOffset = socketRenderOffset;
+    }
+
     private void flash(List<Integer> changedInput){
         if(cbe.getLevel() ==null || !cbe.getLevel().isClientSide)return;
         changedInput.stream().filter(i -> i < n())
@@ -85,7 +96,7 @@ public class CimulinkRenderer implements IRenderer{
     }
 
     public Vec3 socketRenderOffset(){
-        return toVec3(cbe.getDirection().getNormal()).scale(-0.4);
+        return toVec3(cbe.getDirection().getNormal()).scale(-socketRenderOffset);
     }
 
     void tickSocketPositions(){
@@ -103,10 +114,19 @@ public class CimulinkRenderer implements IRenderer{
     }
 
     public void tick(){
+        lazyTick();
         tickCached();
         tickBox();
         tickCurve();
         tickFlash();
+    }
+
+    private void lazyTick(){
+        if(lazyTickCounter-- > 0){
+            return;
+        }
+        lazyTickCounter = lazyTick;
+        tickSocketPositions();
     }
 
     @NotNull

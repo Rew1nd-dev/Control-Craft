@@ -58,7 +58,7 @@ public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
     @Override
     protected void initLayout(GridLayout layoutToFill) {
         AtomicInteger line = new AtomicInteger(0);
-        layoutToFill.addChild(label, line.getAndIncrement(), 0);
+        layoutToFill.addChild(label, line.getAndIncrement(), 0, 1, 2);
 
         IntStream.range(0, max_size).forEach(i -> {
             layoutToFill.addChild(widgets.get(i).label, line.get(), 0);

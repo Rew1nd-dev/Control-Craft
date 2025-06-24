@@ -227,6 +227,43 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int stepCimulinkCommand(CommandContext<CommandSourceStack> context){
+        try{
+            BlockLinkPort.preMainTick();
+            BlockLinkPort.postMainTick();
+        }catch (Exception e){
+            context.getSource().sendFailure(Component.literal("An error occurred while stepping the Cimulink: " + e.getMessage()));
+        }
+        return 1;
+    }
+
+    public static int stepCombinationalCimulinkCommand(CommandContext<CommandSourceStack> context){
+        try{
+            BlockLinkPort.preMainTick();
+        }catch (Exception e){
+            context.getSource().sendFailure(Component.literal("An error occurred while stepping the Combinational: " + e.getMessage()));
+        }
+        return 1;
+    }
+
+    public static int stepTemporalCimulinkCommand(CommandContext<CommandSourceStack> context){
+        try{
+            BlockLinkPort.postMainTick();
+        }catch (Exception e){
+            context.getSource().sendFailure(Component.literal("An error occurred while stepping the Temporal: " + e.getMessage()));
+        }
+        return 1;
+    }
+
+    public static int toggleCimulinkDebugMode(CommandContext<CommandSourceStack> context){
+        BlockLinkPort.DEBUG_STEPPING_MODE = !BlockLinkPort.DEBUG_STEPPING_MODE;
+        context.getSource().sendSuccess(
+                () -> Component.literal("Cimulink debug mode is now " + (BlockLinkPort.DEBUG_STEPPING_MODE ? "enabled" : "disabled")),
+                false
+        );
+        return 1;
+    }
+
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
             Commands
@@ -285,6 +322,10 @@ public class ControlCraftServerCommands {
                         ).then(lt("load-circuit")
                             .then(arg("saveName", StringArgumentType.string())
                                 .executes(ControlCraftServerCommands::loadCircuitCommand))
+                        ).then(lt("step")
+                            .executes(ControlCraftServerCommands::stepCimulinkCommand)
+                        ).then(lt("toggle-debug-mode")
+                            .executes(ControlCraftServerCommands::toggleCimulinkDebugMode)
                         )
         );
     }

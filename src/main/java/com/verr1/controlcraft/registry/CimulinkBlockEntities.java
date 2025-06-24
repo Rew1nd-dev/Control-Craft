@@ -21,6 +21,8 @@ import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlock;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
+import com.verr1.controlcraft.content.links.scope.OscilloscopeBlock;
+import com.verr1.controlcraft.content.links.scope.OscilloscopeBlockEntity;
 import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.sensor.SensorBlockEntity;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
@@ -28,6 +30,7 @@ import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlockEntity;
 import com.verr1.controlcraft.render.CimulinkSocketRenderer;
+import com.verr1.controlcraft.render.OscilloscopeBlockEntityRenderer;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -109,6 +112,12 @@ public class CimulinkBlockEntities {
             .blockEntity(SensorBlock.ID, SensorBlockEntity::new)
             .validBlock(CimulinkBlocks.SENSOR)
             .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<OscilloscopeBlockEntity> SCOPE_BLOCKENTITY = REGISTRATE
+            .blockEntity(OscilloscopeBlock.ID, OscilloscopeBlockEntity::new)
+            .validBlock(CimulinkBlocks.SCOPE)
+            .renderer(() -> OscilloscopeBlockEntityRenderer::new)
             .register();
 
     public static void register(){}

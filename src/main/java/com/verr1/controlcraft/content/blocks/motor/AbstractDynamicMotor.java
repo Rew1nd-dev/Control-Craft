@@ -56,18 +56,11 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         IPacketHandler, IKineticDevice, IPlant
 {
     public SynchronizedField<Double> controlTorque = new SynchronizedField<>(0.0);
-
     private final DynamicController controller = new DynamicController().withPID(DEFAULT_VELOCITY_MODE_PARAMS);
     private boolean isLocked = false;
-
-
     private final DirectReceiver receiver = new DirectReceiver();
-
     private final MotorPlant plant = new MotorPlant(this);
-
     private double speedLimit = 10;
-
-
     protected TargetMode targetMode = TargetMode.VELOCITY;
     protected LockMode lockMode = LockMode.OFF;
     protected CheatMode cheatMode = CheatMode.NONE;
@@ -117,10 +110,8 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public CheatMode getCheatMode() {return cheatMode;}
     public double getTarget(){return controller.getTarget();}
     public boolean isLocked() {return isLocked;}
-
     public double speedLimit() {return speedLimit;}
     public void setSpeedLimit(double speedLimit) {this.speedLimit = Math.max(speedLimit, 2);}
-
     public void setTargetMode(TargetMode targetMode) {
         this.targetMode = targetMode;
         /*
@@ -189,7 +180,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         double AngleFix = VSMathUtils.getDumbFixOfLockMode(getServoDirection(), getCompanionShipAlign());
 
         Quaterniondc q_comp = new Quaterniond()
-                .rotateAxis(AngleFix - getServoAngle(), getCompanionShipAlignJOML())  // dumbFix +  dumb fixing getServoDirectionJOML()
+                .rotateAxis(AngleFix - getServoAngle(), getCompanionShipAlignJOML())  // dumbFix
                 .mul(VSMathUtils.getQuaternionOfPlacement(getCompanionShipAlign().getOpposite()))
                 .mul(new Quaterniond(new AxisAngle4d(Math.toRadians(90.0), 0.0, 0.0, 1.0)), new Quaterniond())
                 .normalize();

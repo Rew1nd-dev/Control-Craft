@@ -8,19 +8,13 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 public class OutputLinkPort extends BlockLinkPort{
 
 
-    private final Component.Port outputPort = new Component.Port();
-
     public OutputLinkPort() {
         super(new Sink());
     }
 
 
     public double peek(){
-        return outputPort.peek();
-    }
-
-    public void tick(){
-        outputPort.update(__raw().peekInput(0));
+        return __raw().peekInput(0);
     }
 
     @Override

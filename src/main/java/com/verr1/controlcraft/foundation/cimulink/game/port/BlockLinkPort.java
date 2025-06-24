@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 public abstract class BlockLinkPort {
 
     public static boolean RUN_AT_PHYSICS_THREAD = false;
+    public static boolean DEBUG_STEPPING_MODE = false;
 
     public static final Set<WorldBlockPos> ALL_BLP = ConcurrentHashMap.newKeySet();
 
@@ -305,11 +306,13 @@ public abstract class BlockLinkPort {
 
     public static void postMainTick(){
         if(RUN_AT_PHYSICS_THREAD)return;
+        if(DEBUG_STEPPING_MODE)return;
         propagateTemporal();
     }
 
     public static void preMainTick(){
         if(RUN_AT_PHYSICS_THREAD)return;
+        if(DEBUG_STEPPING_MODE)return;
         propagateGlobalInput();
     }
 

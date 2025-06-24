@@ -122,7 +122,7 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
     @Override
     public void tickServer() {
         super.tickServer();
-        linkPort().tick();
+        // linkPort().tick();
         updateOutputSignal();
         updateNeighbor();
     }

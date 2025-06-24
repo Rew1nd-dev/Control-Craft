@@ -28,6 +28,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -222,8 +223,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     public void lazyTickClient() {
         super.lazyTickClient();
         requestConnectionStatusOnFocus();
-        // renderer().tickSocketPositions();
-
     }
 
 
@@ -236,11 +235,27 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         syncForNear(false, SharedKeys.COMPONENT_NAME);
     }
 
-    public ConnectionStatus readClientConnectionStatus(){
+    public @Nullable ConnectionStatus readClientConnectionStatus(){
         return handler().readClientBuffer(SharedKeys.CONNECTION_STATUS, ConnectionStatus.class);
     }
 
-    public ValueStatus readClientValueStatus(){
+    public boolean isValueStatusDirty(){
+        return handler().isAnyDirty(SharedKeys.VALUE_STATUS);
+    }
+
+    public boolean isConnectionStatusDirty(){
+        return handler().isAnyDirty(SharedKeys.VALUE_STATUS);
+    }
+
+    public void setValueStatueDirty(){
+        handler().setDirty(SharedKeys.VALUE_STATUS);
+    }
+
+    public void setConnectionStatusDirty(){
+        handler().setDirty(SharedKeys.CONNECTION_STATUS);
+    }
+
+    public @Nullable  ValueStatus readClientValueStatus(){
         return handler().readClientBuffer(SharedKeys.VALUE_STATUS, ValueStatus.class);
     }
 

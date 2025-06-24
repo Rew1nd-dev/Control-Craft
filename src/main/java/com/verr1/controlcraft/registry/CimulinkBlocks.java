@@ -15,6 +15,7 @@ import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlock;
+import com.verr1.controlcraft.content.links.scope.OscilloscopeBlock;
 import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
@@ -209,6 +210,20 @@ public class CimulinkBlocks {
 
             .transform(customItemModel())
             .lang("Inertial Measurement Unit")
+            .register();
+
+    public static final BlockEntry<OscilloscopeBlock> SCOPE = REGISTRATE
+            .block(OscilloscopeBlock.ID, OscilloscopeBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+
+            .transform(customItemModel())
+            .lang("Oscilloscope")
             .register();
 
     public static void register(){}

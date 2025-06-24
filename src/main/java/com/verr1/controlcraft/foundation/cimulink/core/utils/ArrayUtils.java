@@ -66,6 +66,12 @@ public class ArrayUtils {
                 .toList();
     }
 
+    public static <T> List<T> ListOf(int n, Function<Integer ,T> defaultValue){
+        return IntStream.range(0, n)
+                .mapToObj(defaultValue::apply)
+                .toList();
+    }
+
     @SafeVarargs
     public static<T> List<T> flatten(List<T>... lists){
         return Arrays.stream(lists).flatMap(List::stream).toList();

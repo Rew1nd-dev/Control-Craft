@@ -12,7 +12,14 @@ public enum SensorTypes implements Descriptive<SensorTypes> {
     OMEGA(literals("Angular Velocity Sensor")),
     VELOCITY(literals("Velocity Sensor")),
     ROTATION(literals("Rotation Sensor")),
-    EULER_YXZ(literals("Euler Angle Sensor, Y:yaw -> X:pitch -> Z:roll")),
+    EULER_YXZ(literals(
+            "Euler Angle Sensor,",
+            "Y:yaw | X:pitch | Z:roll",
+            "Rotation Sequence: ",
+            "1. Turn around Y-axis",
+            "2. Turn around Z-axis after step 1.",
+            "3. Turn around X-axis after step 2."
+    )),
     ;
 
 

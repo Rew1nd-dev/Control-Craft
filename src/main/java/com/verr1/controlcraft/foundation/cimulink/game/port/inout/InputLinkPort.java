@@ -8,8 +8,6 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 
 public class InputLinkPort extends BlockLinkPort{
 
-    private final Component.Port inputPort = new Component.Port();
-
     public InputLinkPort() {
         super(new Source());
     }
