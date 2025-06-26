@@ -7,6 +7,7 @@ import com.verr1.controlcraft.content.links.scope.OscilloscopeBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -52,8 +53,8 @@ public class OscilloscopeBlockEntityRenderer extends CimulinkSocketRenderer<Osci
                 ms.last().pose(),
                 bufferSource,
                 Font.DisplayMode.NORMAL,
-                light,
-                overlay
+                0,
+                LightTexture.FULL_BRIGHT
         );
         ms.popPose();
 
@@ -71,13 +72,14 @@ public class OscilloscopeBlockEntityRenderer extends CimulinkSocketRenderer<Osci
     }
 
     public static void translateToFace(Direction dir, PoseStack ms, double scale){
-        double distance = 0.7;
+        double distance = 1;
+        double offset = -0.3 / scale; // Offset to center the text
         switch (dir) {
-            case NORTH -> ms.translate(-0.5 / scale, -0.5 / scale, 0); // 北面 (z = -0.5)
-            case SOUTH -> ms.translate( 0.5 / scale, -0.5 / scale, distance / scale);
-            case WEST, DOWN -> ms.translate( 0.5 / scale, -0.5 / scale, 0);
-            case EAST  -> ms.translate(-0.5 / scale, -0.5 / scale, distance / scale);
-            case UP    -> ms.translate(0.5 / scale,  0.5 / scale, distance / scale);
+            case NORTH -> ms.translate(-0.5 / scale, -0.5 / scale, 0 + offset ); // 北面 (z = -0.5)
+            case SOUTH -> ms.translate( 0.5 / scale, -0.5 / scale, distance / scale + offset);
+            case WEST, DOWN -> ms.translate( 0.5 / scale, -0.5 / scale, 0 + offset);
+            case EAST  -> ms.translate(-0.5 / scale, -0.5 / scale, distance / scale + offset);
+            case UP    -> ms.translate(0.5 / scale,  0.5 / scale, distance / scale + offset);
         }
     }
 

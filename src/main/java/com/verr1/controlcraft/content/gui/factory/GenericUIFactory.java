@@ -439,7 +439,7 @@ public class GenericUIFactory {
                 SharedKeys.TARGET_MODE,
                 TargetMode.class,
                 Converter.convert(UIContents.MODE, Converter::titleStyle)
-        ).onOptionSwitch(newValue -> {
+        ).onOptionSwitch(($, newValue) -> {
             if(newValue == TargetMode.VELOCITY){
                 pid.setPIDField(AbstractDynamicMotor.DEFAULT_VELOCITY_MODE_PARAMS);
             }else{
@@ -548,7 +548,7 @@ public class GenericUIFactory {
                 SharedKeys.TARGET_MODE,
                 TargetMode.class,
                 Converter.convert(UIContents.MODE, Converter::titleStyle)
-        ).onOptionSwitch(newValue -> {
+        ).onOptionSwitch(($, newValue) -> {
             if(newValue == TargetMode.VELOCITY){
                 pid.setPIDField(AbstractDynamicMotor.DEFAULT_VELOCITY_MODE_PARAMS);
             }else{
@@ -781,7 +781,8 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, target_field, compliance_field, toggle_mode);
+            Converter.alignLabel(current_view, target_field);
+            Converter.alignLabel(compliance_field, toggle_mode);
             Converter.alignLabel(asm, disasm);
         };
 
@@ -789,13 +790,14 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(SharedKeys.VALUE, current_view)
-                                .withPort(SharedKeys.TARGET, target_field)
-                                .withPort(SharedKeys.COMPLIANCE, compliance_field)
-                                .withPort(SharedKeys.SELF_OFFSET, self_offset)
-                                .withPort(SharedKeys.COMP_OFFSET, comp_offset)
-                                .withPort(SharedKeys.TARGET_MODE, toggle_mode)
+                                .withPort(current_view, target_field, toggle_mode)
                                 .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTab(
+                        ADVANCE_TAB
+                        , new VerticalFlow.builder(boundPos)
+                                .withPort(self_offset, comp_offset, compliance_field)
                                 .build()
                 )
                 .withTab(

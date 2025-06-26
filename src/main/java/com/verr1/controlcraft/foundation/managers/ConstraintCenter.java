@@ -76,11 +76,11 @@ public class ConstraintCenter {
 
     public static void removeConstraintIfPresent(ConstraintKey key){
         if(cache.containsKey(key)){
-            ControlCraft.LOGGER.info("Removing Constraint: " + key);
+            // ControlCraft.LOGGER.info("Removing Constraint: " + key);
             boolean removed = removeConstraint(cache.get(key).ID());
             if(removed){
                 cache.remove(key);
-                ControlCraft.LOGGER.info("Removed Constraint: " + key);
+                // ControlCraft.LOGGER.info("Removed Constraint: " + key);
             }
         }
     }
@@ -130,7 +130,7 @@ public class ConstraintCenter {
 
     private static @Nullable Object createNewConstraint(@Nullable VSConstraint constraint){
         if(constraint == null)return null;
-        ControlCraft.LOGGER.info("Creating New Constraint: " + constraint.getConstraintType());
+        // ControlCraft.LOGGER.info("Creating New Constraint: " + constraint.getConstraintType());
         return Optional.ofNullable(ValkyrienSkies.getShipWorld(server))
                 .filter(ServerShipWorldCore.class::isInstance)
                 .map(ServerShipWorldCore.class::cast)
@@ -140,7 +140,7 @@ public class ConstraintCenter {
 
     private static boolean updateConstraint(int id, VSConstraint constraint){
         if(constraint == null)return false;
-        ControlCraft.LOGGER.info("Updating Constraint: " + constraint.getConstraintType());
+        // ControlCraft.LOGGER.info("Updating Constraint: " + constraint.getConstraintType());
         return Optional
                 .ofNullable(ValkyrienSkies.getShipWorld(server))
                 .filter(ShipObjectServerWorld.class::isInstance)
@@ -155,7 +155,7 @@ public class ConstraintCenter {
                 .map(Number.class::cast)
                 .ifPresent(id -> {
                     cache.put(key, new ConstraintWithID(constraint, id.intValue()));
-                    ControlCraft.LOGGER.info("Created Constraint: " + constraint.getConstraintType() + " ID: " + id);
+                    // ControlCraft.LOGGER.info("Created Constraint: " + constraint.getConstraintType() + " ID: " + id);
                 });
     }
 
@@ -166,11 +166,11 @@ public class ConstraintCenter {
         else{
             ConstraintWithID data = cache.get(key);
             if(!updateConstraint(data.ID(), constraint)){
-                ControlCraft.LOGGER.info("Failed to Update Constraint: " + constraint.getConstraintType());
+                // ControlCraft.LOGGER.info("Failed to Update Constraint: " + constraint.getConstraintType());
                 removeConstraint(data.ID());
                 createOrReplaceNewConstrain(key, constraint);
             }else{
-                ControlCraft.LOGGER.info("Updated Constraint: " + constraint.getConstraintType());
+                // ControlCraft.LOGGER.info("Updated Constraint: " + constraint.getConstraintType());
                 cache.put(key, new ConstraintWithID(constraint, data.ID()));
             }
         }

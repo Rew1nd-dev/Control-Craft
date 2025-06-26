@@ -2,6 +2,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 
 import com.verr1.controlcraft.content.blocks.motor.AbstractDynamicMotor;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.utils.MathUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +19,7 @@ public class MotorPlant extends Plant {
     ) {
         super(
                 new builder()
-                        .in("target", t -> plant.getController().setTarget(t))
+                        .in("target", t -> plant.getController().setTarget(MathUtils.radianReset(t)))
                         .in("lock", l -> plant.tryLock(l > 0.5))
                         .in("torque", plant::setOutputTorque)
                         .out("current", () -> plant.getController().getValue())

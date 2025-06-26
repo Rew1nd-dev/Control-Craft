@@ -10,6 +10,7 @@ import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.VSGetterUtils;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -143,7 +144,7 @@ public class ClientCameraManager {
 
         if(camera != null && isLinked()){
             camera.setPitch(player.getViewXRot(1));
-            camera.setYaw(player.getViewYRot(1));
+            camera.setYaw(MathUtils.angleReset(player.getViewYRot(1)));
             camera.syncServer(player.getName().getString());
             setLatest(toMinecraft(camera.getCameraPosition()));
         }

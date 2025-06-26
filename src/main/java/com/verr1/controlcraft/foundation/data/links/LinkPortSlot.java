@@ -10,10 +10,12 @@ public class LinkPortSlot extends ValueBoxTransform.Sided {
 
     private float y = 8;
     private float x = 3;
+    private float z = 0;
 
-    public LinkPortSlot(float x, float y) {
+    public LinkPortSlot(float x, float y, float z) {
         this.y = y;
         this.x = x;
+        this.z = z;
     }
 
 
@@ -21,7 +23,7 @@ public class LinkPortSlot extends ValueBoxTransform.Sided {
     protected Vec3 getSouthLocation() {
         int signY = direction == Direction.DOWN ? -1 : 1;
         int signX = direction == Direction.DOWN ? 1 : direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -1;
-        return VecHelper.voxelSpace(8 + signX * x, 8 + signY * y, 8);
+        return VecHelper.voxelSpace(8 + signX * x, 8 + signY * y, 8 + z);
     }
 
 }

@@ -13,6 +13,9 @@ import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.FlapBearingPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -50,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class FlapBearingBlockEntity extends OnShipBlockEntity implements
-        IBearingBlockEntity, IReceiver, IPacketHandler, IHaveGoggleInformation
+        IBearingBlockEntity, IReceiver, IPacketHandler, IHaveGoggleInformation, IPlant
 {
     public static NetworkKey ANGLE = NetworkKey.create("angle");
 
@@ -60,7 +63,7 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
     protected float adjustSpeed;
     protected boolean running;
 
-
+    private final FlapBearingPlant plant = new FlapBearingPlant(this);
     private FlapBearingPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
 
@@ -360,5 +363,10 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
 
 
         lazyTickRate = 3;
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }

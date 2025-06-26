@@ -18,6 +18,7 @@ import com.verr1.controlcraft.content.links.signal.DirectCurrentBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
+import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogGroups;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.CimulinkBlocks;
 import net.minecraft.core.BlockPos;
@@ -144,18 +145,43 @@ public class CimulinkUIFactory {
 
     public static GenericSettingScreen createFunctionsScreen(BlockPos boundPos){
 
-        OptionUIField<AnalogTypes> type = new OptionUIField<>(
+        /*
+        * OptionUIField<AnalogTypes> type = new OptionUIField<>(
                 boundPos,
-                FunctionsBlockEntity.FUNCTIONS,
+                SharedKeys.PLACE_HOLDER,
                 AnalogTypes.class,
+                AnalogTypes.SubTypes.Basic.values,
                 convert(UIContents.FF_TYPES, Converter::titleStyle)
         );
+
+        OptionUIField<AnalogTypes.SubTypes> subType = new OptionUIField<>(
+                boundPos,
+                FunctionsBlockEntity.FUNCTIONS,
+                AnalogTypes.SubTypes.class,
+                convert(UIContents.FF_TYPES, Converter::titleStyle)
+        ).onOptionSwitch((field, newValue) -> {
+            type.options().withValues(newValue.values).setState(0).onChanged();
+            field.setMaxLength();
+            Optional.ofNullable(field.parent).ifPresent(VerticalFlow::redoLayout);
+        });
+        * */
 
         StringUIField name = new StringUIField(
                 boundPos,
                 SharedKeys.COMPONENT_NAME,
                 convert(UIContents.NAME, Converter::titleStyle)
         );
+
+        GroupOptionUIField<AnalogGroups, AnalogTypes> type = new GroupOptionUIField<>(
+                boundPos,
+                FunctionsBlockEntity.FUNCTIONS,
+                AnalogTypes.class,
+                AnalogGroups.class,
+                convert(UIContents.FUNCTIONS_TYPES, Converter::titleStyle),
+                convert(UIContents.FUNCTIONS_GROUP, Converter::titleStyle),
+                AnalogTypes.MIN
+        );
+
 
 
 

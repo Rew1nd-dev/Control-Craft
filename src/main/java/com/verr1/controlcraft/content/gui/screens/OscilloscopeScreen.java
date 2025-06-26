@@ -25,6 +25,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.verr1.controlcraft.content.links.scope.OscilloscopeBlockEntity.Plots.PLOT_SIZE;
+
 @OnlyIn(Dist.CLIENT)
 public class OscilloscopeScreen extends AbstractSimiScreen {
 
@@ -46,7 +48,7 @@ public class OscilloscopeScreen extends AbstractSimiScreen {
         addChannelButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::addChannel);
         removeChannelButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::removeChannel);
         this.boundPos = boundPos;
-        this.plotWidget = new MultiPlotWidget(Minecraft.getInstance().font, 0, 0, 200, 75, new MultiPlotWidget.ChannelDataSupplier() {
+        this.plotWidget = new MultiPlotWidget(Minecraft.getInstance().font, 0, 0, 180, 75, new MultiPlotWidget.ChannelDataSupplier() {
             @Override
             public int size() {
                 return channelSize();
@@ -69,7 +71,7 @@ public class OscilloscopeScreen extends AbstractSimiScreen {
     }
 
     public double span(){
-        return boundBlockEntity().map(be -> be.clientReceivedData.plots.size() * 0.05).orElse(1.0);
+        return PLOT_SIZE * 0.05;
     }
 
     public int channelSize(){
@@ -116,7 +118,7 @@ public class OscilloscopeScreen extends AbstractSimiScreen {
 
         total.rowSpacing(0);
 
-        total.setPosition(guiLeft + 16, guiTop + 6);
+        total.setPosition(guiLeft + 24, guiTop + 6);
         total.arrangeElements();
 
         addRenderableWidgets(

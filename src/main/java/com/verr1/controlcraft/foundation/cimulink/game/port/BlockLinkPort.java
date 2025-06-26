@@ -478,7 +478,13 @@ public abstract class BlockLinkPort {
         outputsNames().forEach(this::disconnectOutput);
     }
 
+    public void removeInvalidOutputKey(){
+        forwardLinks.keySet().stream().filter(k -> !outputsNames().contains(k)).toList()
+                .forEach(this::deleteOutput);
+    }
+
     public void removeInvalidOutput(){
+        removeInvalidOutputKey();
         forwardLinks.entrySet().stream().flatMap(e ->
             e.getValue().stream().map(bp -> new Pair<>(e.getKey(), bp))
         ).filter(e -> {
@@ -512,7 +518,7 @@ public abstract class BlockLinkPort {
 
             // blp input port does not include this output port
             if(test){
-                ControlCraft.LOGGER.info("output: {} -> {} is invalid at: {}, blp links: {}", outputName, bp.portName(), pos(), blp.backwardLinks());
+                ControlCraft.LOGGER.info("output: {} -> {} is invalid, blp links: {}", new BlockPort(pos(), outputName), bp, blp.backwardLinks());
                 return true;
             }
 
@@ -526,8 +532,15 @@ public abstract class BlockLinkPort {
 
     }
 
+
+    public void removeInvalidInputKey(){
+        backwardLinks.keySet().stream().filter(k -> !inputsNames().contains(k)).toList()
+                .forEach(this::deleteInput);
+    }
+
     public void removeInvalidInput(){
         // List<String> invalidInputs = new ArrayList<>();
+        removeInvalidInputKey();
         backwardLinks.entrySet().stream().filter(e -> {
 
             if(!ready(e.getValue().pos())){
@@ -559,7 +572,7 @@ public abstract class BlockLinkPort {
                     .contains(new BlockPort(pos(), inputName));
             // blp output port does not include this input port
             if(test){
-                ControlCraft.LOGGER.info("input: {} -> {} is invalid at: {}, blp links: {}", bp.portName(), inputName, pos(), blp.forwardLinks());
+                ControlCraft.LOGGER.info("input: {} -> {} is invalid, blp links: {}", bp, new BlockPort(pos(), inputName), blp.forwardLinks());
                 return true;
             }
             return false; // if the input is not in the blp, it is invalid

@@ -108,8 +108,9 @@ public class MultiPlotWidget extends AbstractSimiWidget {
         graphics.drawString(font, Value, this.getX() + 2, this.getY() - font.lineHeight / 2, 3);
         int slices = 4;
         for (int i = 0; i <= slices; i++){
-            double yValue = minValue + (maxValue - minValue) * i / slices;
-            int yPos = (int) ((1.0 - (yValue - minValue) / (maxValue - minValue)) * widgetHeight);
+            double ratio = (double) i / slices;
+            double yValue = minValue + (maxValue - minValue) * ratio;
+            int yPos = (int) ((1.0 - ratio) * widgetHeight);
             Component label = Component.literal(String.format("%.2f", yValue)).withStyle(s -> s.withColor(ChatFormatting.DARK_AQUA));
             graphics.drawString(font, label,
                     this.getX() - font.width(label) - 2,
@@ -121,9 +122,8 @@ public class MultiPlotWidget extends AbstractSimiWidget {
         }
 
         for (int i = 1; i <= slices; i++){
-            double xValue = (double) i / slices * fetcher.span();
-
-            Component label = Component.literal(String.format("%.2f", xValue)).withStyle(s -> s.withColor(ChatFormatting.DARK_AQUA));
+            double xValue = (double) i / slices;
+            Component label = Component.literal(String.format("%.2f", xValue  * fetcher.span())).withStyle(s -> s.withColor(ChatFormatting.DARK_AQUA));
             int xPos = (int) (xValue * widgetWidth);
             graphics.drawString(font, label,
                     this.getX() + xPos - font.width(label) / 2,

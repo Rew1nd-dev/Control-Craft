@@ -69,6 +69,11 @@ public class CimulinkLinkPacket extends SimplePacketBase {
                 BlockEntityGetter.INSTANCE
                         .getBlockEntityAt(outputPort.pos(), CimulinkBlockEntity.class)
                         .ifPresent(BlockEntity::setChanged);
+
+                BlockEntityGetter.INSTANCE
+                        .getBlockEntityAt(inputPort.pos(), CimulinkBlockEntity.class)
+                        .ifPresent(BlockEntity::setChanged);
+
             }catch (IllegalArgumentException e){
                 if(context.getSender() == null)return;
                 context.getSender().sendSystemMessage(Component.literal(e.getMessage()));

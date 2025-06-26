@@ -31,6 +31,12 @@ public class FunctionsLinkPort extends InspectableLinkPort<AnalogTypes> implemen
             case SIN -> CimulinkFactory.SIN.summarize(__raw());
             case COS -> CimulinkFactory.COS.summarize(__raw());
             case TAN -> CimulinkFactory.TAN.summarize(__raw());
+            case ASIN -> CimulinkFactory.ASIN.summarize(__raw());
+            case ACOS -> CimulinkFactory.ACOS.summarize(__raw());
+            case ATAN -> CimulinkFactory.ATAN.summarize(__raw());
+            case DOT -> CimulinkFactory.V_DOT.summarize(__raw());
+            case CROSS -> CimulinkFactory.V_CROSS.summarize(__raw());
+            case Q_TRANSFORM -> CimulinkFactory.V_TRANSFORM.summarize(__raw());
         };
     }
 }

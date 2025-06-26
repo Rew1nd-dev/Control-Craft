@@ -17,8 +17,6 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -71,9 +69,11 @@ public class VerticalFlow implements SwitchableTab {
                     be.handler().request(keys);
                     be.handler().setDirty(keys);
                     AtomicInteger row = new AtomicInteger();
-                    entries.forEach(port -> verticalLayout.addChild(port.layout(), row.getAndIncrement(), 0, 1, 2));
-                    verticalLayout.rowSpacing(4);
-                    verticalLayout.arrangeElements();
+                    entries.forEach(port -> {
+                        verticalLayout.addChild(port.layout(), row.getAndIncrement(), 0, 1, 2);
+                        port.setParent(this);
+                    });
+                    redoLayout();
                     debug_init_id++;
                     var task = new ConditionExecutable
                             .builder(() -> entries.forEach(v -> {
@@ -90,6 +90,12 @@ public class VerticalFlow implements SwitchableTab {
                 },
                 () -> p.sendSystemMessage(Component.literal("Block Entity Not Found !!!"))
         );
+    }
+
+    public void redoLayout(){
+        listeners.forEach(SwitchableTabListener::onDoLayout);
+        verticalLayout.rowSpacing(4);
+        verticalLayout.arrangeElements();
     }
 
     @Override

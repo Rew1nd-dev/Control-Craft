@@ -45,6 +45,7 @@ public class OscilloscopeBlockEntity extends CimulinkBlockEntity<MultiOutputLink
     public void setSize(int size){
         if(size > MAX_CHANNELS || size <= 0)return;
         linkPort().setSize(size);
+        setChanged();
     }
 
     public int size(){
@@ -64,8 +65,6 @@ public class OscilloscopeBlockEntity extends CimulinkBlockEntity<MultiOutputLink
         super.tickClient();
         clientReceivedData.tick();
     }
-
-
 
     public static class Plots{
         public final static int PLOT_SIZE = 32;

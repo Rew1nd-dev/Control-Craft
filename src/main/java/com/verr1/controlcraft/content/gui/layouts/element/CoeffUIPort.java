@@ -99,7 +99,7 @@ public class CoeffUIPort extends ListUIPort<StringDouble, Coefficients>{
 
         public void write(StringDouble nc){
             label.setText(Component.literal(nc.name()));
-            field.setValue("%.4f".formatted(nc.coeff()));
+            field.setValue("%.8f".formatted(nc.coeff()));
         }
 
         public void setVisible(boolean visible){

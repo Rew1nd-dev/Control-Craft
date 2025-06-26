@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.gui.layouts;
 import com.verr1.controlcraft.content.gui.layouts.api.TabListener;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -19,8 +20,18 @@ public abstract class NetworkUIPort<T> implements TabListener {
         this.read = read;
     }
 
+    public void setParent(VerticalFlow parent){
+        this.parent = parent;
+    }
+
     public GridLayout layout(){
         return layout;
+    }
+
+    public VerticalFlow parent;
+
+    public @Nullable VerticalFlow parent() {
+        return parent;
     }
 
     public void onScreenInit(){
@@ -31,12 +42,11 @@ public abstract class NetworkUIPort<T> implements TabListener {
         writeGUI(read.get());
     }
 
-    public void onScreenTick(){}
-
     public void onActivatedTab(){
         isActivated = true;
         layout.visitWidgets(e -> e.visible = true);
     }
+
 
     @Override
     public void onAddRenderable(Collection<AbstractWidget> toAdd) {

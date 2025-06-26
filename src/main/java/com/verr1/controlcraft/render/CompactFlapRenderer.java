@@ -20,7 +20,7 @@ public class CompactFlapRenderer extends SafeBlockEntityRenderer<CompactFlapBloc
 
     @Override
     protected void renderSafe(CompactFlapBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
-        float angle = be.getClientAnimatedAngle().getValue(partialTicks) + (float)be.getOffset();
+        float angle = be.getClientAnimatedAngle().getValue(partialTicks);// + (float)be.getOffset();
         Direction dir = be.getDirection();
         // int sign = (dir == Direction.UP || dir == Direction.SOUTH || dir == Direction.EAST) ? 1 : -1;
         BlockState state = be.getBlockState();

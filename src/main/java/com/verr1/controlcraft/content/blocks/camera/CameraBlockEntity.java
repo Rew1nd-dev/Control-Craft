@@ -9,6 +9,9 @@ import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.camera.CameraMovementTracker;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.CameraPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.data.render.RayLerpHelper;
@@ -86,7 +89,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CameraBlockEntity extends OnShipBlockEntity
-        implements IPacketHandler, IReceiver, IHaveGoggleInformation
+        implements IPacketHandler, IReceiver, IHaveGoggleInformation, IPlant
 {
     public static NetworkKey RESET = NetworkKey.create("reset_view");
 
@@ -120,6 +123,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
 
     private CameraClipType rayType = CameraClipType.NO_RAY;
+
+    private final CameraPlant plant = new CameraPlant(this);
 
     public final CameraMovementTracker tracker;
 
@@ -1075,5 +1080,11 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
         return true;
     }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
+    }
+
     public record CameraDrawingContext(ServerPlayer player, Vec3 pos, Direction dir, String slot, int rgb) { }
 }

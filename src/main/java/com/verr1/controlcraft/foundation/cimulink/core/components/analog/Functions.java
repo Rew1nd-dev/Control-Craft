@@ -100,6 +100,27 @@ public class Functions {
         }
     };
 
+    public static final Supplier<FunctionN> ASIN = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(MathUtils.safeAsin(inputs.get(0)));
+        }
+    };
+
+    public static final Supplier<FunctionN> ACOS = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(MathUtils.safeAcos(inputs.get(0)));
+        }
+    };
+
+    public static final Supplier<FunctionN> ATAN = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(Math.atan(inputs.get(0)));
+        }
+    };
+
     public static int deserializeN(CompoundTag tag){
         return SerializeUtils.INT.deserialize(tag.getCompound("n"));
     }

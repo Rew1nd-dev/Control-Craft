@@ -11,6 +11,9 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
+import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.Cross;
+import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.Dot;
+import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.QTransform;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -191,6 +194,13 @@ public class CimulinkFactory {
             defaultID("cos")
     );
 
+    public static final Factory<Dot> V_DOT = register(Dot::new, Dot.class);
+
+    public static final Factory<Cross> V_CROSS = register(Cross::new, Cross.class);
+
+    public static final Factory<QTransform> V_TRANSFORM = register(QTransform::new, QTransform.class);
+
+
     public static final Factory<Functions.FunctionN> TAN = register(
             SerializeUtils.of(
                     Functions.FunctionN::serialize,
@@ -200,7 +210,11 @@ public class CimulinkFactory {
             defaultID("tan")
     );
 
+    public static final Factory<Functions.FunctionN> ASIN = register(Functions.ASIN, Functions.FunctionN.class, "asin");
 
+    public static final Factory<Functions.FunctionN> ACOS = register(Functions.ACOS, Functions.FunctionN.class, "acos");
+
+    public static final Factory<Functions.FunctionN> ATAN = register(Functions.ATAN, Functions.FunctionN.class, "atan");
 
     public static final Factory<Gates.Gate> AND_N = register(
             SerializeUtils.of(
@@ -277,6 +291,35 @@ public class CimulinkFactory {
         Factory<T> factory = new Factory<>(serializer, clazz, ID);
         REGISTRY.put(ID, factory);
         return factory;
+    }
+
+    private static <T extends NamedComponent> Factory<T> register(
+            Supplier<T> argLessFactory,
+            Class<T> clazz
+    ){
+        return register(
+                SerializeUtils.of(
+                        $ -> new CompoundTag(),
+                        $ -> argLessFactory.get()
+                ),
+                clazz,
+                defaultID(clazz.getSimpleName().toLowerCase())
+        );
+    }
+
+    private static <T extends NamedComponent> Factory<T> register(
+            Supplier<T> argLessFactory,
+            Class<T> clazz,
+            String ID
+    ){
+        return register(
+                SerializeUtils.of(
+                        $ -> new CompoundTag(),
+                        $ -> argLessFactory.get()
+                ),
+                clazz,
+                defaultID(ID)
+        );
     }
 
     private static ComponentDeserializer register(

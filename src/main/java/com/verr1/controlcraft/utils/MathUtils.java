@@ -34,6 +34,23 @@ public class MathUtils {
         return x / y;
     }
 
+    public static double safeAsin(double x){
+        if(Math.abs(x) > 1){
+            return x > 0 ? Math.PI / 2 : -Math.PI / 2;
+        }
+        return Math.asin(x);
+    }
+
+    public static double safeAcos(double x){
+        if(Math.abs(x) > 1){
+            return x > 0 ? 0 : Math.PI;
+        }
+        return Math.acos(x);
+    }
+
+
+
+
     public static double clamp1(double x){
         return Math.atan(x) / Math.PI * 0.5;
     }
@@ -86,24 +103,14 @@ public class MathUtils {
         return angle;
     }
 
+    // a bit cursed
     public static double angleReset(double angle){
-        while(angle > 180){
-            angle -= 360;
-        }
-        while(angle < -180){
-            angle += 360;
-        }
-        return angle;
+        return Math.IEEEremainder(angle, 360);
     }
 
+    // a bit cursed
     public static double radianReset(double radian){
-        while(radian > Math.PI){
-            radian -= 2 * Math.PI;
-        }
-        while(radian < -Math.PI){
-            radian += 2 * Math.PI;
-        }
-        return radian;
+        return Math.IEEEremainder(radian, 2 * Math.PI);
     }
 
     public static double toControlCraftAngular(double createSpeed){

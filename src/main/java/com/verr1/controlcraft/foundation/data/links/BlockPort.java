@@ -19,7 +19,7 @@ public record BlockPort(@NotNull WorldBlockPos pos, String portName) {
 
     @Override
     public String toString() {
-        return "Name: " + portName + " at: " + pos.pos().toShortString();
+        return "[" + portName + " | " + pos.pos().toShortString() + "]";
     }
 
     public BlockPort offset(BlockPos offsetPos){

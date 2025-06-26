@@ -73,7 +73,7 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
                             .map(ComponentLike::asComponent)
                             .map(c -> c.copy().withStyle(Converter::optionStyle))
                             .ifPresent(value::setTextOnly);
-                    onOptionSwitch.forEach(o -> o.onSwitch(it));
+                    onOptionSwitch.forEach(o -> o.onSwitch(this, it));
                 }
         );
         setMaxLength();
@@ -87,14 +87,20 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
         return options;
     }
 
-    private void setMaxLength(){
+    public void setMaxLength(){
         AtomicInteger maxLen = new AtomicInteger(0);
         options.values().stream().map(ComponentLike::asComponent).forEach(c -> {
             int len = Minecraft.getInstance().font.width(c);
             if(len > maxLen.get()) maxLen.set(len);
         });
-        value.setWidth(maxLen.get());
+        setMaxLength(maxLen.get());
     }
+
+    public void setMaxLength(int length){
+        value.setWidth(length);
+    }
+
+
 
     private T valueOfOption(){
         return options.valueOfOption();
@@ -131,7 +137,9 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
 
     @FunctionalInterface
     public interface SwitchListener<T>{
-        void onSwitch(T newValue);
+        // void onSwitch(T newValue);
+        // onSwitch(newValue);
+        void onSwitch(OptionUIField<?> self, T newValue);
     }
 
 

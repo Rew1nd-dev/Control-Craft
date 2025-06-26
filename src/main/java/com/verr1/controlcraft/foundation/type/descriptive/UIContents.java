@@ -64,6 +64,7 @@ public enum UIContents implements Descriptive<UIContents> {
     FF_TYPES(Component.literal("Type"), literals("Flip Flop Types")),
 
     FUNCTIONS_TYPES(Component.literal("Type"), literals("Functions Types")),
+    FUNCTIONS_GROUP(Component.literal("Group"), literals("Functions Group")),
 
     LINK_INPUT(Component.literal("Input"), literals("Input Port Value")),
     LINK_OUTPUT(Component.literal("Output"), literals("Output Port Value")),

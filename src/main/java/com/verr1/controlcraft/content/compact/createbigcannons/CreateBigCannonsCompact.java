@@ -13,7 +13,12 @@ public class CreateBigCannonsCompact {
 
     public static @Nullable IPeripheral cannonMountPeripheral(ServerLevel level, BlockPos pos) {
         if (getter == null) return null;
-        return getter.get(level, pos);
+        return getter.getComputercraft(level, pos);
+    }
+
+    public static @Nullable NamedComponent cannonMountPlant(ServerLevel level, BlockPos pos) {
+        if (getter == null) return null;
+        return getter.getCimulink(level, pos);
     }
 
     public static void init() {
