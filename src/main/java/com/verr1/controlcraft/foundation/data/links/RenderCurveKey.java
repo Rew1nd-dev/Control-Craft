@@ -19,7 +19,8 @@ public record RenderCurveKey(
         Vec3 outVec,
         Direction inDir,
         Direction outDir,
-        double startOffset
+        double startOffset,
+        double endOffset
 ) {
 
     @Override
@@ -47,7 +48,7 @@ public record RenderCurveKey(
         Vector3dc outJoml = toJOML(Vec3.atLowerCornerOf(outDir.getNormal()));
         return new CimulinkWireEntry(
                 toJOML(outVec).fma(-startOffset, outJoml),
-                toJOML(inVec).fma(-startOffset, inJoml),
+                toJOML(inVec).fma(-endOffset, inJoml),
                 outJoml,
                 inJoml,
                 0.067f,

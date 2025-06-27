@@ -357,7 +357,12 @@ public class CimulinkRenderer implements IRenderer{
             BlockPort inPort = new BlockPort(WorldBlockPos.of(cbe.getLevel(), cbe.getBlockPos()), inName);
             BlockPort outPort = new BlockPort(WorldBlockPos.of(cbe.getLevel(), outPos), outName);
 
-            var k = new RenderCurveKey(inPort, outPort, inPosition, outPosition, inDir, outDir, socketRenderOffset);
+            var k = new RenderCurveKey(
+                    inPort, outPort,
+                    inPosition, outPosition,
+                    inDir, outDir,
+                    ord.socketRenderOffset, socketRenderOffset
+            );
 
             ControlCraftClient.CLIENT_CURVE_OUTLINER.showLine(k, k::createBezier);
 

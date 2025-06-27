@@ -153,7 +153,7 @@ public abstract class BlockLinkPort {
             this.portPos = portPos;
             add(portPos);
         }else {
-            throw new IllegalCallerException("BlockLinkPort Pos has already been set!");
+            throw new IllegalStateException("BlockLinkPort Pos has already been set!");
         }
     }
 
@@ -287,7 +287,6 @@ public abstract class BlockLinkPort {
     public static void add(WorldBlockPos pos){
         // ControlCraft.LOGGER.info("add is called at: {}", pos);
         ALL_BLP.add(pos);
-
     }
 
     public static void validate(){

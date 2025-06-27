@@ -7,38 +7,25 @@
       "type": "patchouli:spotlight",
       "item": "vscontrolcraft:servo,vscontrolcraft:joint",
       "title": "Servo Motor",
-      "text": "Overview $(br2)Efficiently controls two physics structures to maintain a given rotation angle/angular velocity under suitable conditions.$(br)The two motors differ only in rotation direction."
+      "text": "Overview $(br2)Efficiently and accurately controls two physical structures to maintain a given rotation angle/angular velocity under suitable conditions.$(br)The two motors differ only in rotation direction."
     },
     {
       "type": "patchouli:text",
-      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above into a physics structure (similar to Clockwork bearings). Glue not supported.$(li)Use a wrench to adjust orientation."
+      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above into a physical structure (similar to Clockwork physics bearings). Glue not supported.$(li)Use a wrench to adjust orientation."
     },
     {
       "type": "patchouli:image",
-      "title": "Main Panel",
+      "title": "Control Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_main.png"],
       "text": "Right Click with an empty hand to open the control panel."
     },
     {
       "type": "patchouli:text",
-      "text": "Main Panel $(br2)Displays basic settings:$(br2)Current: Real-time relative angle/angular velocity (radians/radians per second).$(br2)Locked: Whether the motor is constrained.$(br2)Target: Desired angle/angular velocity."
-    },
-    {
-      "type": "patchouli:image",
-      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/offset.png"],
-      "text": "Both motors at 57°. Top: Controlled structure offset. Bottom: Axis offset."
+      "text": "Main Panel $(br2)Displays basic settings:$(br2)Current: Real-time relative angle/angular velocity (radians/radians per second).$(br2)Locked: Whether the motor is constrained.$(br2)Target: Desired angle/angular velocity (radians/radians per second)."
     },
     {
       "type": "patchouli:text",
-      "text": "Main Panel $(br2)Offset (First Line): Axis offset for the next assembly.$(br2)Offset (Second Line): Controlled structure's axis offset."
-    },
-    {
-      "type": "patchouli:text",
-      "text": "Main Panel $(br2)Mode: Angle or Angular Velocity.$(br2)Cheat:$(li)NO_REPULSE: Disables reaction force.$(li)NO_GRAVITY: Removes gravity."
-    },
-    {
-      "type": "patchouli:text",
-      "text": "Main Panel $(br2)AutoLock: Automatically locks the motor when:$(li)Angular Velocity mode: Target is 0.$(li)Angle mode: Error < 1e-3."
+      "text": "Main Panel $(li)Mode: Select Angle or Angular Velocity target$(li)Cheat: Convenience features - NO_REPULSE disables reaction force during rotation, NO_GRAVITY removes gravity from controlled structures$(li)AutoLock: Automatically constrains the motor when:$(li)Angular Velocity mode: Target is 0$(li)Angle mode: Actual angle approaches target angle (error < 1e-3)"
     },
     {
       "type": "patchouli:image",
@@ -48,27 +35,36 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Redstone Panel $(br2)Configurable parameters: Output torque, Target value, Lock status. See general redstone panel documentation."
+      "text": "Redstone Panel $(br2)Configurable parameters:$(li)Output torque$(li)Target value$(li)Lock status$(br)Each parameter can be bound to multiple channels. See general redstone panel documentation."
     },
     {
       "type": "patchouli:image",
-      "title": "PID Control Panel",
+      "title": "PID Controller Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_pid.png"],
-      "text": "Servo Motor PID Panel"
+      "text": "Servo Motor PID Controller Panel"
     },
     {
       "type": "patchouli:text",
-      "text": "PID Panel $(br2)Output torque formula: (P*error + D*error_rate + I*error_integral) * moment of inertia.$(br)Do not adjust if unfamiliar with PID tuning."
+      "text": "Advanced Panel $(li)PID controller parameters. Actual output torque = (P*error + D*error_rate + I*error_integral) * MOI of controlled structure relative to its COM. Note: MOI does not include other structures connected via constraints.$(br)Do not adjust these without PID tuning knowledge.$(li)Speed Limit: Rotation speed limit in Angle mode (minimum 3 rad/s)"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Advanced Panel $(li)Offset (First Line): Axis offset relative to default axis position for next assembly/connection$(li)Offset (Second Line): Controlled structure's axis offset relative to default axis position for next assembly/connection"
     },
     {
       "type": "patchouli:image",
-      "title": "Remote Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/servo/offset.png"],
+      "text": "Both motors at 57°. Top: Controlled structure offset adjustment. Bottom: Axis offset adjustment."
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Remote Control Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/servo/panel_remote.png"],
       "text": "Servo Motor Remote Panel"
     },
     {
       "type": "patchouli:text",
-      "text": "Remote Panel $(br2)Buttons:$(li)Assembly (Sneak + Right Click equivalent).$(li)Lock/Unlock.$(li)Disconnect."
+      "text": "Remote Panel $(br2)Manual controls:$(li)Assembly (equivalent to Sneak + Right Click)$(li)Lock (manual constraint)$(li)Unlock (manual release)$(li)Disconnect"
     }
   ]
 }

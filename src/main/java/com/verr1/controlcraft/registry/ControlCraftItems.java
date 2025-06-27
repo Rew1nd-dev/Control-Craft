@@ -5,6 +5,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import com.verr1.controlcraft.content.items.AweInWandItem;
 import com.verr1.controlcraft.content.items.CameraLinkItem;
 import com.verr1.controlcraft.content.items.CircuitCompilerItem;
+import com.verr1.controlcraft.content.items.CommonManualItem;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -25,6 +26,7 @@ public class ControlCraftItems {
             .properties(p -> p.stacksTo(1))
             .lang("Camera Link")
             .register();
+
 
     static {
         REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.CIMULINK);

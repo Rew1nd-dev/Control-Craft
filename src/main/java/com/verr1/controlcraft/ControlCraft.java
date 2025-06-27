@@ -83,6 +83,8 @@ public class ControlCraft
         modEventBus.addListener(this::addCreative);
 
         ControlCraftCreativeTabs.register(modEventBus);
+        ControlCraftManuals.register(modEventBus);
+
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
         CimulinkBlocks.register();
@@ -95,14 +97,11 @@ public class ControlCraft
         // CimulinkPonderIndex.register();
 
 
-        Configurator.setLevel("org.valkryienskies.core.impl.networking", Level.ERROR);
-        Configurator.setLevel("org.valkryienskies.core.networking", Level.ERROR);
-        Configurator.setLevel("org.valkryienskies.physics.networking", Level.ERROR);
-
 
         TweakControllerCompact.init();
         CreateBigCannonsCompact.init();
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
+
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftClient::clientInit);
@@ -134,6 +133,8 @@ public class ControlCraft
         modEventBus.addListener(this::addCreative);
 
         ControlCraftCreativeTabs.register(modEventBus);
+        ControlCraftManuals.register(modEventBus);
+
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
         CimulinkBlocks.register();

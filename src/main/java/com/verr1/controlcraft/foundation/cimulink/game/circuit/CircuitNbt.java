@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 
+import com.simibubi.create.foundation.utility.NBTHelper;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitConstructor;
@@ -8,6 +9,7 @@ import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
 
+import java.io.IOException;
 import java.util.List;
 
 public class CircuitNbt {
@@ -93,6 +95,16 @@ public class CircuitNbt {
                 CONNECTION_SERIALIZER.deserialize(tag.getCompound("connections")),
                 IO_SERIALIZER.deserialize(tag.getCompound("inOuts"))
         );
+    }
+
+    public CompoundTag serializeCompressed() throws IOException {
+        return CompoundTagBuilder.create()
+                .withByteArray("compressed", SerializeUtils.compress(serialize()))
+                .build();
+    }
+
+    public static CircuitNbt deserializeCompressed(CompoundTag tag) throws IOException {
+        return deserialize(SerializeUtils.decompress(tag.getByteArray("compressed")));
     }
 
 

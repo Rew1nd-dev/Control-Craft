@@ -8,6 +8,7 @@ import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
@@ -16,12 +17,15 @@ import org.joml.Vector3dc;
 import org.valkyrienskies.core.apigame.constraints.*;
 
 import javax.annotation.Nullable;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class SerializeUtils {
     public static HashMap<Class<?>, Serializer<?>> EnumSerializerCache = new HashMap<>();
@@ -585,6 +589,24 @@ public class SerializeUtils {
             t.put(key.getSerializedName(), tag);
         }
 
+    }
+
+    public static byte[] compress(CompoundTag tag) throws IOException {
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzipOutput = new GZIPOutputStream(byteOutput);
+             DataOutputStream dataOutput = new DataOutputStream(gzipOutput)) {
+
+            NbtIo.write(tag, dataOutput); // 序列化NBT
+        }
+        return byteOutput.toByteArray();
+    }
+
+    public static CompoundTag decompress(byte[] compressedData) throws IOException {
+        try (GZIPInputStream gzipInput = new GZIPInputStream(new ByteArrayInputStream(compressedData));
+             DataInputStream dataInput = new DataInputStream(gzipInput)) {
+
+            return NbtIo.read(dataInput); // 反序列化NBT
+        }
     }
 
 }

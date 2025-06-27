@@ -30,7 +30,9 @@ public class OscilloscopeBlockEntity extends CimulinkBlockEntity<MultiOutputLink
         panel().registerUnit(ADD_CHANNEL, this::addChannel);
         panel().registerUnit(REMOVE_CHANNEL, this::removeChannel);
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ((CimulinkRenderer)renderer()).setSocketRenderOffset(0.2));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ((CimulinkRenderer)renderer()).setSocketRenderOffset(-0.5);
+        });
     }
 
     public double peekMain(){

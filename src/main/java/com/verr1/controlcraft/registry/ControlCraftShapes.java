@@ -10,6 +10,7 @@ public class ControlCraftShapes {
             HALF_BOX_SHAPE = cuboid(0, 0, 0, 16, 8, 16),
             CENTRAL_UNIT_SHAPE = cuboid(7, 7, 7, 9, 9, 9),
             SMALL_ROD_SHAPE = cuboid(2, 0, 2, 14, 10, 14),
+            SCOPE_SHAPE = cuboid(1, 1, 1, 15, 13, 16),
             FLAT_BASE_SHAPE = cuboid(0, 0, 0, 16, 4, 16)
                     ;
 
@@ -17,6 +18,7 @@ public class ControlCraftShapes {
     public static final VoxelShaper
             HALF_BOX_BASE = shape(HALF_BOX_SHAPE).forDirectional(),
             DIRECTIONAL_ROD = shape(SMALL_ROD_SHAPE).forDirectional(),
+            SCOPE_SHAPE_FACE = shape(SCOPE_SHAPE).forDirectional(),
             FLAT_BASE = shape(FLAT_BASE_SHAPE).forDirectional()
                     ;
 

@@ -7,11 +7,11 @@
       "type": "patchouli:spotlight",
       "item": "vscontrolcraft:constraint_revolute,vscontrolcraft:constraint_joint,vscontrolcraft:constraint_slider",
       "title": "Kinematic Components",
-      "text": "Overview $(br2)Kinematic variants of Servo Motors/Physical Pistons.$(br)Powerful but unsafe."
+      "text": "Overview $(br2)Kinematic variants of Servo Motors/Physical Pistons.$(br)Powerful but potentially unstable."
     },
     {
       "type": "patchouli:text",
-      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above (glue not supported).$(li)Use a wrench to adjust orientation."
+      "text": "Interaction $(br2)$(li)Sneak + Right Click to assemble blocks above into a physical structure (similar to Clockwork physics bearings). Glue not supported.$(li)Use a wrench to adjust orientation."
     },
     {
       "type": "patchouli:image",
@@ -21,15 +21,17 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Main Panel $(br2)Displays:$(br2)Current: Relative angle/angular velocity or position/velocity (radians/radians per second or blocks/blocks per second).$(br2)Target: Desired angle/angular velocity."
+      "text": "Main Panel $(br2)Displays basic settings:$(li)Current: Real-time relative angle (position)/angular velocity (speed) (radians/radians per second or blocks/blocks per second)$(li)Target: Desired angle/angular velocity (radians/radians per second)$(li)Mode: Select Angle or Angular Velocity target"
+    },
+    {
+      "type": "patchouli:image",
+      "title": "Advanced Panel",
+      "images": ["vscontrolcraft:patchouli/categories/abstract/kinematic/panel_advance.png"],
+      "text": "Kinematic Machine Advanced Panel"
     },
     {
       "type": "patchouli:text",
-      "text": "Main Panel $(br2)Compliance: Stops updating constraints when error falls below 1e-5 (default log value: -5)."
-    },
-    {
-      "type": "patchouli:text",
-      "text": "Main Panel $(br2)Mode: Angle or Angular Velocity."
+      "text": "Advanced Panel $(li)Compliance: Machine stops updating constraints when position/angle error falls below 10^value. Default -5 = error < 1e-5$(li)Offset (First Line): Axis offset relative to default position for next assembly$(li)Offset (Second Line): Controlled structure's axis offset for next assembly"
     },
     {
       "type": "patchouli:image",
@@ -39,21 +41,21 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Redstone Panel $(br2)Configurable parameter: Target value (supports multiple inputs with min/max settings).$(br) See general redstone panel documentation."
+      "text": "Redstone Panel $(br2)Configurable parameter: Target value. Supports multiple channel binding. See Redstone Channels documentation."
     },
     {
       "type": "patchouli:image",
-      "title": "Remote Panel",
+      "title": "Remote Control Panel",
       "images": ["vscontrolcraft:patchouli/categories/abstract/kinematic/panel_remote.png"],
       "text": "Kinematic Machine Remote Panel"
     },
     {
       "type": "patchouli:text",
-      "text": "Remote Panel $(br2)Buttons:$(li)Assembly (Sneak + Right Click equivalent).$(li)Disconnect."
+      "text": "Remote Panel $(br2)Manual controls:$(li)Assembly (equivalent to Sneak + Right Click)$(li)Disconnect"
     },
     {
       "type": "patchouli:text",
-      "text": "Warnings $(br2)Kinematic machines ignore physics, which has consequences:$(li)Avoid destroying connected structures without disassembly—this may crash the physics thread.$(li)Strong recoil requires the base to be static or massive to prevent oscillations."
+      "text": "Warnings $(br2)Kinematic machines ignore physics with consequences:$(li)Never destroy connected structures without disassembly first - use Disconnect or break machine before deletion to avoid physics thread crash (VS engine limitation)$(li)Strong recoil requires base to be static or significantly heavier than controlled structure to prevent oscillations"
     }
   ]
 }

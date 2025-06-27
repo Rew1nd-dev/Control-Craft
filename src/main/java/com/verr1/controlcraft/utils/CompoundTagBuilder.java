@@ -28,6 +28,13 @@ public class CompoundTagBuilder {
         return this;
     }
 
+    public CompoundTagBuilder withByteArray(String name, byte[] content){
+        toBuild.putByteArray(name, content);
+        return this;
+    }
+
+
+
     public CompoundTagBuilder withListTag(String name, ListTag content){
         toBuild.put(name, content);
         return this;
