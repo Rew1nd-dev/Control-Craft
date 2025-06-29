@@ -40,8 +40,8 @@ public class VelocitySensor extends NamedComponent {
     @Override
     public void onPositiveEdge() {
         Matrix3dc transform = transformToLocal ? sp.getTw2s() : new Matrix3d();
-        Vector3dc omega = transform.transform(sp.getSensorVelocity(), new Vector3d());
-        updateOutput(List.of(omega.x(), omega.y(), omega.z()));
+        Vector3dc velocity = transform.transform(sp.getSensorVelocity(), new Vector3d());
+        updateOutput(List.of(velocity.x(), velocity.y(), velocity.z()));
     }
 
 }

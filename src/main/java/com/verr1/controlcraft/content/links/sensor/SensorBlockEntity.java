@@ -73,11 +73,11 @@ public class SensorBlockEntity extends CimulinkBlockEntity<SensorLinkPort> {
         return readSelf().omega();
     }
 
-    public Matrix3dc getTw2s(){
+    public Matrix3dc getTs2w(){
         return readSelf().rotationMatrix();
     }
 
-    public Matrix3dc getTs2w(){
+    public Matrix3dc getTw2s(){
         return readSelf().rotationMatrix().transpose(new Matrix3d());
     }
 

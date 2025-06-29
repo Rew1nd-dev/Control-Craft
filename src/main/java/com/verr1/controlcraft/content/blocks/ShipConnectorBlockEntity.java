@@ -143,6 +143,7 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
         setCompanionShipID(-1);
         setCompanionShipDirection(Direction.UP);
         setBlockConnectContext(BlockPos.ZERO);
+        setChanged();
     }
 
 

@@ -2,7 +2,7 @@ package com.verr1.controlcraft.foundation.network.packets.specific;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitTagBuilder;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitWorldBuilder;
 import com.verr1.controlcraft.registry.ControlCraftItems;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.ChatFormatting;
@@ -42,7 +42,7 @@ public class CimulinkCompilePacket extends SimplePacketBase {
             if(player == null)return;
             ServerLevel level = player.serverLevel();
             try{
-                CircuitNbt nbt = CircuitTagBuilder.compile(level, sel0, sel1);
+                CircuitNbt nbt = CircuitWorldBuilder.compile(level, sel0, sel1);
                 CompoundTag tag = new CompoundTag();
                 tag.put("circuitNbt", nbt.serialize());
                 tag.put("sel0", SerializeUtils.BLOCK_POS.serialize(sel0));

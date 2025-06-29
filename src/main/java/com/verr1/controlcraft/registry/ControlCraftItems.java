@@ -5,7 +5,6 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import com.verr1.controlcraft.content.items.AweInWandItem;
 import com.verr1.controlcraft.content.items.CameraLinkItem;
 import com.verr1.controlcraft.content.items.CircuitCompilerItem;
-import com.verr1.controlcraft.content.items.CommonManualItem;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 

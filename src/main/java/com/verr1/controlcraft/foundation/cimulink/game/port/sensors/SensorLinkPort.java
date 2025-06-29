@@ -50,8 +50,8 @@ public class SensorLinkPort extends SwitchableLinkPort<SensorTypes> {
 
     @Override
     public void deserialize(CompoundTag tag) {
-        setLocal(SerializeUtils.BOOLEAN.deserialize(tag.getCompound("transform")));
         super.deserialize(tag.getCompound("super"));
+        setLocal(SerializeUtils.BOOLEAN.deserialize(tag.getCompound("transform")));
     }
 
 }

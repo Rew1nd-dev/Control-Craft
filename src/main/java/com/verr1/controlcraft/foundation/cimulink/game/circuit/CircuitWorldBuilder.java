@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class CircuitTagBuilder {
+public class CircuitWorldBuilder {
     Set<String> existName = new HashSet<>();
 
     Map<WorldBlockPos, BlockLinkPort> normals  = new HashMap<>();
@@ -23,11 +23,11 @@ public class CircuitTagBuilder {
     List<ConnectionNbt> connectionNbts;
     List<IoNbt> inOuts;
 
-    public static CircuitTagBuilder of(List<BlockLinkPort> blps){
-        return new CircuitTagBuilder(blps);
+    public static CircuitWorldBuilder of(List<BlockLinkPort> blps){
+        return new CircuitWorldBuilder(blps);
     }
 
-    public CircuitTagBuilder(List<BlockLinkPort> blps){
+    public CircuitWorldBuilder(List<BlockLinkPort> blps){
         blps.forEach(blp -> {
             if(blp instanceof ISummarizable){
                 normals.put(blp.pos(), convertName(blp));
@@ -61,7 +61,7 @@ public class CircuitTagBuilder {
             }
         }
 
-        return CircuitTagBuilder.of(blps).buildNbt();
+        return CircuitWorldBuilder.of(blps).buildNbt();
     }
 
     public CircuitNbt buildNbt() throws IllegalArgumentException{

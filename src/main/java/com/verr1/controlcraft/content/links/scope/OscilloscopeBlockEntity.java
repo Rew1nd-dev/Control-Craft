@@ -71,16 +71,18 @@ public class OscilloscopeBlockEntity extends CimulinkBlockEntity<MultiOutputLink
     public static class Plots{
         public final static int PLOT_SIZE = 32;
         Queue<Double> values = new ArrayDeque<>(PLOT_SIZE + 1);
+        private double latest = 0.0;
 
         public void receive(double value){
             if(values.size() >= PLOT_SIZE) {
                 values.poll();
             }
+            latest = value;
             values.offer(value);
         }
 
         public double peek(){
-            return values.isEmpty() ? 0.0 : values.peek();
+            return latest;
         }
 
         public void clear(){

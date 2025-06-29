@@ -181,14 +181,14 @@ public class CimulinkRenderer implements IRenderer{
     }
     private static final int MAX_INPUTS_PER_COLUMN = 4;
 
-    private static double deltaX(int count, int total){
+    public static double deltaX(int count, int total){
         int div = count / MAX_INPUTS_PER_COLUMN; // which column
         int m_1 = (total / MAX_INPUTS_PER_COLUMN + 1); // column count
         double dx = 0.5 / m_1;
         return 0.35 - div * dx;
     }
 
-    private static double deltaY(int count, int total){
+    public static double deltaY(int count, int total){
             /*
             double dy = 1.0 / total;
             return (total - 1) * dy / 2 - (count * dy);
@@ -213,7 +213,7 @@ public class CimulinkRenderer implements IRenderer{
     }
 
     public Vec3 computeInputPortOffset(int count){
-        double x = -deltaX(count, m());//-0.25;
+        double x = -deltaX(count, n());//-0.25;
         double y =  deltaY(count, n());
 
         Vec3 h = MinecraftUtils.toVec3(cbe.getHorizontal().getNormal());

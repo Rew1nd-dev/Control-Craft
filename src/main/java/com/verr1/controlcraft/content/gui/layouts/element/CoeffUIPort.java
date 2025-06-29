@@ -64,6 +64,7 @@ public class CoeffUIPort extends ListUIPort<StringDouble, Coefficients>{
     }
 
     private void setVisibility(){
+        if(!isActivated)return;
         IntStream.range(0, max_size).forEach(i -> widgets.get(i).setVisible(i < currentSize));
     }
 
@@ -99,7 +100,7 @@ public class CoeffUIPort extends ListUIPort<StringDouble, Coefficients>{
 
         public void write(StringDouble nc){
             label.setText(Component.literal(nc.name()));
-            field.setValue("%.8f".formatted(nc.coeff()));
+            field.setValue("%.5f".formatted(nc.coeff()));
         }
 
         public void setVisible(boolean visible){

@@ -39,8 +39,6 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         this.be = be;
     }
 
-
-
     public void setPlant(@Nullable NamedComponent plant){
         if(this.plant == plant)return;
         ControlCraft.LOGGER.debug("Setting plant in PlantProxyLinkPort: {} at: {}", plant, be.getBlockPos());

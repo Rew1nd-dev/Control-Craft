@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port.digital;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -56,7 +57,8 @@ public class FMALinkPort extends BlockLinkPort implements ICompilable<LinearAdde
 
     public void setNamedCoefficients(List<Pair<String, Double>> all){
         if(all.size() != n()){ // n() is equal to coeffs.size(), normally
-            resetNamedCoefficients(all);
+            // resetNamedCoefficients(all);
+            return;
         }else {
             ((LinearAdder)__raw()).setNamedCoefficients(all);
         }

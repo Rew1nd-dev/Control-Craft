@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.BezierCurve;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -71,7 +72,6 @@ public class CimulinkWireEntry implements RenderableOutline {
         checkAlways();
         recreate();
     }
-
 
     private void clearAll(){
         offsets.clear();
@@ -189,7 +189,7 @@ public class CimulinkWireEntry implements RenderableOutline {
         }
     }
 
-    public void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
+    public void render(PoseStack ms, MultiBufferSource buffer, Vec3 camera, float pt) {
         ms.pushPose();
         ms.translate(-camera.x, -camera.y, -camera.z);
 
@@ -221,7 +221,7 @@ public class CimulinkWireEntry implements RenderableOutline {
 
     }
 
-    public static Matrix4dc transformAt(Vector3dc v){
+    public Matrix4dc transformAt(Vector3dc v){
         return  Optional.ofNullable(ValkyrienSkies.getShipManagingBlock(Minecraft.getInstance().level, BlockPos.containing(toMinecraft(v))))
                 .map(ship -> (ClientShip)ship)
                 .map(ClientShip::getRenderTransform)
@@ -229,16 +229,6 @@ public class CimulinkWireEntry implements RenderableOutline {
                 .orElse(new Matrix4d());
     }
 
-    public static Matrix4fc convertToMatrix4fc(Matrix4dc matrix4dc) {
-        // 创建一个 float 数组来存储矩阵元素
-        float[] data = new float[16];
-        // 将 Matrix4dc 的元素复制到 float 数组中
-        matrix4dc.get(data, 0);
-        // 使用 float 数组创建一个 Matrix4f 对象
-        Matrix4f matrix4f = new Matrix4f().set(data);
-        // 返回 Matrix4f 对象，它实现了 Matrix4fc 接口
-        return matrix4f;
-    }
 
     public void renderInto(
             VertexConsumer consumer,
@@ -384,72 +374,7 @@ public class CimulinkWireEntry implements RenderableOutline {
         }
     }
 
-    public void renderIntoTransparent(
-            VertexConsumer consumer,
-            Matrix4f matrix,
-            int color,
-            int flashColor,
-            float[] lightLevels
-    ) {
-        float r = (color >> 16 & 255) / 255f;
-        float g = (color >> 8 & 255) / 255f;
-        float b = (color & 255) / 255f;
-        float fr = (flashColor >> 16 & 255) / 255f;
-        float fg = (flashColor >> 8 & 255) / 255f;
-        float fb = (flashColor & 255) / 255f;
 
-        for (int i = 0; i < offsets.size() - 1; i++) {
-            Vector3dc[] curr = squareVertices.get(i);
-            Vector3dc[] next = squareVertices.get(i + 1);
-
-            // 判断是否为闪烁 segment
-            boolean isFlashing = (flashFrame == i);
-            float lr = isFlashing ? fr : r;
-            float lg = isFlashing ? fg : g;
-            float lb = isFlashing ? fb : b;
-
-            // 应用光照
-            float light = lightLevels[i];
-            lr *= light;
-            lg *= light;
-            lb *= light;
-
-            // 将 float 光照值转换为整数 lightmap 值（0-255 范围，乘以 15 表示最大亮度）
-            int lightmap = (int) (light * 15);
-
-            // 上面（法线指向 +Y）
-            addVertex(consumer, matrix, curr[0], lr, lg, lb, 0, 1, 0, lightmap); // 右上
-            addVertex(consumer, matrix, next[0], lr, lg, lb, 0, 1, 0, lightmap); // 下一个右上
-            addVertex(consumer, matrix, next[1], lr, lg, lb, 0, 1, 0, lightmap); // 下一个右下
-            addVertex(consumer, matrix, curr[0], lr, lg, lb, 0, 1, 0, lightmap); // 右上
-            addVertex(consumer, matrix, next[1], lr, lg, lb, 0, 1, 0, lightmap); // 下一个右下
-            addVertex(consumer, matrix, curr[1], lr, lg, lb, 0, 1, 0, lightmap); // 右下
-
-            // 下面（法线指向 -Y）
-            addVertex(consumer, matrix, curr[2], lr, lg, lb, 0, -1, 0, lightmap); // 左下
-            addVertex(consumer, matrix, next[2], lr, lg, lb, 0, -1, 0, lightmap); // 下一个左下
-            addVertex(consumer, matrix, next[3], lr, lg, lb, 0, -1, 0, lightmap); // 下一个左上
-            addVertex(consumer, matrix, curr[2], lr, lg, lb, 0, -1, 0, lightmap); // 左下
-            addVertex(consumer, matrix, next[3], lr, lg, lb, 0, -1, 0, lightmap); // 下一个左上
-            addVertex(consumer, matrix, curr[3], lr, lg, lb, 0, -1, 0, lightmap); // 左上
-
-            // 左面（法线指向 -X）
-            addVertex(consumer, matrix, curr[3], lr, lg, lb, -1, 0, 0, lightmap); // 左上
-            addVertex(consumer, matrix, next[3], lr, lg, lb, -1, 0, 0, lightmap); // 下一个左上
-            addVertex(consumer, matrix, next[0], lr, lg, lb, -1, 0, 0, lightmap); // 下一个右上
-            addVertex(consumer, matrix, curr[3], lr, lg, lb, -1, 0, 0, lightmap); // 左上
-            addVertex(consumer, matrix, next[0], lr, lg, lb, -1, 0, 0, lightmap); // 下一个右上
-            addVertex(consumer, matrix, curr[0], lr, lg, lb, -1, 0, 0, lightmap); // 右上
-
-            // 右面（法线指向 +X）
-            addVertex(consumer, matrix, curr[1], lr, lg, lb, 1, 0, 0, lightmap); // 右下
-            addVertex(consumer, matrix, next[1], lr, lg, lb, 1, 0, 0, lightmap); // 下一个右下
-            addVertex(consumer, matrix, next[2], lr, lg, lb, 1, 0, 0, lightmap); // 下一个左下
-            addVertex(consumer, matrix, curr[1], lr, lg, lb, 1, 0, 0, lightmap); // 右下
-            addVertex(consumer, matrix, next[2], lr, lg, lb, 1, 0, 0, lightmap); // 下一个左下
-            addVertex(consumer, matrix, curr[2], lr, lg, lb, 1, 0, 0, lightmap); // 左下
-        }
-    }
 
     private static void addVertex(VertexConsumer consumer, Matrix4f matrix, Vector3dc pos, float r, float g, float b) {
         consumer.vertex(matrix, (float) pos.x(), (float) pos.y(), (float) pos.z())
@@ -465,14 +390,4 @@ public class CimulinkWireEntry implements RenderableOutline {
 
     }
 
-    private static void addVertex(VertexConsumer consumer, Matrix4f matrix, Vector3dc pos,
-                                  float r, float g, float b, float nx, float ny, float nz, int lightmap) {
-        consumer.vertex(matrix, (float) pos.x(), (float) pos.y(), (float) pos.z())  // 顶点位置
-                .color(r, g, b, 1.0f)                                       // 颜色
-                .uv(0, 0)                                                   // 默认纹理坐标
-                .overlayCoords(OverlayTexture.NO_OVERLAY)                   // 默认 Overlay 坐标
-                .uv2(lightmap)                                              // Lightmap 坐标
-                .normal(nx, ny, nz)                                         // 法线
-                .endVertex();
-    }
 }

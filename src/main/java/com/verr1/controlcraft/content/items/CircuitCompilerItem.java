@@ -60,7 +60,7 @@ public class CircuitCompilerItem extends Item {
 
 
     public static void save(String saveName, ItemStack stack){
-        Path file = CIMULINKS.resolve(saveName).toAbsolutePath();
+        Path file = CIMULINKS.resolve(saveName + ".nbt").toAbsolutePath();
         CompoundTag data = stack.getOrCreateTag();
         try{
             Files.createDirectories(CIMULINKS);
@@ -74,7 +74,7 @@ public class CircuitCompilerItem extends Item {
     }
 
     public static void load(String saveName, ItemStack stack){
-        Path file = CIMULINKS.resolve(saveName).toAbsolutePath();
+        Path file = CIMULINKS.resolve(saveName + ".nbt").toAbsolutePath();
 
         try(InputStream in = Files.newInputStream(file, StandardOpenOption.CREATE)){
             CompoundTag tag = NbtIo.readCompressed(in);

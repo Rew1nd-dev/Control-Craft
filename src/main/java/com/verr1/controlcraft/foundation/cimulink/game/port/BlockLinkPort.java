@@ -433,9 +433,18 @@ public abstract class BlockLinkPort {
         return realTimeComponent.output(outputPortName);
     }
 
-    public void deleteInput(String name){
+    public void onInputDisconnection(String inputPortName){
+        try{
+            input(inputPortName, 0);
+        }catch (Exception ignored){}
+    }
+
+    public void onOutputDisconnection(String outputPortName){}
+
+    protected void deleteInput(String name){
         ControlCraft.LOGGER.info("deleting input: {} at: {}", name, pos());
         backwardLinks.remove(name);
+        onInputDisconnection(name);
     }
 
     public void disconnectInput(String inputPortName){
@@ -444,6 +453,7 @@ public abstract class BlockLinkPort {
         of(linked.pos()).ifPresent(p -> p.deleteOutput(inputPortName, new BlockPort(pos(), inputPortName)));
 
         deleteInput(inputPortName);
+
     }
 
     public void disconnectOutput(String outputPortName){
@@ -451,6 +461,7 @@ public abstract class BlockLinkPort {
             of(blockPort.pos()).ifPresent(p -> p.deleteInput(blockPort.portName()));
         });
         deleteOutput(outputPortName);
+
     }
 
     public void disconnectOutput(String outputPortName, BlockPort forwardPort){
@@ -461,15 +472,17 @@ public abstract class BlockLinkPort {
         deleteOutput(outputPortName);
     }
 
-    public void deleteOutput(String name, BlockPort forwardPort){
+    protected void deleteOutput(String name, BlockPort forwardPort){
         ControlCraft.LOGGER.info("deleting output: {} -> {} at: {}", name, forwardPort, pos());
         forwardLinks.getOrDefault(name, EMPTY).remove(forwardPort);
         if(forwardLinks.getOrDefault(name, EMPTY).isEmpty())forwardLinks.remove(name);
+        onOutputDisconnection(name);
     }
 
     public void deleteOutput(String name){
         ControlCraft.LOGGER.info("deleting all output: {} at: {}", name, pos());
         forwardLinks.remove(name);
+        onOutputDisconnection(name);
     }
 
     public void removeAllLinks(){

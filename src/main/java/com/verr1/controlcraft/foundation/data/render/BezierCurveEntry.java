@@ -2,8 +2,8 @@ package com.verr1.controlcraft.foundation.data.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.verr1.controlcraft.utils.BezierCurve;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -106,7 +106,7 @@ public class BezierCurveEntry implements RenderableOutline{
     }
 
 
-    public void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt){
+    public void render(PoseStack ms, MultiBufferSource buffer, Vec3 camera, float pt){
         ms.pushPose();
         ms.translate(-camera.x, -camera.y, -camera.z); // 相机坐标系转换
 

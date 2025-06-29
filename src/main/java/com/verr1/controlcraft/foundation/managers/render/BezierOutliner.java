@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.data.render.BezierCurveEntry;
 import com.verr1.controlcraft.foundation.data.render.Line;
 import com.verr1.controlcraft.foundation.data.render.RayLerpHelper;
 import com.verr1.controlcraft.foundation.data.render.RenderableOutline;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
@@ -30,9 +31,10 @@ public class BezierOutliner {
         }
     }
 
-    public void showLine(Object slot, Supplier<RenderableOutline> factory) {
+    public OutlineEntry showLine(Object slot, Supplier<RenderableOutline> factory) {
         OutlineEntry entry = outlines.computeIfAbsent(slot, k -> new OutlineEntry(factory.get()));
         entry.ticksTillRemoval = 10;
+        return entry;
     }
 
     public RenderableOutline retrieveLine(Object slot){
@@ -50,7 +52,11 @@ public class BezierOutliner {
         outlines.remove(slot);
     }
 
-    public void renderOutlines(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
+    public void clear(){
+        outlines.clear();
+    }
+
+    public void renderOutlines(PoseStack ms, MultiBufferSource buffer, Vec3 camera, float pt) {
         outlines.forEach((key, entry) -> {
             RenderableOutline outline = entry.getOutline();
             outline.render(ms, buffer, camera, pt);
@@ -62,6 +68,8 @@ public class BezierOutliner {
 
         private final RenderableOutline outline;
         private int ticksTillRemoval = 1;
+        private boolean eternal = false;
+
 
         public OutlineEntry(RenderableOutline outline) {
             this.outline = outline;
@@ -75,6 +83,16 @@ public class BezierOutliner {
             return ticksTillRemoval;
         }
 
+        public OutlineEntry setLive(int ticksTillRemoval){
+            this.ticksTillRemoval = ticksTillRemoval;
+            return this;
+        }
+
+        public OutlineEntry eternal(boolean eternal){
+            this.eternal = eternal;
+            return this;
+        }
+
         public boolean isAlive() {
             return ticksTillRemoval >= -FADE_TICKS;
         }
@@ -84,7 +102,7 @@ public class BezierOutliner {
         }
 
         public void tick() {
-            ticksTillRemoval--;
+            if(!eternal)ticksTillRemoval--;
             outline.tick();
         }
     }

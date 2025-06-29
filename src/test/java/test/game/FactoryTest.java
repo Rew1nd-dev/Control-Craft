@@ -1,16 +1,12 @@
 package test.game;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
-import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitTagBuilder;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitWorldBuilder;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
-import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
-import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.*;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
@@ -23,7 +19,6 @@ import org.apache.commons.lang3.function.TriFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.UnaryOperator;
 
 public class FactoryTest {
 
@@ -47,7 +42,7 @@ public class FactoryTest {
         fma.connectTo(fma.out(0), shifter.pos(), shifter.in(0));
         shifter.connectTo(shifter.out(0), fma.pos(), fma.in(1));
 
-        CircuitNbt nbt = CircuitTagBuilder.of(List.of(fma, input, output, shifter)).buildNbt();
+        CircuitNbt nbt = CircuitWorldBuilder.of(List.of(fma, input, output, shifter)).buildNbt();
 
         Circuit circuit = (Circuit) nbt.buildCircuit().withName("circuit");
 

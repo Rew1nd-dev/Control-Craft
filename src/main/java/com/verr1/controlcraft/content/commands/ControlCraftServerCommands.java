@@ -11,6 +11,7 @@ import com.verr1.controlcraft.content.items.CircuitCompilerItem;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
@@ -109,8 +110,11 @@ public class ControlCraftServerCommands {
         }
         BlockLinkPort.of(WorldBlockPos.of(player.serverLevel(), bht.getBlockPos())).filter(blp -> blp instanceof CircuitLinkPort).ifPresentOrElse(
                 blp -> {
-                    if(!(blp.__raw() instanceof Circuit circuit)){
-                        source.sendFailure(Component.literal("blp does not have a circuit yet"));
+                    if(!(blp.__raw() instanceof PlantProxy circuitProxy)){
+                        return;
+                    }
+                    if(!(circuitProxy.plant() instanceof Circuit circuit)){
+                        source.sendFailure(Component.literal("This should not happen, report this to https://github.com/Rew1nd-dev/Control-Craft/issues"));
                         return;
                     }
                     CircuitDebugger debugger = new CircuitDebugger(circuit);

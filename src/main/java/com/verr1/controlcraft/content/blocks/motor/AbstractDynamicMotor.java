@@ -312,22 +312,11 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         super.destroyConstraints();
         removeConstraint("fix");
         controlTorque.write(0.0);
+
     }
 
     public void setMode(boolean adjustAngle){
         targetMode = adjustAngle ? TargetMode.POSITION : TargetMode.VELOCITY;
-        // delay a bit because client screen will also call to set PID values of last mode
-        // Now I make ui side change their pid input automatically when mode changes, so no need to change here
-        /*
-        Runnable task = () -> {if(adjustAngle){
-            getController().PID(DEFAULT_POSITION_MODE_PARAMS);
-        }else{
-            getController().PID(DEFAULT_VELOCITY_MODE_PARAMS);
-        }};
-
-        if(level != null && !level.isClientSide) ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 2);
-        * */
-
         setChanged();
     }
 

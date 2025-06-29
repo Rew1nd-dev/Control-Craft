@@ -83,7 +83,7 @@ public class ControlCraft
         modEventBus.addListener(this::addCreative);
 
         ControlCraftCreativeTabs.register(modEventBus);
-        ControlCraftManuals.register(modEventBus);
+        // ControlCraftManuals.register(modEventBus);
 
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
@@ -106,6 +106,7 @@ public class ControlCraft
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftClient::clientInit);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftServer::ServerInit);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> CimulinkPonderIndex::register);
 
         MinecraftForge.EVENT_BUS.register(this);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
@@ -133,7 +134,7 @@ public class ControlCraft
         modEventBus.addListener(this::addCreative);
 
         ControlCraftCreativeTabs.register(modEventBus);
-        ControlCraftManuals.register(modEventBus);
+        // ControlCraftManuals.register(modEventBus);
 
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
@@ -154,7 +155,7 @@ public class ControlCraft
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftClient::clientInit);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftServer::ServerInit);
-
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> CimulinkPonderIndex::register);
 
 
         MinecraftForge.EVENT_BUS.register(this);
