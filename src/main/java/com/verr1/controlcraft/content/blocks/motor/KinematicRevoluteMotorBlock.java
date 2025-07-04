@@ -51,7 +51,7 @@ public class KinematicRevoluteMotorBlock extends DirectionalAxisKineticBlock imp
 
     @OnlyIn(Dist.CLIENT)
     protected void displayScreen(BlockPos pos){
-        ScreenOpener.open(GenericUIFactory.createKinematicDeviceScreen(pos, ControlCraftBlocks.CONSTRAINT_SERVO_MOTOR_BLOCK.asStack()));
+        ScreenOpener.open(GenericUIFactory.createKinematicMotorScreen(pos, ControlCraftBlocks.CONSTRAINT_SERVO_MOTOR_BLOCK.asStack()));
     }
 
     @Override

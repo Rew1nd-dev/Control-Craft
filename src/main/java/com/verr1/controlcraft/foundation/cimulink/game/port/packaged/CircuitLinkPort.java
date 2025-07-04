@@ -34,7 +34,7 @@ public class CircuitLinkPort extends BlockLinkPort implements ICompilable<Circui
     List<String> cachedEnabledOutputs = new ArrayList<>();
 
     public CircuitLinkPort() {
-        super(CircuitNbt.EMPTY_CIRCUIT);
+        super(PlantProxy.of(CircuitNbt.EMPTY_CIRCUIT, List.of(), List.of()));
     }
 
 

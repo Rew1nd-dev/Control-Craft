@@ -1,0 +1,14 @@
+{
+  "vscontrolcraft.ponder.ff_0.text.0": "This is a T-Flip-Flop",
+  "vscontrolcraft.ponder.ff_0.text.1": "It Flips its input every tick, with 1 tick delay",
+  "vscontrolcraft.ponder.ff_0.text.2": "i = 4(True)",
+  "vscontrolcraft.ponder.ff_0.text.3": "o = 0(False)",
+  "vscontrolcraft.ponder.ff_0.text.4": "i = 0(False)",
+  "vscontrolcraft.ponder.ff_0.text.5": "o = 1(True)",
+  "vscontrolcraft.ponder.ff_0.text.6": "This is a D-Flip-Flop",
+  "vscontrolcraft.ponder.ff_0.text.7": "It transmits its input with 1 tick delay",
+  "vscontrolcraft.ponder.ff_0.text.8": "i = 4(True)",
+  "vscontrolcraft.ponder.ff_0.text.9": "o = 1(True)",
+  "vscontrolcraft.ponder.ff_0.text.10": "i = 0(False)",
+  "vscontrolcraft.ponder.ff_0.text.11": "o = 0(False)"
+}

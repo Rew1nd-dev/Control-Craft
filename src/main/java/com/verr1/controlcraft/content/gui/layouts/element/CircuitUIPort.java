@@ -99,12 +99,22 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
         return CircuitBlockEntity.PAIR_SER.serialize(new Pair<>(input, output));
     }
 
+    static List<CircuitPortStatus> sort(List<CircuitPortStatus> statuses) {
+        return statuses.stream()
+                .sorted((a, b) -> {
+                    int cmp = a.portName().compareTo(b.portName());
+                    if (cmp != 0) return cmp;
+                    return Boolean.compare(a.isInput(), b.isInput());
+                })
+                .toList();
+    }
+
     @Override
     protected void writeGUI(CompoundTag value) {
 
         var inputStatus = CircuitBlockEntity.PAIR_SER.deserialize(value);
 
-        List<CircuitPortStatus> newData = ArrayUtils.flatten(inputStatus.getFirst(), inputStatus.getSecond());
+        List<CircuitPortStatus> newData = ArrayUtils.flatten(sort(inputStatus.getFirst()), sort(inputStatus.getSecond()));
 
         immutableData.clear();
         immutableData.addAll(newData);

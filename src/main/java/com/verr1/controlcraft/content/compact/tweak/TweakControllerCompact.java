@@ -5,6 +5,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.ModList;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +16,11 @@ public class TweakControllerCompact {
     public static @Nullable NamedComponent tweakedControllerPlant(ServerLevel level, BlockPos pos) {
         if (getter == null) return null;
         return getter.tweakedControllerPlant(level, pos);
+    }
+
+    public static BlockState lecternBlock(){
+        if (getter == null) return null;
+        return getter.lecternBlock();
     }
 
     public static void init(){

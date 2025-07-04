@@ -1,0 +1,13 @@
+{
+  "vscontrolcraft.ponder.cmp.text.0": "This is a Comparator",
+  "vscontrolcraft.ponder.cmp.text.1": "It compares its inputs",
+  "vscontrolcraft.ponder.cmp.text.2": "A",
+  "vscontrolcraft.ponder.cmp.text.3": "B",
+  "vscontrolcraft.ponder.cmp.text.4": "The result is its three outputs",
+  "vscontrolcraft.ponder.cmp.text.5": "A > B(Ge)",
+  "vscontrolcraft.ponder.cmp.text.6": "A < B(Le)",
+  "vscontrolcraft.ponder.cmp.text.7": "A = B(Eq)",
+  "vscontrolcraft.ponder.cmp.text.8": "i0(4) > i1(2), Ge = true, other = false",
+  "vscontrolcraft.ponder.cmp.text.9": "i0(2) < i1(4), Le = true, other = false",
+  "vscontrolcraft.ponder.cmp.text.10": "|i0(4) - i1(4)| < 1e-3, Eq = true, other = false"
+}

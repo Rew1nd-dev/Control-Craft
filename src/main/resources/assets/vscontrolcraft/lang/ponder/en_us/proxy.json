@@ -1,0 +1,14 @@
+{
+  "vscontrolcraft.ponder.proxy.text.0": "This is a Proxy",
+  "vscontrolcraft.ponder.proxy.text.1": "It is used to expose machine input and output ports",
+  "vscontrolcraft.ponder.proxy.text.2": "Let's say it's attached to a speed controller",
+  "vscontrolcraft.ponder.proxy.text.3": "You can now set speed and get speed from proxy ports",
+  "vscontrolcraft.ponder.proxy.text.4": "set input to 32",
+  "vscontrolcraft.ponder.proxy.text.5": "now speed is set to 32",
+  "vscontrolcraft.ponder.proxy.text.6": "you can get speed = 32 here",
+  "vscontrolcraft.ponder.proxy.text.7": "For resistor, you can get and set RATIO in proxy port",
+  "vscontrolcraft.ponder.proxy.text.8": "For propeller, you can get and set SPEED in proxy port",
+  "vscontrolcraft.ponder.proxy.text.9": "For cannons, you can get PITCH and YAW in proxy port",
+  "vscontrolcraft.ponder.proxy.text.10": "For tweaked lectern controller, you can get player INPUT AXIS in proxy port",
+  "vscontrolcraft.ponder.proxy.text.11": "Just try it yourself to see what you can get/set!"
+}

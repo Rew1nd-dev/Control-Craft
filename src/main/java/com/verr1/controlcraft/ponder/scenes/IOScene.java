@@ -16,7 +16,7 @@ public class IOScene {
         var nixie = output.east();
 
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "io");
 
         cu
                 .init()
@@ -37,7 +37,7 @@ public class IOScene {
                 .showPower(nixie, 0).idle(5)
                 .text("Set input to 4", input, READING_TIME).idle(READING_TIME)
                 .showPower(nixie, 4).idle(5);
-
+        cu.end();
     }
 
 }

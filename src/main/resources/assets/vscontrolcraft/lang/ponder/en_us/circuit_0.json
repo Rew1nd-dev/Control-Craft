@@ -1,0 +1,16 @@
+{
+  "vscontrolcraft.ponder.circuit_0.text.0": "This is a working circuit",
+  "vscontrolcraft.ponder.circuit_0.text.1": "But it is too big...",
+  "vscontrolcraft.ponder.circuit_0.text.2": "Compiler is design for this case",
+  "vscontrolcraft.ponder.circuit_0.text.3": "use wand in compiler mode",
+  "vscontrolcraft.ponder.circuit_0.text.4": "select an area to include circuit",
+  "vscontrolcraft.ponder.circuit_0.text.5": "right-click air to confirm",
+  "vscontrolcraft.ponder.circuit_0.text.6": "Now you get a compiler, which stores the circuit",
+  "vscontrolcraft.ponder.circuit_0.text.7": "Place a uncompiled circuit block",
+  "vscontrolcraft.ponder.circuit_0.text.8": "Click with compiler you just got",
+  "vscontrolcraft.ponder.circuit_0.text.9": "Now it copies the circuit you just store",
+  "vscontrolcraft.ponder.circuit_0.text.10": "Input Link Port blocks of the original circuit",
+  "vscontrolcraft.ponder.circuit_0.text.11": "Is converted to circuit block's input ports",
+  "vscontrolcraft.ponder.circuit_0.text.12": "Output Link Port blocks of the original circuit",
+  "vscontrolcraft.ponder.circuit_0.text.13": "Is converted to circuit block's output ports"
+}

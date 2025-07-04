@@ -1,0 +1,4 @@
+{
+  "vscontrolcraft.ponder.basic_1.text.0": "An output port can link to multiple input ports",
+  "vscontrolcraft.ponder.basic_1.text.1": "But an input port can only link to one output port"
+}

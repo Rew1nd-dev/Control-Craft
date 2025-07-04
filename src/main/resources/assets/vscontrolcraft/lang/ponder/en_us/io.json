@@ -1,0 +1,6 @@
+{
+  "vscontrolcraft.ponder.io.text.0": "Input port accepts surrounding redstone input",
+  "vscontrolcraft.ponder.io.text.1": "Output port applies redstone output to surrounding blocks",
+  "vscontrolcraft.ponder.io.text.2": "You can also manually set values to input port from its ui",
+  "vscontrolcraft.ponder.io.text.3": "Set input to 4"
+}

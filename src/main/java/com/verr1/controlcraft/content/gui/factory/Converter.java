@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
+import org.stringtemplate.v4.ST;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +54,14 @@ public class Converter {
             }
         };
 
+    }
+
+    public static Component convert(UnaryOperator<Style> s, Component c){
+        return c.plainCopy().withStyle(s);
+    }
+
+    public static Component convert(UnaryOperator<Style> s, Descriptive<?> c){
+        return c.specificFlat().plainCopy().withStyle(s);
     }
 
     public static<T extends Enum<?>> Descriptive<T> convert(

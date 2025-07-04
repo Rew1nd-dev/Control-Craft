@@ -10,4 +10,10 @@ public interface ICannonDuck {
 
     float controlCraft$getPitch();
 
+    void controlCraft$fire();
+
+    void controlCraft$assemble();
+
+    void controlCraft$disassemble();
+
 }

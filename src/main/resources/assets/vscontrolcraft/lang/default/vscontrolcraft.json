@@ -8,5 +8,7 @@
   "tooltip.forthisoption": "For This Option",
 
   "key.controlcraft.link": "link last camera",
-  "key.categories.controlcraft" : "Control Craft"
+  "key.categories.controlcraft" : "Control Craft",
+
+  "vscontrolcraft.ponder.cimulink/base.header": "What's Cimulink"
 }

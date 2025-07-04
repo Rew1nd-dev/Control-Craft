@@ -32,6 +32,7 @@ import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlock;
+import com.verr1.controlcraft.content.links.scope.OscilloscopeBlock;
 import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
@@ -78,7 +79,7 @@ public enum VsMasses {
     DC(DirectCurrentBlock.ID, 1),
     FUNC(FunctionsBlock.ID, 1),
     IMU(SensorBlock.ID, 1),
-
+    SCOPE(OscilloscopeBlock.ID, 10)
 
     ;
 

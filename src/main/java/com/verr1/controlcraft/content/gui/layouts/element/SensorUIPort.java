@@ -20,10 +20,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SensorUIPort extends MultipleTypedUIPort{
 
-    FormattedLabel title = UIContents.SENSOR_SETTINGS.toUILabel();
+    FormattedLabel title = UIContents.SENSOR_SETTINGS.convertTo(Converter::titleStyle).toUILabel();
 
-    FormattedLabel typeTitle  = UIContents.SENSOR_TYPE.toUILabel();
-    FormattedLabel localTitle = UIContents.SENSOR_LOCAL.toUILabel();
+    FormattedLabel typeTitle  = UIContents.SENSOR_TYPE.convertTo(Converter::titleStyle).toUILabel();
+    FormattedLabel localTitle = UIContents.SENSOR_LOCAL.convertTo(Converter::titleStyle).toUILabel();
 
     FormattedLabel value = new FormattedLabel(0, 0, Component.literal("LLLLL"));
 

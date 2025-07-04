@@ -1,0 +1,5 @@
+{
+  "vscontrolcraft.ponder.shifter_0.text.0": "This is a Shifter",
+  "vscontrolcraft.ponder.shifter_0.text.1": "It shifts its input by DELAY tick, which is configurable in its ui",
+  "vscontrolcraft.ponder.shifter_0.text.2": "Let's say DELAY is now 40"
+}

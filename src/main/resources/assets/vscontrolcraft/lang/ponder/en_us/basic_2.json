@@ -1,0 +1,11 @@
+{
+  "vscontrolcraft.ponder.basic_2.text.0": "There Are 3 Kinds Of Components",
+  "vscontrolcraft.ponder.basic_2.text.1": "Combinational Components (Yellow Panel)",
+  "vscontrolcraft.ponder.basic_2.text.2": "Temporal Components (Blue Panel)",
+  "vscontrolcraft.ponder.basic_2.text.3": "Special Components (Other Color)",
+  "vscontrolcraft.ponder.basic_2.text.4": "Combinational Components are components that do not have any internal state",
+  "vscontrolcraft.ponder.basic_2.text.5": "They Transmits Signals Without Any Delay",
+  "vscontrolcraft.ponder.basic_2.text.6": "Temporal Components has internal state",
+  "vscontrolcraft.ponder.basic_2.text.7": "They takes time to transit between states",
+  "vscontrolcraft.ponder.basic_2.text.8": "The delay is decided by specific settings"
+}

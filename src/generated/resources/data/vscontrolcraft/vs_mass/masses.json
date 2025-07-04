@@ -150,5 +150,9 @@
   {
     "block": "vscontrolcraft:link_sensor",
     "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:scope",
+    "mass": 10.0
   }
 ]

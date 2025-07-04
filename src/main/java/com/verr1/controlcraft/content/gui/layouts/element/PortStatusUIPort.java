@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.gui.layouts.element;
 
 import com.simibubi.create.foundation.gui.widget.Label;
+import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
@@ -58,7 +59,7 @@ public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
     @Override
     protected void initLayout(GridLayout layoutToFill) {
         AtomicInteger line = new AtomicInteger(0);
-        layoutToFill.addChild(label, line.getAndIncrement(), 0, 1, 2);
+        layoutToFill.addChild(label, line.getAndIncrement(), 0, 1, 1);
 
         IntStream.range(0, max_size).forEach(i -> {
             layoutToFill.addChild(widgets.get(i).label, line.get(), 0);
@@ -103,7 +104,7 @@ public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
         }
 
         public void write(StringBoolean ps){
-            label.setText(Component.literal(ps.name()));
+            label.setText(Component.literal(ps.name()).withStyle(Converter::optionStyle));
             field.setSelected(ps.enabled());
         }
 

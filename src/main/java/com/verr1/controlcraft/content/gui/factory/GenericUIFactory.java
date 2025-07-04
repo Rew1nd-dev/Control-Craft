@@ -18,6 +18,7 @@ import com.verr1.controlcraft.content.gui.layouts.preset.TerminalDeviceUIField;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
 import com.verr1.controlcraft.content.gui.layouts.preset.DynamicControllerUIField;
 import com.verr1.controlcraft.content.gui.layouts.preset.SpatialScheduleUIField;
+import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -25,13 +26,16 @@ import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.*;
 import com.verr1.controlcraft.registry.ControlCraftBlocks;
 import com.verr1.controlcraft.utils.MathUtils;
+import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 import static com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity.*;
 import static com.verr1.controlcraft.content.gui.layouts.api.ISerializableSchedule.SCHEDULE;
@@ -274,7 +278,27 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.FLAP_BIAS, Converter::titleStyle)
         );
 
-        Runnable alignLabels = () -> Converter.alignLabel(angle, offset, lift, drag, bias);
+        UnitUIPanel assemble = new UnitUIPanel(
+                boundPos,
+                SharedKeys.ASSEMBLE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
+        );
+
+        UnitUIPanel disassemble = new UnitUIPanel(
+                boundPos,
+                SharedKeys.DISASSEMBLE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(angle, offset);
+            Converter.alignLabel(lift, drag, bias);
+            Converter.alignLabel(assemble, disassemble);
+        };
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.COMPACT_FLAP_BLOCK.asStack())
@@ -282,17 +306,25 @@ public class GenericUIFactory {
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
                                 .withPort(SharedKeys.PLACE_HOLDER, angle_view)
-                                .withPort(CompactFlapBlockEntity.ANGLE, angle)
-                                .withPort(CompactFlapBlockEntity.OFFSET, offset)
-                                .withPort(CompactFlapBlockEntity.LIFT, lift)
-                                .withPort(CompactFlapBlockEntity.DRAG, drag)
-                                .withPort(CompactFlapBlockEntity.BIAS, bias)
+                                .withPort(angle, offset)
                                 .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTab(
+                        ADVANCE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(lift, drag, bias)
                                 .build()
                 )
                 .withTab(
                         REDSTONE_TAB,
                         createTerminalDeviceTab(boundPos)
+                )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(assemble, disassemble)
+                                .build()
                 )
                 .withTickTask(createSyncTasks(boundPos, CompactFlapBlockEntity.ANGLE))
                 .build();
@@ -423,7 +455,7 @@ public class GenericUIFactory {
                 $ -> false
         );
 
-        var target = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d); //, Converter.combine(Math::toDegrees, d -> MathUtils.clampDigit(d, 2)), Math::toRadians
+        var target_field = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d); //, Converter.combine(Math::toDegrees, d -> MathUtils.clampDigit(d, 2)), Math::toRadians
 
         var pid = new DynamicControllerUIField(boundPos, 30);
 
@@ -434,17 +466,33 @@ public class GenericUIFactory {
         var offset_self = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 25);
         var offset_comp = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
 
+
+        int maxLen = MinecraftUtils.maxLength(
+                (UnaryOperator<Style>) Converter::titleStyle,
+                UIContents.TARGET_ANGLE,
+                UIContents.TARGET_OMEGA,
+                UIContents.CURRENT_OMEGA,
+                UIContents.CURRENT_ANGLE
+        );
+
         var toggle_mode = new OptionUIField<>(
                 boundPos,
                 SharedKeys.TARGET_MODE,
                 TargetMode.class,
                 Converter.convert(UIContents.MODE, Converter::titleStyle)
-        ).onOptionSwitch(($, newValue) -> {
+        ).onOptionSwitch((self, newValue) -> {
             if(newValue == TargetMode.VELOCITY){
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_OMEGA.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_OMEGA.title());
                 pid.setPIDField(AbstractDynamicMotor.DEFAULT_VELOCITY_MODE_PARAMS);
             }else{
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_ANGLE.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_ANGLE.title());
                 pid.setPIDField(AbstractDynamicMotor.DEFAULT_POSITION_MODE_PARAMS);
             }
+            target_field.title().setWidth(maxLen);
+            current_view.title().setWidth(maxLen);
+            self.parent.redoLayout();
         });
 
 
@@ -484,7 +532,7 @@ public class GenericUIFactory {
 
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, lock_view, target);
+            Converter.alignLabel(current_view, lock_view, target_field);
             Converter.alignLabel(toggle_mode, toggle_cheat, toggle_lock_mode);
             Converter.alignLabel(toggle_mode.valueLabel(), toggle_cheat.valueLabel(), toggle_lock_mode.valueLabel());
             Converter.alignLabel(lock, unlock, asm, disasm);
@@ -495,7 +543,7 @@ public class GenericUIFactory {
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
                                 .withPort(
-                                        current_view, lock_view, target,
+                                        current_view, lock_view, target_field,
                                         toggle_mode, toggle_cheat, toggle_lock_mode
                                 )
                                 .withPreDoLayout(alignLabels)
@@ -526,6 +574,197 @@ public class GenericUIFactory {
 
     }
 
+    public static GenericSettingScreen createKinematicMotorScreen(BlockPos boundPos, ItemStack stack){
+
+        var current_view = new DoubleUIView(boundPos, SharedKeys.VALUE, Converter.convert(UIContents.CURRENT, Converter::viewStyle));
+
+        var target_field = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle));
+
+        var self_offset = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 25);
+
+        var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
+
+
+        var compliance_field = new DoubleUIField(
+                boundPos,
+                SharedKeys.COMPLIANCE,
+                Converter.convert(UIContents.COMPLIANCE, Converter::titleStyle)
+        );
+
+        int maxLen = MinecraftUtils.maxLength(
+                (UnaryOperator<Style>) Converter::titleStyle,
+                UIContents.TARGET_ANGLE,
+                UIContents.TARGET_OMEGA,
+                UIContents.CURRENT_OMEGA,
+                UIContents.CURRENT_ANGLE
+        );
+
+        var toggle_mode = new OptionUIField<>(
+                boundPos,
+                SharedKeys.TARGET_MODE,
+                TargetMode.class,
+                Converter.convert(UIContents.MODE, Converter::titleStyle)
+        ).onOptionSwitch((self, newValue) -> {
+            if(newValue == TargetMode.VELOCITY){
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_OMEGA.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_OMEGA.title());
+            }else{
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_ANGLE.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_ANGLE.title());
+            }
+            target_field.title().setWidth(maxLen);
+            current_view.title().setWidth(maxLen);
+            self.parent.redoLayout();
+        });;
+
+        var asm = new UnitUIPanel(
+                boundPos,
+                SharedKeys.ASSEMBLE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
+        );
+
+        var disasm = new UnitUIPanel(
+                boundPos,
+                SharedKeys.DISASSEMBLE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(current_view, target_field);
+            Converter.alignLabel(compliance_field, toggle_mode);
+            Converter.alignLabel(asm, disasm);
+        };
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(current_view, target_field, toggle_mode)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTab(
+                        ADVANCE_TAB
+                        , new VerticalFlow.builder(boundPos)
+                                .withPort(self_offset, comp_offset, compliance_field)
+                                .build()
+                )
+                .withTab(
+                        REDSTONE_TAB,
+                        createTerminalDeviceTab(boundPos)
+                )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(SharedKeys.ASSEMBLE, asm)
+                                .withPort(SharedKeys.DISASSEMBLE, disasm)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withRenderedStack(stack)
+                .withTickTask(createSyncTasks(boundPos, SharedKeys.VALUE))
+                .build();
+    }
+
+    public static GenericSettingScreen createKinematicSliderScreen(BlockPos boundPos, ItemStack stack){
+
+        var current_view = new DoubleUIView(boundPos, SharedKeys.VALUE, Converter.convert(UIContents.CURRENT, Converter::viewStyle));
+
+        var target_field = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle));
+
+        var self_offset = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 25);
+
+        var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
+
+
+        var compliance_field = new DoubleUIField(
+                boundPos,
+                SharedKeys.COMPLIANCE,
+                Converter.convert(UIContents.COMPLIANCE, Converter::titleStyle)
+        );
+
+        int maxLen = MinecraftUtils.maxLength(
+                (UnaryOperator<Style>) Converter::titleStyle,
+                UIContents.TARGET_DISTANCE,
+                UIContents.TARGET_VELOCITY,
+                UIContents.CURRENT_DISTANCE,
+                UIContents.CURRENT_VELOCITY
+        );
+
+        var toggle_mode = new OptionUIField<>(
+                boundPos,
+                SharedKeys.TARGET_MODE,
+                TargetMode.class,
+                Converter.convert(UIContents.MODE, Converter::titleStyle)
+        ).onOptionSwitch((self, newValue) -> {
+            if(newValue == TargetMode.VELOCITY){
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_VELOCITY.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_VELOCITY.title());
+            }else{
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_DISTANCE.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_DISTANCE.title());
+            }
+            target_field.title().setWidth(maxLen);
+            current_view.title().setWidth(maxLen);
+            self.parent.redoLayout();
+        });
+
+        var asm = new UnitUIPanel(
+                boundPos,
+                SharedKeys.ASSEMBLE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
+        );
+
+        var disasm = new UnitUIPanel(
+                boundPos,
+                SharedKeys.DISASSEMBLE,
+                Double.class,
+                0.0,
+                Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(current_view, target_field);
+            Converter.alignLabel(compliance_field, toggle_mode);
+            Converter.alignLabel(asm, disasm);
+        };
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(current_view, target_field, toggle_mode)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTab(
+                        ADVANCE_TAB
+                        , new VerticalFlow.builder(boundPos)
+                                .withPort(compliance_field)
+                                .build()
+                )
+                .withTab(
+                        REDSTONE_TAB,
+                        createTerminalDeviceTab(boundPos)
+                )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(asm, disasm)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withRenderedStack(stack)
+                .withTickTask(createSyncTasks(boundPos, SharedKeys.VALUE))
+                .build();
+    }
+
     public static GenericSettingScreen createDynamicSliderScreen(BlockPos boundPos, ItemStack stack){
         var current_view = new DoubleUIView(boundPos, SharedKeys.VALUE, Converter.convert(UIContents.CURRENT, Converter::viewStyle));
 
@@ -539,21 +778,36 @@ public class GenericUIFactory {
                 $ -> false
         );
 
-        var target = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d);
+        var target_field = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d);
 
         var pid = new DynamicControllerUIField(boundPos, 30);
+
+        int maxLen = MinecraftUtils.maxLength(
+                (UnaryOperator<Style>) Converter::titleStyle,
+                UIContents.TARGET_DISTANCE,
+                UIContents.TARGET_VELOCITY,
+                UIContents.CURRENT_DISTANCE,
+                UIContents.CURRENT_VELOCITY
+        );
 
         var toggle_mode = new OptionUIField<>(
                 boundPos,
                 SharedKeys.TARGET_MODE,
                 TargetMode.class,
                 Converter.convert(UIContents.MODE, Converter::titleStyle)
-        ).onOptionSwitch(($, newValue) -> {
+        ).onOptionSwitch((self, newValue) -> {
             if(newValue == TargetMode.VELOCITY){
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_VELOCITY.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_VELOCITY.title());
                 pid.setPIDField(AbstractDynamicMotor.DEFAULT_VELOCITY_MODE_PARAMS);
             }else{
+                ((FormattedLabel) target_field.title()).setText(UIContents.TARGET_DISTANCE.title());
+                ((FormattedLabel) current_view.title()).setText(UIContents.CURRENT_DISTANCE.title());
                 pid.setPIDField(AbstractDynamicMotor.DEFAULT_POSITION_MODE_PARAMS);
             }
+            target_field.title().setWidth(maxLen);
+            current_view.title().setWidth(maxLen);
+            self.parent.redoLayout();
         });
 
         var toggle_cheat = new OptionUIField<>(boundPos, SharedKeys.CHEAT_MODE, CheatMode.class, new CheatMode[]{CheatMode.NONE, CheatMode.NO_REPULSE} , Converter.convert(UIContents.CHEAT, Converter::titleStyle));
@@ -593,7 +847,7 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, lock_view, target);
+            Converter.alignLabel(current_view, lock_view, target_field);
             Converter.alignLabel(toggle_mode, toggle_cheat, toggle_lock_mode);
             Converter.alignLabel(toggle_mode.valueLabel(), toggle_cheat.valueLabel(), toggle_lock_mode.valueLabel());
             Converter.alignLabel(lock, unlock, asm, disasm);
@@ -605,7 +859,7 @@ public class GenericUIFactory {
                         new VerticalFlow.builder(boundPos)
                                 .withPort(SharedKeys.VALUE, current_view)
                                 .withPort(SharedKeys.IS_LOCKED, lock_view)
-                                .withPort(SharedKeys.TARGET, target)
+                                .withPort(SharedKeys.TARGET, target_field)
                                 .withPort(SharedKeys.TARGET_MODE, toggle_mode)
                                 .withPort(SharedKeys.CHEAT_MODE, toggle_cheat)
                                 .withPort(SharedKeys.LOCK_MODE, toggle_lock_mode)
@@ -715,9 +969,6 @@ public class GenericUIFactory {
 
         var is_static_field = new BooleanUIField(pos, SpatialAnchorBlockEntity.IS_STATIC, SlotType.IS_STATIC.convertTo(Converter::titleStyle));
 
-
-
-
         Runnable alignLabels = () -> {
             Converter.alignLabel(offset_field, protocol_field);
             Converter.alignLabel(is_running_field, is_static_field);
@@ -745,77 +996,7 @@ public class GenericUIFactory {
                 .build();
     }
 
-    public static GenericSettingScreen createKinematicDeviceScreen(BlockPos boundPos, ItemStack stack){
 
-        var current_view = new DoubleUIView(boundPos, SharedKeys.VALUE, Converter.convert(UIContents.CURRENT, Converter::viewStyle));
-
-        var target_field = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle));
-
-        var self_offset = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 25);
-
-        var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
-
-
-        var compliance_field = new DoubleUIField(
-                boundPos,
-                SharedKeys.COMPLIANCE,
-                Converter.convert(UIContents.COMPLIANCE, Converter::titleStyle)
-        );
-
-        var toggle_mode = new OptionUIField<>(boundPos, SharedKeys.TARGET_MODE, TargetMode.class, Converter.convert(UIContents.MODE, Converter::titleStyle));
-
-        var asm = new UnitUIPanel(
-                boundPos,
-                SharedKeys.ASSEMBLE,
-                Double.class,
-                0.0,
-                Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
-        );
-
-        var disasm = new UnitUIPanel(
-                boundPos,
-                SharedKeys.DISASSEMBLE,
-                Double.class,
-                0.0,
-                Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
-        );
-
-        Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, target_field);
-            Converter.alignLabel(compliance_field, toggle_mode);
-            Converter.alignLabel(asm, disasm);
-        };
-
-        return new GenericSettingScreen.builder(boundPos)
-                .withTab(
-                        GENERIC_SETTING_TAB,
-                        new VerticalFlow.builder(boundPos)
-                                .withPort(current_view, target_field, toggle_mode)
-                                .withPreDoLayout(alignLabels)
-                                .build()
-                )
-                .withTab(
-                        ADVANCE_TAB
-                        , new VerticalFlow.builder(boundPos)
-                                .withPort(self_offset, comp_offset, compliance_field)
-                                .build()
-                )
-                .withTab(
-                        REDSTONE_TAB,
-                        createTerminalDeviceTab(boundPos)
-                )
-                .withTab(
-                        REMOTE_TAB,
-                        new VerticalFlow.builder(boundPos)
-                                .withPort(SharedKeys.ASSEMBLE, asm)
-                                .withPort(SharedKeys.DISASSEMBLE, disasm)
-                                .withPreDoLayout(alignLabels)
-                                .build()
-                )
-                .withRenderedStack(stack)
-                .withTickTask(createSyncTasks(boundPos, SharedKeys.VALUE))
-                .build();
-    }
 
     public static GenericSettingScreen createKineticResistorScreen(BlockPos boundPos){
         var ratio = new DoubleUIField(boundPos, KineticResistorBlockEntity.RATIO, Converter.convert(SlotType.RATIO, Converter::titleStyle));

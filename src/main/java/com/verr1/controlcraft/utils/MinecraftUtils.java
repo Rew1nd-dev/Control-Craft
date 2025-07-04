@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,9 +27,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.UnaryOperator;
 
 public class MinecraftUtils {
     public static void updateBlockState(@Nullable Level world, BlockPos pos, BlockState newState){
@@ -109,6 +112,26 @@ public class MinecraftUtils {
             if(len > maxLen.get()) maxLen.set(len);
         });
         return maxLen.get();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static<T extends Descriptive<?>> int maxLength(T... descriptive){
+        return maxLength(Arrays.asList(descriptive));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static<T extends Descriptive<?>> int maxLength(UnaryOperator<Style> style, List<T> descriptive){
+        AtomicInteger maxLen = new AtomicInteger(0);
+        descriptive.forEach(c -> {
+            int len = Minecraft.getInstance().font.width(c.asComponent().copy().withStyle(style));
+            if(len > maxLen.get()) maxLen.set(len);
+        });
+        return maxLen.get();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static<T extends Descriptive<?>> int maxLength(UnaryOperator<Style> style, T... descriptive){
+        return maxLength(style, Arrays.asList(descriptive));
     }
 
     @OnlyIn(Dist.CLIENT)

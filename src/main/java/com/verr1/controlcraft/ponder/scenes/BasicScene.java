@@ -19,13 +19,19 @@ import java.util.function.UnaryOperator;
 public class BasicScene {
     public static final String EMPTY = "cimulink/base";
     public static final int READING_TIME = 60;
+    public static final int READING_TIME_133 = (int)(READING_TIME * 1.333);
+    public static final int READING_TIME_80 = (int)(READING_TIME * 0.8);
+    public static final int READING_TIME_50 = (int)(READING_TIME * 0.5);
+    public static final int READING_TIME_33 = (int)(READING_TIME * 0.3333);
+    public static final int READING_TIME_25 = (int)(READING_TIME * 0.25);
+    public static final int READING_TIME_20 = (int)(READING_TIME * 0.2);
 
     public static void scene_0(SceneBuilder scene, SceneBuildingUtil util){
         var input = of(2, 1, 2);
         var output = of(4, 1, 2);
         var air = of(6, 1, 2);
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "basic_0");
 
         cu
                 .init()
@@ -45,7 +51,7 @@ public class BasicScene {
                 .frame()
 
         ;
-
+        cu.end();
     }
 
     public static void scene_1(SceneBuilder scene, SceneBuildingUtil util){
@@ -56,7 +62,7 @@ public class BasicScene {
         var output_2 = of(4, 1, 4);
 
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "basic_1");
 
         cu
                 .init()
@@ -76,6 +82,8 @@ public class BasicScene {
                 .inst(removeWire("i1")).idle(10)
                 .inst(addWire("i5", input_1, output_2)).idle(10)
                 .inst(removeWire("i2")).idle(10);
+
+        cu.end();
     }
 
 
@@ -117,7 +125,7 @@ public class BasicScene {
         var chain_o = chains[chains.length - 1].east().south();
         var lamp = chain_o.south();
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "basic_2");
 
         cu
                 .init()
@@ -188,7 +196,7 @@ public class BasicScene {
 
 
 
-
+        cu.end();
     }
 
     public static void scene_3(SceneBuilder scene, SceneBuildingUtil util){
@@ -206,7 +214,7 @@ public class BasicScene {
             chains[i] = chains[i - 1].south();
         }
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "basic_3");
 
         cu
                 .init()
@@ -236,17 +244,18 @@ public class BasicScene {
         cu.text("This is still a valid loop", chains[0], READING_TIME).idle(READING_TIME);
 
 
+
         cu.setBlock(Constants.LOGIC, chains[size - 1]).idle(10);
 
         cu
                 .text("This is not a valid loop", chains[0], READING_TIME).idle(READING_TIME)
-                .text("If you input something...", chains[0], READING_TIME).idle(READING_TIME);
+                .text("If you input something...", chains[0], READING_TIME / 2).idle(READING_TIME / 2);
 
         cu
-                .setBlock(power(true), lever).idle(READING_TIME)
-                .inst(removeWire("chain_loop")).idle(READING_TIME)
+                .setBlock(power(true), lever).idle(READING_TIME / 4)
+                .inst(removeWire("chain_loop")).idle(READING_TIME / 3)
                 .text("the loop will disconnect automatically", chains[0], READING_TIME).idle(READING_TIME);
-
+        cu.end();
     }
 
     public static UnaryOperator<BlockState> power(boolean on){

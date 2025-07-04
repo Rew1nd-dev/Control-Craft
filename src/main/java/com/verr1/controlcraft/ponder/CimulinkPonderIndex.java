@@ -62,7 +62,8 @@ public class CimulinkPonderIndex {
 
         PONDER_HELPER
                 .forComponents(CimulinkBlocks.CIRCUIT)
-                .addStoryBoard(BasicScene.EMPTY, CircuitScene::scene);
+                .addStoryBoard(BasicScene.EMPTY, CircuitScene::scene)
+                .addStoryBoard(BasicScene.EMPTY, CircuitScene::scene_1);
     }
 
 }

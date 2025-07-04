@@ -56,6 +56,11 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         recreate();
     }
 
+    @Override
+    public boolean isCombinational() {
+        return false;
+    }
+
     public void setEnabledInput(String name, boolean enable){
         if(!plant.namedInputs().containsKey(name))return;
         setEnabledInput(plant.in(name), enable);

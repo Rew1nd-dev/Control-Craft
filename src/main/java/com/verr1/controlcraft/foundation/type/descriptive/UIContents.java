@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.foundation.type.descriptive;
 
+import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
-import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;
@@ -12,6 +12,17 @@ import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 
 public enum UIContents implements Descriptive<UIContents> {
     CURRENT(Component.literal("Current"), literals("Current Angle, Velocity, Position Etc.")),
+
+    TARGET_ANGLE(Component.literal("Angle"), literals("Target Angle")),
+    TARGET_OMEGA(Component.literal("Omega"), literals("Target Velocity")),
+    TARGET_DISTANCE(Component.literal("Distance"), literals("Target Distance")),
+    TARGET_VELOCITY(Component.literal("Velocity"), literals("Target Velocity")),
+
+    CURRENT_ANGLE(Component.literal("Angle"), literals("Current Angle")),
+    CURRENT_OMEGA(Component.literal("Omega"), literals("Current Velocity")),
+    CURRENT_DISTANCE(Component.literal("Distance"), literals("Current Distance")),
+    CURRENT_VELOCITY(Component.literal("Velocity"), literals("Current Velocity")),
+
     LOCKED(Component.literal("Locked"), literals("Whether The Device Is Locked By Constraint")),
     TARGET(Component.literal("Target"), literals("Target Angle, Velocity, Position Etc.")),
     SELF_OFFSET(Component.literal("Offset"), literals("Rotation Axis Offset For Next Assembly / Connection")),
@@ -97,7 +108,13 @@ public enum UIContents implements Descriptive<UIContents> {
         return l;
     }
 
+    public Component title(){
+        return this.asComponent().plainCopy().withStyle(Converter::titleStyle);
+    }
 
+    public Component option(){
+        return this.asComponent().plainCopy().withStyle(Converter::optionStyle);
+    }
 
     UIContents(Component displayName, List<Component> description) {
         LangUtils.registerDefaultName(UIContents.class, this, displayName);

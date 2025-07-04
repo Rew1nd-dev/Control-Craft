@@ -1,0 +1,15 @@
+{
+  "vscontrolcraft.ponder.fma.text.0": "This is a linear adder",
+  "vscontrolcraft.ponder.fma.text.1": "It multiply its input with coefficients",
+  "vscontrolcraft.ponder.fma.text.2": "And add them together",
+  "vscontrolcraft.ponder.fma.text.3": "default coeffs are all 1.0",
+  "vscontrolcraft.ponder.fma.text.4": "i0 = 4",
+  "vscontrolcraft.ponder.fma.text.5": "i1 = 2",
+  "vscontrolcraft.ponder.fma.text.6": "o = 4 * 1.0 + 2 * 1.0 = 6",
+  "vscontrolcraft.ponder.fma.text.7": "coefficients can be changed",
+  "vscontrolcraft.ponder.fma.text.8": "Let's change i0 coefficient to -1.0",
+  "vscontrolcraft.ponder.fma.text.9": "i0 = 2",
+  "vscontrolcraft.ponder.fma.text.10": "i1 = 4",
+  "vscontrolcraft.ponder.fma.text.11": "o = 2 * -1.0 + 4 * 1.0 = 2",
+  "vscontrolcraft.ponder.fma.text.12": "A Subtractor!"
+}

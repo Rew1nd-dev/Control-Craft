@@ -1,0 +1,14 @@
+{
+  "vscontrolcraft.ponder.shifter_1.text.0": "This is an Async Shifter",
+  "vscontrolcraft.ponder.shifter_1.text.1": "It only shift its input",
+  "vscontrolcraft.ponder.shifter_1.text.2": "when a positive edge is received at clk port",
+  "vscontrolcraft.ponder.shifter_1.text.3": "Let's say DELAY is now 4",
+  "vscontrolcraft.ponder.shifter_1.text.4": "4-[0-0-0-0]-->0",
+  "vscontrolcraft.ponder.shifter_1.text.5": "4-[4-0-0-0]-->0",
+  "vscontrolcraft.ponder.shifter_1.text.6": "8-[4-0-0-0]-->0",
+  "vscontrolcraft.ponder.shifter_1.text.7": "12-[4-0-0-0]-->0",
+  "vscontrolcraft.ponder.shifter_1.text.8": "12-[12-4-0-0]-->0",
+  "vscontrolcraft.ponder.shifter_1.text.9": "12-[12-12-4-0]-->0",
+  "vscontrolcraft.ponder.shifter_1.text.10": "12-[12-12-12-4]-->4",
+  "vscontrolcraft.ponder.shifter_1.text.11": "12-[12-12-12-12]-->12"
+}

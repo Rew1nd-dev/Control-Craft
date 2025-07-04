@@ -1,0 +1,12 @@
+{
+  "vscontrolcraft.ponder.mux.text.0": "This is a Selector",
+  "vscontrolcraft.ponder.mux.text.1": "It selects one of its inputs based on a selector",
+  "vscontrolcraft.ponder.mux.text.2": "If selector is False, it outputs i0",
+  "vscontrolcraft.ponder.mux.text.3": "If selector is True, it outputs i1",
+  "vscontrolcraft.ponder.mux.text.4": "i0 = 4",
+  "vscontrolcraft.ponder.mux.text.5": "i1 = 2",
+  "vscontrolcraft.ponder.mux.text.6": "sel = 0(False)",
+  "vscontrolcraft.ponder.mux.text.7": "o = 4",
+  "vscontrolcraft.ponder.mux.text.8": "sel = 1(True)",
+  "vscontrolcraft.ponder.mux.text.9": "o = 2"
+}

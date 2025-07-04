@@ -48,7 +48,7 @@ public class KinematicSliderBlock extends DirectionalKineticBlock implements
 
     @OnlyIn(Dist.CLIENT)
     protected void displayScreen(BlockPos pos){
-        ScreenOpener.open(GenericUIFactory.createKinematicDeviceScreen(pos, ControlCraftBlocks.CONSTRAINT_SLIDER_BLOCK.asStack()));
+        ScreenOpener.open(GenericUIFactory.createKinematicSliderScreen(pos, ControlCraftBlocks.CONSTRAINT_SLIDER_BLOCK.asStack()));
     }
 
     @Override

@@ -54,5 +54,14 @@ public class CannonMountPeripheral extends AbstractAttachedPeripheral<CannonMoun
         return Optional.ofNullable(duck).map(ICannonDuck::controlCraft$getYaw).orElse(0.0f);
     }
 
+    @LuaFunction(mainThread = true)
+    public final void assemble(){
+        Optional.ofNullable(duck).ifPresent(ICannonDuck::controlCraft$assemble);
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void disassemble(){
+        Optional.ofNullable(duck).ifPresent(ICannonDuck::controlCraft$disassemble);
+    }
 
 }

@@ -26,7 +26,7 @@ public class GatesScene {
 
         var nixie = o.east();
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "gates");
 
         cu
                 .init()
@@ -144,7 +144,7 @@ public class GatesScene {
                 .text("i0 = 0(False)", analog0, READING_TIME / 3).idle(READING_TIME / 2)
                 .text("o = 1(True)", o, READING_TIME / 3).idle(READING_TIME / 2)
                 .text("NOT Gate flips its input", gate, READING_TIME).idle(READING_TIME);
-
+        cu.end();
     }
 
 

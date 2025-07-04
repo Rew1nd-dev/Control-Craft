@@ -13,25 +13,23 @@ public class FFScene {
 
     public static void scene(SceneBuilder scene, SceneBuildingUtil util){
         var i0 = of(2, 1, 2);
-        var i1 = i0.south().south();
 
-        var gate = i0.south().east();
+        var gate = i0.east().east();
         var o = gate.east();
 
         var lever0 = i0.west();
-        var lever1 = i1.west();
 
         var nixie = o.east();
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "ff_0");
 
         cu
                 .init()
-                .setBlock(Constants.INPUT, i0, i1).idle(4)
+                .setBlock(Constants.INPUT, i0).idle(4)
                 .setBlock(Constants.FF, gate).idle(4)
                 .setBlock(Constants.OUTPUT, o).idle(4)
                 .setBlock(Constants.NIXIE, nixie).idle(4)
-                .setBlock(Constants.ANALOG_LEVER, lever0, lever1).idle(4)
+                .setBlock(Constants.ANALOG_LEVER, lever0).idle(4)
                 .inst(addWire("i0", i0, gate)).idle(2)
                 .inst(addWire("o", gate, o)).idle(4)
                 .showPower(nixie, 0).idle(READING_TIME);
@@ -41,23 +39,32 @@ public class FFScene {
                 .frame()
                 .text("This is a T-Flip-Flop", gate, READING_TIME).idle(READING_TIME)
                 .text("It Flips its input every tick, with 1 tick delay", gate, READING_TIME).idle(READING_TIME)
-                .power(lever0, 4).idle(1).showPower(nixie, 0).idle(READING_TIME)
-                .text("i = 4(True)", i0, READING_TIME / 2)
+                .power(lever0, 0)
+                .power(lever0, 4)
+                .showPower(nixie, 0).idle(READING_TIME)
+                .text("i = 4(True)", i0, READING_TIME / 2).idle(READING_TIME / 2)
                 .text("o = 0(False)", o, READING_TIME / 2).idle(READING_TIME / 2)
-                .power(lever0, 0).idle(1).showPower(nixie, 1).idle(READING_TIME)
-                .text("i = 0(False)", i0, READING_TIME / 2)
-                .text("o = 1(True)", o, READING_TIME / 2).idle(READING_TIME / 2);
+                .power(lever0, 0)
+                .power(lever0, 0)
+                .showPower(nixie, 1).idle(READING_TIME)
+                .text("i = 0(False)", i0, READING_TIME / 2).idle(READING_TIME / 2)
+                .text("o = 1(True)", o, READING_TIME / 2).idle(READING_TIME / 2)
+                .showPower(nixie, 0);
 
         cu
                 .frame()
                 .setBlock(s -> s.setValue(FFBlock.TYPE, FFTypes.D_FF), gate).idle(READING_TIME)
                 .text("This is a D-Flip-Flop", gate, READING_TIME).idle(READING_TIME)
                 .text("It transmits its input with 1 tick delay", gate, READING_TIME).idle(READING_TIME)
-                .power(lever0, 4).idle(1).showPower(nixie, 1).idle(READING_TIME)
-                .text("i = 4(True)", i0, READING_TIME / 2)
+                .power(lever0, 0)
+                .power(lever0, 4)
+                .showPower(nixie, 1).idle(READING_TIME)
+                .text("i = 4(True)", i0, READING_TIME / 2).idle(READING_TIME / 2)
                 .text("o = 1(True)", o, READING_TIME / 2).idle(READING_TIME / 2)
-                .power(lever0, 0).idle(1).showPower(nixie, 0).idle(READING_TIME)
-                .text("i = 0(False)", i0, READING_TIME / 2)
+                .power(lever0, 0)
+                .power(lever0, 0)
+                .showPower(nixie, 0).idle(READING_TIME)
+                .text("i = 0(False)", i0, READING_TIME / 2).idle(READING_TIME / 2)
                 .text("o = 0(False)", o, READING_TIME / 2).idle(READING_TIME / 2);
 
         /*
@@ -104,7 +111,7 @@ public class FFScene {
 
 
 
-
+        cu.end();
     }
 
     public static void scene_1(SceneBuilder scene, SceneBuildingUtil util){
@@ -119,7 +126,7 @@ public class FFScene {
 
         var nixie = o.east();
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "ff_1");
 
         cu
                 .init()
@@ -198,7 +205,7 @@ public class FFScene {
                 .text("A Positive Edge is received", clk, READING_TIME / 2).idle(READING_TIME)
                 .text("DFF transmit its input and get output 0.0(False)", o, READING_TIME / 2).idle(READING_TIME);
 
-
+        cu.end();
     }
 
 }

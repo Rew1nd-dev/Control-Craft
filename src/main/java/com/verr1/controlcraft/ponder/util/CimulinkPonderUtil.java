@@ -27,7 +27,17 @@ import java.util.function.UnaryOperator;
 
 import static com.verr1.controlcraft.ponder.scenes.BasicScene.lit;
 
-public record CimulinkPonderUtil(SceneBuilder scene, SceneBuildingUtil util) {
+public class CimulinkPonderUtil {
+    final SceneBuilder scene;
+    final SceneBuildingUtil util;
+    final LocalizationCollector collector;
+
+    public CimulinkPonderUtil(SceneBuilder scene, SceneBuildingUtil util, String sceneTitle){
+        this.scene = scene;
+        this.util = util;
+        this.collector = new LocalizationCollector(sceneTitle);
+    }
+
 
     public CimulinkPonderUtil setBlock(BlockState block, BlockPos pos) {
         scene.addInstruction(BasicScene.set(util.select.position(pos), block));
@@ -111,8 +121,10 @@ public record CimulinkPonderUtil(SceneBuilder scene, SceneBuildingUtil util) {
 
     public CimulinkPonderUtil text(String text, Vec3 pointAt, int duration) {
         PlainTextElement textWindowElement = new PlainTextElement();
-        textWindowElement.new Builder().text(text).pointAt(pointAt).placeNearTarget();
-        scene.addInstruction(new PlainTextInstruction(textWindowElement, duration));
+
+        textWindowElement.new Builder().text(collector.collect(text)).pointAt(pointAt).placeNearTarget();
+
+        scene.addInstruction(new PlainTextInstruction(textWindowElement, (int)duration));
         return this;
     }
 
@@ -120,16 +132,6 @@ public record CimulinkPonderUtil(SceneBuilder scene, SceneBuildingUtil util) {
         return text(text, pointAt.getCenter(), duration);
     }
 
-    public CimulinkPonderUtil text(Descriptive<?> text, Vec3 pointAt, int duration) {
-        PlainTextElement textWindowElement = new PlainTextElement();
-        textWindowElement.new Builder().text(text).pointAt(pointAt).placeNearTarget();
-        scene.addInstruction(new PlainTextInstruction(textWindowElement, duration));
-        return this;
-    }
-
-    public CimulinkPonderUtil text(Descriptive<?> text, BlockPos pointAt, int duration) {
-        return text(text, pointAt.getCenter(), duration);
-    }
 
     public CimulinkPonderUtil frame() {
         scene.addLazyKeyframe();
@@ -147,7 +149,9 @@ public record CimulinkPonderUtil(SceneBuilder scene, SceneBuildingUtil util) {
         return this;
     }
 
-
+    public void end(){
+        collector.end();
+    }
 
     public CimulinkPonderUtil showPower(BlockPos pos, int level){
         scene.world.modifyBlockEntityNBT(util.select.position(pos), NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", level));

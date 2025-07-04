@@ -15,14 +15,14 @@ public class IMUScene {
     public static void scene(SceneBuilder scene, SceneBuildingUtil util){
         var imu = of(3, 1, 3);
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "imu");
 
         cu
                 .init()
                 .setBlock(Constants.IMU, imu).idle(4)
                 .text("This is imu", imu, READING_TIME).idle(READING_TIME)
                 .text("You can get velocity/omega/.. values of the vs ship its located on", imu, READING_TIME + 2).idle(READING_TIME + 2);
-
+        cu.end();
     }
 
 }

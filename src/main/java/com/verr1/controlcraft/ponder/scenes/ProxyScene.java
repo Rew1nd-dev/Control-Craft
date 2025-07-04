@@ -4,11 +4,14 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.simibubi.create.foundation.ponder.SceneBuilder;
 import com.simibubi.create.foundation.ponder.SceneBuildingUtil;
+import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
+import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.ponder.Constants;
 import com.verr1.controlcraft.ponder.util.CimulinkPonderUtil;
 import com.verr1.controlcraft.registry.ControlCraftBlocks;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 import static com.verr1.controlcraft.ponder.scenes.BasicScene.*;
@@ -23,7 +26,7 @@ public class ProxyScene {
         var in = proxy.west().west();
         var out = proxy.east().east();
 
-        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util);
+        CimulinkPonderUtil cu = new CimulinkPonderUtil(scene, util, "proxy");
 
         cu
                 .init()
@@ -54,24 +57,49 @@ public class ProxyScene {
                 .frame()
                 .clearBlock(util.select.position(plantTop))
                 .setBlock(ControlCraftBlocks.KINETIC_RESISTOR_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant)
-                .text("For resistor, you can get and set RATIO in proxy port", proxy, READING_TIME).idle(READING_TIME + 1);
+                .text("For resistor, you can get and set RATIO in proxy port", proxy, READING_TIME).idle(READING_TIME);
 
         cu
                 .frame()
                 .setBlock(ControlCraftBlocks.PROPELLER_CONTROLLER.getDefaultState().setValue(FACING, Direction.UP), plant)
                 .setBlock(ControlCraftBlocks.PROPELLER_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plantTop).idle(READING_TIME / 2)
-                .text("For propeller, you can get and set SPEED in proxy port", proxy, READING_TIME).idle(READING_TIME + 1);
+                .text("For propeller, you can get and set SPEED in proxy port", proxy, READING_TIME).idle(READING_TIME)
+                .clearBlock(util.select.position(plantTop));
+
+        BlockState mount_0 = CreateBigCannonsCompact.cannonMountBlock(0);
+        BlockState mount_1 = CreateBigCannonsCompact.cannonMountBlock(1);
+        BlockState lectern = TweakControllerCompact.lecternBlock();
+
+        if(mount_0 != null){
+            cu.setBlock(mount_0, plant).idle(READING_TIME_33);
+            if(mount_1 != null){
+                cu.setBlock(mount_1, plant).idle(READING_TIME_33);
+            }
+            cu.text("For cannons, you can get PITCH and YAW in proxy port", proxy, READING_TIME).idle(READING_TIME_133)
+            ;
+        }
+        if(lectern != null){
+            cu
+                    .setBlock(lectern, plant).idle(READING_TIME_33)
+                    .text("For tweaked lectern controller, you can get player INPUT AXIS in proxy port", proxy, READING_TIME).idle(READING_TIME_133)
+            ;
+        }
+
 
         cu
-                .clearBlock(util.select.position(plantTop))
                 .setBlock(ControlCraftBlocks.JET_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3)
                 .setBlock(ControlCraftBlocks.SERVO_MOTOR_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3)
                 .setBlock(ControlCraftBlocks.JOINT_MOTOR_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3)
                 .setBlock(ControlCraftBlocks.CAMERA_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3)
                 .setBlock(ControlCraftBlocks.COMPACT_FLAP_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3)
-                .setBlock(ControlCraftBlocks.WING_CONTROLLER_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3)
-                .text("Just try it yourself to see what you can do!", proxy, READING_TIME / 2).idle(READING_TIME);
+                .setBlock(ControlCraftBlocks.WING_CONTROLLER_BLOCK.getDefaultState().setValue(FACING, Direction.UP), plant).idle(READING_TIME / 3);
 
+
+
+        cu
+                .text("Just try it yourself to see what you can get/set!", proxy, READING_TIME / 2).idle(READING_TIME);
+
+        cu.end();
     }
 
 }

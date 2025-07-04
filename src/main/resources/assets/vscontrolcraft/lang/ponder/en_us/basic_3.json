@@ -1,0 +1,8 @@
+{
+  "vscontrolcraft.ponder.basic_3.text.0": "This is a loop",
+  "vscontrolcraft.ponder.basic_3.text.1": "A loop must contain at least 1 temporal component",
+  "vscontrolcraft.ponder.basic_3.text.2": "This is still a valid loop",
+  "vscontrolcraft.ponder.basic_3.text.3": "This is not a valid loop",
+  "vscontrolcraft.ponder.basic_3.text.4": "If you input something...",
+  "vscontrolcraft.ponder.basic_3.text.5": "the loop will disconnect automatically"
+}
