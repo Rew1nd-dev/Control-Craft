@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.apigame.joints.VSJoint;
 
 
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class ConstraintSavedData extends SavedData {
     }
 
 
-    public void put(ConstraintKey key, VSConstraint constrain){
+    public void put(ConstraintKey key, VSJoint constrain){
         data.put(key, new ConstraintSerializable(constrain));
         setDirty();
     }

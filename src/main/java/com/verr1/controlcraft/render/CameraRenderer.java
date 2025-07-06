@@ -22,11 +22,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3dc;
-import org.joml.Vector4f;
-
-import java.awt.*;
-
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
     public CameraRenderer(BlockEntityRendererProvider.Context context) {

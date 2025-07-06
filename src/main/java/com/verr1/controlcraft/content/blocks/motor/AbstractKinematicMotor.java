@@ -3,13 +3,13 @@ package com.verr1.controlcraft.content.blocks.motor;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.create.KMotorKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
-import com.verr1.controlcraft.content.valkyrienskies.transform.KinematicMotorTransformProvider;
 import com.verr1.controlcraft.content.valkyrienskies.transform.LerpedTransformProvider;
 import com.verr1.controlcraft.content.gui.layouts.api.IKinematicUIDevice;
 import com.verr1.controlcraft.foundation.api.IKineticPeripheral;
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
 import com.verr1.controlcraft.foundation.data.GroundBodyShip;
 import com.verr1.controlcraft.foundation.data.NumericField;
+import com.verr1.controlcraft.foundation.data.control.Pose;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -21,7 +21,6 @@ import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.foundation.vsapi.PhysPose;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -38,7 +37,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.apigame.joints.VSFixedJoint;
+import org.valkyrienskies.core.apigame.joints.VSJoint;
+import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.apigame.joints.VSJointPose;
 
 import java.lang.Math;
 import java.util.Optional;
@@ -197,16 +199,14 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
 
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
+        VSJoint joint = new VSFixedJoint(
                 getShipOrGroundID(),
-                getCompanionShipID(),
-                1.0E-20,
-                context.self().getPos().add(v_own, new Vector3d()),
-                context.comp().getPos().add(v_cmp, new Vector3d()),
-                1.0E20,
-                0.0
+                new VSJointPose(context.self().getPos(), q_self),
+                compID,
+                new VSJointPose(context.comp().getPos(), q_comp),
+                new VSJointMaxForceTorque(1e20f, 1e20f)
         );
-        overrideConstraint("control", fixed);
+        overrideConstraint("control", joint);
         targetOfLastAppliedConstraint = controller.getTarget();
     }
 
@@ -252,7 +252,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         }
     }
 
-    public @Nullable PhysPose tickPose(){
+    public @Nullable Pose tickPose(){
         LoadedServerShip compShip = getCompanionServerShip();
         LogicalKinematicMotor motor = getLogicalMotor();
         Ship selfShip = getShipOn();
@@ -268,11 +268,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     public void tickServer() {
         super.tickServer();
         syncForNear(true, FIELD);
-        if(USE_CONSTRAINT_SPAMMING) {
-            tickConstraint();
-        } else{
-            syncAttachTransformProviderServer();
-        }
+        tickConstraint();
         kineticPeripheral.tick();
     }
 
@@ -296,13 +292,16 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         // syncAttachTransformProviderClient();
     }
 
+
+
+    /*
+    *
     public void syncAttachTransformProviderClient(){
         if(level != null && !level.isClientSide)return;
         Optional
                 .ofNullable(getCompanionClientShip())
                 .ifPresent(LerpedTransformProvider::replaceOrCreate);
     }
-
     public void syncAttachTransformProviderServer(){
         if(level != null && level.isClientSide)return;
         Optional
@@ -310,6 +309,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
                 .map(KinematicMotorTransformProvider::replaceOrCreate)
                 .ifPresent(prov -> Optional.ofNullable(tickPose()).ifPresent(prov::set));
     }
+    * */
 
 
     public @Nullable LogicalKinematicMotor getLogicalMotor() {

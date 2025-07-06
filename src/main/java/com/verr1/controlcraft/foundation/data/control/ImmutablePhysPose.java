@@ -1,11 +1,11 @@
 package com.verr1.controlcraft.foundation.data.control;
 
-import com.verr1.controlcraft.foundation.vsapi.PhysPose;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.properties.PhysPose;
 
 public record ImmutablePhysPose(Vector3dc pos, Quaterniondc rot) implements PhysPose {
 

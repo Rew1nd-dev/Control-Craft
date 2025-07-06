@@ -31,7 +31,8 @@ import org.joml.Vector3dc;
 import java.awt.*;
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
+
 
 @OnlyIn(Dist.CLIENT)
 public class WandGUI implements IGuiOverlay {

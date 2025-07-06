@@ -7,7 +7,6 @@ import com.verr1.controlcraft.foundation.type.descriptive.CheatMode;
 import com.verr1.controlcraft.foundation.type.descriptive.LockMode;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +17,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 public class DynamicRevoluteMotorBlockEntity extends AbstractDynamicMotor {
     public DynamicRevoluteMotorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

@@ -4,30 +4,30 @@ import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.control.ImmutablePhysPose;
+import com.verr1.controlcraft.foundation.data.control.Pose;
 import com.verr1.controlcraft.foundation.data.logical.*;
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+import org.valkyrienskies.core.api.ships.*;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.physics_api.PoseVel;
+import org.valkyrienskies.core.api.ships.PhysShip;
+import org.valkyrienskies.core.apigame.ships.PhysShipCore;
+import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.lang.Math;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
 /*
 *   This is what makes Control Craft to be Control Craft :)
-*
 * */
 
 public class InducerControls {
 
-    public static void anchorTickControls(LogicalAnchor anchor, @NotNull PhysShipWrapper physShip) {
+    public static void anchorTickControls(LogicalAnchor anchor, @NotNull PhysShip physShip) {
 
         Vector3dc p_sc = ValkyrienSkies.set(new Vector3d(), anchor.pos().pos().getCenter());
         Vector3dc s_sc = physShip.getTransform().getPositionInShip();
@@ -36,7 +36,7 @@ public class InducerControls {
         Vector3dc r_sc_gravity = anchor.extraGravityAtPos() ? r_sc : new Vector3d();
 
         Vector3dc velocity = physShip.getVelocity();
-        Vector3dc omega = physShip.getOmega();
+        Vector3dc omega = physShip.getAngularVelocity();
         Vector3dc abs_velocity = velocity.add(omega.cross(r_sc_resistance, new Vector3d()), new Vector3d());
 
         Vector3dc v_dir = MathUtils.safeNormalize(abs_velocity);
@@ -69,7 +69,7 @@ public class InducerControls {
         return scaleVector.get(scaleVector.minComponent());
     }
 
-    public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @NotNull  PhysShipWrapper motorShip, @NotNull PhysShipWrapper compShip) {
+    public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @NotNull  PhysShip motorShip, @NotNull PhysShip compShip) {
         if(!motor.free())return;
 
 
@@ -107,7 +107,7 @@ public class InducerControls {
     }
 
 
-    public static void sliderTickControls(LogicalSlider slider, @NotNull PhysShipWrapper selfShip, @NotNull PhysShipWrapper compShip){
+    public static void sliderTickControls(LogicalSlider slider, @NotNull PhysShip selfShip, @NotNull PhysShip compShip){
         if(!slider.free())return;
         Vector3dc own_local_pos = slider.selfContact();
         Vector3dc cmp_local_pos = slider.compContact();
@@ -161,7 +161,7 @@ public class InducerControls {
 
     }
 
-    public static void spatialTickControls(LogicalSpatial spatial, @NotNull PhysShipWrapper physShip){
+    public static void spatialTickControls(LogicalSpatial spatial, @NotNull PhysShip physShip){
         if(!spatial.shouldDrive())return;
         spatial.schedule().overridePhysics(physShip);
         Vector3dc controlTorque = spatial.schedule().calcControlTorque();
@@ -171,7 +171,7 @@ public class InducerControls {
         physShip.applyInvariantTorque(controlTorque);
     }
 
-    public static void jetTickControls(LogicalJet jet, @NotNull PhysShipWrapper physShip) {
+    public static void jetTickControls(LogicalJet jet, @NotNull PhysShip physShip) {
         Vector3dc dir = jet.direction();
         double thrust = MathUtils.clamp(jet.thrust(), BlockPropertyConfig._JET_MAX_THRUST);
         if(!BlockPropertyConfig._CAN_JET_THRUST_BACK)thrust = MathUtils.relu(thrust);
@@ -187,7 +187,7 @@ public class InducerControls {
         physShip.applyInvariantForceToPos(force_wc, relativeRadius_sc);
     }
 
-    public static void propellerTickControls(LogicalPropeller propeller, @NotNull PhysShipWrapper physShip) {
+    public static void propellerTickControls(LogicalPropeller propeller, @NotNull PhysShip physShip) {
         if(!propeller.canDrive())return;
         Vector3dc p_sc = ValkyrienSkies.set(new Vector3d(), propeller.pos().pos().getCenter());
         Vector3dc s_sc = physShip.getTransform().getPositionInShip();
@@ -208,7 +208,7 @@ public class InducerControls {
     }
 
 
-    public static ImmutablePhysPose kinematicMotorTickControls(LogicalKinematicMotor motor, Ship motorShip, ServerShip compShip){
+    public static Pose kinematicMotorTickControls(LogicalKinematicMotor motor, Ship motorShip, LoadedServerShip compShip){
         Quaterniondc q_m = motorShip.getTransform().getShipToWorldRotation();
         Quaterniondc q_m_c = motor.context().self().getRot();
         Quaterniondc q_c_c = motor.context().comp().getRot();
@@ -246,11 +246,11 @@ public class InducerControls {
             motor.controller().updateTargetAngular(1d / 60);
         }
         // ((PhysShipImpl)compShip).setKinematicTarget(new Ei(p_t, q_t));
-        return ImmutablePhysPose.of(p_t, q_t);
+        return Pose.of(p_t, q_t);
 
     }
 
-    public static void kinematicMotorTickControls(LogicalKinematicMotor motor, PhysShipWrapper motorShip, PhysShipWrapper compShip){
+    public static void kinematicMotorTickControls(LogicalKinematicMotor motor, PhysShip motorShip, PhysShip compShip){
         Quaterniondc q_m = motorShip.getTransform().getShipToWorldRotation();
         Quaterniondc q_m_c = motor.context().self().getRot();
         Quaterniondc q_c_c = motor.context().comp().getRot();
@@ -282,17 +282,16 @@ public class InducerControls {
         }else{
             motor.controller().updateTargetAngular(1d / 60);
         }
-        compShip.implOptional().ifPresent(impl ->
-        {
-            impl.setEnableKinematicVelocity(true);
-            impl.setStatic(true);
-            impl.setPoseVel(new PoseVel(p_t, q_t, new Vector3d(), new Vector3d()));
-        });
+        compShip.setStatic(true);
+        ((PhysShipImpl) compShip).setKinematicTarget(new Pose(
+                p_t, q_t
+        ));
+
 
     }
 
 
-    public static void flapTickControls(LogicalFlap flap, PhysShipWrapper ship){
+    public static void flapTickControls(LogicalFlap flap, PhysShip ship){
         double lift = flap.lift();
         double drag = flap.drag();
 

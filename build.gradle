@@ -187,10 +187,12 @@ repositories {
     mavenCentral()
 }
 
+
 mixin {
     add sourceSets.main, "mixins.controlcraft.refmap.json"
     config 'mixins.controlcraft.json'
 }
+
 
 
 configurations {
@@ -210,11 +212,14 @@ dependencies {
     implementation fg.deobf("libs:architectury-forge:9.2.14")
 
     // implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_mod_version}")
-    compileOnly("org.valkyrienskies.core:api:${vs_core_version}")
-    compileOnly("org.valkyrienskies.core:api-game:${vs_core_version}")
-    compileOnly("org.valkyrienskies.core:util:${vs_core_version}")
-    compileOnly("org.valkyrienskies.core:impl:${vs_core_version}")
+    // implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_mod_version}")
+    // compileOnly("org.valkyrienskies.core:api:${vs_core_version}")
+    // compileOnly("org.valkyrienskies.core:api-game:${vs_core_version}")
+    // compileOnly("org.valkyrienskies.core:util:${vs_core_version}")
+    // compileOnly("org.valkyrienskies.core:impl:${vs_core_version}")
+
+    implementation fg.deobf("libs:valkyrienskies-1201-forge:2.5")
+    implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
 
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")

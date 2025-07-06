@@ -14,9 +14,6 @@ import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
-import com.verr1.controlcraft.foundation.vsapi.ShipAssembler;
-import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
@@ -30,17 +27,17 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSFixedOrientationConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSSlideConstraint;
+import org.valkyrienskies.core.apigame.joints.*;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
 public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
         IConstraintHolder, IBruteConnectable
@@ -164,7 +161,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
         Vector3dc p_self = getAssembleBlockPosJOML();
         Vector3dc p_comp = ValkyrienSkies.set(new Vector3d(), bp_comp.getCenter());
 
-        /*
+
         VSPrismaticJoint joint = new VSPrismaticJoint(
                 selfId,
                 new VSJointPose(p_self, q_self),
@@ -173,73 +170,38 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
                 new VSJointMaxForceTorque(1e20f, 1e20f),
                 new VSD6Joint.LinearLimitPair(-m, m, null, null, null, null)
         );
-        * */
 
 
 
-        VSFixedOrientationConstraint orientation = new VSFixedOrientationConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                q_self,
-                q_comp,
-                1.0E20
-        );
 
-        VSSlideConstraint slide = new VSSlideConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                p_self,
-                p_comp,
-                1.0E20,
-                getDirectionJOML(),
-                MAX_SLIDE_DISTANCE
-        );
 
-        recreateConstrains(orientation, slide);
+        recreateConstrains(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(align_comp);
         setChanged();
 
     }
 
-    public void recreateConstrains(VSConstraint... joint) {
+    public void recreateConstrains(VSJoint... joint) {
         if(level == null || level.isClientSide)return;
-        if(joint.length < 2){
+        if(joint.length < 1){
             ControlCraft.LOGGER.error("invalid constraint data for slider");
             return;
         }
         overrideConstraint("orient", joint[0]);
-        overrideConstraint("slide", joint[1]);
-        updateConnectContext();
+        updateConnectContext(joint[0]);
     }
 
     public void invalidateConnectContext(){
         context = ConnectContext.EMPTY;
     }
 
-    public void updateConnectContext(){
-        Optional.ofNullable(getConstraint("slide")).ifPresentOrElse(
-                sld -> Optional.ofNullable(getConstraint("orient")).ifPresentOrElse(
-                fx -> {
-                    VSSlideConstraint slide = (VSSlideConstraint) sld;
-                    VSFixedOrientationConstraint fix = (VSFixedOrientationConstraint) fx;
-                    Vector3dc p0 = slide.getLocalPos0();
-                    Vector3dc p1 = slide.getLocalPos1();
-                    Quaterniondc q0 = fix.getLocalRot0();
-                    Quaterniondc q1 = fix.getLocalRot1();
-
-                    context = new ConnectContext(
-                            new VSJointPose(p0, q0),
-                            new VSJointPose(p1, q1),
-                            false
-                    );
-                },
-                    this::invalidateConnectContext
-                ),
-                    this::invalidateConnectContext
-                );
+    public void updateConnectContext(VSJoint joint){
+        context = new ConnectContext(
+                joint.getPose0(),
+                joint.getPose1(),
+                false
+        );
     }
 
     public double getSlideDistance(){
@@ -279,63 +241,51 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
         // if(self == null)return;
         ServerLevel serverLevel = (ServerLevel) level;
         List<BlockPos> collected = List.of(getAssembleBlockPos());
-        ServerShip comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected.get(0), true, 1, true);
+        ServerShip comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1, true);
 
         Vector3dc comp_at_sc = toJOML(getAssembleBlockPos().getCenter());
         Vector3dc comp_at_wc = getShipOn() != null ?
                 getShipOn().getShipToWorld().transformPosition(comp_at_sc, new Vector3d()) :
                 new Vector3d(comp_at_sc);
-        ((ShipDataCommon)comp).setTransform(
+        /*
+        * ((ShipDataCommon)comp).setTransform(
                 new ShipTransformImpl(
                         comp_at_wc,
                         comp.getInertiaData().getCenterOfMassInShip(),
                         getSelfShipQuaternion(),
                         new Vector3d(1, 1, 1)
                 ));
+        * */
 
         long compId = comp.getId();
         long selfId = getShipOrGroundID();
         Vector3dc selfContact = getAssembleBlockPosJOML();
-        Vector3dc compContact = comp.getInertiaData().getCenterOfMassInShip().add(new Vector3d(0.5, 0.5, 0.5), new Vector3d());
+        Vector3dc compContact = comp.getKinematics().getTransform().getPositionInModel().add(new Vector3d(0.5, 0.5, 0.5), new Vector3d());
         // Vector3dc selfOffset = self.getTransform().getPositionInShip();  //.sub(selfContact, new Vector3d())
 
         // float m = (float)(MAX_SLIDE_DISTANCE);
 
         Quaterniondc selfQuaternion = new Quaterniond(); // VSMathUtils.getQuaternionToEast_(getDirection());
         Quaterniondc compQuaternion = new Quaterniond(); // VSMathUtils.getQuaternionToEast_(getDirection());
-        /*
+
         VSPrismaticJoint joint = new VSPrismaticJoint(
                 selfId,
                 new VSJointPose(selfContact, selfQuaternion),
                 compId,
                 new VSJointPose(compContact, compQuaternion),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
-                new VSD6Joint.LinearLimitPair(-(float) MAX_SLIDE_DISTANCE, (float) MAX_SLIDE_DISTANCE, null, null, null, null)
-        );
-        * */
-
-
-        VSFixedOrientationConstraint orientation = new VSFixedOrientationConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                selfQuaternion,
-                compQuaternion,
-                1.0E20
+                new VSD6Joint.LinearLimitPair(
+                        -(float) MAX_SLIDE_DISTANCE,
+                        (float) MAX_SLIDE_DISTANCE,
+                        null, null, null, null
+                )
         );
 
-        VSSlideConstraint slide = new VSSlideConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                selfContact,
-                compContact,
-                1.0E20,
-                getDirectionJOML(),
-                MAX_SLIDE_DISTANCE
-        );
 
-        recreateConstrains(orientation, slide);
+
+
+
+        recreateConstrains(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(getDirection().getOpposite());
         setChanged();

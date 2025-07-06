@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.foundation.data;
 
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
 import com.verr1.controlcraft.utils.CCUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -38,9 +37,8 @@ public record ShipPhysics(Vector3dc velocity,
             -1L
     );
 
-    public static ShipPhysics of(@Nullable PhysShip ship_){
-        if(ship_ == null)return EMPTY;
-        PhysShipWrapper ship = new PhysShipWrapper((PhysShipImpl) ship_);
+    public static ShipPhysics of(@Nullable PhysShip ship){
+        if(ship == null)return EMPTY;
         return new ShipPhysics(
                         new Vector3d(ship.getVelocity()),
                         new Vector3d(ship.getAngularVelocity()),

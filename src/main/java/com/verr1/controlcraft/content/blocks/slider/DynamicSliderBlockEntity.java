@@ -31,7 +31,6 @@ import com.verr1.controlcraft.foundation.type.descriptive.CheatMode;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.descriptive.LockMode;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -49,7 +48,9 @@ import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.apigame.joints.VSDistanceJoint;
+import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.lang.Math;
 import java.util.List;
@@ -201,20 +202,24 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         long compId = compShip.getId();
 
 
-        Vector3dc sliDir = ValkyrienSkies.set(new Vector3d(), getSlideDirection().getNormal());
+
+        float d = (float) getSlideDistance();
 
 
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
+        VSDistanceJoint joint = new VSDistanceJoint(
                 selfId,
+                context.self(),
                 compId,
-                1.0E-20,
-                context.self().getPos().fma(getSlideDistance(), sliDir, new Vector3d()),
-                context.comp().getPos(), // This is the opposite with the case of assemble()
-                1.0E20,
-                0.0
+                context.comp(),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                d - 1e-4f,
+                d + 1e-4f,
+                1e-20f,
+                null,
+                null
         );
 
-        overrideConstraint("fix", fixed);
+        overrideConstraint("fix", joint);
 
         isLocked = true;
         setChanged();

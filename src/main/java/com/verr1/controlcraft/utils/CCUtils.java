@@ -3,7 +3,6 @@ package com.verr1.controlcraft.utils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.verr1.controlcraft.foundation.data.ShipHitResult;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixinducks.IEntityDuck;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.computer.core.ServerContext;
@@ -18,6 +17,7 @@ import org.joml.*;
 import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.Ship;
 
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.List;

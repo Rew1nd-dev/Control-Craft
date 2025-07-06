@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.foundation.data.control;
 
 import com.verr1.controlcraft.content.gui.layouts.api.ISerializableSchedule;
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
+import org.valkyrienskies.core.api.ships.PhysShip;
 import com.verr1.controlcraft.utils.InputChecker;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import org.joml.Quaterniond;
@@ -62,7 +62,7 @@ public class SpatialSchedule implements ISerializableSchedule {
         return torque_pd;
     }
 
-    public void overridePhysics(PhysShipWrapper ship){
+    public void overridePhysics(PhysShip ship){
         mass = ship.getMass();
         inertia = ship.getMomentOfInertia().m00();
 

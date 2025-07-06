@@ -4,7 +4,6 @@ import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
-import com.verr1.controlcraft.content.legacy.PeripheralInterfaceBlockEntity_;
 import com.verr1.controlcraft.registry.ControlCraftBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -68,7 +67,7 @@ public class PeripheralInterfaceBlock extends DirectionalBlock implements IBE<Pe
         ControlCraftServer.SERVER_EXECUTOR.executeLater(
                 () -> {
                     BlockEntity entity = world.getExistingBlockEntity(pos);
-                    if(entity instanceof PeripheralInterfaceBlockEntity_ receiver){
+                    if(entity instanceof PeripheralInterfaceBlockEntity receiver){
                         receiver.updateAttachedPeripheral();
                     }
                 },

@@ -12,7 +12,8 @@ import org.joml.Vector3d;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
+
 
 public class CameraBoundFakePlayer extends FakePlayer {
 

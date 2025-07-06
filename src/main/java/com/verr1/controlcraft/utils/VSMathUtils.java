@@ -2,21 +2,16 @@ package com.verr1.controlcraft.utils;
 
 
 
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.joml.*;
-import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 
 import javax.annotation.Nullable;
 import java.lang.Math;
-import java.util.ArrayList;
 import java.util.List;
 
 //XC2YC:  [X, Y, Z]: X: the X unit basis in YC coordinate represented by XC coordinate unit vector basis,

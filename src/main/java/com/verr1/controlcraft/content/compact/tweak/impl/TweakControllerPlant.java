@@ -18,7 +18,6 @@ public class TweakControllerPlant extends Plant {
                 .out("lt", () -> (double)lectern.GetAxis(4))
                 .out("rt", () -> (double)lectern.GetAxis(5))
         );
-        /*super(List.of(), List.of("lx", "ly", "rx", "ry", "lt", "rt"));     */
 
         this.lectern = lectern;
     }
@@ -28,27 +27,5 @@ public class TweakControllerPlant extends Plant {
         return lectern;
     }
 
-    /*
-    * @Override
-    public List<Integer> propagateTo(int inputIndex) {
-        return List.of();
-    }
 
-    @Override
-    public void onInputChange(Integer... inputIndexes) {
-
-    }
-
-    @Override
-    public void onPositiveEdge() {
-        updateOutput(List.of(
-                (double)lectern.GetAxis(0),
-                (double)lectern.GetAxis(1),
-                (double)lectern.GetAxis(2),
-                (double)lectern.GetAxis(3),
-                (double)lectern.GetAxis(4),
-                (double)lectern.GetAxis(5)
-        ));
-    }
-    * */
 }

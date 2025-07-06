@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.cctweaked.peripheral;
 
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.data.ShipHitResult;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.CCUtils;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import dan200.computercraft.api.lua.LuaFunction;
@@ -15,6 +14,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.List;
 import java.util.Map;

@@ -1,15 +1,16 @@
 package com.verr1.controlcraft.content.blocks;
 
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.api.operatable.IConstraintHolder;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConstraintKey;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+// import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,7 +22,9 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+// import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.apigame.joints.VSJoint;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,24 +73,20 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
         return registeredConstraintKeys.get(id);
     }
 
-    public void overrideConstraint(String id, VSConstraint newConstraint){
+    public void overrideConstraint(String id, VSJoint newConstraint){
         Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(key -> ConstraintCenter.createOrReplaceNewConstrain(key, newConstraint));
+                .ifPresent(key -> ControlCraftServer.JOINT_HANDLER.requestOverrideJoint(key, newConstraint));
     }
 
-    public void updateConstraint(String id, VSConstraint newConstraint){
-        Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(key -> ConstraintCenter.updateOrCreateConstraint(key, newConstraint));
-    }
 
     public void removeConstraint(String id){
         Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(ConstraintCenter::removeConstraintIfPresent);
+                .ifPresent(ControlCraftServer.JOINT_HANDLER::requestRemoveJoint);
     }
 
-    public @Nullable VSConstraint getConstraint(String id){
+    public @Nullable VSJoint retrieveJoint(String id){
         return Optional.ofNullable(getConstraintKey(id))
-                .map(ConstraintCenter::get)
+                .map(ControlCraftServer.JOINT_HANDLER::retrieveJoint)
                 .orElse(null);
     }
 
@@ -115,7 +114,7 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
         if(!(level instanceof ClientLevel lvl))return null;
 
         return Optional
-                .ofNullable(ValkyrienSkies.getShipWorld(lvl))
+                .ofNullable(ValkyrienSkies.getShipWorld(Minecraft.getInstance()))
                 .map(shipWorld -> shipWorld.getLoadedShips().getById(companionShipID))
                 .orElse(null);
     }

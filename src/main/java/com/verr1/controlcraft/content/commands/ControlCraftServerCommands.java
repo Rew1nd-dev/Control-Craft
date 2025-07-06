@@ -15,9 +15,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.registry.ControlCraftItems;
 import net.minecraft.commands.CommandSourceStack;
@@ -31,6 +29,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +46,7 @@ public class ControlCraftServerCommands {
     }
 
     private static void clearAllAttachments(){
+        /*
         ControlCraftServer
                 .INSTANCE
                 .getAllLevels()
@@ -64,10 +64,11 @@ public class ControlCraftServerCommands {
                                         )
                             )
                 );
+        * */
     }
 
     private static int saveAllConstraintsCommand(CommandContext<CommandSourceStack> $){
-        ConstraintCenter.saveAll();
+        ControlCraftServer.JOINT_HANDLER.saveAll();
         return 1;
     }
 

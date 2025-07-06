@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 @OnlyIn(Dist.CLIENT)
 public class CimulinkRenderCenter {

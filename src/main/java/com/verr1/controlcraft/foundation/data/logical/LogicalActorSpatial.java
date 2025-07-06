@@ -3,7 +3,6 @@ package com.verr1.controlcraft.foundation.data.logical;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.api.ISpatialTarget;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.VSGetterUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.BlockPos;
@@ -11,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.Objects;
 import java.util.Optional;

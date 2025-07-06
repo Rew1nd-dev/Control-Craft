@@ -48,8 +48,8 @@ import org.joml.Vector3dc;
 
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         IReceiver, IBearingBlockEntity, IPlant

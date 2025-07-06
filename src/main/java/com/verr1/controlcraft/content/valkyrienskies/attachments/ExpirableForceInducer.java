@@ -8,9 +8,12 @@ import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import org.valkyrienskies.core.api.world.PhysLevel;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @JsonAutoDetect(
@@ -20,7 +23,7 @@ import java.util.function.Supplier;
         setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class ExpirableForceInducer<T> implements ShipForcesInducer {
+public abstract class ExpirableForceInducer<T> implements ShipPhysicsListener {
     @JsonIgnore
     private final ConcurrentHashMap<WorldBlockPos, ExpirableControlContext<T>> lives = new ConcurrentHashMap<>();
     @JsonIgnore
@@ -28,20 +31,18 @@ public abstract class ExpirableForceInducer<T> implements ShipForcesInducer {
     @JsonIgnore
     private int lazyTickCount = lazyTickRate;
 
+
     @Override
-    public final void applyForces(@NotNull PhysShip physShip) {
+    public final void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
         lazyTickLives();
         applyControl(physShip);
+        applyControlWithOther(physShip, physLevel::getShipById);
     }
 
     @Override
-    public final void applyForcesAndLookupPhysShips(
-            @NotNull PhysShip physShip,
-            @NotNull Function1<? super Long, ? extends PhysShip> lookupPhysShip
-    ) {
-        applyControlWithOther(physShip, lookupPhysShip);
+    public final void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel, double delta) {
+        ShipPhysicsListener.super.physTick(physShip, physLevel, delta);
     }
-
 
     public void replace(
             WorldBlockPos pos,
@@ -52,7 +53,7 @@ public abstract class ExpirableForceInducer<T> implements ShipForcesInducer {
 
     protected void applyControl(@NotNull PhysShip physShip){};
 
-    protected void applyControlWithOther(@NotNull PhysShip physShip, @NotNull Function1<? super Long, ? extends PhysShip> lookupPhysShip){
+    protected void applyControlWithOther(@NotNull PhysShip physShip, @NotNull Function<Long, PhysShip> lookupPhysShip){
         lives
             .values()
             .stream()
@@ -63,7 +64,7 @@ public abstract class ExpirableForceInducer<T> implements ShipForcesInducer {
             );
     };
 
-    protected abstract void consume(@NotNull PhysShip physShip, @NotNull Function1<? super Long, ? extends PhysShip> lookupPhysShip, @NotNull T context);
+    protected abstract void consume(@NotNull PhysShip physShip, @NotNull Function<Long, PhysShip> lookupPhysShip, @NotNull T context);
 
 
 

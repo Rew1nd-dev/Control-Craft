@@ -2,13 +2,14 @@ package com.verr1.controlcraft.content.valkyrienskies.attachments;
 
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
 import com.verr1.controlcraft.foundation.data.logical.LogicalSlider;
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
 import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
-public class DynamicSliderForceInducer extends ExpirableForceInducer<LogicalSlider>{
+import java.util.function.Function;
+
+public final class DynamicSliderForceInducer extends ExpirableForceInducer<LogicalSlider>{
 
     public static DynamicSliderForceInducer getOrCreate(ServerShip ship){
         //return ship.getOrPutAttachment(AnchorForceInducer.class, AnchorForceInducer::new);
@@ -21,11 +22,15 @@ public class DynamicSliderForceInducer extends ExpirableForceInducer<LogicalSlid
     }
 
     @Override
-    protected void consume(@NotNull PhysShip physShip, @NotNull Function1<? super Long, ? extends PhysShip> lookupPhysShip, @NotNull LogicalSlider context) {
+    protected void consume(
+            @NotNull PhysShip physShip,
+            @NotNull Function<Long, PhysShip> lookupPhysShip,
+            @NotNull LogicalSlider context
+    ) {
         InducerControls.sliderTickControls(
                 context,
-                PhysShipWrapper.of(lookupPhysShip.invoke(context.selfShipID())),
-                PhysShipWrapper.of(physShip)
+                lookupPhysShip.apply(context.selfShipID()),
+                physShip
         );
     }
 }

@@ -8,7 +8,8 @@ import org.joml.Vector3dc;
 
 import java.util.Objects;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+
 
 public record RenderCurveKey(
         BlockPort in,

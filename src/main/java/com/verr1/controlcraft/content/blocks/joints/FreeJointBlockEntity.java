@@ -9,10 +9,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaterniond;
 import org.joml.Vector3dc;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.apigame.joints.VSJoint;
+import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.apigame.joints.VSJointPose;
+import org.valkyrienskies.core.apigame.joints.VSSphericalJoint;
 
 public class FreeJointBlockEntity extends AbstractJointBlockEntity{
     public FreeJointBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -41,20 +43,19 @@ public class FreeJointBlockEntity extends AbstractJointBlockEntity{
 
 
 
-        VSAttachmentConstraint attachment = new VSAttachmentConstraint(
+        VSSphericalJoint joint = new VSSphericalJoint(
                 selfID,
+                new VSJointPose(selfContact, new Quaterniond()),
                 otherID,
-                1.0E-20,
-                selfContact,
-                otherContact,
-                1.0E20,
-                0.0
+                new VSJointPose(otherContact, new Quaterniond()),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                null
         );
 
-        recreateConstraints(attachment);
+        recreateConstraints(joint);
     }
 
-    public void recreateConstraints(@NotNull VSConstraint... joint){
+    public void recreateConstraints(@NotNull VSJoint... joint){
         if(level == null || level.isClientSide)return;
         if(joint.length == 0){
             ControlCraft.LOGGER.error("invalid constraint data for free joint");
@@ -66,11 +67,11 @@ public class FreeJointBlockEntity extends AbstractJointBlockEntity{
 
     @Override
     public Direction getAlign() {
-        return null;
+        return Direction.UP;
     }
 
     @Override
     public Direction getForward() {
-        return null;
+        return Direction.NORTH;
     }
 }

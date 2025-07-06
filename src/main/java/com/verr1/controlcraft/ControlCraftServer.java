@@ -3,6 +3,7 @@ package com.verr1.controlcraft;
 
 import com.verr1.controlcraft.content.compact.tweak.impl.RedstoneLinkNetworkHandlerExtension;
 import com.verr1.controlcraft.foundation.executor.Executor;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import me.lucko.spark.common.platform.PlatformInfo;
 import me.lucko.spark.forge.ForgePlatformInfo;
@@ -18,6 +19,7 @@ public class ControlCraftServer {
     public static RedstoneLinkNetworkHandlerExtension DECIMAL_LINK_NETWORK_HANDLER = new RedstoneLinkNetworkHandlerExtension();
     public static PeripheralNetwork CC_NETWORK = new PeripheralNetwork();
     public static final Executor SERVER_EXECUTOR = new Executor();
+    public static final JointHandler JOINT_HANDLER = new JointHandler();
 
     public static void ServerInit(){
         Configurator.setLevel("org.valkyrienskies.core.impl.networking", Level.ERROR);

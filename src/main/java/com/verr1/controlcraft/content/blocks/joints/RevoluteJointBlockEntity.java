@@ -10,9 +10,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.*;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSHingeOrientationConstraint;
+import org.valkyrienskies.core.apigame.joints.VSJoint;
+import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.apigame.joints.VSJointPose;
+import org.valkyrienskies.core.apigame.joints.VSRevoluteJoint;
 
 import java.lang.Math;
 
@@ -78,38 +79,26 @@ public class RevoluteJointBlockEntity extends AbstractJointBlockEntity implement
         long selfID = getShipOrGroundID();
         long otherID = otherHinge.getShipOrGroundID();
 
-        VSHingeOrientationConstraint orientation = new VSHingeOrientationConstraint(
+        VSRevoluteJoint joint = new VSRevoluteJoint(
                 selfID,
+                new VSJointPose(selfContact, selfRotation),
                 otherID,
-                1.0E-20,
-                selfRotation,
-                otherRotation,
-                1.0E20
+                new VSJointPose(otherContact, otherRotation),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                null, null, null, null, null
         );
 
-        VSAttachmentConstraint attachment = new VSAttachmentConstraint(
-                selfID,
-                otherID,
-                1.0E-20,
-                selfContact,
-                otherContact,
-                1.0E20,
-                0.0
-        );
-
-        recreateConstraints(orientation, attachment);
+        recreateConstraints(joint);
 
     }
 
-    public void recreateConstraints(VSConstraint... joint){
+    public void recreateConstraints(VSJoint... joint){
         if(level == null || level.isClientSide)return;
-        if(joint.length < 2){
+        if(joint.length < 1){
             ControlCraft.LOGGER.error("invalid constraint data for pivot joint");
             return;
         }
         overrideConstraint("revolute", joint[0]);
-        overrideConstraint("attach", joint[1]);
-
     }
 
     @Override

@@ -2,18 +2,19 @@ package com.verr1.controlcraft.foundation.data.constraint;
 
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
-import org.valkyrienskies.core.apigame.constraints.*;
+import org.valkyrienskies.core.apigame.joints.*;
 
-public record ConstraintSerializable(VSConstraint constraint) {
+public record ConstraintSerializable(VSJoint constraint) {
 
     public static ConstraintSerializable deserialize(CompoundTag tag) {
         String type = tag.getString("type");
-        VSConstraint joint =
-        switch (VSConstraintType.valueOf(type)) {
-            case ATTACHMENT -> SerializeUtils.ATTACH.deserialize(tag.getCompound("nbt"));
-            case FIXED_ORIENTATION -> SerializeUtils.FIXED_ORIENT.deserialize(tag.getCompound("nbt"));
-            case HINGE_ORIENTATION -> SerializeUtils.ORIENT.deserialize(tag.getCompound("nbt"));
-            case SLIDE -> SerializeUtils.SLIDE.deserialize(tag.getCompound("nbt"));
+        CompoundTag nbt = tag.getCompound("nbt");
+        VSJoint joint =
+        switch (VSJointType.valueOf(type)) {
+            case FIXED -> SerializeUtils.FIXED_JOINT.deserialize(nbt);
+            case REVOLUTE -> SerializeUtils.REVOLUTE_JOINT.deserialize(nbt);
+            case PRISMATIC -> SerializeUtils.PRISMATIC_JOINT.deserialize(nbt);
+            case DISTANCE -> SerializeUtils.DISTANCE_JOINT.deserialize(nbt);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
         return new ConstraintSerializable(joint);
@@ -21,14 +22,14 @@ public record ConstraintSerializable(VSConstraint constraint) {
 
     public CompoundTag serialize() {
         CompoundTag tag = new CompoundTag();
-        tag.putString("type", constraint.getConstraintType().name());
+        tag.putString("type", constraint.getJointType().name());
         CompoundTag constraintTag =
-        switch (constraint.getConstraintType()) {
-            case ATTACHMENT -> SerializeUtils.ATTACH.serialize((VSAttachmentConstraint) constraint);
-            case FIXED_ORIENTATION -> SerializeUtils.FIXED_ORIENT.serialize((VSFixedOrientationConstraint) constraint);
-            case HINGE_ORIENTATION -> SerializeUtils.ORIENT.serialize((VSHingeOrientationConstraint) constraint);
-            case SLIDE -> SerializeUtils.SLIDE.serialize((VSSlideConstraint) constraint);
-            default -> throw new IllegalStateException("Unexpected value: " + constraint.getConstraintType().name());
+        switch (constraint.getJointType()) {
+            case FIXED -> SerializeUtils.FIXED_JOINT.serialize((VSFixedJoint) constraint);
+            case REVOLUTE -> SerializeUtils.REVOLUTE_JOINT.serialize((VSRevoluteJoint) constraint);
+            case DISTANCE -> SerializeUtils.DISTANCE_JOINT.serialize((VSDistanceJoint) constraint);
+            case PRISMATIC -> SerializeUtils.PRISMATIC_JOINT.serialize((VSPrismaticJoint) constraint);
+            default -> throw new IllegalStateException("Unexpected value: " + constraint.getJointType().name());
         };
         tag.put("nbt", constraintTag);
         return tag;

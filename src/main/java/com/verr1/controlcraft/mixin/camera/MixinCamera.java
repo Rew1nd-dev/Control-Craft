@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.mixin.camera;
 
+import com.verr1.controlcraft.foundation.data.GroundBodyShip;
 import com.verr1.controlcraft.mixinducks.ICameraDuck;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.valkyrienskies.core.api.bodies.properties.BodyTransform;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
@@ -77,31 +79,39 @@ public abstract class MixinCamera implements ICameraDuck {
     ) {
 
 
-        ShipTransform renderTransform = Optional
+        BodyTransform renderTransform = Optional
                 .ofNullable(shipMountedTo)
                 .map(ClientShip::getRenderTransform)
-                .orElse(new ShipTransformImpl(new Vector3d(), new Vector3d(), new Quaterniond(), new Vector3d(1, 1, 1)));
+                .orElse(GroundBodyShip.EMPTY_TRANSFORM);
 
         final Vector3dc playerBasePos =
-                renderTransform.getShipToWorldMatrix().transformPosition(inShipPlayerPosition, new Vector3d());
+                renderTransform.getToWorld().transformPosition(inShipPlayerPosition, new Vector3d());
 
 
         this.initialized = true;
         this.level = level;
         this.entity = renderViewEntity;
         this.detached = thirdPerson;
-        this.controlCraft$setRotationWithShipTransform(renderViewEntity.getViewYRot(partialTicks),
-                renderViewEntity.getViewXRot(partialTicks), renderTransform);
+        this.controlCraft$setRotationWithShipTransform(
+                renderViewEntity.getViewYRot(partialTicks),
+                renderViewEntity.getViewXRot(partialTicks),
+                renderTransform
+        );
         this.setPosition(playerBasePos.x(), playerBasePos.y(), playerBasePos.z());
 
     }
 
+    @Unique
     @Override
-    public void controlCraft$setRotationWithShipTransform(final float yaw, final float pitch, final ShipTransform renderTransform) {
+    public void controlCraft$setRotationWithShipTransform(
+            float yaw,
+            float pitch,
+            BodyTransform renderTransform
+    ) {
         final Quaterniondc originalRotation =
                 new Quaterniond().rotateY(Math.toRadians(-yaw)).rotateX(Math.toRadians(pitch)).normalize();
         final Quaterniondc newRotation =
-                renderTransform.getShipCoordinatesToWorldCoordinatesRotation().mul(originalRotation, new Quaterniond());
+                renderTransform.getRotation().mul(originalRotation, new Quaterniond());
         this.xRot = pitch;
         this.yRot = yaw;
         this.rotation.set(newRotation);

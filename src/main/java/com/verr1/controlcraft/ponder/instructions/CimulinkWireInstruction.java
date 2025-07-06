@@ -12,8 +12,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3dc;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
 public class CimulinkWireInstruction extends TickingInstruction {
     public static class Remove extends TickingInstruction{

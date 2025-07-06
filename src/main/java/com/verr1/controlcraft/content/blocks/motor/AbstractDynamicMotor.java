@@ -42,7 +42,9 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.apigame.joints.VSFixedJoint;
+import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.apigame.joints.VSJointPose;
 
 import javax.annotation.Nullable;
 import java.lang.Math;
@@ -188,27 +190,18 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         Vector3dc v_own = q_self.transform(new Vector3d(0, 1, 0));
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
-        /*
-        * VSFixedJoint joint = new VSFixedJoint(
-                getShipID(),
+
+        VSFixedJoint joint = new VSFixedJoint(
+                getShipOrGroundID(),
                 new VSJointPose(context.self().getPos(), q_self),
                 getCompanionShipID(),
                 new VSJointPose(context.comp().getPos(), q_comp),
                 new VSJointMaxForceTorque(1e20f, 1e20f)
         );
-        * */
 
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
-                getShipOrGroundID(),
-                getCompanionShipID(),
-                1.0E-20,
-                context.self().getPos().add(v_own, new Vector3d()),
-                context.comp().getPos().add(v_cmp, new Vector3d()),
-                1.0E20,
-                0.0
-        );
 
-        overrideConstraint("fix", fixed);
+
+        overrideConstraint("fix", joint);
         isLocked = true;
         setChanged();
     }

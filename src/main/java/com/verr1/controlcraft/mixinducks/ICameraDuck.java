@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3dc;
 import org.spongepowered.asm.mixin.Unique;
+import org.valkyrienskies.core.api.bodies.properties.BodyTransform;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 
@@ -25,6 +26,6 @@ public interface ICameraDuck {
             @NotNull Vector3dc inShipPlayerPosition
     );
 
-    void controlCraft$setRotationWithShipTransform(final float yaw, final float pitch, final ShipTransform renderTransform);
+    void controlCraft$setRotationWithShipTransform(final float yaw, final float pitch, final BodyTransform renderTransform);
 
 }

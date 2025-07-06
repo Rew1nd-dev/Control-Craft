@@ -2,7 +2,7 @@ package com.verr1.controlcraft.content.blocks;
 
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+// import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,14 +16,16 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
+
+
+import javax.annotation.Nullable;
+import java.util.*;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
-import org.valkyrienskies.core.impl.game.ships.DummyShipWorldServer;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
-import javax.annotation.Nullable;
-import java.util.*;
 
 import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toJOML;
 
@@ -62,7 +64,7 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
     public @Nullable LoadedServerShip getLoadedServerShip(){
         if(level == null || level.isClientSide)return null;
         return Optional
-                .of(ValkyrienSkies.getShipWorld(level.getServer()))
+                .ofNullable(ValkyrienSkies.getShipWorld(level.getServer()))
                 .map((shipWorld -> shipWorld.getLoadedShips().getById(getShipOrGroundID()))).orElse(null);
     }
 
@@ -70,7 +72,7 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
     public @Nullable ClientShip getClientShip(){
         if(level == null || !level.isClientSide)return null;
         return Optional
-                .of(ValkyrienSkies.getShipWorld(Minecraft.getInstance()))
+                .ofNullable(ValkyrienSkies.getShipWorld(Minecraft.getInstance()))
                 .map(shipWorld -> shipWorld.getLoadedShips().getById(getShipOrGroundID())).orElse(null);
     }
 
@@ -109,7 +111,8 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
                 .filter(ServerLevel.class::isInstance)
                 .map(ServerLevel.class::cast)
                 .map(ValkyrienSkies::getShipWorld)
-                .filter(sw -> !(sw instanceof DummyShipWorldServer))
+                .filter(ServerShipWorldCore.class::isInstance)
+                .map(ServerShipWorldCore.class::cast)
                 .map(ServerShipWorldCore::getDimensionToGroundBodyIdImmutable)
                 .map(m -> m.get(getDimensionID()))
                 .orElse(-1L);

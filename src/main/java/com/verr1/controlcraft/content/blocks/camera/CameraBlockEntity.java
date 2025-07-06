@@ -33,7 +33,6 @@ import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.CameraClipType;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixinducks.IEntityDuck;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.*;
@@ -73,6 +72,7 @@ import org.joml.primitives.AABBd;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
@@ -85,8 +85,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 public class CameraBlockEntity extends OnShipBlockEntity
         implements IPacketHandler, IReceiver, IHaveGoggleInformation, IPlant
@@ -373,8 +373,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
         Vector3dc camStart_wc = camPos_wc.add(camFront_wc, new Vector3d());
         Vector3dc camTo_wc = camStart_wc.fma(clipRange, camFront_wc, new Vector3d());
         return new ClipContext(
-                ValkyrienSkies.toMinecraft(camStart_wc),
-                ValkyrienSkies.toMinecraft(camTo_wc),
+                toMinecraft(camStart_wc),
+                toMinecraft(camTo_wc),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.NONE,
                 null
@@ -388,8 +388,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
         Vector3dc camStart_wc = camPos_wc.add(camFront_wc, new Vector3d());
         Vector3dc camTo_wc = camStart_wc.fma(clipRange, camFront_wc, new Vector3d());
         return new ClipContext(
-                ValkyrienSkies.toMinecraft(camStart_wc),
-                ValkyrienSkies.toMinecraft(camTo_wc),
+                toMinecraft(camStart_wc),
+                toMinecraft(camTo_wc),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.NONE,
                 null
@@ -404,8 +404,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
         Vector3dc camMin = center.fma(clipRange, view, new Vector3d());
         Vector3dc camMax = center.fma(-10, view, new Vector3d());
         return new AABB(
-                ValkyrienSkies.toMinecraft(camMin),
-                ValkyrienSkies.toMinecraft(camMax)
+                toMinecraft(camMin),
+                toMinecraft(camMax)
         );
     }
 
@@ -413,8 +413,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
         if(level == null)return AABB.of(BoundingBox.fromCorners(new Vec3i(0, 0, 0), new Vec3i(0, 0, 0)));
         Vector3dc center = getCameraPosition(); // VSGetterUtils.getAbsolutePosition(WorldBlockPos.of(level, worldPosition));
         return new AABB(
-                ValkyrienSkies.toMinecraft(center.add(new Vector3d(clipRange, clipRange, clipRange), new Vector3d())),
-                ValkyrienSkies.toMinecraft(center.add(new Vector3d(-clipRange, -clipRange, -clipRange), new Vector3d()))
+                 toMinecraft(center.add(new Vector3d(clipRange, clipRange, clipRange), new Vector3d())),
+                 toMinecraft(center.add(new Vector3d(-clipRange, -clipRange, -clipRange), new Vector3d()))
         );
     }
 
@@ -427,7 +427,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
         AABBd endAABB = MathUtils.centerWithRadius(camEnd, radiusSquare).intersection(toJOML(trivialAABB()));
         ArrayList<Vector3dc> points = new ArrayList<>(MathUtils.pointOf(endAABB));
         points.add(center);
-        return ValkyrienSkies.toMinecraft(MathUtils.coverOf(points));
+        return  toMinecraft(MathUtils.coverOf(points));
 
     }
 
@@ -464,8 +464,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public @Nullable BlockHitResult clipBlock(Vector3d from, Vector3d to){
         if(level == null)return null;
         ClipContext context = new ClipContext(
-                ValkyrienSkies.toMinecraft(from),
-                ValkyrienSkies.toMinecraft(to),
+                toMinecraft(from),
+                toMinecraft(to),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.NONE,
                 null
@@ -700,7 +700,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     @OnlyIn(Dist.CLIENT)
     private void outlineLocation(Vec3 center, Direction direction, int color, String slot){
-        double distance = center.subtract(ValkyrienSkies.toMinecraft(getCameraPosition())).length();
+        double distance = center.subtract(toMinecraft(getCameraPosition())).length();
         double scale = distance / 5;
         ClientOutliner.drawOutline(center, direction, scale, color, slot);
         // ClientOutliner.drawOutline(center, direction.getOpposite(), scale, color, slot + "_opposite");

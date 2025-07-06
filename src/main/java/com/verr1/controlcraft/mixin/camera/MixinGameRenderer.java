@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.foundation.data.GroundBodyShip;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.mixinducks.ICameraDuck;
 import net.minecraft.client.Camera;
@@ -17,6 +18,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.valkyrienskies.core.api.bodies.properties.BodyTransform;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
@@ -80,18 +82,13 @@ abstract class MixinGameRenderer {
         );
 
         // Apply the ship render transform to [matrixStack]
-        ShipTransform renderTransform = Optional.ofNullable(cameraClientShip).map(ClientShip::getRenderTransform).orElse(
-                new ShipTransformImpl(
-                        new Vector3d(),
-                        new Vector3d(),
-                        new Quaterniond(),
-                        new Vector3d(1, 1, 1)
-                )
+        BodyTransform renderTransform = Optional.ofNullable(cameraClientShip).map(ClientShip::getRenderTransform).orElse(
+                GroundBodyShip.EMPTY_TRANSFORM
         );
 
 
         final Quaternionf invShipRenderRotation = new Quaternionf(
-                renderTransform.getShipToWorldRotation().conjugate(new Quaterniond())
+                renderTransform.getRotation().conjugate(new Quaterniond())
         );
         matrixStack.mulPose(invShipRenderRotation);
 

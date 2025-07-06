@@ -14,10 +14,10 @@ import org.joml.AxisAngle4d;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3dc;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSHingeOrientationConstraint;
+import org.valkyrienskies.core.apigame.joints.VSJoint;
+import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.apigame.joints.VSJointPose;
+import org.valkyrienskies.core.apigame.joints.VSRevoluteJoint;
 
 public class PivotJointBlockEntity extends AbstractJointBlockEntity{
     public PivotJointBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -59,36 +59,25 @@ public class PivotJointBlockEntity extends AbstractJointBlockEntity{
         long selfID = getShipOrGroundID();
         long otherID = otherHinge.getShipOrGroundID();
 
-        VSHingeOrientationConstraint orientation = new VSHingeOrientationConstraint(
+        VSRevoluteJoint joint = new VSRevoluteJoint(
                 selfID,
+                new VSJointPose(selfContact, selfRotation),
                 otherID,
-                1.0E-20,
-                selfRotation,
-                otherRotation,
-                1.0E20
+                new VSJointPose(otherContact, otherRotation),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                null, null, null, null, null
         );
 
-        VSAttachmentConstraint attachment = new VSAttachmentConstraint(
-                selfID,
-                otherID,
-                1.0E-20,
-                selfContact,
-                otherContact,
-                1.0E20,
-                0.0
-        );
-
-        recreateConstraints(orientation, attachment);
+        recreateConstraints(joint);
     }
 
-    public void recreateConstraints(VSConstraint... joint){
+    public void recreateConstraints(VSJoint... joint){
         if(level == null || level.isClientSide)return;
-        if(joint.length < 2){
+        if(joint.length < 1){
             ControlCraft.LOGGER.error("invalid constraint data for pivot joint");
             return;
         }
         overrideConstraint("revolute", joint[0]);
-        overrideConstraint("attach", joint[1]);
     }
 
     @Override

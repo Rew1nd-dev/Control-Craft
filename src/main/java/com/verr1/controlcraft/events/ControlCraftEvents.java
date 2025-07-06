@@ -1,13 +1,13 @@
 package com.verr1.controlcraft.events;
 
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftAsyncDelegation;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
 import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
@@ -24,6 +24,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import org.valkyrienskies.core.api.events.PhysTickEvent;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
 @Mod.EventBusSubscriber
 public class ControlCraftEvents {
@@ -32,17 +35,17 @@ public class ControlCraftEvents {
     public static void onServerStarting(ServerStartingEvent event) {
         // AttachmentRegistry.register();
         BlockEntityGetter.create(event.getServer());
-        ConstraintCenter.onServerStaring(event.getServer());
+
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftAttachments.register();
-
-        // VSEvents.ShipLoadEvent.Companion.on(ControlCraftAttachments::onShipLoad);
+        ControlCraftServer.JOINT_HANDLER.onServerStaring(event.getServer());
+        ValkyrienSkies.api().getPhysTickEvent().on(ControlCraftEvents::onPhysicsTickStart);
+        ValkyrienSkies.api().getShipLoadEvent().on(ControlCraftAttachments::onShipLoad);
     }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        // ControlCraftServer.SERVER_INTERVAL_EXECUTOR.tick();
         if(event.phase == TickEvent.Phase.START){
             ControlCraftServer.SERVER_EXECUTOR.tick();
             SpatialLinkManager.tick();
@@ -95,17 +98,20 @@ public class ControlCraftEvents {
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
-        ConstraintCenter.onServerStopping(event.getServer());
+        // ConstraintCenter.onServerStopping(event.getServer());
+        ControlCraftServer.JOINT_HANDLER.onServerStopping(event.getServer());
         BlockLinkPort.onClose();
     }
 
-    public static void onPhysicsTickStart(){
-        ComputerCraftDelegation.lockDelegateThread();
+    public static void onPhysicsTickStart(PhysTickEvent event){
+        ControlCraftServer.JOINT_HANDLER.physTick(event.getWorld(), event.getDelta());
+        ComputerCraftAsyncDelegation.onPhysTick();
+        // ComputerCraftDelegation.lockDelegateThread();
         BlockLinkPort.prePhysicsTick();
     }
 
     public static void onPhysicsTickEnd(){
-        ComputerCraftDelegation.freeDelegateThread();
+        // ComputerCraftDelegation.freeDelegateThread();
     }
 
 }

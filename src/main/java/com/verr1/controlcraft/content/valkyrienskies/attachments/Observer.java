@@ -6,12 +6,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.verr1.controlcraft.foundation.data.*;
 import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
+import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import org.valkyrienskies.core.api.world.PhysLevel;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @JsonAutoDetect(
@@ -21,15 +25,14 @@ import java.util.function.Supplier;
         setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class Observer implements ShipForcesInducer {
+public final class Observer implements ShipPhysicsListener {
     @JsonIgnore
     private final ConcurrentHashMap<WorldBlockPos, ExpirableListener<ShipPhysics>> Listener = new ConcurrentHashMap<>();
     @JsonIgnore
     private final SynchronizedField<ShipPhysics> Observation = new SynchronizedField<>(ShipPhysics.EMPTY);
 
-
     @Override
-    public void applyForces(@NotNull PhysShip physShip) {
+    public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
         ShipPhysics tickPhysics = ShipPhysics.of(physShip);
         Observation.write(tickPhysics);
         Listener.values().forEach(listener -> listener.accept(tickPhysics));
@@ -37,19 +40,10 @@ public final class Observer implements ShipForcesInducer {
         Listener.entrySet().removeIf(entry -> entry.getValue().isExpired());
     }
 
-    @Override
-    public void applyForcesAndLookupPhysShips(@NotNull PhysShip physShip, @NotNull Function1<? super Long, ? extends PhysShip> lookupPhysShip) {
-
-    }
 
 
-    public static Observer getOrCreate(ServerShip ship){
-        var obj = ship.getAttachment(Observer.class);
-        if(obj == null){
-            obj = new Observer();
-            ship.saveAttachment(Observer.class, obj);
-        }
-        return obj;
+    public static Observer getOrCreate(AttachmentHolder ship){
+       return ship.getOrPutAttachment(Observer.class, Observer::new);
     }
 
 
@@ -65,5 +59,6 @@ public final class Observer implements ShipForcesInducer {
     public ShipPhysics read(){
         return Observation.read();
     }
+
 
 }

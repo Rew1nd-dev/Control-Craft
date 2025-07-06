@@ -1,9 +1,14 @@
 package com.verr1.controlcraft.registry;
 
 import com.verr1.controlcraft.content.valkyrienskies.attachments.*;
-import com.verr1.controlcraft.content.valkyrienskies.attachments.legacy.*;
+import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
+import org.valkyrienskies.core.api.events.ShipLoadEvent;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.core.impl.hooks.VSEvents;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+
+import java.util.Arrays;
 
 public enum ControlCraftAttachments {
 
@@ -20,12 +25,6 @@ public enum ControlCraftAttachments {
 
 
 
-    LEGACY_ANCHOR(AnchorForceInducer_.class),
-    LEGACY_DYNAMIC_MOTOR(DynamicMotorForceInducer_.class),
-    LEGACY_SLIDER(DynamicSliderForceInducer_.class),
-    LEGACY_SPATIAL(SpatialForceInducer_.class),
-    LEGACY_JET(JetForceInducer_.class),
-    LEGACY_PROPELLER(PropellerForceInducer_.class),
 
     // CAFFEINE(Caffeine.class),
     // KINEMATIC_MOTOR(KinematicMotorForceInducer.class),
@@ -40,12 +39,13 @@ public enum ControlCraftAttachments {
     }
 
     private final Class<?> clazz;
-    <T extends ShipForcesInducer> ControlCraftAttachments (Class<T> clazz) {
+    <T extends ShipPhysicsListener> ControlCraftAttachments (Class<T> clazz) {
         this.clazz = clazz;
     }
 
     public static void register() {
         if(isRegistered) return;
+
         /*
         AttachmentRegistration<?> ANCHOR_INDUCER = ValkyrienSkies.api()
                 .newAttachmentRegistrationBuilder(AnchorForceInducer.class)
@@ -78,6 +78,7 @@ public enum ControlCraftAttachments {
         ValkyrienSkies.api().registerAttachment(QUEUE_FORCE_INDUCER);
         ValkyrienSkies.api().registerAttachment(SLIDER);
         isRegistered = true;
+        */
 
         Arrays
             .stream(ControlCraftAttachments.values())
@@ -89,30 +90,13 @@ public enum ControlCraftAttachments {
                 )
             );
 
-        * */
 
         isRegistered = true;
     }
 
 
-    public static void onShipLoad(VSEvents.ShipLoadEvent shipLoadEvent) {
+    public static void onShipLoad(ShipLoadEvent shipLoadEvent) {
         Observer.getOrCreate(shipLoadEvent.getShip());
-        /*
-        Arrays
-            .stream(ControlCraftAttachments.values())
-            .forEach(
-                type -> {
-                    try {
-                        type.clazz
-                                .getMethod("getOrCreate", ServerShip.class)
-                                .invoke(null, shipLoadEvent.getShip());
-                    } catch (Exception e) {
-                        ControlCraft.LOGGER.info(e.toString());
-                    }
-                }
-            );
-        * */
-
     }
 
 

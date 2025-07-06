@@ -15,7 +15,6 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.executor.executables.FaceAlignmentSchedule;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldMessage;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.ExposedFieldOpenScreenPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
@@ -132,14 +131,14 @@ public class ServerGenericPacketHandler {
             .filter(ServerLevel.class::isInstance)
             .map(ServerLevel.class::cast)
             .ifPresent(
-                    serverLevel -> ConstraintCenter.destroyAllConstrains(serverLevel, pos)
+                    serverLevel -> ControlCraftServer.JOINT_HANDLER.destroyAllJoints(serverLevel, pos)
             );
     }
 
     public static void handleDestroyConstraints(GenericServerPacket packet, NetworkEvent.Context context){
         BlockPos pos = BlockPos.of(packet.getLongs().get(0));
         Optional
-                .ofNullable(context.getSender()).map(e -> BlockEntityGetter.INSTANCE.getLevelBlockEntityAt(e.serverLevel(), pos, IConstraintHolder.class))
+                .ofNullable(context.getSender()).map(e -> BlockEntityGetter.getLevelBlockEntityAt(e.serverLevel(), pos, IConstraintHolder.class))
                 .map(Optional::orElseThrow)
                 .ifPresent(IConstraintHolder::destroyConstraints);
     }
@@ -167,7 +166,7 @@ public class ServerGenericPacketHandler {
         double value = packet.getDoubles().get(3);
         Optional
                 .ofNullable(context.getSender())
-                .map(e -> BlockEntityGetter.INSTANCE.getLevelBlockEntityAt(e.serverLevel(), pos, IControllerProvider.class))
+                .map(e -> BlockEntityGetter.getLevelBlockEntityAt(e.serverLevel(), pos, IControllerProvider.class))
                 .map(Optional::orElseThrow)
                 .ifPresent(c -> c.getController().setPID(p, i, d).setTarget(value));
     }

@@ -3,14 +3,17 @@ package com.verr1.controlcraft.content.valkyrienskies.attachments;
 import com.google.common.collect.Queues;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import org.valkyrienskies.core.api.world.PhysLevel;
 
 import java.util.Queue;
 import java.util.function.Consumer;
 
-public final class QueueForceInducer implements ShipForcesInducer {
+public final class QueueForceInducer implements ShipPhysicsListener {
     private final Queue<Vector3dc> invForces = Queues.newConcurrentLinkedQueue();
     private final Queue<Vector3dc> invTorques = Queues.newConcurrentLinkedQueue();
     private final Queue<Vector3dc> rotForces = Queues.newConcurrentLinkedQueue();
@@ -19,17 +22,12 @@ public final class QueueForceInducer implements ShipForcesInducer {
     private final Queue<ForcePos> rotPosForces = Queues.newConcurrentLinkedQueue();
 
 
-    public static QueueForceInducer getOrCreate(@NotNull ServerShip ship){
-        QueueForceInducer obj = ship.getAttachment(QueueForceInducer.class);
-        if(obj == null){
-            obj = new QueueForceInducer();
-            ship.saveAttachment(QueueForceInducer.class, obj);
-        }
-        return obj;
+    public static QueueForceInducer getOrCreate(@NotNull AttachmentHolder ship){
+        return ship.getOrPutAttachment(QueueForceInducer.class, QueueForceInducer::new);
     }
 
     @Override
-    public void applyForces(@NotNull PhysShip physShip) {
+    public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
         pollUntilEmpty(invForces, physShip::applyInvariantForce);
         pollUntilEmpty(invTorques, physShip::applyInvariantTorque);
         pollUntilEmpty(invPosForces , (pos) -> physShip.applyInvariantForceToPos(pos.force, pos.pos) );
@@ -37,6 +35,8 @@ public final class QueueForceInducer implements ShipForcesInducer {
         pollUntilEmpty(rotForces, physShip::applyRotDependentForce);
         pollUntilEmpty(rotTorques, physShip::applyRotDependentTorque);
     }
+
+
 
     private <T> void pollUntilEmpty(Queue<T> queue, Consumer<T> consumer){
         T elem;
@@ -72,6 +72,8 @@ public final class QueueForceInducer implements ShipForcesInducer {
     public void  applyRotDependentForceToPos(Vector3dc force, Vector3dc pos) {
         rotPosForces.add(new ForcePos(force, pos));
     }
+
+
 
     private record ForcePos(Vector3dc force, Vector3dc pos) {}
 }
