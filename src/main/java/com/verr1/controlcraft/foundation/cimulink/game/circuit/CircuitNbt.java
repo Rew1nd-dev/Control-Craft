@@ -1,29 +1,29 @@
 package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 
-import com.simibubi.create.foundation.utility.NBTHelper;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitConstructor;
 import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 
 import java.io.IOException;
 import java.util.List;
 
 public class CircuitNbt {
-    private static final SerializeUtils.Serializer<List<ComponentNbt>> SUMMARY_SERIALIZER =
+    private static final Serializer<List<ComponentNbt>> SUMMARY_SERIALIZER =
             SerializeUtils.ofList(SerializeUtils.of(
                     ComponentNbt::serialize, ComponentNbt::deserialize
             ));
 
-    private static final SerializeUtils.Serializer<List<ConnectionNbt>> CONNECTION_SERIALIZER =
+    private static final Serializer<List<ConnectionNbt>> CONNECTION_SERIALIZER =
             SerializeUtils.ofList(SerializeUtils.of(
                     ConnectionNbt::serialize, ConnectionNbt::deserialize
             ));
 
-    private static final SerializeUtils.Serializer<List<IoNbt>> IO_SERIALIZER =
+    private static final Serializer<List<IoNbt>> IO_SERIALIZER =
             SerializeUtils.ofList(SerializeUtils.of(
                     IoNbt::serialize, IoNbt::deserialize
             ));

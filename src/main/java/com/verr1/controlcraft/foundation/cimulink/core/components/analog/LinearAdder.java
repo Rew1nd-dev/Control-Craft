@@ -6,6 +6,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combin
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import kotlin.Pair;
 import net.minecraft.nbt.CompoundTag;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class LinearAdder extends Combinational {
-    private static final SerializeUtils.Serializer<List<Double>> COEFF =
+    private static final Serializer<List<Double>> COEFF =
             SerializeUtils.ofList(SerializeUtils.DOUBLE);
 
     private final ArrayList<Double> coefficients;

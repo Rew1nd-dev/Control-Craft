@@ -1,9 +1,10 @@
 package com.verr1.controlcraft.content.links.circuit;
 
-import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
@@ -13,11 +14,9 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
-import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.redstone.TerminalMenu;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
-import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -46,7 +45,7 @@ import static java.lang.Math.min;
 
 public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> implements MenuProvider {
 
-    public static SerializeUtils.Serializer<List<CircuitPortStatus>> CPS_SER =
+    public static Serializer<List<CircuitPortStatus>> CPS_SER =
             SerializeUtils.ofList(
                     SerializeUtils.of(
                             CircuitPortStatus::serialize,
@@ -54,10 +53,11 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
                     )
             );
 
-    public static SerializeUtils.Serializer<Pair<List<CircuitPortStatus>, List<CircuitPortStatus>>> PAIR_SER =
+    public static Serializer<Pair<List<CircuitPortStatus>, List<CircuitPortStatus>>> PAIR_SER =
             SerializeUtils.ofPair(CPS_SER);
 
     public static final NetworkKey CIRCUIT = NetworkKey.create("circuit");
+    public static final NetworkKey DECIMAL = NetworkKey.create("decimal");
     public static final NetworkKey CHANNEL = NetworkKey.create("channel");
     public static final NetworkKey WRAPPER = NetworkKey.create("wrapper");
 
@@ -69,6 +69,10 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     private int validSize = 0;
 
     private final WrappedChannel wrapper;
+
+
+
+    private boolean useDecimalNetwork = false;
 
     public CircuitBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -84,6 +88,10 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
                 .runtimeOnly()
                 .register();
 
+        buildRegistry(DECIMAL)
+                .withBasic(SerializePort.of(this::useDecimalNetwork, this::setUseDecimalNetwork, SerializeUtils.BOOLEAN))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .register();
         buildRegistry(WRAPPER).withBasic(CompoundTagPort.of(wrapper::saveToTag, wrapper::loadFromTag)).register();
         buildRegistry(CHANNEL).withBasic(CompoundTagPort.of(this::serializeIo, this::deserializeIo)).register();
     }
@@ -103,6 +111,13 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         updateIOName();
     }
 
+    public boolean useDecimalNetwork() {
+        return useDecimalNetwork;
+    }
+
+    public void setUseDecimalNetwork(boolean useDecimalNetwork) {
+        this.useDecimalNetwork = useDecimalNetwork;
+    }
 
     private void updateIOName(){
         AtomicInteger ioIndex = new AtomicInteger(0);
@@ -132,16 +147,16 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     }
 
     private void removeFromNetwork(){
-        io.forEach(e -> {
+        io.stream().filter(o -> o.isRedundant).forEach(e -> {
+            DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
             REDSTONE_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
-            // DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
         });
     }
 
     private void addToNetwork(){
-        io.forEach(e -> {
+        io.stream().filter(o -> !o.isRedundant).forEach(e -> {
+            DECIMAL_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
             REDSTONE_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
-            // DECIMAL_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
         });
     }
 
@@ -169,6 +184,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     }
 
     public void setWithIoSettings(List<IoSettings> settings){
+        removeFromNetwork();
         int size = Math.min(settings.size(), io.size());
         for (int i = 0; i < size; i++){
             IoSettings setting = settings.get(i);
@@ -176,7 +192,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
             wirelessIO.enabled = setting.enabled();
             wirelessIO.minMax = Couple.create(setting.min(), setting.max());
         }
-
+        addToNetwork();
     }
 
     @Override
@@ -210,7 +226,11 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
     public void updateTransmission(){
         io.stream().filter(io -> io.enabled && !io.isInput).forEach(wirelessIO -> {
-            REDSTONE_LINK_NETWORK_HANDLER.updateNetworkOf(level, wirelessIO);
+            if(useDecimalNetwork){
+                DECIMAL_LINK_NETWORK_HANDLER.updateNetworkOf(level, wirelessIO);
+            }else{
+                REDSTONE_LINK_NETWORK_HANDLER.updateNetworkOf(level, wirelessIO);
+            }
         });
     }
 
@@ -250,11 +270,12 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         }
     }
 
-    public class WirelessIO implements IRedstoneLinkable {
+    public class WirelessIO implements $IRedstoneLinkable {
         public Couple<RedstoneLinkNetworkHandler.Frequency> key = EMPTY_FREQUENCY;
 
 
         public int lastReceivedStrength = 0;
+        public double $lastReceivedStrength = 0.0;
 
         public boolean isInput;
         public String ioName = "";
@@ -270,10 +291,6 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         public int getTransmittedStrength() {
             if(!isInput && !isRedundant) {
                 try{
-                    /*
-                    double ratio = (out - minMax.getFirst()) / (minMax.getSecond() - minMax.getFirst());
-                    return (int) (ratio * 15.0);
-                    * */
                     double out = linkPort().output(ioName);
                     return (int)out;
                 } catch (Exception e){
@@ -301,6 +318,38 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
             ioName = "Redundant";
         }
 
+        private double select(){
+            return useDecimalNetwork ? $lastReceivedStrength : lastReceivedStrength;
+        }
+
+        private void updateInput(){
+            double ratio = select();
+            double value = minMax.getFirst() + ratio * (minMax.getSecond() - minMax.getFirst());
+            try{
+                linkPort().input(ioName, value);
+            }catch (Exception e){
+                ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
+            }
+        }
+
+        @Override
+        public double $getTransmittedStrength() {
+            if(!isInput && !isRedundant) {
+                try{
+                    double out = linkPort().output(ioName);
+                    return out;
+                } catch (Exception e){
+                    ControlCraft.LOGGER.error("Error while getting transmitted decimal strength for circuit: {}", e.getMessage());
+                }
+            }
+            return Double.NEGATIVE_INFINITY;
+        }
+
+        @Override
+        public boolean isSource() {
+            return !isInput;
+        }
+
         @Override
         public void setReceivedStrength(int power) {
             if(!isInput)return;
@@ -308,14 +357,17 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
             if (lastReceivedStrength == power)return;
             lastReceivedStrength = power;
 
-            double ratio = power / 15.0;
-            double value = minMax.getFirst() + ratio * (minMax.getSecond() - minMax.getFirst());
-            try{
-                linkPort().input(ioName, value);
-            }catch (Exception e){
-                ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
-            }
+            updateInput();
+        }
 
+        @Override
+        public void $setReceivedStrength(double decimal) {
+            if(!isInput)return;
+
+            if (Math.abs(decimal - $lastReceivedStrength) < 1e-6)return;
+            $lastReceivedStrength = decimal;
+
+            updateInput();
         }
 
         public CompoundTag serialize(){
@@ -358,5 +410,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         public BlockPos getLocation() {
             return getBlockPos();
         }
+
+
     }
 }

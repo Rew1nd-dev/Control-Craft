@@ -227,7 +227,15 @@ public class NetworkHandler {
         CompoundTag saveloads = compound.getCompound("saveloads");
         saveLoads.forEach((k, sidePort) -> {
             if(saveloads.contains(k.getSerializedName())){
-                sidePort.dispatch(saveloads.getCompound(k.getSerializedName()), false);
+                try{
+                    sidePort.dispatch(saveloads.getCompound(k.getSerializedName()), false);
+                }catch (Exception e){
+                    ControlCraft.LOGGER.warn(
+                            "Failed to read save load for key {}: {}",
+                            k.getSerializedName(),
+                            e.getMessage()
+                    );
+                }
             }
         });
         // readExtra(compound);
@@ -236,11 +244,18 @@ public class NetworkHandler {
 
     public void onWrite(CompoundTag compound, boolean clientPacket) {
         // super.write(compound, clientPacket);
-
         if(clientPacket)return;
         CompoundTag saveloads = new CompoundTag();
         saveLoads.forEach((k, sidePort) -> {
-            saveloads.put(k.getSerializedName(), sidePort.send(false));
+            try{
+                saveloads.put(k.getSerializedName(), sidePort.send(false));
+            }catch (Exception e){
+                ControlCraft.LOGGER.warn(
+                        "Failed to write save load for key {}: {}",
+                        k.getSerializedName(),
+                        e.getMessage()
+                );
+            }
         });
         compound.put("saveloads", saveloads);
         // writeExtra(compound);

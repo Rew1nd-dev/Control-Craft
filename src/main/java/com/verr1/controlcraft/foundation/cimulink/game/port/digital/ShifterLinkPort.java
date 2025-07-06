@@ -24,7 +24,7 @@ public class ShifterLinkPort extends BlockLinkPort implements ISummarizable {
 
 
     public void setParallel(long p){
-        p = Math.min(1, p);
+        p = Math.max(1, p);
         parallel = (int)p;
         recreate();
     }

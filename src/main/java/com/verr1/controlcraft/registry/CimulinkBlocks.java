@@ -11,6 +11,7 @@ import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
 import com.verr1.controlcraft.content.links.func.FunctionsBlock;
 import com.verr1.controlcraft.content.links.input.InputPortBlock;
+import com.verr1.controlcraft.content.links.logic.FlexibleGateBlock;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
@@ -42,6 +43,20 @@ public class CimulinkBlocks {
 
             .transform(customItemModel())
             .lang("Logic Gates")
+            .register();
+
+    public static final BlockEntry<FlexibleGateBlock> FLEXIBLE_GATE = REGISTRATE
+            .block(FlexibleGateBlock.ID, FlexibleGateBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    FlexibleGateBlock.GateDataGenerator.generate()
+            )
+            .item()
+
+            .transform(customItemModel())
+            .lang("Flexible Logic Gates")
             .register();
 
     public static final BlockEntry<FFBlock> FF = REGISTRATE

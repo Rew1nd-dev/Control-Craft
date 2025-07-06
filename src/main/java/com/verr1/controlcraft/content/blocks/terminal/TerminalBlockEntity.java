@@ -4,7 +4,7 @@ import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
-import com.verr1.controlcraft.content.compact.tweak.impl.$IRedstoneLinkable;
+import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -229,7 +229,7 @@ public class TerminalBlockEntity extends OnShipBlockEntity implements
 
         private boolean isBoolean;
         private int lastAppliedSignal = 0;
-        private int $lastAppliedSignal = 0; // decimal
+        private double $lastAppliedSignal = 0; // decimal
         private final int index;
 
         public TerminalChannel(int control) {
@@ -279,17 +279,27 @@ public class TerminalBlockEntity extends OnShipBlockEntity implements
         }
 
         public double combine(){
-            return lastAppliedSignal + $lastAppliedSignal / 15.0;
+            return lastAppliedSignal + $lastAppliedSignal;
         }
 
         @Override
-        public void $setReceivedStrength(int signal) {
-            if(signal == $lastAppliedSignal)return;
-            if(isReversed && isBoolean)signal = 15 - signal;
+        public void $setReceivedStrength(double decimal) {
+            if(Math.abs(decimal - $lastAppliedSignal) < 1e-6)return;
+            if(isReversed && isBoolean)decimal = 1 - decimal;
 
 
-            $lastAppliedSignal = signal;
+            $lastAppliedSignal = decimal;
             remoteReceiver.accept(combine(), index);
+        }
+
+        @Override
+        public double $getTransmittedStrength() {
+            return 0;
+        }
+
+        @Override
+        public boolean isSource() {
+            return false;
         }
 
         @Override

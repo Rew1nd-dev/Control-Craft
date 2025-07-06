@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.foundation.network.remote;
 
-import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.Consumer;
@@ -26,7 +26,7 @@ public class RemotePort<T> {
         this.deserializer = deserializer;
     }
 
-    public static<T> RemotePort<T> of(Class<T> type, Consumer<T> task, SerializeUtils.Serializer<T> serializer) {
+    public static<T> RemotePort<T> of(Class<T> type, Consumer<T> task, Serializer<T> serializer) {
         return new RemotePort<>(
                 type,
                 task,

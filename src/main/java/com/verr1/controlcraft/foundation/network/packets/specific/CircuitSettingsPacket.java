@@ -6,18 +6,18 @@ import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.circuit.IoSettings;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
 
 public class CircuitSettingsPacket extends SimplePacketBase {
 
-    private final SerializeUtils.Serializer<List<IoSettings>> SERIALIZERS =
+    private final Serializer<List<IoSettings>> SERIALIZERS =
             SerializeUtils.ofList(SerializeUtils.of(
                     IoSettings::serialize,
                     IoSettings::deserialize

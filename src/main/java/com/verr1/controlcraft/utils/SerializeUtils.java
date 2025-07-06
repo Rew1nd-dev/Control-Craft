@@ -16,7 +16,6 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.apigame.constraints.*;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -471,28 +470,6 @@ public class SerializeUtils {
         CompoundTag tag = new CompoundTag();
         tag.putLong("value", l);
         return tag;
-    }
-
-    public interface Serializer<T>{
-
-
-        default CompoundTag serializeNullable(@Nullable T obj){
-            return obj == null ? new CompoundTag() : serialize(obj);
-        }
-
-        default @Nullable T deserializeNullable(CompoundTag tag){
-            return tag.isEmpty() ? null : deserialize(tag);
-        }
-
-        CompoundTag serialize(@NotNull T obj);
-
-        @NotNull T deserialize(CompoundTag tag);
-
-        default T deserializeOrElse(CompoundTag tag, T orElse){
-            if(tag.isEmpty())return orElse;
-            return deserialize(tag);
-        }
-
     }
 
 

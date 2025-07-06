@@ -1,13 +1,14 @@
 package com.verr1.controlcraft.foundation.data.links;
 
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.List;
 
 public record StringBooleanDoubles (List<StringBooleanDouble> contents){
 
-    public static final SerializeUtils.Serializer<List<StringBooleanDouble>> SER =
+    public static final Serializer<List<StringBooleanDouble>> SER =
             SerializeUtils.ofList(SerializeUtils.of(
                     StringBooleanDouble::serialize,
                     StringBooleanDouble::deserialize

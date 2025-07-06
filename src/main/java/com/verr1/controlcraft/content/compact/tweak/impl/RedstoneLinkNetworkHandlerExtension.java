@@ -2,15 +2,17 @@ package com.verr1.controlcraft.content.compact.tweak.impl;
 
 import com.simibubi.create.Create;
 
-import com.simibubi.create.content.redstone.link.LinkBehaviour;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.WorldHelper;
 import com.simibubi.create.infrastructure.config.AllConfigs;
+import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import net.minecraft.world.level.LevelAccessor;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.withinRange;
 
 public class RedstoneLinkNetworkHandlerExtension {
 
@@ -22,12 +24,12 @@ public class RedstoneLinkNetworkHandlerExtension {
 
     public void onLoadWorld(LevelAccessor world) {
         connections.put(world, new HashMap<>());
-        Create.LOGGER.debug("Prepared Redstone Network Space for " + WorldHelper.getDimensionID(world));
+        Create.LOGGER.debug("Prepared Redstone Network Space for {}", WorldHelper.getDimensionID(world));
     }
 
     public void onUnloadWorld(LevelAccessor world) {
         connections.remove(world);
-        Create.LOGGER.debug("Removed Redstone Network Space for " + WorldHelper.getDimensionID(world));
+        Create.LOGGER.debug("Removed Redstone Network Space for {}", WorldHelper.getDimensionID(world));
     }
 
     public Set<$IRedstoneLinkable> getNetworkOf(LevelAccessor world, $IRedstoneLinkable actor) {
@@ -56,29 +58,47 @@ public class RedstoneLinkNetworkHandlerExtension {
     public void updateNetworkOf(LevelAccessor world, $IRedstoneLinkable actor) {
         Set<$IRedstoneLinkable> network = getNetworkOf(world, actor);
         globalPowerVersion.incrementAndGet();
-        int power = 0;
 
-        for (Iterator<$IRedstoneLinkable> iterator = network.iterator(); iterator.hasNext();) {
+
+        network.stream().filter(o -> !o.isAlive()).toList().forEach(network::remove);
+
+        double power =network.stream()
+                .filter(other -> other.isSource() && other.isAlive() && withinRange(other, actor))
+                .map($IRedstoneLinkable::$getTransmittedStrength)
+                .max(Double::compare)
+                .orElse(0.0);
+
+        /*
+        * for (Iterator<$IRedstoneLinkable> iterator = network.iterator(); iterator.hasNext();) {
             $IRedstoneLinkable other = iterator.next();
             if (!other.isAlive()) {
                 iterator.remove();
                 continue;
             }
 
+            if(!other.isSource()){
+                continue;
+            }
+            // This one is mixined by vs, so use mixined one
             if (!withinRange(actor, other))
                 continue;
 
-            if (power < 15)
-                power = Math.max(other.getTransmittedStrength(), power);
+            updated = true;
+            power = Math.max(other.$getTransmittedStrength(), power);
         }
+        * */
 
-        if (actor instanceof LinkBehaviour linkBehaviour) {
+
+/*
+        // LinkBehaviour should not add to this network
+        * if (actor instanceof LinkBehaviour linkBehaviour) {
             // fix one-to-one loading order problem
             if (linkBehaviour.isListening()) {
                 linkBehaviour.newPosition = true;
                 linkBehaviour.setReceivedStrength(power);
             }
         }
+* */
 
         for ($IRedstoneLinkable other : network) {
             if (other != actor && other.isListening() && withinRange(actor, other))
@@ -86,12 +106,7 @@ public class RedstoneLinkNetworkHandlerExtension {
         }
     }
 
-    public static boolean withinRange($IRedstoneLinkable from, $IRedstoneLinkable to) {
-        if (from == to)
-            return true;
-        return from.getLocation()
-                .closerThan(to.getLocation(), AllConfigs.server().logistics.linkRange.get());
-    }
+
 
     public Map<Couple<RedstoneLinkNetworkHandler.Frequency>, Set<$IRedstoneLinkable>> networksIn(LevelAccessor world) {
         if (!connections.containsKey(world)) {
@@ -107,7 +122,7 @@ public class RedstoneLinkNetworkHandlerExtension {
             if (set == null || set.isEmpty())
                 continue;
             for ($IRedstoneLinkable link : set)
-                if (link.getTransmittedStrength() > 0)
+                if (link.$getTransmittedStrength() > 0)
                     return true;
         }
         return false;

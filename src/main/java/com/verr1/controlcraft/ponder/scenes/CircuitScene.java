@@ -127,7 +127,7 @@ public class CircuitScene {
         cu
                 .frame()
                 .text("Compiled Circuit Can Be Further Compiled.", circuit0, READING_TIME).idle(READING_TIME)
-                .selectArea(circuitI0, circuitO1, PonderPalette.GREEN, "circuit area", READING_TIME).idle(READING_TIME)
+                .selectArea(circuitI0.north(), circuitO1, PonderPalette.GREEN, "circuit area", READING_TIME).idle(READING_TIME)
                 .setBlock(Constants.CIRCUIT, compiled).idle(READING_TIME / 2)
                 .click(compiled, Constants.COMPILER, READING_TIME / 4).idle(READING_TIME / 2)
                 .setBlock(Constants.INPUT, compiled_i0, compiled_i1).idle(4)

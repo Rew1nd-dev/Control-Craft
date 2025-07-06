@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.data.links.StringBoolean;
 import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,7 @@ import java.util.*;
 
 public class PlantProxyLinkPort extends BlockLinkPort {
 
-    public static final SerializeUtils.Serializer<StringBooleans> PROXY_PORT =
+    public static final Serializer<StringBooleans> PROXY_PORT =
             SerializeUtils.of(
                     StringBooleans::serialize,
                     StringBooleans::deserialize

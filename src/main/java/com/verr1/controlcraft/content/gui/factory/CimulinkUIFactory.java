@@ -1,16 +1,19 @@
 package com.verr1.controlcraft.content.gui.factory;
 
 import com.verr1.controlcraft.content.blocks.SharedKeys;
+import com.verr1.controlcraft.content.gui.layouts.SwitchableTabListener;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.layouts.element.*;
 import com.verr1.controlcraft.content.gui.layouts.element.general.*;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
+import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlockEntity;
 import com.verr1.controlcraft.content.links.func.FunctionsBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
+import com.verr1.controlcraft.content.links.logic.FlexibleGateBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
@@ -248,7 +251,6 @@ public class CimulinkUIFactory {
         UnitUIPanel inc = new UnitUIPanel(
                 boundPos,
                 LinearAdderBlockEntity.INC,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.FMA_INC, Converter::titleStyle)
         );
@@ -256,7 +258,6 @@ public class CimulinkUIFactory {
         UnitUIPanel dec = new UnitUIPanel(
                 boundPos,
                 LinearAdderBlockEntity.DEC,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.FMA_DEC, Converter::titleStyle)
         );
@@ -289,6 +290,12 @@ public class CimulinkUIFactory {
                 title(UIContents.NAME)
         );
 
+        BooleanUIField decimal = new BooleanUIField(
+                boundPos,
+                CircuitBlockEntity.DECIMAL,
+                title(UIContents.USE_DECIMAL)
+        );
+
         CircuitUIPort circuit = new CircuitUIPort(boundPos);
 
         return new GenericSettingScreen.builder(boundPos)
@@ -296,7 +303,7 @@ public class CimulinkUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(name, circuit)
+                                .withPort(name, decimal, circuit)
                                 .build()
                 )
                 .build();
@@ -380,6 +387,67 @@ public class CimulinkUIFactory {
                         new VerticalFlow.builder(boundPos)
                                 .withPort(name)
                                 .withPort(sensor)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createFlexibleGateScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+        OptionUIField<GateTypes> type = new OptionUIField<>(
+                boundPos,
+                FlexibleGateBlockEntity.AND,
+                GateTypes.class,
+                new GateTypes[]{GateTypes.AND, GateTypes.OR},
+                convert(UIContents.GATE_TYPES, Converter::titleStyle)
+        );
+
+        BooleanUIField outputMask = new BooleanUIField(
+                boundPos,
+                FlexibleGateBlockEntity.OUTPUT_MASK,
+                convert(UIContents.MASK_OUT, Converter::titleStyle)
+        );
+
+        MaskUIPort mask = new MaskUIPort(boundPos);
+
+        UnitUIPanel add = new UnitUIPanel(
+                boundPos,
+                FlexibleGateBlockEntity.ADD_PORT,
+                Converter.convert(UIContents.FMA_INC, Converter::titleStyle)
+        );
+
+        UnitUIPanel remove = new UnitUIPanel(
+                boundPos,
+                FlexibleGateBlockEntity.REMOVE_PORT,
+                Converter.convert(UIContents.FMA_DEC, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> alignLabel(add, remove);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, type)
+                                .build()
+                )
+                .withTab(
+                        ADVANCE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(outputMask, mask)
+                                .build()
+                )
+                .withTab(
+                        REMOTE_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(add, remove)
+                                .withPreDoLayout(alignLabels)
                                 .build()
                 )
                 .build();

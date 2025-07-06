@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.IntAttached;
 import com.simibubi.create.foundation.utility.WorldAttached;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 
@@ -34,7 +35,7 @@ public class TweakedLinkedControllerServerHandlerExtension {
         }
 
         public int getTransmittedStrength() {
-            return this.isAlive() ? 15 : 0;
+            throw new UnsupportedOperationException("This should not be called");
         }
 
         public boolean isAlive() {
@@ -57,8 +58,18 @@ public class TweakedLinkedControllerServerHandlerExtension {
         }
 
         @Override
-        public void $setReceivedStrength(int power) {
+        public void $setReceivedStrength(double decimal) {
 
+        }
+
+        @Override
+        public double $getTransmittedStrength() {
+            return this.isAlive() ? 15 : 0;
+        }
+
+        @Override
+        public boolean isSource() {
+            return true;
         }
     }
 
@@ -83,12 +94,12 @@ public class TweakedLinkedControllerServerHandlerExtension {
         }
 
         public int getTransmittedStrength() {
-            return this.isAlive() ? decimal2Level(level) : 0;
+            throw new UnsupportedOperationException("This should not be called");
         }
 
-        private static int decimal2Level(float fullPrecision){
-            float d256 = fullPrecision * 256;
-            return (int)((d256 - (int)d256) * 15);
+        private static double decimal2Level(float fullPrecision){
+            float d15 = fullPrecision * 15;
+            return (d15 - (int)d15);
         }
 
         public boolean isAlive() {
@@ -99,8 +110,7 @@ public class TweakedLinkedControllerServerHandlerExtension {
             return this.pos;
         }
 
-        public void setReceivedStrength(int power) {
-        }
+        public void setReceivedStrength(int power) {}
 
         public boolean isListening() {
             return false;
@@ -111,8 +121,18 @@ public class TweakedLinkedControllerServerHandlerExtension {
         }
 
         @Override
-        public void $setReceivedStrength(int power) {
+        public void $setReceivedStrength(double decimal) {
 
+        }
+
+        @Override
+        public double $getTransmittedStrength() {
+            return this.isAlive() ? decimal2Level(level) : 0;
+        }
+
+        @Override
+        public boolean isSource() {
+            return true;
         }
     }
 

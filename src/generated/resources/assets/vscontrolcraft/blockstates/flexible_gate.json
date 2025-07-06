@@ -1,0 +1,56 @@
+{
+  "variants": {
+    "facing=down,is_and=false": {
+      "model": "vscontrolcraft:block/flexible_gate/or",
+      "x": 180
+    },
+    "facing=down,is_and=true": {
+      "model": "vscontrolcraft:block/flexible_gate/and",
+      "x": 180
+    },
+    "facing=east,is_and=false": {
+      "model": "vscontrolcraft:block/flexible_gate/or",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,is_and=true": {
+      "model": "vscontrolcraft:block/flexible_gate/and",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,is_and=false": {
+      "model": "vscontrolcraft:block/flexible_gate/or",
+      "x": 90
+    },
+    "facing=north,is_and=true": {
+      "model": "vscontrolcraft:block/flexible_gate/and",
+      "x": 90
+    },
+    "facing=south,is_and=false": {
+      "model": "vscontrolcraft:block/flexible_gate/or",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,is_and=true": {
+      "model": "vscontrolcraft:block/flexible_gate/and",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,is_and=false": {
+      "model": "vscontrolcraft:block/flexible_gate/or"
+    },
+    "facing=up,is_and=true": {
+      "model": "vscontrolcraft:block/flexible_gate/and"
+    },
+    "facing=west,is_and=false": {
+      "model": "vscontrolcraft:block/flexible_gate/or",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,is_and=true": {
+      "model": "vscontrolcraft:block/flexible_gate/and",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

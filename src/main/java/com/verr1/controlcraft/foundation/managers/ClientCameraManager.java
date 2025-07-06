@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -72,6 +73,12 @@ public class ClientCameraManager {
     public static void linkDirect(BlockPos cameraPos){
         LinkCameraPos = cameraPos;
         lastSuccessfulLinkCameraPos = cameraPos;
+        Optional.ofNullable(getLinkedCamera()).ifPresent(c -> {
+            Player player = Minecraft.getInstance().player;
+            if(player == null)return;
+            player.setXRot((float) c.getPitch());
+            player.setYRot((float) c.getYaw());
+        });
         Minecraft.getInstance().options.bobView().set(false);
     }
 

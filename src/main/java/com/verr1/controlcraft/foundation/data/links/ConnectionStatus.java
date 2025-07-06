@@ -3,9 +3,9 @@ package com.verr1.controlcraft.foundation.data.links;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -15,7 +15,7 @@ import java.util.*;
 public class ConnectionStatus {
     public static final ConnectionStatus EMPTY = new ConnectionStatus();
 
-    public static final SerializeUtils.Serializer<List<String>> NAMES =
+    public static final Serializer<List<String>> NAMES =
             SerializeUtils.ofList(SerializeUtils.STRING);
 
 

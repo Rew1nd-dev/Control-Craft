@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.network.executors;
 import com.verr1.controlcraft.foundation.api.Slot;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,9 +31,9 @@ public class ClientBuffer<T> implements Slot<CompoundTag> {
     boolean isDirty = false; // true if 2 consecutive read without a set(tag) in between
 
     @NotNull
-    SerializeUtils.Serializer<T> serializer;
+    Serializer<T> serializer;
 
-    public ClientBuffer(SerializeUtils.@NotNull Serializer<T> serializer, Class<T> clazz) {
+    public ClientBuffer(@NotNull Serializer<T> serializer, Class<T> clazz) {
         this.serializer = serializer;
         this.clazz = clazz;
     }

@@ -143,7 +143,6 @@ public class GenericUIFactory {
         UnitUIPanel reset = new UnitUIPanel(
                 boundAnchorPos,
                 CameraBlockEntity.RESET,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.CAMERA_LINK_RESET, Converter::titleStyle)
         );
@@ -200,7 +199,6 @@ public class GenericUIFactory {
         UnitUIPanel assemble = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
         );
@@ -208,7 +206,6 @@ public class GenericUIFactory {
         UnitUIPanel disassemble = new UnitUIPanel(
                 boundPos,
                 SharedKeys.DISASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
@@ -281,7 +278,6 @@ public class GenericUIFactory {
         UnitUIPanel assemble = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
         );
@@ -289,7 +285,6 @@ public class GenericUIFactory {
         UnitUIPanel disassemble = new UnitUIPanel(
                 boundPos,
                 SharedKeys.DISASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
@@ -499,7 +494,6 @@ public class GenericUIFactory {
         var asm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
         );
@@ -507,7 +501,6 @@ public class GenericUIFactory {
         var lock = new UnitUIPanel(
                 boundPos,
                 SharedKeys.LOCK,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.LOCK, Converter::titleStyle)
         );
@@ -515,7 +508,6 @@ public class GenericUIFactory {
         var unlock = new UnitUIPanel(
                 boundPos,
                 SharedKeys.UNLOCK,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.UNLOCK, Converter::titleStyle)
         );
@@ -523,7 +515,6 @@ public class GenericUIFactory {
         var disasm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.DISASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
@@ -620,7 +611,6 @@ public class GenericUIFactory {
         var asm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
         );
@@ -628,7 +618,6 @@ public class GenericUIFactory {
         var disasm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.DISASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
@@ -716,7 +705,6 @@ public class GenericUIFactory {
         var asm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
         );
@@ -724,7 +712,6 @@ public class GenericUIFactory {
         var disasm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.DISASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
@@ -817,7 +804,6 @@ public class GenericUIFactory {
         var asm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ASSEMBLY, Converter::titleStyle)
         );
@@ -825,7 +811,6 @@ public class GenericUIFactory {
         var lock = new UnitUIPanel(
                 boundPos,
                 SharedKeys.LOCK,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.LOCK, Converter::titleStyle)
         );
@@ -833,7 +818,6 @@ public class GenericUIFactory {
         var unlock = new UnitUIPanel(
                 boundPos,
                 SharedKeys.UNLOCK,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.UNLOCK, Converter::titleStyle)
         );
@@ -841,7 +825,6 @@ public class GenericUIFactory {
         var disasm = new UnitUIPanel(
                 boundPos,
                 SharedKeys.DISASSEMBLE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
@@ -917,7 +900,6 @@ public class GenericUIFactory {
         var online = new UnitUIPanel(
                 boundPos,
                 PeripheralInterfaceBlockEntity.ONLINE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.ONLINE, Converter::titleStyle)
         );
@@ -925,7 +907,6 @@ public class GenericUIFactory {
         var offline = new UnitUIPanel(
                 boundPos,
                 PeripheralInterfaceBlockEntity.OFFLINE,
-                Double.class,
                 0.0,
                 Converter.convert(UIContents.OFFLINE, Converter::titleStyle)
         );

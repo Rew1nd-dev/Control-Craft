@@ -19,6 +19,10 @@ public class FormattedLabel extends Label {
         super(x, y, text);
     }
 
+    public FormattedLabel() {
+        super(0, 0, Component.literal(""));
+    }
+
     public FormattedLabel withToolTip(Component tooltip){
         this.toolTip.add(tooltip);
         return this;

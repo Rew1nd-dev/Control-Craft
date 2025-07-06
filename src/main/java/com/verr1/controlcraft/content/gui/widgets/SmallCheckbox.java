@@ -30,8 +30,12 @@ public class SmallCheckbox extends AbstractButton implements Identifiable<String
 
     private Function<SmallCheckbox, Boolean> callback = (s)->{return false;};
 
-    public SmallCheckbox(int p_93826_, int p_93827_, int p_93828_, int p_93829_, Component p_93830_, boolean p_93831_) {
-        this(p_93826_, p_93827_, p_93828_, p_93829_, p_93830_, p_93831_, true);
+    public SmallCheckbox(int x, int y, int xl, int yl, Component message, boolean checked) {
+        this(x, y, xl, yl, message, checked, true);
+    }
+
+    public SmallCheckbox() {
+        this(0, 0, 10, 10, Component.literal(""), true);
     }
 
     public SmallCheckbox(int p_93833_, int p_93834_, int p_93835_, int p_93836_, Component p_93837_, boolean p_93838_, boolean p_93839_) {

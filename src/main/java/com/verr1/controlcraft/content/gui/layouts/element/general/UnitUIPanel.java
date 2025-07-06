@@ -22,18 +22,30 @@ public class UnitUIPanel extends TypedUIPanel<Double> implements TitleLabelProvi
     public UnitUIPanel(
             BlockPos boundPos,
             NetworkKey key,
-            Class<Double> dataType,
             Double defaultValue,
             LabelProvider titleProv
     ) {
         super(
                 boundPos,
                 key,
-                dataType,
+                Double.class,
                 defaultValue
         );
         title = titleProv.toDescriptiveLabel();
         this.key = key;
+    }
+
+    public UnitUIPanel(
+            BlockPos boundPos,
+            NetworkKey key,
+            LabelProvider titleProv
+    ) {
+        this(
+                boundPos,
+                key,
+                0.0,
+                titleProv
+        );
     }
 
     public NetworkKey key() {

@@ -13,6 +13,8 @@ import com.verr1.controlcraft.content.links.func.FunctionsBlock;
 import com.verr1.controlcraft.content.links.func.FunctionsBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlock;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
+import com.verr1.controlcraft.content.links.logic.FlexibleGateBlock;
+import com.verr1.controlcraft.content.links.logic.FlexibleGateBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
@@ -39,6 +41,12 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<LogicGateBlockEntity> LOGIC_GATE_BLOCKENTITY = REGISTRATE
             .blockEntity(LogicGateBlock.ID, LogicGateBlockEntity::new)
             .validBlock(CimulinkBlocks.LOGIC_GATE)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<FlexibleGateBlockEntity> FLEXIBLE_GATE_BLOCKENTITY = REGISTRATE
+            .blockEntity(FlexibleGateBlock.ID, FlexibleGateBlockEntity::new)
+            .validBlock(CimulinkBlocks.FLEXIBLE_GATE)
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 

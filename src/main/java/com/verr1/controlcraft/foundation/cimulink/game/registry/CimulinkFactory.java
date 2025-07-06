@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearA
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.ff.*;
+import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.FlexibleGate;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.Gates;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
@@ -17,6 +18,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.QTrans
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -216,6 +218,15 @@ public class CimulinkFactory {
 
     public static final Factory<Functions.FunctionN> ATAN = register(Functions.ATAN, Functions.FunctionN.class, "atan");
 
+    public static final Factory<FlexibleGate> F_GATE = register(
+            SerializeUtils.of(
+                    FlexibleGate::serialize,
+                    FlexibleGate::deserialize
+            ),
+            FlexibleGate.class,
+            defaultID("flexible_gate")
+    );
+
     public static final Factory<Gates.Gate> AND_N = register(
             SerializeUtils.of(
                     Gates.Gate::serialize,
@@ -281,7 +292,7 @@ public class CimulinkFactory {
 
 
     private static<T extends NamedComponent> Factory<T> register(
-            SerializeUtils.Serializer<T> serializer,
+            Serializer<T> serializer,
             Class<T> clazz,
             String ID
     ){
@@ -345,7 +356,7 @@ public class CimulinkFactory {
     }
 
 
-    public static<T extends NamedComponent> SerializeUtils.Serializer<T> createParamLess(Supplier<T> initializer){
+    public static<T extends NamedComponent> Serializer<T> createParamLess(Supplier<T> initializer){
         return SerializeUtils.of(
                 $ -> new CompoundTag(),
                 $ -> initializer.get()
@@ -374,11 +385,11 @@ public class CimulinkFactory {
     }
 
     public static class Factory<T extends NamedComponent> implements ComponentDeserializer{
-        SerializeUtils.Serializer<T> serializer;
+        Serializer<T> serializer;
         Class<T> clazz;
         String ID;
 
-        Factory(SerializeUtils.Serializer<T> serializer, Class<T> clazz, String ID) {
+        Factory(Serializer<T> serializer, Class<T> clazz, String ID) {
             this.ID = ID;
             this.serializer = serializer;
             this.clazz = clazz;

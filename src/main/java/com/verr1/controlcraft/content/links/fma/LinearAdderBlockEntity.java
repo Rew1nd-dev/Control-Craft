@@ -8,6 +8,7 @@ import com.verr1.controlcraft.foundation.data.links.StringDouble;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,16 +18,16 @@ import java.util.List;
 
 public class LinearAdderBlockEntity extends CimulinkBlockEntity<FMALinkPort> {
 
-    public static final SerializeUtils.Serializer<StringDouble> NAMED_COEFF_SERIALIZER =
+    public static final Serializer<StringDouble> NAMED_COEFF_SERIALIZER =
             SerializeUtils.of(
                     StringDouble::serialize,
                     StringDouble::deserialize
             );
 
-    public static final SerializeUtils.Serializer<List<StringDouble>> COEFF_LIST_SERIALIZER =
+    public static final Serializer<List<StringDouble>> COEFF_LIST_SERIALIZER =
             SerializeUtils.ofList(NAMED_COEFF_SERIALIZER);
 
-    public static final SerializeUtils.Serializer<Coefficients> COEFF_SERIALIZER =
+    public static final Serializer<Coefficients> COEFF_SERIALIZER =
             SerializeUtils.of(
                     c -> COEFF_LIST_SERIALIZER.serialize(c.content()),
                     t -> new Coefficients(COEFF_LIST_SERIALIZER.deserialize(t))

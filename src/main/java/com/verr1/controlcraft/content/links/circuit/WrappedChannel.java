@@ -1,9 +1,7 @@
 package com.verr1.controlcraft.content.links.circuit;
 
-import com.simibubi.create.foundation.utility.Couple;
-import com.verr1.controlcraft.foundation.data.terminal.TerminalRowData;
-import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,7 +11,7 @@ import java.util.List;
 
 public class WrappedChannel {
 
-    private static final SerializeUtils.Serializer<List<IoData>> SERIALIZER =
+    private static final Serializer<List<IoData>> SERIALIZER =
             SerializeUtils.ofList(SerializeUtils.of(
                     IoData::serialize,
                     IoData::deserialize

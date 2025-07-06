@@ -10,7 +10,6 @@ import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.SignalGenerator;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -21,6 +20,7 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -68,13 +68,13 @@ public abstract class BlockLinkPort {
 
     // make it concurrent
 
-    public static final SerializeUtils.Serializer<HashMap<BlockPos, String>> POS_NAME_MAP =
+    public static final Serializer<HashMap<BlockPos, String>> POS_NAME_MAP =
             SerializeUtils.ofMap(SerializeUtils.BLOCK_POS, SerializeUtils.STRING);
 
-    public static final SerializeUtils.Serializer<HashMap<String, BlockPort>> BACKWARD =
+    public static final Serializer<HashMap<String, BlockPort>> BACKWARD =
             SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.BLOCK_PORT);
 
-    public static final SerializeUtils.Serializer<HashMap<String, Set<BlockPort>>> FORWARD =
+    public static final Serializer<HashMap<String, Set<BlockPort>>> FORWARD =
             SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.ofSet(SerializeUtils.BLOCK_PORT));
 
     private static final Set<BlockPort> EMPTY = new HashSet<>();

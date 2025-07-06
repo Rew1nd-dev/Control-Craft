@@ -96,6 +96,17 @@ public enum UIContents implements Descriptive<UIContents> {
     SENSOR_TYPE(Component.literal("Type"), literals("Which metric to measure")),
     SENSOR_LOCAL(Component.literal("Local"), literals("Transform vector to local coordinate")),
 
+    USE_DECIMAL(
+            Component.literal("Decimal"),
+            literals(
+                    "Use decimal Network to transmit wireless signal",
+                    "Enabling this will stop circuit from transmit or receive from",
+                    "regular create redstone network")
+    ),
+
+    MASK_IN(Component.literal("Negate Input"), literals("Negate Input Signal")),
+    MASK_OUT(Component.literal("Negate Output"), literals("Negate Output Signal")),
+
     PLACE_HOLDER(Component.literal(""), literals(""))
     ;
 

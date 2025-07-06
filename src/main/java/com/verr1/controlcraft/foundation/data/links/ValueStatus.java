@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.data.links;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 public class ValueStatus {
     public static final ValueStatus EMPTY = new ValueStatus();
 
-    public static final SerializeUtils.Serializer<List<Double>> VALUES =
+    public static final Serializer<List<Double>> VALUES =
             SerializeUtils.ofList(SerializeUtils.DOUBLE);
 
     public final List<Double> inputValues = new ArrayList<>();
