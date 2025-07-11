@@ -3,9 +3,8 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.analog;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
 import com.verr1.controlcraft.foundation.cimulink.game.port.InspectableLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.SwitchableLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogTypes;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 
 public class FunctionsLinkPort extends InspectableLinkPort<AnalogTypes> implements ISummarizable {
     public FunctionsLinkPort() {

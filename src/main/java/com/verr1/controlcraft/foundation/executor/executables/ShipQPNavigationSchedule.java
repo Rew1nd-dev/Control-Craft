@@ -15,8 +15,8 @@ public class ShipQPNavigationSchedule extends IntervalExecutable {
     protected WorldBlockPos shipPos;
 
     // running data
-    protected Quaterniondc q_tar = new Quaterniond();
-    protected Vector3dc p_tar = new Vector3d();
+    protected Quaterniondc q_tar;
+    protected Vector3dc p_tar;
 
     protected Quaterniondc q_err_prev = new Quaterniond();
     protected Quaterniondc q_err = new Quaterniond();

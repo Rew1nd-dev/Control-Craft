@@ -5,7 +5,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.ponder.CimulinkPonderIndex;
 import com.verr1.controlcraft.registry.*;
 import net.minecraft.resources.ResourceLocation;
@@ -24,8 +24,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.joml.Random;
 import org.slf4j.Logger;
 
@@ -94,8 +92,6 @@ public class ControlCraft
         ControlCraftMenuTypes.register();
         ControlCraftDataGen.registerEnumDescriptions();
         CimulinkFactory.register();
-        // CimulinkPonderIndex.register();
-
 
 
         TweakControllerCompact.init();
@@ -107,6 +103,9 @@ public class ControlCraft
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftClient::clientInit);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftServer::ServerInit);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> CimulinkPonderIndex::register);
+
+
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ControlCraftAttachments::register);
 
         MinecraftForge.EVENT_BUS.register(this);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
@@ -145,11 +144,9 @@ public class ControlCraft
         ControlCraftMenuTypes.register();
         ControlCraftDataGen.registerEnumDescriptions();
         CimulinkFactory.register();
-        // CimulinkPonderIndex.register();
-        // ControlCraftAttachments.register();
         TweakControllerCompact.init();
         CreateBigCannonsCompact.init();
-        // AttachmentRegistry.register();
+
 
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
@@ -157,7 +154,7 @@ public class ControlCraft
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ControlCraftServer::ServerInit);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> CimulinkPonderIndex::register);
 
-
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ControlCraftAttachments::register);
         MinecraftForge.EVENT_BUS.register(this);
 
         context.registerConfig(ModConfig.Type.COMMON, BlockPropertyConfig.SPEC);

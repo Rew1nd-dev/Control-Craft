@@ -2,7 +2,10 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.MathUtils;
@@ -22,12 +25,22 @@ public class Functions {
         protected List<Double> transform(List<Double> inputs) {
             return List.of(inputs.stream().reduce(1.0, (a, b) -> a * b));
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.PRODUCT;
+        }
     };
 
     public static final Supplier<FunctionN> DIV = () -> new FunctionN(2) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
             return List.of(MathUtils.safeDiv(inputs.get(0), inputs.get(1)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.DIV;
         }
     };
 
@@ -36,6 +49,11 @@ public class Functions {
         protected List<Double> transform(List<Double> inputs) {
             return List.of(inputs.stream().max(Double::compareTo).orElse(0.0));
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.MAX;
+        }
     };
 
     public static final Function<Integer, FunctionN> MIN = n -> new FunctionN(n) {
@@ -43,12 +61,22 @@ public class Functions {
         protected List<Double> transform(List<Double> inputs) {
             return List.of(inputs.stream().min(Double::compareTo).orElse(0.0));
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.MIN;
+        }
     };
 
     public static final Supplier<FunctionN> ANGLE_FIX = () -> new FunctionN(1) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
             return List.of(MathUtils.radErrFix(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.ANGLE_FIX;
         }
     };
 
@@ -70,12 +98,22 @@ public class Functions {
 
 
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.POWER;
+        }
     };
 
     public static final Supplier<FunctionN> ABS = () -> new FunctionN(1) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
             return List.of(Math.abs(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.ABS;
         }
     };
 
@@ -84,12 +122,22 @@ public class Functions {
         protected List<Double> transform(List<Double> inputs) {
             return List.of(Math.sin(inputs.get(0)));
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.SIN;
+        }
     };
 
     public static final Supplier<FunctionN> COS = () -> new FunctionN(1) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
             return List.of(Math.cos(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.COS;
         }
     };
 
@@ -98,12 +146,22 @@ public class Functions {
         protected List<Double> transform(List<Double> inputs) {
             return List.of(Math.tan(inputs.get(0)));
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.TAN;
+        }
     };
 
     public static final Supplier<FunctionN> ASIN = () -> new FunctionN(1) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
             return List.of(MathUtils.safeAsin(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.ASIN;
         }
     };
 
@@ -112,12 +170,22 @@ public class Functions {
         protected List<Double> transform(List<Double> inputs) {
             return List.of(MathUtils.safeAcos(inputs.get(0)));
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.ACOS;
+        }
     };
 
     public static final Supplier<FunctionN> ATAN = () -> new FunctionN(1) {
         @Override
         protected List<Double> transform(List<Double> inputs) {
             return List.of(Math.atan(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.ATAN;
         }
     };
 

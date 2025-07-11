@@ -4,7 +4,9 @@ package com.verr1.controlcraft.foundation.cimulink.core.components;
 
 
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 
 import java.util.*;
 
@@ -181,6 +183,14 @@ public abstract class NamedComponent extends Component {
 
     public static NamedComponent combinational(Component raw){
         return null;
+    }
+
+    public Factory<? extends NamedComponent> factory(){
+        throw new UnsupportedOperationException("Factory method not implemented for " + this.getClass().getSimpleName());
+    }
+
+    public Summary summary(){
+        return factory().summarize(this);
     }
 
 }

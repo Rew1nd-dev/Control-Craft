@@ -207,9 +207,9 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
 
 
         VSDistanceJoint joint = new VSDistanceJoint(
-                selfId,
+                selfId == -1 ? null : selfId,
                 context.self(),
-                compId,
+                compId == -1 ? null : compId,
                 context.comp(),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
                 d - 1e-4f,

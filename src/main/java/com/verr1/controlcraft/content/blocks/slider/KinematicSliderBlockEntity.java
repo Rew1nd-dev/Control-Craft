@@ -178,9 +178,9 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
         Vector3dc sliDir = ValkyrienSkies.set(new Vector3d(), getSlideDirection().getNormal());
 
         VSJoint joint = new VSFixedJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(context.self().getPos(), context.self().getRot()),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(context.comp().getPos().fma(
                         -MathUtils.clamp(
                                 controller.getTarget(),
@@ -194,7 +194,7 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
                 ),
                 new VSJointMaxForceTorque(1e20f, 1e20f)
         );
-        overrideConstraint("control", joint);
+        overrideRuntimeConstraint("control", joint);
         targetOfLastAppliedConstraint = controller.getTarget();
     }
 

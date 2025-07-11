@@ -7,6 +7,7 @@ import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
 import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.SynchronizedField;
+import com.verr1.controlcraft.foundation.data.constraint.AngleLimit;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.api.operatable.IBruteConnectable;
@@ -14,6 +15,7 @@ import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,10 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.joints.VSJoint;
-import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
-import org.valkyrienskies.core.apigame.joints.VSJointPose;
-import org.valkyrienskies.core.apigame.joints.VSRevoluteJoint;
+import org.valkyrienskies.core.apigame.joints.*;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
@@ -44,6 +43,8 @@ import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 public abstract class AbstractMotor extends ShipConnectorBlockEntity implements IBruteConnectable
 {
     public static final NetworkKey ANIMATED_ANGLE = NetworkKey.create("animated_angle");
+    public static final NetworkKey ANGLE_LIMIT = NetworkKey.create("angle_limit");
+    public static final Serializer<AngleLimit> SER = SerializeUtils.of(AngleLimit::serialize, AngleLimit::deserialize);
 
     // public static final NetworkKey CONNECT_CONTEXT = NetworkKey.create("connect_context");
 
@@ -54,20 +55,29 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
     public ConnectContext context = ConnectContext.EMPTY;
     protected Vector3d selfOffset = new Vector3d();
     protected Vector3d compOffset = new Vector3d();
+    private AngleLimit angleLimit = AngleLimit.FREE;
 
     private final SynchronizedField<Double> cachedAngle = new SynchronizedField<>(0.0);
     private final SynchronizedField<Double> cachedVelocity = new SynchronizedField<>(0.0);
 
     public AbstractMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        // registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getServoAngle, this::setClientAngle, SerializeUtils.DOUBLE, ANIMATED_ANGLE), Side.RUNTIME_SHARED);
-        // registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getOffset, this::setOffset, SerializeUtils.VECTOR3DC, OFFSET), Side.SHARED);
 
         buildRegistry(ANIMATED_ANGLE).withBasic(SerializePort.of(this::getServoAngle, this::setClientAngle, SerializeUtils.DOUBLE)).dispatchToSync().runtimeOnly().register();
         buildRegistry(SharedKeys.SELF_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getSelfOffset()), this::setSelfOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).dispatchToSync().register();
         buildRegistry(SharedKeys.COMP_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getCompOffset()), this::setCompOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).register();
         buildRegistry(CONNECT_CONTEXT).withBasic(SerializePort.of(() -> context, ctx -> context = ctx, SerializeUtils.CONNECT_CONTEXT)).register();
-
+        buildRegistry(ANGLE_LIMIT)
+                .withBasic(
+                    SerializePort.of(
+                        this::getAngleLimit,
+                        this::setAngleLimit,
+                        SER
+                    )
+                ).withClient(new ClientBuffer<>(
+                        SER,
+                        AngleLimit.class
+                )).register();
 
         panel().registerUnit(SharedKeys.ASSEMBLE, this::assemble);
         panel().registerUnit(SharedKeys.DISASSEMBLE, this::destroyConstraints);
@@ -83,6 +93,14 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
     public void setClientAngle(double clientAngle) {
         this.clientAngle = (float) clientAngle;
+    }
+
+    public AngleLimit getAngleLimit() {
+        return angleLimit;
+    }
+
+    public void setAngleLimit(AngleLimit angleLimit) {
+        this.angleLimit = angleLimit;
     }
 
     @Override
@@ -142,7 +160,7 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
         ServerLevel serverLevel = (ServerLevel) level;
         List<BlockPos> collected = List.of(getAssembleBlockPos());
-        ServerShip comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1, true);
+        Ship comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1, true);
 
         Vector3dc comp_at_sc = toJOML(getAssembleBlockPos().getCenter());
         Vector3dc comp_at_wc = getShipOn() != null ?
@@ -160,8 +178,8 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
         long compId = comp.getId();
         long selfId = getShipOrGroundID();
-        Vector3dc p_self = getRotationCenterPosJOML();
-        Vector3dc p_comp = comp.getTransform().getPositionInShip().add(new Vector3d(0.5, 0.5, 0.5).add(compOffset), new Vector3d());  // new Vector3d();
+        Vector3dc p_self = selfId == -1L ? getRotationCenterPosJOML().add(new Vector3d(0.5, 0.5, 0.5)) : getRotationCenterPosJOML();
+        Vector3dc p_comp = comp.getTransform().getPositionInShip().add(new Vector3d(0.0, 0.0, 0.0).add(compOffset), new Vector3d());  // new Vector3d();
         // Vector3dc selfOffset = self.map(s -> s.getTransform().getPositionInShip()).orElse(); //.sub(p_self, new Vector3d())
         Quaterniondc q_self = VSMathUtils.getQuaternionToEast_(getServoDirection());
         Quaterniondc q_comp = VSMathUtils.getQuaternionToEast_(getServoDirection());
@@ -172,12 +190,13 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
 
         VSRevoluteJoint joint = new VSRevoluteJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(p_self, q_self),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(p_comp, q_comp),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
-                null, null, null, null, null
+                getAngleLimit().toPhysX(getDirection()),
+                null, null, null, null
         );
 
 
@@ -233,12 +252,13 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         Vector3d dir_comp = ValkyrienSkies.set(new Vector3d(), direction_comp.getNormal());
 
         VSRevoluteJoint joint = new VSRevoluteJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(p_self, q_self),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(p_comp, q_comp),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
-                null, null, null, null, null
+                getAngleLimit().toPhysX(getDirection()),
+                null, null, null, null
         );
 
 

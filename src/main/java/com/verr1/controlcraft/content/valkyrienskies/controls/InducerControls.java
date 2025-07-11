@@ -3,9 +3,13 @@ package com.verr1.controlcraft.content.valkyrienskies.controls;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
+import com.verr1.controlcraft.foundation.data.control.GroundBodyPhysShip;
+import com.verr1.controlcraft.foundation.data.control.ImmutableKinematic;
 import com.verr1.controlcraft.foundation.data.control.ImmutablePhysPose;
 import com.verr1.controlcraft.foundation.data.control.Pose;
 import com.verr1.controlcraft.foundation.data.logical.*;
+import org.valkyrienskies.core.api.bodies.properties.BodyKinematics;
+import org.valkyrienskies.core.api.bodies.properties.BodyTransform;
 import org.valkyrienskies.core.api.ships.*;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
@@ -14,6 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.apigame.ships.PhysShipCore;
+import org.valkyrienskies.core.apigame.world.PhysLevelCore;
+import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
+import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 
@@ -69,12 +76,12 @@ public class InducerControls {
         return scaleVector.get(scaleVector.minComponent());
     }
 
-    public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @NotNull  PhysShip motorShip, @NotNull PhysShip compShip) {
+    public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @NotNull PhysShip motorShip, @NotNull PhysShip compShip) {
         if(!motor.free())return;
 
 
         double angle = VSMathUtils.get_yc2xc(motorShip, compShip, motor.motorDir(), motor.compDir());
-        double speed = VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getOmega(), compShip.getOmega(), motor.motorDir(), motor.compDir());
+        double speed = VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getAngularVelocity(), compShip.getAngularVelocity(), motor.motorDir(), motor.compDir());
 
         motor.speedCallBack().accept(speed);
         motor.angleCallBack().accept(angle);
@@ -225,17 +232,12 @@ public class InducerControls {
                 .mul(q_e)
                 .normalize();
 
-        ShipPhysics comp_sp = Observer.getOrCreate(compShip).read(); // fixing ServerShip::getPositionInShip() not updating when new blocks placed
-
+        // ShipPhysics comp_sp = Observer.getOrCreate(compShip).read(); // fixing ServerShip::getPositionInShip() not updating when new blocks placed
+        Vector3dc offset = motor.motorShipID() == -1 ? new Vector3d(0.5, 0.5, 0.5) : new Vector3d();
         Vector3dc p_m_contact_s = motor.context().self().getPos();
         Vector3dc p_m_contact_w = motorShip.getTransform().getShipToWorld().transformPosition(p_m_contact_s, new Vector3d());
         Vector3dc p_c_contact_s = motor.context().comp().getPos();
-        Vector3dc r_c_contact_s = p_c_contact_s.sub(compShip
-                                                    .getInertiaData()
-                                                    .getCenterOfMassInShip()
-                                                    .add(new Vector3d(0.5, 0.5, 0.5),
-                                                            new Vector3d()),
-                                                    new Vector3d());  //comp_sp.positionInShip()
+        Vector3dc r_c_contact_s = p_c_contact_s.sub(compShip.getTransform().getPositionInShip().add(offset, new Vector3d()), new Vector3d());  //comp_sp.positionInShip()
         Vector3dc r_c_contact_w = q_t.transform(r_c_contact_s, new Vector3d());
         Vector3dc p_t = p_m_contact_w.sub(r_c_contact_w, new Vector3d());
 
@@ -245,8 +247,9 @@ public class InducerControls {
         }else{
             motor.controller().updateTargetAngular(1d / 60);
         }
-        // ((PhysShipImpl)compShip).setKinematicTarget(new Ei(p_t, q_t));
-        return Pose.of(p_t, q_t);
+        compShip.setStatic(true);
+
+        return new Pose(p_t, q_t);
 
     }
 
@@ -268,11 +271,11 @@ public class InducerControls {
                 .normalize();
 
         // ShipPhysics comp_sp = Observer.getOrCreate(compShip).read(); // fixing ServerShip::getPositionInShip() not updating when new blocks placed
-
+        Vector3dc offset = motor.motorShipID() == -1 ? new Vector3d(0.5, 0.5, 0.5) : new Vector3d();
         Vector3dc p_m_contact_s = motor.context().self().getPos();
         Vector3dc p_m_contact_w = motorShip.getTransform().getShipToWorld().transformPosition(p_m_contact_s, new Vector3d());
         Vector3dc p_c_contact_s = motor.context().comp().getPos();
-        Vector3dc r_c_contact_s = p_c_contact_s.sub(compShip.getTransform().getPositionInShip().add(new Vector3d(0.5, 0.5, 0.5), new Vector3d()), new Vector3d());  //comp_sp.positionInShip()
+        Vector3dc r_c_contact_s = p_c_contact_s.sub(compShip.getTransform().getPositionInShip().add(offset, new Vector3d()), new Vector3d());  //comp_sp.positionInShip()
         Vector3dc r_c_contact_w = q_t.transform(r_c_contact_s, new Vector3d());
         Vector3dc p_t = p_m_contact_w.sub(r_c_contact_w, new Vector3d());
 
@@ -283,9 +286,31 @@ public class InducerControls {
             motor.controller().updateTargetAngular(1d / 60);
         }
         compShip.setStatic(true);
+
         ((PhysShipImpl) compShip).setKinematicTarget(new Pose(
                 p_t, q_t
         ));
+
+        /*
+        BodyTransform original = compShip.getKinematics().getTransform();
+        ((PhysShipImpl) compShip).setFromTransform(new BodyTransformImpl(
+                p_t,
+                q_t,
+                original.getScaling(),
+                original.getPositionInModel()
+        ));
+        BodyTransform original = compShip.getKinematics().getTransform();
+        ((PhysShipImpl) compShip).unsafeSetKinematics(new BodyKinematicsImpl(
+                new Vector3d(),
+                new Vector3d(),
+                new BodyTransformImpl(
+                        p_t,
+                        q_t,
+                        original.getScaling(),
+                        original.getPositionInModel()
+                )
+        ));
+        * */
 
 
     }

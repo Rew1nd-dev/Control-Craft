@@ -106,16 +106,17 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
 
 
     public long getGroundBodyID(){
-        return Optional
-                .ofNullable(level)
-                .filter(ServerLevel.class::isInstance)
-                .map(ServerLevel.class::cast)
-                .map(ValkyrienSkies::getShipWorld)
-                .filter(ServerShipWorldCore.class::isInstance)
-                .map(ServerShipWorldCore.class::cast)
-                .map(ServerShipWorldCore::getDimensionToGroundBodyIdImmutable)
-                .map(m -> m.get(getDimensionID()))
-                .orElse(-1L);
+//        Optional
+//                .ofNullable(level)
+//                .filter(ServerLevel.class::isInstance)
+//                .map(ServerLevel.class::cast)
+//                .map(ValkyrienSkies::getShipWorld)
+//                .filter(ServerShipWorldCore.class::isInstance)
+//                .map(ServerShipWorldCore.class::cast)
+//                .map(ServerShipWorldCore::getDimensionToGroundBodyIdImmutable)
+//                .map(m -> m.get(getDimensionID()))
+//                .orElse(-1L);
+        return Optional.ofNullable(getShipOn()).map(Ship::getId).orElse(-1L);
     }
 
     public long getShipOrGroundID(){
@@ -126,6 +127,8 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
 
     }
 
-
+    public @Nullable Long getShipOrGroundIDNullable(){
+        return Optional.of(getShipOrGroundID()).filter(id -> id != -1L).orElse(null);
+    }
 
 }

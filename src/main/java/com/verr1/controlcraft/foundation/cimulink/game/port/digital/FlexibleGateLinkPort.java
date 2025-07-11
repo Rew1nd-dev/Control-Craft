@@ -5,14 +5,12 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.data.links.StringBoolean;
 import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
-import com.verr1.controlcraft.utils.MathUtils;
 import net.minecraft.nbt.CompoundTag;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 public class FlexibleGateLinkPort extends BlockLinkPort implements ISummarizable {

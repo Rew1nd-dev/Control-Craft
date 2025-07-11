@@ -388,14 +388,35 @@ public class SerializeUtils {
     public static Serializer<VSJoint> JOINT = of(
             joint -> {
                 CompoundTag tag = new CompoundTag();
-                tag.put("ship_id_0", LONG.serialize(Optional.ofNullable(joint.getShipId0()).orElse(-1L)));
-                tag.put("ship_id_1", LONG.serialize(Optional.ofNullable(joint.getShipId1()).orElse(-1L)));
+                tag.put("ship_id_0", LONG.serializeNullable(joint.getShipId0()));
+                tag.put("ship_id_1", LONG.serializeNullable(joint.getShipId1()));
                 tag.put("pose_0", JOINT_POSE.serialize(joint.getPose0()));
                 tag.put("pose_1", JOINT_POSE.serialize(joint.getPose1()));
 
                 return tag;
             },
             tag -> null
+    );
+
+    public static Serializer<VSD6Joint.LimitCone> LIMIT_CONE = of(
+            cone -> {
+                CompoundTag tag = new CompoundTag();
+                tag.put("y_limit", FLOAT.serialize(cone.getYLimitAngle()));
+                tag.put("z_limit", FLOAT.serialize(cone.getZLimitAngle()));
+                tag.put("restitution", FLOAT.serializeNullable(cone.getRestitution()));
+                tag.put("bounce_threshold", FLOAT.serializeNullable(cone.getBounceThreshold()));
+                tag.put("stiffness", FLOAT.serializeNullable(cone.getStiffness()));
+                tag.put("damping", FLOAT.serializeNullable(cone.getDamping()));
+                return tag;
+            },
+            tag -> new VSD6Joint.LimitCone(
+                    FLOAT.deserialize(tag.getCompound("y_limit")),
+                    FLOAT.deserialize(tag.getCompound("z_limit")),
+                    FLOAT.deserializeNullable(tag.getCompound("restitution")),
+                    FLOAT.deserializeNullable(tag.getCompound("bounce_threshold")),
+                    FLOAT.deserializeNullable(tag.getCompound("stiffness")),
+                    FLOAT.deserializeNullable(tag.getCompound("damping"))
+            )
     );
 
     public static Serializer<VSFixedJoint> FIXED_JOINT = of(
@@ -434,6 +455,27 @@ public class SerializeUtils {
                         JOINT_POSE.deserialize(commonJoint.getCompound("pose_1")),
                         MAX_FORCE_TORQUE.deserializeNullable(tag.getCompound("max_force_torque")),
                         LINEAR_LIMIT_PAIR.deserializeNullable(tag.getCompound("linear_limit_pair"))
+                );
+            }
+    );
+
+    public static Serializer<VSSphericalJoint> SPHERICAL_JOINT = of(
+            joint -> {
+                CompoundTag tag = new CompoundTag();
+                tag.put("joint", JOINT.serialize(joint));
+                tag.put("max_force_torque", MAX_FORCE_TORQUE.serializeNullable(joint.getMaxForceTorque()));
+                tag.put("limit_cone", LIMIT_CONE.serializeNullable(joint.getLimitCone()));
+                return tag;
+            },
+            tag -> {
+                CompoundTag commonJoint = tag.getCompound("joint");
+                return new VSSphericalJoint(
+                        LONG.deserializeNullable(commonJoint.getCompound("ship_id_0")),
+                        JOINT_POSE.deserialize(commonJoint.getCompound("pose_0")),
+                        LONG.deserializeNullable(commonJoint.getCompound("ship_id_1")),
+                        JOINT_POSE.deserialize(commonJoint.getCompound("pose_1")),
+                        MAX_FORCE_TORQUE.deserializeNullable(tag.getCompound("max_force_torque")),
+                        LIMIT_CONE.deserializeNullable(tag.getCompound("limit_cone"))
                 );
             }
     );

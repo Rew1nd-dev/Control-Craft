@@ -2,9 +2,8 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.digital;
 
 import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
 import com.verr1.controlcraft.foundation.cimulink.game.port.InspectableLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.SwitchableLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 
 public class FFLinkPort extends InspectableLinkPort<FFTypes> implements ISummarizable {

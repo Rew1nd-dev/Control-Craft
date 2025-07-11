@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.api.operatable.IConstraintHolder;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConstraintKey;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 // import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -66,27 +67,31 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
     }
 
     public void registerConstraintKey(String id){
-        registeredConstraintKeys.put(id, new ConstraintKey(getBlockPos(), getDimensionID(), id));
+        // registeredConstraintKeys.put(id, new ConstraintKey(getBlockPos(), getDimensionID(), id));
     }
 
-    public @Nullable ConstraintKey getConstraintKey(String id){
-        return registeredConstraintKeys.get(id);
+    public @Nullable ConstraintKey getConstraintKey(String id, boolean runtimeOnly){
+        return new ConstraintKey(getBlockPos(), getDimensionID(), id, runtimeOnly);
     }
 
     public void overrideConstraint(String id, VSJoint newConstraint){
-        Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(key -> ControlCraftServer.JOINT_HANDLER.requestOverrideJoint(key, newConstraint));
+        Optional.ofNullable(getConstraintKey(id, false))
+                .ifPresent(key -> JointHandler.requestOverrideJoint(key, newConstraint));
     }
 
+    public void overrideRuntimeConstraint(String id, VSJoint newConstraint){
+        Optional.ofNullable(getConstraintKey(id, true))
+                .ifPresent(key -> JointHandler.requestOverrideJoint(key, newConstraint));
+    }
 
     public void removeConstraint(String id){
-        Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(ControlCraftServer.JOINT_HANDLER::requestRemoveJoint);
+        Optional.ofNullable(getConstraintKey(id, false))
+                .ifPresent(JointHandler::requestRemoveJoint);
     }
 
     public @Nullable VSJoint retrieveJoint(String id){
-        return Optional.ofNullable(getConstraintKey(id))
-                .map(ControlCraftServer.JOINT_HANDLER::retrieveJoint)
+        return Optional.ofNullable(getConstraintKey(id, false))
+                .map(JointHandler::retrieveJoint)
                 .orElse(null);
     }
 

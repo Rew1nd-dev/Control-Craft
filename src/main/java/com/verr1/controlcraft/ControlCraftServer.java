@@ -19,7 +19,7 @@ public class ControlCraftServer {
     public static RedstoneLinkNetworkHandlerExtension DECIMAL_LINK_NETWORK_HANDLER = new RedstoneLinkNetworkHandlerExtension();
     public static PeripheralNetwork CC_NETWORK = new PeripheralNetwork();
     public static final Executor SERVER_EXECUTOR = new Executor();
-    public static final JointHandler JOINT_HANDLER = new JointHandler();
+    // public static final JointHandler JOINT_HANDLER = new JointHandler();
 
     public static void ServerInit(){
         Configurator.setLevel("org.valkyrienskies.core.impl.networking", Level.ERROR);

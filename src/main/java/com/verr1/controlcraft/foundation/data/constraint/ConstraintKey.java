@@ -1,9 +1,10 @@
 package com.verr1.controlcraft.foundation.data.constraint;
 
+import com.verr1.controlcraft.ControlCraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 
-public record ConstraintKey(BlockPos pos, String dimension, String name){
+public record ConstraintKey(BlockPos pos, String dimension, String name, boolean runtimeOnly){
     @Override
     public int hashCode() {
         return pos.hashCode();
@@ -21,6 +22,9 @@ public record ConstraintKey(BlockPos pos, String dimension, String name){
     }
 
     public CompoundTag serialize() {
+        if(runtimeOnly){
+            ControlCraft.LOGGER.warn("serializing runtimeOnly constraint, what happened? + pos: {} name: {}", pos, name);
+        }
         CompoundTag tag = new CompoundTag();
         tag.putLong("pos", pos.asLong());
         tag.putString("type", name);
@@ -32,7 +36,7 @@ public record ConstraintKey(BlockPos pos, String dimension, String name){
         var pos = BlockPos.of(tag.getLong("pos"));
         var level = tag.getString("level");
         var name = tag.getString("type");
-        return new ConstraintKey(pos, level, name);
+        return new ConstraintKey(pos, level, name, false);
     }
 
 

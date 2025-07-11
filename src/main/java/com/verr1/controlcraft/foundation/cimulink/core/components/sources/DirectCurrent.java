@@ -1,5 +1,8 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.sources;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -41,4 +44,8 @@ public class DirectCurrent extends SignalGenerator<Double> {
         return new DirectCurrent(SerializeUtils.DOUBLE.deserialize(tag.getCompound("dc")));
     }
 
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.DC;
+    }
 }

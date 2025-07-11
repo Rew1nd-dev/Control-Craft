@@ -4,9 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniondc;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.bodies.properties.BodyPose;
+import org.valkyrienskies.core.api.bodies.properties.BodyTransform;
 import org.valkyrienskies.core.api.ships.properties.PhysPose;
 
-public record Pose(Vector3dc position, Quaterniondc rotation) implements BodyPose, PhysPose {
+public record Pose(Vector3dc position, Quaterniondc rotation) implements BodyPose, PhysPose{
     public static Pose of(Vector3dc pT, Quaterniondc qT) {
         return new Pose(pT, qT);
     }

@@ -15,6 +15,7 @@ public record ConstraintSerializable(VSJoint constraint) {
             case REVOLUTE -> SerializeUtils.REVOLUTE_JOINT.deserialize(nbt);
             case PRISMATIC -> SerializeUtils.PRISMATIC_JOINT.deserialize(nbt);
             case DISTANCE -> SerializeUtils.DISTANCE_JOINT.deserialize(nbt);
+            case SPHERICAL -> SerializeUtils.SPHERICAL_JOINT.deserialize(nbt);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
         return new ConstraintSerializable(joint);
@@ -29,6 +30,7 @@ public record ConstraintSerializable(VSJoint constraint) {
             case REVOLUTE -> SerializeUtils.REVOLUTE_JOINT.serialize((VSRevoluteJoint) constraint);
             case DISTANCE -> SerializeUtils.DISTANCE_JOINT.serialize((VSDistanceJoint) constraint);
             case PRISMATIC -> SerializeUtils.PRISMATIC_JOINT.serialize((VSPrismaticJoint) constraint);
+            case SPHERICAL -> SerializeUtils.SPHERICAL_JOINT.serialize((VSSphericalJoint) constraint);
             default -> throw new IllegalStateException("Unexpected value: " + constraint.getJointType().name());
         };
         tag.put("nbt", constraintTag);

@@ -5,7 +5,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.analog.AsyncSh
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Shifter;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;

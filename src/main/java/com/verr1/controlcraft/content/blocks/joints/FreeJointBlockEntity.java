@@ -35,18 +35,18 @@ public class FreeJointBlockEntity extends AbstractJointBlockEntity{
         FreeJointBlockEntity otherHinge = BlockEntityGetter.getLevelBlockEntityAt(level, pos, FreeJointBlockEntity.class).orElse(null);
         if(otherHinge == null)return;
 
-        Vector3dc selfContact = getJointConnectorPosJOML();
-        Vector3dc otherContact = otherHinge.getJointConnectorPosJOML();
+
 
         long selfID = getShipOrGroundID();
         long otherID = otherHinge.getShipOrGroundID();
 
-
+        Vector3dc selfContact = getJointConnectorPosJOML();
+        Vector3dc otherContact = otherHinge.getJointConnectorPosJOML();
 
         VSSphericalJoint joint = new VSSphericalJoint(
-                selfID,
+                selfID == -1L ? null: selfID,
                 new VSJointPose(selfContact, new Quaterniond()),
-                otherID,
+                otherID == -1L ? null: otherID,
                 new VSJointPose(otherContact, new Quaterniond()),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
                 null

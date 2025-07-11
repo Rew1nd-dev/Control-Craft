@@ -11,6 +11,7 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -45,7 +46,7 @@ public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
     }
 
     public Vector3dc getXFacePos(){
-        ServerShip xShip = VSGameUtilsKt.getShipObjectManagingPos(level, xPos);
+        Ship xShip = ValkyrienSkies.getShipManagingBlock(level, xPos);
         if(xShip == null)return ValkyrienSkies.set(new Vector3d(), xPos.relative(xAlign).getCenter());
         Vector3dc xFace_sc = ValkyrienSkies.set(new Vector3d(), xPos.relative(xAlign).getCenter());
         Vector3dc xFace_wc = xShip.getTransform().getShipToWorld().transformPosition(xFace_sc, new Vector3d());
@@ -53,7 +54,7 @@ public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
     }
 
     public Quaterniondc getXBaseQuaternion(){
-        ServerShip xShip = VSGameUtilsKt.getShipObjectManagingPos(level, xPos);
+        Ship xShip = ValkyrienSkies.getShipManagingBlock(level, xPos);
         if(xShip == null)return new Quaterniond();
         Quaterniondc xBaseQuaternion = xShip.getTransform().getShipToWorldRotation();
         return xBaseQuaternion;
@@ -67,11 +68,11 @@ public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
     }
 
     public Vector3dc getYTargetPosition(){
-        ServerShip yShip = VSGameUtilsKt.getShipObjectManagingPos(level, yPos);
+        Ship yShip = ValkyrienSkies.getShipManagingBlock(level, yPos);
         if(yShip == null)return new Vector3d(0, 0, 0);
         Vector3dc dir = ValkyrienSkies.set(new Vector3d(), yAlign.getNormal()).mul(0.2);
         Vector3dc yFace_sc = ValkyrienSkies.set(new Vector3d(), yPos).add(dir);
-        Vector3dc yCenter_sc = yShip.getInertiaData().getCenterOfMassInShip();
+        Vector3dc yCenter_sc = yShip.getTransform().getPositionInShip();
         Vector3dc relative_r_sc = new Vector3d(yFace_sc).sub(yCenter_sc, new Vector3d());
 
         Quaterniondc targetQuaternion = getYTargetQuaternion();

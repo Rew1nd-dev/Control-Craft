@@ -219,7 +219,7 @@ dependencies {
     // compileOnly("org.valkyrienskies.core:impl:${vs_core_version}")
 
     implementation fg.deobf("libs:valkyrienskies-1201-forge:2.5")
-    implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
+    compileOnly fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
 
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")

@@ -1,6 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.vectors;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 
 import java.util.List;
 
@@ -25,5 +28,10 @@ public class Dot extends Combinational {
 
         double dotProduct = x0 * x1 + y0 * y1 + z0 * z1;
         return List.of(dotProduct);
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.V_DOT;
     }
 }

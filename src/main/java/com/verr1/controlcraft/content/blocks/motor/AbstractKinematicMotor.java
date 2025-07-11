@@ -2,13 +2,14 @@ package com.verr1.controlcraft.content.blocks.motor;
 
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.create.KMotorKineticPeripheral;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.KinematicMotorPoseInducer;
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
-import com.verr1.controlcraft.content.valkyrienskies.transform.LerpedTransformProvider;
 import com.verr1.controlcraft.content.gui.layouts.api.IKinematicUIDevice;
 import com.verr1.controlcraft.foundation.api.IKineticPeripheral;
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
 import com.verr1.controlcraft.foundation.data.GroundBodyShip;
 import com.verr1.controlcraft.foundation.data.NumericField;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.control.Pose;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -19,6 +20,7 @@ import com.verr1.controlcraft.foundation.data.control.KinematicController;
 import com.verr1.controlcraft.foundation.data.logical.LogicalKinematicMotor;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
+import com.verr1.controlcraft.foundation.type.descriptive.ConstraintMode;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -35,12 +37,14 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
+import org.valkyrienskies.core.api.bodies.properties.BodyTransform;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.apigame.joints.VSFixedJoint;
 import org.valkyrienskies.core.apigame.joints.VSJoint;
 import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.apigame.joints.VSJointPose;
+import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 
 import java.lang.Math;
 import java.util.Optional;
@@ -53,18 +57,17 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     protected KinematicController controller = new KinematicController();
 
     protected double compliance = -5;
-
     protected TargetMode mode = TargetMode.VELOCITY;
-
     protected boolean USE_CONSTRAINT_SPAMMING = true;
-
     protected double targetOfLastAppliedConstraint = 114514; // magic number : )
-
     private final DirectReceiver receiver = new DirectReceiver();
 
+    protected ConstraintMode constraintMode = ConstraintMode.CONSTRAINT;
     private KinematicMotorPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
     private final KMotorKineticPeripheral kineticPeripheral = new KMotorKineticPeripheral(this);
+
+
 
     @Override
     public IKineticPeripheral peripheral() {
@@ -76,6 +79,16 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         return receiver;
     }
 
+    public ConstraintMode getConstraintMode() {
+        return constraintMode;
+    }
+
+    public void setConstraintMode(ConstraintMode constraintMode) {
+        if(constraintMode == this.constraintMode)return;
+        this.constraintMode = constraintMode;
+        quitAttachKinematicInducer();
+        destroyConstraintForMode();
+    }
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @org.jetbrains.annotations.Nullable Direction side) {
         if(cap == Capabilities.CAPABILITY_PERIPHERAL){
@@ -133,6 +146,12 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
                 .withBasic(SerializePort.of(this::getTargetMode, this::setTargetMode, SerializeUtils.ofEnum(TargetMode.class)))
                 .withClient(ClientBuffer.of(TargetMode.class))
                 .register();
+
+        buildRegistry(CONSTRAINT_MODE)
+                .withBasic(SerializePort.of(this::getConstraintMode, this::setConstraintMode, SerializeUtils.ofEnum(ConstraintMode.class)))
+                .withClient(ClientBuffer.of(ConstraintMode.class))
+                .register();
+
         buildRegistry(CONNECT_CONTEXT).withBasic(SerializePort.of(() -> context, ctx -> context = ctx, SerializeUtils.CONNECT_CONTEXT)).register();
 
         buildRegistry(TARGET).withBasic(SerializePort.of(() -> getController().getControlTarget(), t -> getController().setControlTarget(t), SerializeUtils.DOUBLE)).withClient(ClientBuffer.DOUBLE.get()).register();
@@ -176,6 +195,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     }
 
     private void tickConstraint(){
+        if(noCompanionShip())return;
         tickTarget();
         if(Math.abs(targetOfLastAppliedConstraint - controller.getTarget()) < Math.pow(10, compliance) + 1e-6)return;
         if(level == null || level.isClientSide)return;
@@ -200,13 +220,13 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
 
 
         VSJoint joint = new VSFixedJoint(
-                getShipOrGroundID(),
+                getShipOrGroundIDNullable(),
                 new VSJointPose(context.self().getPos(), q_self),
                 compID,
                 new VSJointPose(context.comp().getPos(), q_comp),
                 new VSJointMaxForceTorque(1e20f, 1e20f)
         );
-        overrideConstraint("control", joint);
+        overrideRuntimeConstraint("control", joint);
         targetOfLastAppliedConstraint = controller.getTarget();
     }
 
@@ -252,64 +272,67 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         }
     }
 
-    public @Nullable Pose tickPose(){
+    public @Nullable void tickPose(){
         LoadedServerShip compShip = getCompanionServerShip();
         LogicalKinematicMotor motor = getLogicalMotor();
+
+
+
         Ship selfShip = getShipOn();
-        if(compShip == null || motor == null)return null;
-        return InducerControls.kinematicMotorTickControls(
+        if(compShip == null || motor == null)return;
+        Pose pose =  InducerControls.kinematicMotorTickControls(
                 motor,
                 Optional.ofNullable(selfShip).orElse(new GroundBodyShip()),
                 compShip
         );
+
+        BodyTransform original = compShip.getKinematics().getTransform();
+
+        compShip.unsafeSetTransform(new BodyTransformImpl(
+                pose.position(),
+                pose.rotation(),
+                original.getScaling(),
+                original.getPositionInModel()
+        ));
     }
 
     @Override
     public void tickServer() {
         super.tickServer();
         syncForNear(true, FIELD);
-        tickConstraint();
+        dispatchControl();
         kineticPeripheral.tick();
     }
 
-    public void syncAttachInducer(){
+    private void dispatchControl(){
+        if(constraintMode == ConstraintMode.CONSTRAINT){
+            tickConstraint();
+        }else {
+            // tickPose();
+            syncAttachKinematicInducer();
+        }
+    }
+
+    public void syncAttachKinematicInducer(){
         if(level == null || level.isClientSide)return;
-        /*
+
         Optional
                 .ofNullable(getCompanionServerShip())
-                .map(KinematicMotorForceInducer_::getOrCreate)
-                .ifPresent(inducer -> inducer.alive(WorldBlockPos.of(level, getBlockPos())));
-        * */
-
-    }
-
-    // simply for debugging
-
-
-    @Override
-    public void tickClient() {
-        super.tickClient();
-        // syncAttachTransformProviderClient();
+                .map(KinematicMotorPoseInducer::getOrCreate)
+                .ifPresent(inducer -> inducer.replace(WorldBlockPos.of(level, getBlockPos()), this::getLogicalMotor));
     }
 
 
+    public void quitAttachKinematicInducer(){
+        if(level == null || level.isClientSide)return;
 
-    /*
-    *
-    public void syncAttachTransformProviderClient(){
-        if(level != null && !level.isClientSide)return;
-        Optional
-                .ofNullable(getCompanionClientShip())
-                .ifPresent(LerpedTransformProvider::replaceOrCreate);
-    }
-    public void syncAttachTransformProviderServer(){
-        if(level != null && level.isClientSide)return;
         Optional
                 .ofNullable(getCompanionServerShip())
-                .map(KinematicMotorTransformProvider::replaceOrCreate)
-                .ifPresent(prov -> Optional.ofNullable(tickPose()).ifPresent(prov::set));
+                .map(KinematicMotorPoseInducer::getOrCreate)
+                .ifPresent(inducer -> inducer.quit(WorldBlockPos.of(level, getBlockPos())));
     }
-    * */
+
+
 
 
     public @Nullable LogicalKinematicMotor getLogicalMotor() {

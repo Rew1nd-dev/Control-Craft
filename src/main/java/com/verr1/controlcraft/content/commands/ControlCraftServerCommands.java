@@ -15,6 +15,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.registry.ControlCraftItems;
@@ -68,7 +69,12 @@ public class ControlCraftServerCommands {
     }
 
     private static int saveAllConstraintsCommand(CommandContext<CommandSourceStack> $){
-        ControlCraftServer.JOINT_HANDLER.saveAll();
+        JointHandler.saveAll();
+        return 1;
+    }
+
+    private static int removeInvalidConstraintsCommand(CommandContext<CommandSourceStack> $){
+        JointHandler.removeInvalidJoints();
         return 1;
     }
 
@@ -295,6 +301,10 @@ public class ControlCraftServerCommands {
                 ).then(
                         lt("save-all-constraints").executes(
                                 ControlCraftServerCommands::saveAllConstraintsCommand
+                        )
+                ).then(
+                        lt("remove-invalid-cache").executes(
+                                ControlCraftServerCommands::removeInvalidConstraintsCommand
                         )
                 )
         );

@@ -2,7 +2,10 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates
 
 
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanCombinational;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -20,6 +23,11 @@ public class Gates {
         protected Boolean transform1(List<Boolean> inputs) {
             return inputs.stream().allMatch(b -> b);
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.AND_N;
+        }
     };
 
     public static final Function<Integer, Gate> OR = n -> new Gate(n) {
@@ -27,6 +35,10 @@ public class Gates {
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return inputs.stream().anyMatch(b -> b);
+        }
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.OR_N;
         }
     };
 
@@ -36,6 +48,10 @@ public class Gates {
         protected Boolean transform1(List<Boolean> inputs) {
             return inputs.stream().filter(b -> b).count() % 2 == 1;
         }
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.XOR_N;
+        }
     };
 
     public static final Function<Integer, Gate> NOT = n -> new Gate(1) {
@@ -43,6 +59,10 @@ public class Gates {
         @Override
         protected Boolean transform1(List<Boolean> inputs) {
             return !inputs.get(0);
+        }
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.NOT_N;
         }
     };
 

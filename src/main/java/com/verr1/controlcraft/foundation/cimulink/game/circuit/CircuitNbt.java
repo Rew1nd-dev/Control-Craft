@@ -3,7 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitConstructor;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
@@ -36,7 +36,7 @@ public class CircuitNbt {
     List<IoNbt> inOuts;
 
 
-    CircuitNbt(
+    public CircuitNbt(
             List<ComponentNbt> componentSummaries,
             List<ConnectionNbt> connectionNbts,
             List<IoNbt> inOuts

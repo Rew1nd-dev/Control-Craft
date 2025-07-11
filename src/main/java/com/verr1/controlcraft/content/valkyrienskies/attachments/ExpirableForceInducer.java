@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
-import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.core.api.world.PhysLevel;
 
@@ -35,8 +34,7 @@ public abstract class ExpirableForceInducer<T> implements ShipPhysicsListener {
     @Override
     public final void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
         lazyTickLives();
-        applyControl(physShip);
-        applyControlWithOther(physShip, physLevel::getShipById);
+        applyControlWithOther(physShip, physLevel::getShipById, physLevel);
     }
 
     @Override
@@ -51,20 +49,32 @@ public abstract class ExpirableForceInducer<T> implements ShipPhysicsListener {
         lives.put(pos, new ExpirableControlContext<>(provider));
     }
 
-    protected void applyControl(@NotNull PhysShip physShip){};
+    public void quit(WorldBlockPos pos){
+        lives.remove(pos);
+    }
 
-    protected void applyControlWithOther(@NotNull PhysShip physShip, @NotNull Function<Long, PhysShip> lookupPhysShip){
+
+    protected void applyControlWithOther(
+            @NotNull PhysShip physShip,
+            @NotNull Function<Long, @Nullable PhysShip> lookupPhysShip,
+            @NotNull PhysLevel world
+    ){
         lives
             .values()
             .stream()
             .map(ExpirableControlContext::context)
             .filter(Objects::nonNull)
             .forEach(
-                context -> consume(physShip, lookupPhysShip, context)
+                context -> consume(physShip, lookupPhysShip, context, world)
             );
     };
 
-    protected abstract void consume(@NotNull PhysShip physShip, @NotNull Function<Long, PhysShip> lookupPhysShip, @NotNull T context);
+    protected abstract void consume(
+            @NotNull PhysShip physShip,
+            @NotNull Function<Long, @Nullable PhysShip> lookupPhysShip,
+            @NotNull T context,
+            @NotNull PhysLevel world
+    );
 
 
 

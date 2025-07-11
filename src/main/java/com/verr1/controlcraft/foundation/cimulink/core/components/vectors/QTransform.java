@@ -1,6 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.vectors;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 
 import java.util.List;
 
@@ -29,5 +32,10 @@ public class QTransform extends Combinational {
         double tz = qw * vz + qx * vy - qy * vx;
 
         return List.of(tx, ty, tz);
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.V_TRANSFORM;
     }
 }

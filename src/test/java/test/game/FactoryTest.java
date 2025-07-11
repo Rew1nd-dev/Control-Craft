@@ -13,7 +13,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.ArrayList;

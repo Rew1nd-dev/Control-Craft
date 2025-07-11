@@ -2,11 +2,10 @@ package com.verr1.controlcraft.content.valkyrienskies.attachments;
 
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
 import com.verr1.controlcraft.foundation.data.logical.LogicalJet;
-import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.PhysShip;
-import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.world.PhysLevel;
 
 import java.util.function.Function;
 
@@ -20,8 +19,8 @@ public final class JetForceInducer extends ExpirableForceInducer<LogicalJet>{
     protected void consume(
             @NotNull PhysShip physShip,
             @NotNull Function<Long, PhysShip> lookupPhysShip,
-            @NotNull LogicalJet context
-    ) {
+            @NotNull LogicalJet context,
+            @NotNull PhysLevel world) {
         InducerControls.jetTickControls(
                 context,
                 physShip

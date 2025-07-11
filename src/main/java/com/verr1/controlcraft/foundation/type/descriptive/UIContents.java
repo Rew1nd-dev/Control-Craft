@@ -5,8 +5,10 @@ import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 
@@ -30,6 +32,7 @@ public enum UIContents implements Descriptive<UIContents> {
     SPEED_LIMIT(Component.literal("Limit"), literals("Maximum Rotational Speed")),
 
     MODE(Component.literal("Mode"), literals("Velocity / Position")),
+    CONSTRAINT_MODE(Component.literal("Mode"), literals("Constraint / Kinematic")),
     CHEAT(Component.literal("Cheat"), literals("Convenience")),
     AUTO_LOCK(Component.literal("Auto Lock"), literals("Locked When:", " .Target Speed = 0", " .Target Angle Reached")),
     PID_CONTROLLER(Component.literal("PID Controller"), literals("Integrated Proportional Integral Derivative Controller")),
@@ -40,6 +43,10 @@ public enum UIContents implements Descriptive<UIContents> {
 
     MIN(Component.literal("Min"), literals("Minimum Value Of Signal 0")),
     MAX(Component.literal("Max"), literals("Maximum Value Of Signal 15")),
+
+    FROM(Component.literal("From"), literals("Start Angle")),
+    TO(Component.literal("To"), literals("End Angle")),
+    CLOCKWISE(Component.literal("Clockwise"), literals("Direction")),
 
     TYPE(Component.literal("Type"), literals("Type Of The Peripheral")),
     PROTOCOL(Component.literal("protocol"), literals("Unique Channel")),
@@ -107,9 +114,12 @@ public enum UIContents implements Descriptive<UIContents> {
     MASK_IN(Component.literal("Negate Input"), literals("Negate Input Signal")),
     MASK_OUT(Component.literal("Negate Output"), literals("Negate Output Signal")),
 
-    PLACE_HOLDER(Component.literal(""), literals(""))
-    ;
+    PLACE_HOLDER(Component.literal(""), literals("")),
 
+
+    FLAP_ADD(Component.literal("Increase"), literals("Increase Flap Strength")),
+    FLAP_DEC(Component.literal("Decrease"), literals("Decrease Flap Strength")),
+    ;
 
 
 

@@ -8,6 +8,7 @@ import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
@@ -38,8 +39,8 @@ public class ControlCraftEvents {
 
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
-        ControlCraftAttachments.register();
-        ControlCraftServer.JOINT_HANDLER.onServerStaring(event.getServer());
+
+        JointHandler.onServerStaring(event.getServer());
         ValkyrienSkies.api().getPhysTickEvent().on(ControlCraftEvents::onPhysicsTickStart);
         ValkyrienSkies.api().getShipLoadEvent().on(ControlCraftAttachments::onShipLoad);
     }
@@ -99,15 +100,17 @@ public class ControlCraftEvents {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         // ConstraintCenter.onServerStopping(event.getServer());
-        ControlCraftServer.JOINT_HANDLER.onServerStopping(event.getServer());
+        JointHandler.onServerStopping(event.getServer());
         BlockLinkPort.onClose();
     }
 
     public static void onPhysicsTickStart(PhysTickEvent event){
-        ControlCraftServer.JOINT_HANDLER.physTick(event.getWorld(), event.getDelta());
-        ComputerCraftAsyncDelegation.onPhysTick();
-        // ComputerCraftDelegation.lockDelegateThread();
-        BlockLinkPort.prePhysicsTick();
+        JointHandler.dispatchEvent(event);
+
+        if(event.getWorld().getDimension().equals(ValkyrienSkies.getDimensionId(ControlCraftServer.OVERWORLD))){
+            ComputerCraftAsyncDelegation.onPhysTick();
+            BlockLinkPort.prePhysicsTick();
+        }
     }
 
     public static void onPhysicsTickEnd(){

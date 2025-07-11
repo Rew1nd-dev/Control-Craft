@@ -4,12 +4,13 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import kotlin.Pair;
@@ -163,7 +164,7 @@ public class CircuitLinkPort extends BlockLinkPort implements ICompilable<Circui
 
 
     @Override
-    public CimulinkFactory.Factory<Circuit> factory() {
+    public Factory<Circuit> factory() {
         return CimulinkFactory.CIRCUIT;
     }
 

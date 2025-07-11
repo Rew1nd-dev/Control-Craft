@@ -259,19 +259,19 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
 
         long compId = comp.getId();
         long selfId = getShipOrGroundID();
-        Vector3dc selfContact = getAssembleBlockPosJOML();
-        Vector3dc compContact = comp.getKinematics().getTransform().getPositionInModel().add(new Vector3d(0.5, 0.5, 0.5), new Vector3d());
+        Vector3dc selfContact = selfId == -1L ? getAssembleBlockPosJOML().add(new Vector3d(0.5, 0.5, 0.5)) : getAssembleBlockPosJOML();
+        Vector3dc compContact = comp.getKinematics().getTransform().getPositionInModel().add(new Vector3d(0.0, 0.0, 0.0), new Vector3d());
         // Vector3dc selfOffset = self.getTransform().getPositionInShip();  //.sub(selfContact, new Vector3d())
 
         // float m = (float)(MAX_SLIDE_DISTANCE);
 
-        Quaterniondc selfQuaternion = new Quaterniond(); // VSMathUtils.getQuaternionToEast_(getDirection());
-        Quaterniondc compQuaternion = new Quaterniond(); // VSMathUtils.getQuaternionToEast_(getDirection());
+        Quaterniondc selfQuaternion = VSMathUtils.getQuaternionToEast_(getDirection()); //new Quaterniond();
+        Quaterniondc compQuaternion = VSMathUtils.getQuaternionToEast_(getDirection());
 
         VSPrismaticJoint joint = new VSPrismaticJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(selfContact, selfQuaternion),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(compContact, compQuaternion),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
                 new VSD6Joint.LinearLimitPair(

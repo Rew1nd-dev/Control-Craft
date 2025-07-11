@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.foundation.cimulink.game.registry;
+package com.verr1.controlcraft.foundation.cimulink.core.registry;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.AsyncShifter;
@@ -52,9 +52,9 @@ public class CimulinkFactory {
     );
 
     public static final Factory<Comparator> COMPARATOR = register(
-        createParamLess(Comparator::new),
-        Comparator.class,
-        defaultID("comparator")
+            createParamLess(Comparator::new),
+            Comparator.class,
+            defaultID("comparator")
     );
 
     public static final Factory<NamedComponent> D_FF = register(
@@ -333,11 +333,6 @@ public class CimulinkFactory {
         );
     }
 
-    private static ComponentDeserializer register(
-            Function<Summary, NamedComponent> deserializeFunc
-    ){
-        throw new NotImplementedException();
-    }
 
     private static String defaultID(String name){
         return PREFIX + name;
@@ -369,48 +364,6 @@ public class CimulinkFactory {
         NamedComponent deserialize(CompoundTag tag);
     }
 
-    public static class CircuitFactory implements ComponentDeserializer{
-        public static final String ID = defaultID("circuit");
 
-
-        public CompoundTag serialize(CircuitNbt nbt){
-            return nbt.serialize();
-        }
-
-
-        @Override
-        public NamedComponent deserialize(CompoundTag tag) {
-            return CircuitNbt.deserialize(tag).buildCircuit();
-        }
-    }
-
-    public static class Factory<T extends NamedComponent> implements ComponentDeserializer{
-        Serializer<T> serializer;
-        Class<T> clazz;
-        String ID;
-
-        Factory(Serializer<T> serializer, Class<T> clazz, String ID) {
-            this.ID = ID;
-            this.serializer = serializer;
-            this.clazz = clazz;
-        }
-
-        public String getID(){return ID;}
-
-        public Summary summarize(NamedComponent component){
-            if(!clazz.isAssignableFrom(component.getClass())){
-                throw new IllegalArgumentException("Component " + component.getClass().getName() + " is not assignable to " + clazz.getName());
-            }
-            return new Summary(
-                    ID,
-                    serializer.serialize(clazz.cast(component))
-            );
-        }
-
-        @Override
-        public NamedComponent deserialize(CompoundTag tag) {
-            return serializer.deserialize(tag);
-        }
-    }
 
 }

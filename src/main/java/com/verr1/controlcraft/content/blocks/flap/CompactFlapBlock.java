@@ -60,7 +60,8 @@ public class CompactFlapBlock extends BearingBlock implements
             return InteractionResult.SUCCESS;
         }
 
-        if(hit.getDirection() == state.getValue(FlapBearingBlock.FACING)){
+        /*
+        * if(hit.getDirection() == state.getValue(FlapBearingBlock.FACING)){
             if (!player.mayBuild())
                 return InteractionResult.FAIL;
             if (player.isShiftKeyDown())
@@ -81,6 +82,7 @@ public class CompactFlapBlock extends BearingBlock implements
             }
             return InteractionResult.PASS;
         }
+        * */
 
         return InteractionResult.PASS;
     }

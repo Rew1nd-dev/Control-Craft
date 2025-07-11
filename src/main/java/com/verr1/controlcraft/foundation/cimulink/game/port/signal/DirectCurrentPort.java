@@ -2,9 +2,10 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.signal;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -49,7 +50,7 @@ public class DirectCurrentPort extends BlockLinkPort implements ICompilable<Dire
     }
 
     @Override
-    public CimulinkFactory.Factory<DirectCurrent> factory() {
+    public Factory<DirectCurrent> factory() {
         return CimulinkFactory.DC;
     }
 }

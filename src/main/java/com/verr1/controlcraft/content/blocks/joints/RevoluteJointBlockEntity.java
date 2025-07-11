@@ -80,9 +80,9 @@ public class RevoluteJointBlockEntity extends AbstractJointBlockEntity implement
         long otherID = otherHinge.getShipOrGroundID();
 
         VSRevoluteJoint joint = new VSRevoluteJoint(
-                selfID,
+                selfID == -1L ? null : selfID,
                 new VSJointPose(selfContact, selfRotation),
-                otherID,
+                otherID == -1L ? null : otherID,
                 new VSJointPose(otherContact, otherRotation),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
                 null, null, null, null, null

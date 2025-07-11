@@ -6,6 +6,7 @@ public class SharedKeys {
     public static final NetworkKey VALUE = NetworkKey.create("value");
     public static final NetworkKey CHEAT_MODE = NetworkKey.create("cheat");
     public static final NetworkKey TARGET_MODE = NetworkKey.create("target_mode");
+    public static final NetworkKey CONSTRAINT_MODE = NetworkKey.create("constraint_mode");
     public static final NetworkKey TARGET = NetworkKey.create("target");
     public static final NetworkKey LOCK_MODE = NetworkKey.create("lock_mode");
     public static final NetworkKey IS_LOCKED = NetworkKey.create("is_locked");

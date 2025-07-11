@@ -2,8 +2,11 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.general.ad;
 
 
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 
 import java.util.List;
 
@@ -68,5 +71,10 @@ public class Comparator extends Combinational {
 
     public ComponentPortName __eq(){
         return __out(2);
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.COMPARATOR;
     }
 }

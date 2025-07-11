@@ -2,10 +2,11 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.digital;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.LinearAdder;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
@@ -112,7 +113,7 @@ public class FMALinkPort extends BlockLinkPort implements ICompilable<LinearAdde
     }
 
     @Override
-    public CimulinkFactory.Factory<LinearAdder> factory() {
+    public Factory<LinearAdder> factory() {
         return CimulinkFactory.FMA;
     }
 }

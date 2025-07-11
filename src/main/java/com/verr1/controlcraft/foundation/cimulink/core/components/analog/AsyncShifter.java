@@ -1,6 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -65,6 +68,11 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
                 SerializeUtils.INT.deserializeOrElse(tag.getCompound("delay"), 0),
                 SerializeUtils.INT.deserializeOrElse(tag.getCompound("parallel"), 1)
         );
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.ASYNC_SHIFTER;
     }
 
     public static class AsyncShifterQueue{

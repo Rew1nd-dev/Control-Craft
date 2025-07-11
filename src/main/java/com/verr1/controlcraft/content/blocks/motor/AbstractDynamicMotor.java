@@ -9,6 +9,7 @@ import com.verr1.controlcraft.content.valkyrienskies.attachments.DynamicMotorFor
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.MotorPlant;
+import com.verr1.controlcraft.foundation.data.constraint.AngleLimit;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -191,8 +192,9 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
 
+
         VSFixedJoint joint = new VSFixedJoint(
-                getShipOrGroundID(),
+                getShipOrGroundIDNullable(),
                 new VSJointPose(context.self().getPos(), q_self),
                 getCompanionShipID(),
                 new VSJointPose(context.comp().getPos(), q_comp),

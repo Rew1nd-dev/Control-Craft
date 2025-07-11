@@ -289,10 +289,22 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
 
+        UnitUIPanel addLevel = new UnitUIPanel(
+                boundPos,
+                CompactFlapBlockEntity.ADD_LEVEL,
+                Converter.convert(UIContents.FLAP_ADD, Converter::titleStyle)
+        );
+
+        UnitUIPanel decLevel = new UnitUIPanel(
+                boundPos,
+                CompactFlapBlockEntity.DEC_LEVEL,
+                Converter.convert(UIContents.FLAP_DEC, Converter::titleStyle)
+        );
+
         Runnable alignLabels = () -> {
             Converter.alignLabel(angle, offset);
             Converter.alignLabel(lift, drag, bias);
-            Converter.alignLabel(assemble, disassemble);
+            Converter.alignLabel(assemble, disassemble, decLevel, addLevel);
         };
 
         return new GenericSettingScreen.builder(boundPos)
@@ -318,7 +330,7 @@ public class GenericUIFactory {
                 .withTab(
                         REMOTE_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(assemble, disassemble)
+                                .withPort(assemble, disassemble, addLevel, decLevel)
                                 .build()
                 )
                 .withTickTask(createSyncTasks(boundPos, CompactFlapBlockEntity.ANGLE))
@@ -521,6 +533,7 @@ public class GenericUIFactory {
 
         var limit = new DoubleUIField(boundPos, SharedKeys.SPEED_LIMIT, Converter.convert(UIContents.SPEED_LIMIT, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d); //, Converter.combine(Math::toDegrees, d -> MathUtils.clampDigit(d, 2)), Math::toRadians
 
+        var al = new AngleLimitUIPort(boundPos);
 
         Runnable alignLabels = () -> {
             Converter.alignLabel(current_view, lock_view, target_field);
@@ -547,7 +560,7 @@ public class GenericUIFactory {
                 .withTab(
                         ADVANCE_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(pid, limit, offset_self, offset_comp)
+                                .withPort(pid, limit, offset_self, offset_comp, al)
                                 .build()
                 )
                 .withTab(
@@ -574,6 +587,13 @@ public class GenericUIFactory {
         var self_offset = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 25);
 
         var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
+
+        var constraint_option = new OptionUIField<>(
+                boundPos,
+                SharedKeys.CONSTRAINT_MODE,
+                ConstraintMode.class,
+                Converter.convert(UIContents.CONSTRAINT_MODE, Converter::titleStyle)
+        );
 
 
         var compliance_field = new DoubleUIField(
@@ -623,8 +643,9 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, target_field);
-            Converter.alignLabel(compliance_field, toggle_mode);
+            Converter.alignLabel(current_view, target_field, toggle_mode, constraint_option);
+            Converter.alignLabel(toggle_mode.valueLabel(), constraint_option.valueLabel());
+            Converter.alignLabel(compliance_field, self_offset, comp_offset);
             Converter.alignLabel(asm, disasm);
         };
 
@@ -632,7 +653,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(current_view, target_field, toggle_mode)
+                                .withPort(current_view, target_field, toggle_mode, constraint_option)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )

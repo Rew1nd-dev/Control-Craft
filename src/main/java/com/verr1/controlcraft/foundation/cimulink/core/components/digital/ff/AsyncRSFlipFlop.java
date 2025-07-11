@@ -1,7 +1,10 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.digital.ff;
 
 import com.verr1.controlcraft.foundation.cimulink.core.api.StateFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanTemporal;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import kotlin.Pair;
 
 import java.util.List;
@@ -30,5 +33,10 @@ public class AsyncRSFlipFlop extends BooleanTemporal<Boolean> {
             out = lastClock; // Maintain last state
         }
         return new Pair<>(List.of(out), clk);
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.ASYNC_RS_FF;
     }
 }

@@ -1,6 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanCombinational;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -92,6 +95,11 @@ public class FlexibleGate extends BooleanCombinational {
     protected List<Boolean> transformOr(List<Boolean> inputs) {
         boolean out = outputMask ^ maskIn(inputs).stream().reduce(false, (a, b) -> a || b);
         return List.of(out);
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.F_GATE;
     }
 
     public CompoundTag serialize(){

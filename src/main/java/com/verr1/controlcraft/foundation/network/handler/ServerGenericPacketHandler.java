@@ -15,6 +15,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.executor.executables.FaceAlignmentSchedule;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldMessage;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.ExposedFieldOpenScreenPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
@@ -131,7 +132,7 @@ public class ServerGenericPacketHandler {
             .filter(ServerLevel.class::isInstance)
             .map(ServerLevel.class::cast)
             .ifPresent(
-                    serverLevel -> ControlCraftServer.JOINT_HANDLER.destroyAllJoints(serverLevel, pos)
+                    serverLevel -> JointHandler.destroyAllJoints(serverLevel, pos)
             );
     }
 

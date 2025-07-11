@@ -147,7 +147,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     }
 
     private void removeFromNetwork(){
-        io.stream().filter(o -> o.isRedundant).forEach(e -> {
+        io.forEach(e -> {  //  stream().filter(o -> !o.isRedundant)
             DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
             REDSTONE_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
         });
@@ -291,7 +291,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         public int getTransmittedStrength() {
             if(!isInput && !isRedundant) {
                 try{
-                    double out = linkPort().output(ioName);
+                    double out = linkPort().circuit().output(ioName);
                     return (int)out;
                 } catch (Exception e){
                     ControlCraft.LOGGER.error("Error while getting transmitted strength for circuit: {}", e.getMessage());
@@ -326,7 +326,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
             double ratio = select();
             double value = minMax.getFirst() + ratio * (minMax.getSecond() - minMax.getFirst());
             try{
-                linkPort().input(ioName, value);
+                linkPort().circuit().input(ioName, value);
             }catch (Exception e){
                 ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
             }
@@ -334,9 +334,9 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public double $getTransmittedStrength() {
-            if(!isInput && !isRedundant) {
+            if(!isInput && !isRedundant && useDecimalNetwork) {
                 try{
-                    double out = linkPort().output(ioName);
+                    double out = linkPort().circuit().output(ioName);
                     return out;
                 } catch (Exception e){
                     ControlCraft.LOGGER.error("Error while getting transmitted decimal strength for circuit: {}", e.getMessage());
@@ -352,7 +352,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public void setReceivedStrength(int power) {
-            if(!isInput)return;
+            if(!isInput || useDecimalNetwork)return;
 
             if (lastReceivedStrength == power)return;
             lastReceivedStrength = power;
@@ -362,7 +362,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public void $setReceivedStrength(double decimal) {
-            if(!isInput)return;
+            if(!isInput || !useDecimalNetwork)return;
 
             if (Math.abs(decimal - $lastReceivedStrength) < 1e-6)return;
             $lastReceivedStrength = decimal;

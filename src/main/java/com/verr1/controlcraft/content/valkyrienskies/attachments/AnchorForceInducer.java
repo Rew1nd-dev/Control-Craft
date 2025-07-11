@@ -5,6 +5,7 @@ import com.verr1.controlcraft.foundation.data.logical.LogicalAnchor;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.PhysShip;
+import org.valkyrienskies.core.api.world.PhysLevel;
 
 import java.util.function.Function;
 
@@ -15,7 +16,7 @@ public final class AnchorForceInducer extends ExpirableForceInducer<LogicalAncho
     }
 
     @Override
-    protected void consume(@NotNull PhysShip physShip, @NotNull Function<Long, PhysShip> lookupPhysShip, @NotNull LogicalAnchor context) {
+    protected void consume(@NotNull PhysShip physShip, @NotNull Function<Long, PhysShip> lookupPhysShip, @NotNull LogicalAnchor context, @NotNull PhysLevel world) {
         InducerControls.anchorTickControls(
                 context,
                 physShip

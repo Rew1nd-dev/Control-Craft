@@ -2,10 +2,10 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.digital;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
-import com.verr1.controlcraft.foundation.cimulink.game.port.ISummarizable;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 
 public class ComparatorLinkPort extends BlockLinkPort implements ICompilable<Comparator> {
 
@@ -25,7 +25,7 @@ public class ComparatorLinkPort extends BlockLinkPort implements ICompilable<Com
     }
 
     @Override
-    public CimulinkFactory.Factory<Comparator> factory() {
+    public Factory<Comparator> factory() {
         return CimulinkFactory.COMPARATOR;
     }
 

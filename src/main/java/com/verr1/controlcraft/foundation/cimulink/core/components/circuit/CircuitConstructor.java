@@ -7,12 +7,15 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Signal
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.GraphUtils;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPort;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.*;
 import kotlin.Pair;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class CircuitConstructor {
     private static final String INPUT_NAME = "input@#$%^";
@@ -37,6 +40,50 @@ public class CircuitConstructor {
         return (Circuit) (build().withName(name));
     }
 
+    public CircuitNbt buildContext(){
+        List<ComponentNbt> componentSummaries = components.entrySet().stream().map(e -> {
+            String name = e.getKey();
+            NamedComponent component = e.getValue();
+            Summary sum = component.summary();
+            return new ComponentNbt(name, sum);
+        }).toList();
+
+        List<ConnectionNbt> connectionNbts = reverseConnections.entrySet().stream().map(e -> {
+            ComponentPortName outputPort = e.getValue();
+            ComponentPortName inputPort = e.getKey();
+            return new ConnectionNbt(
+                    outputPort.componentName(),
+                    outputPort.portName(),
+                    inputPort.componentName(),
+                    inputPort.portName()
+            );
+        }).toList();
+
+        List<IoNbt> inOuts = Stream.concat(inputs
+                .entrySet()
+                .stream()
+                .flatMap(is -> is.getValue().stream().map(in -> new Pair<>(is.getKey(), in)))
+                .map(cpn -> new IoNbt(
+                        true,
+                        cpn.getFirst(),
+                        cpn.getSecond().componentName(),
+                        cpn.getSecond().portName()
+                )),
+                outputs.entrySet().stream().map(e -> new IoNbt(
+                        false,
+                        e.getKey(),
+                        e.getValue().componentName(),
+                        e.getValue().portName()
+                ))
+        ).toList();
+
+
+        return new CircuitNbt(
+                componentSummaries,
+                connectionNbts,
+                inOuts
+        );
+    }
 
     public Circuit build() {
         addComponent(INPUT_NAME, new Circuit.NamedInput(inputs.keySet().stream().toList()));

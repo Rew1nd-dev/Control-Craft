@@ -63,17 +63,20 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public static final NetworkKey DRAG = NetworkKey.create("drag");
     public static final NetworkKey BIAS = NetworkKey.create("bias");
 
+    public static final NetworkKey ADD_LEVEL = NetworkKey.create("add_flap_level");
+    public static final NetworkKey DEC_LEVEL = NetworkKey.create("dec_flap_level");
+
     private final DirectReceiver receiver = new DirectReceiver();
 
     private final FlapPlant plant;
 
     private double offset = 0.0;
 
-
+    private int flapLevel = 0;
 
     private double bias = 0.0;
-    private double resistRatio = 30.0;
-    private double liftRatio = 150.0;
+    private double resistRatio = 3.0;
+    private double liftRatio = 15.0;
 
     protected LerpedFloat clientAnimatedAngle = LerpedFloat.angular();
 
@@ -161,6 +164,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
         panel().registerUnit(SharedKeys.DISASSEMBLE, this::disassemble);
 
+        panel().registerUnit(ADD_LEVEL, () -> setFlapLevel(getFlapLevel() + 1));
+
+        panel().registerUnit(DEC_LEVEL, () -> setFlapLevel(getFlapLevel() - 1));
+
         receiver().register(
                 new NumericField(
                         () -> angle.read(),
@@ -170,6 +177,19 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 new DirectReceiver.InitContext(SlotType.DEGREE, Couple.create(0.0, 1.0)),
                 8
         );
+    }
+
+
+
+    public void setFlapLevel(int fLevel){
+        if(fLevel <= 0)return;
+        flapLevel = fLevel;
+        setLiftRatio(fLevel * 15);
+        setResistRatio(fLevel * 3);
+    }
+
+    public int getFlapLevel(){
+        return flapLevel;
     }
 
     public void setAttackAngle(double angle){

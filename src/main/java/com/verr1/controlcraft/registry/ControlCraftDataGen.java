@@ -91,6 +91,7 @@ public class ControlCraftDataGen {
 
     public static void registerEnumDescriptions(){
         CheatMode.register();
+        ConstraintMode.register();
         WandGUIModesType.register();
         LockMode.register();
         SlotType.register();
