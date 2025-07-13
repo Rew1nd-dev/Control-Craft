@@ -44,7 +44,10 @@ import org.valkyrienskies.core.apigame.joints.VSFixedJoint;
 import org.valkyrienskies.core.apigame.joints.VSJoint;
 import org.valkyrienskies.core.apigame.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.apigame.joints.VSJointPose;
+import org.valkyrienskies.core.apigame.ships.LoadedServerShipCore;
+import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsBuilderImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
+import org.valkyrienskies.core.impl.shadow.Eq;
 
 import java.lang.Math;
 import java.util.Optional;
@@ -287,13 +290,13 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         );
 
         BodyTransform original = compShip.getKinematics().getTransform();
-
-        compShip.unsafeSetTransform(new BodyTransformImpl(
-                pose.position(),
-                pose.rotation(),
-                original.getScaling(),
-                original.getPositionInModel()
-        ));
+        compShip.unsafeSetTransform(new BodyKinematicsBuilderImpl()
+                .position(pose.position())
+                .rotation(pose.rotation())
+                .scaling(original.getScaling())
+                .positionInModel(original.getPositionInModel())
+                .build().getTransform()
+        );
     }
 
     @Override

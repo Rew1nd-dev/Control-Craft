@@ -222,7 +222,6 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
         var p = new BlockBoundClientPacket.builder(getBlockPos(), RegisteredPacketType.OPEN_SCREEN_0)
                 .withDouble(rotationalSpeed.read())
                 .build();
-
         ControlCraftPackets.sendToPlayer(p, player);
     }
 

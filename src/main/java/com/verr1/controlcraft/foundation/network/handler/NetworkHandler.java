@@ -192,7 +192,7 @@ public class NetworkHandler {
         if(!duplexTag.isEmpty()){
             duplex.forEach((k, sidePort) -> {
                 if(!duplexTag.contains(k.getSerializedName()))return;
-                if(!checkPermission(k, sender))return;
+                if(!delegate.getLevel().isClientSide && !checkPermission(k, sender))return;
                 sidePort.dispatch(duplexTag.getCompound(k.getSerializedName()), delegate.getLevel().isClientSide);
             });
         }
@@ -221,8 +221,6 @@ public class NetworkHandler {
 
 
     public void onRead(CompoundTag compound, boolean clientPacket) {
-        // super.read(compound, clientPacket);
-
         if(clientPacket)return;
         CompoundTag saveloads = compound.getCompound("saveloads");
         saveLoads.forEach((k, sidePort) -> {

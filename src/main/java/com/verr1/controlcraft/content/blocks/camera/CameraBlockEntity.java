@@ -813,7 +813,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public Quaterniond getAbsViewTransform(){
         Quaterniondc originalRotation =
-                new Quaterniond().rotateY(Math.toRadians(-yaw)).rotateX(Math.toRadians(pitch)).normalize();
+                new Quaterniond().rotateY(Math.toRadians(-getYaw())).rotateX(Math.toRadians(getPitch())).normalize();
         return getCameraBaseRotation().mul(originalRotation, new Quaterniond());
     }
 
@@ -822,7 +822,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     public Quaterniond getLocViewTransform(){
-        return new Quaterniond().rotateY(Math.toRadians(-yaw)).rotateX(Math.toRadians(pitch)).normalize();
+        return new Quaterniond().rotateY(Math.toRadians(-getYaw())).rotateX(Math.toRadians(getPitch())).normalize();
     }
 
     public Vector3d getLocViewForward(){
@@ -833,8 +833,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void syncServer(String uuid){
         if(level == null || !level.isClientSide)return;
         var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_0)
-                .withDouble(pitch)
-                .withDouble(yaw)
+                .withDouble(getPitch())
+                .withDouble(getYaw())
                 .withUtf8(uuid)
                 .build();
         ControlCraftPackets.getChannel().sendToServer(p);
@@ -843,8 +843,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void syncServerNoChunkLoading(String uuid){
         if(level == null || !level.isClientSide)return;
         var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
-                .withDouble(pitch)
-                .withDouble(yaw)
+                .withDouble(getPitch())
+                .withDouble(getYaw())
                 .withUtf8(uuid)
                 .build();
         ControlCraftPackets.getChannel().sendToServer(p);
@@ -861,8 +861,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void syncForOtherPlayers(){
         if(level == null || level.isClientSide)return;
         var p = new BlockBoundClientPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
-                .withDouble(pitch)
-                .withDouble(yaw)
+                .withDouble(getPitch())
+                .withDouble(getYaw())
                 .build();
         ControlCraftPackets.getChannel().send(
                 PacketDistributor.ALL.noArg(),
