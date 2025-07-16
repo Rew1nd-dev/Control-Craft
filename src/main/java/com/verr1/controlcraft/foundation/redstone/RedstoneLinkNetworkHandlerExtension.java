@@ -1,12 +1,10 @@
-package com.verr1.controlcraft.content.compact.tweak.impl;
+package com.verr1.controlcraft.foundation.redstone;
 
 import com.simibubi.create.Create;
 
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.WorldHelper;
-import com.simibubi.create.infrastructure.config.AllConfigs;
-import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import net.minecraft.world.level.LevelAccessor;
 
 import java.util.*;
@@ -62,43 +60,12 @@ public class RedstoneLinkNetworkHandlerExtension {
 
         network.stream().filter(o -> !o.isAlive()).toList().forEach(network::remove);
 
-        double power =network.stream()
+        double power = network.stream()
                 .filter(other -> other.isSource() && other.isAlive() && withinRange(other, actor))
                 .map($IRedstoneLinkable::$getTransmittedStrength)
                 .max(Double::compare)
                 .orElse(0.0);
 
-        /*
-        * for (Iterator<$IRedstoneLinkable> iterator = network.iterator(); iterator.hasNext();) {
-            $IRedstoneLinkable other = iterator.next();
-            if (!other.isAlive()) {
-                iterator.remove();
-                continue;
-            }
-
-            if(!other.isSource()){
-                continue;
-            }
-            // This one is mixined by vs, so use mixined one
-            if (!withinRange(actor, other))
-                continue;
-
-            updated = true;
-            power = Math.max(other.$getTransmittedStrength(), power);
-        }
-        * */
-
-
-/*
-        // LinkBehaviour should not add to this network
-        * if (actor instanceof LinkBehaviour linkBehaviour) {
-            // fix one-to-one loading order problem
-            if (linkBehaviour.isListening()) {
-                linkBehaviour.newPosition = true;
-                linkBehaviour.setReceivedStrength(power);
-            }
-        }
-* */
 
         for ($IRedstoneLinkable other : network) {
             if (other != actor && other.isListening() && withinRange(actor, other))

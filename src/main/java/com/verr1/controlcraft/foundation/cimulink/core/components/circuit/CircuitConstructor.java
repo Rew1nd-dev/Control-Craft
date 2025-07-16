@@ -8,6 +8,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName
 import com.verr1.controlcraft.foundation.cimulink.core.utils.GraphUtils;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPort;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.*;
+import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import kotlin.Pair;
 import net.minecraft.nbt.CompoundTag;
 
@@ -20,6 +21,8 @@ import java.util.stream.Stream;
 public class CircuitConstructor {
     private static final String INPUT_NAME = "input@#$%^";
     private static final String OUTPUT_NAME = "output@#$%^";
+
+    boolean used = false;
 
     Map<String, NamedComponent> components = new HashMap<>();
 
@@ -41,6 +44,9 @@ public class CircuitConstructor {
     }
 
     public CircuitNbt buildContext(){
+        if(used){
+            throw new IllegalStateException("constructor is already used to build non-context circuit!");
+        }
         List<ComponentNbt> componentSummaries = components.entrySet().stream().map(e -> {
             String name = e.getKey();
             NamedComponent component = e.getValue();
@@ -86,6 +92,7 @@ public class CircuitConstructor {
     }
 
     public Circuit build() {
+        used = true;
         addComponent(INPUT_NAME, new Circuit.NamedInput(inputs.keySet().stream().toList()));
         addComponent(OUTPUT_NAME, new Circuit.NamedOutput(outputs.keySet().stream().toList()));
         Consumer<Pair<ComponentPortName, ComponentPortName>> connect = cp_cp -> connect(cp_cp.getFirst(), cp_cp.getSecond());
@@ -224,9 +231,22 @@ public class CircuitConstructor {
 
     public CircuitConstructor addComponent(NamedComponent... component) {
         for (var comp : component) {
+            comp.withName(convertedName(comp.name()));
             addComponent(comp.name(), comp);
         }
         return this;
+    }
+
+    public String convertedName(String name){
+        if(components.containsKey(name)){
+            int count = 1;
+            while(components.containsKey(name + "(" + count + ")")){
+                count++;
+            }
+            return name + "(" + count + ")";
+        }
+
+        return name;
     }
 
     public CircuitConstructor connect(
@@ -297,6 +317,20 @@ public class CircuitConstructor {
 
     public CircuitConstructor defineInput(String name, ComponentPortName cp) {
         return defineInput(name, cp.componentName(), cp.portName());
+    }
+
+    public CircuitConstructor defineInput(String name, ComponentPortName... cp) {
+        for (ComponentPortName c : cp) {
+            defineInput(name, c.componentName(), c.portName());
+        }
+        return this;
+    }
+
+    public CircuitConstructor connect(ComponentPortName cpo, ComponentPortName... cpis){
+        for (ComponentPortName cpi : cpis) {
+            connect(cpo, cpi);
+        }
+        return this;
     }
 
     public CircuitConstructor defineOutput(String name, ComponentPortName cp) {

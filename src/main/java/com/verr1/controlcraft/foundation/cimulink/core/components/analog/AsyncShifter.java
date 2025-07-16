@@ -2,6 +2,7 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
+import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -35,6 +36,15 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
 
     public int clk(){
         return n() - 1;
+    }
+
+    public ComponentPortName __dat(int i){
+        ArrayUtils.AssertRange(i, n() - 1);
+        return __in(i);
+    }
+
+    public ComponentPortName __clk(){
+        return __in(clk());
     }
 
     @Override

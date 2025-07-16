@@ -10,6 +10,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 
 import java.util.*;
 
+import static com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils.AssertPresence;
 import static com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils.checkName;
 
 
@@ -91,6 +92,16 @@ public abstract class NamedComponent extends Component {
         return new ComponentPortName(name(), out(index));
     }
 
+    public ComponentPortName __in(String index){
+        AssertPresence(namedInputs.keySet(), index);
+        return new ComponentPortName(name(), index);
+    }
+
+    public ComponentPortName __out(String index){
+        AssertPresence(namedOutputs.keySet(), index);
+        return new ComponentPortName(name(), index);
+    }
+
     public String in(){
         return in(0);
     }
@@ -120,7 +131,9 @@ public abstract class NamedComponent extends Component {
         return namedOutputs;
     }
 
-
+    public List<String> inputsExcludeSignals() {
+        return inputs().stream().filter(s -> !s.contains("@")).toList();
+    }
 
     public double retrieveOutput(String name) {
         ArrayUtils.AssertPresence(outputs, name);
@@ -192,5 +205,6 @@ public abstract class NamedComponent extends Component {
     public Summary summary(){
         return factory().summarize(this);
     }
+
 
 }

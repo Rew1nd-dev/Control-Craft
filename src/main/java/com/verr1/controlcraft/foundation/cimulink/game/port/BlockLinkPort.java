@@ -376,8 +376,10 @@ public abstract class BlockLinkPort {
         return realTimeComponent.inputs();
     }
 
+
+
     public final List<String> inputsNamesExcludeSignals(){
-        return realTimeComponent.inputs().stream().filter(s -> !s.contains("@")).toList();
+        return realTimeComponent.inputsExcludeSignals(); // ().stream().filter(s -> !s.contains("@")).toList();
     }
 
     public final List<String> outputsNames(){

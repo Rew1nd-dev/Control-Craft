@@ -86,14 +86,14 @@ public class TerminalBlockEntity extends OnShipBlockEntity implements
     private void removeFromNetwork(){
         channels.forEach(e -> {
             REDSTONE_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
-            DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
+            // DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
         });
     }
 
     private void addToNetwork(){
         channels.forEach(e -> {
             REDSTONE_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
-            DECIMAL_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
+            // DECIMAL_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
         });
     }
 

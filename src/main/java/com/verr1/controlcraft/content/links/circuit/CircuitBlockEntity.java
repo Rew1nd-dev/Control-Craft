@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.links.circuit;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
@@ -119,9 +120,14 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         this.useDecimalNetwork = useDecimalNetwork;
     }
 
+    private Circuit linkCircuit(){
+        return linkPort().circuit();
+    }
+
+
     private void updateIOName(){
         AtomicInteger ioIndex = new AtomicInteger(0);
-        linkPort().inputsNamesExcludeSignals()
+        linkCircuit().inputsExcludeSignals()
             .forEach(s -> {
                 int ioId = ioIndex.get();
                 if(ioId >= io.size())return;
@@ -130,7 +136,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
                 WirelessIO wirelessIO = io.get(ioId);
                 wirelessIO.setAsInput(s);
             });
-        linkPort().outputsNames()
+        linkCircuit().outputs()
             .forEach(s -> {
                 int ioId = ioIndex.get();
                 if(ioId >= io.size())return;
@@ -291,7 +297,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         public int getTransmittedStrength() {
             if(!isInput && !isRedundant) {
                 try{
-                    double out = linkPort().circuit().output(ioName);
+                    double out = linkCircuit().output(ioName);
                     return (int)out;
                 } catch (Exception e){
                     ControlCraft.LOGGER.error("Error while getting transmitted strength for circuit: {}", e.getMessage());
@@ -336,7 +342,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         public double $getTransmittedStrength() {
             if(!isInput && !isRedundant && useDecimalNetwork) {
                 try{
-                    double out = linkPort().circuit().output(ioName);
+                    double out = linkCircuit().output(ioName);
                     return out;
                 } catch (Exception e){
                     ControlCraft.LOGGER.error("Error while getting transmitted decimal strength for circuit: {}", e.getMessage());

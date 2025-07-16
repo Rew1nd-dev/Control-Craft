@@ -14,6 +14,7 @@ import kotlin.Pair;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -32,6 +33,12 @@ public class LinearAdder extends Combinational {
         );
         this.coefficients = new ArrayList<>(coefficients);
         coefficientsView = Collections.unmodifiableList(this.coefficients);
+    }
+
+    public LinearAdder(double... coeffs){
+        this(
+                Arrays.stream(coeffs).boxed().toList()
+        );
     }
 
     public void setCoefficients(List<Double> newCoefficients){

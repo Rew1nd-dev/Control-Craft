@@ -19,18 +19,18 @@ public class Multiplexer extends Combinational {
     private final int bits;
 
 
-    public Multiplexer(int n) {
+    public Multiplexer(int bits) {
         super(
                 ArrayUtils.flatten(
                         ArrayUtils.createWithPrefix(
                                 "sel_",
-                                n
+                                bits
                         ),
-                        ArrayUtils.createInputNames(1 << n)
+                        ArrayUtils.createInputNames(1 << bits)
                 ),
                 ArrayUtils.SINGLE_OUTPUT
         );
-        bits = n;
+        this.bits = bits;
     }
 
     public String dat(int i){
