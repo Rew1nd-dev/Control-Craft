@@ -5,6 +5,8 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 import com.simibubi.create.infrastructure.config.CKinetics;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.cctweaked.peripheral.JetPeripheral;
+import com.verr1.controlcraft.content.cctweaked.peripheral.KineticResistorPeripheral;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
@@ -20,12 +22,17 @@ import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
@@ -41,6 +48,9 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
     private final NetworkHandler handler = new NetworkHandler(this);
 
     private final ResistorPlant plant = new ResistorPlant(this);
+
+    private KineticResistorPeripheral peripheral;
+    private LazyOptional<IPeripheral> peripheralCap;
 
     @Override
     public DirectReceiver receiver() {
@@ -90,6 +100,19 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
                 new DirectReceiver.InitContext(SlotType.RATIO, Couple.create(0.0, 1.0))
         );
 
+    }
+
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if(cap == Capabilities.CAPABILITY_PERIPHERAL){
+            if(this.peripheral == null){
+                this.peripheral = new KineticResistorPeripheral(this);
+            }
+            if(peripheralCap == null || !peripheralCap.isPresent())
+                peripheralCap =  LazyOptional.of(() -> this.peripheral);
+            return peripheralCap.cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override

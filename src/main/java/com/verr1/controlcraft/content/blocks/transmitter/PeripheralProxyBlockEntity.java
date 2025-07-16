@@ -9,10 +9,12 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.blocks.SidedTickedBlockEntity;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.content.cctweaked.peripheral.TransmitterPeripheral;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.executor.Executor;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import dan200.computercraft.api.lua.IArguments;
 import dan200.computercraft.api.lua.ILuaContext;
@@ -23,6 +25,9 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -36,7 +41,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class PeripheralProxyBlockEntity extends SmartBlockEntity {
+public class PeripheralProxyBlockEntity extends SidedTickedBlockEntity {
 
     // Example executor for the main thread (replace with your actual executor)
 
@@ -44,6 +49,7 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
 
     private TransmitterPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
+    private final Executor invalidatorExecutor = new Executor();
 
 
     private static final LoadingCache<WorldBlockPos, Optional<PeripheralInterfaceBlockEntity>> cache = CacheBuilder.newBuilder()
@@ -61,6 +67,7 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
 
                     @Override
                     public @NotNull Optional<PeripheralInterfaceBlockEntity> load(@NotNull WorldBlockPos pos) throws Exception {
+                        // ControlCraft.LOGGER.info("Loading Peripheral Interface Block Entity at: {}, mainThread: {}", pos, ControlCraftServer.onMainThread());
                         return BlockEntityGetter.INSTANCE
                                 .getBlockEntityAt(
                                         pos.globalPos(),
@@ -109,6 +116,7 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
             return MethodResult.of(null, "Peripheral Is Not A Receiver");
         }
         if(receiver.isRemoved()){
+            scheduleRemoveInvalid(peripheralPos);
             ControlCraft.LOGGER.error("Receiver is already removed!: {}", peripheralName);
         }
         return receiver
@@ -118,6 +126,21 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
                             methodName,
                             args
                     );
+    }
+
+    private void scheduleRemoveInvalid(WorldBlockPos invalidPos){
+        invalidatorExecutor.executeLater(
+                invalidPos.toString(),
+                () -> {
+                    ServerLevel level = invalidPos.level(ControlCraftServer.INSTANCE);
+                    if(level == null)return;
+                    level.setBlock(invalidPos.pos(), Blocks.AIR.defaultBlockState(), 3);
+                    level
+                            .getPlayers(p -> p.position().distanceTo(invalidPos.pos().getCenter()) < 32)
+                            .forEach(p -> p.sendSystemMessage(Component.literal("removing invalid peripheral interface: " + invalidPos.pos())));
+                },
+                1
+        );
     }
 
     public MethodResult callRemoteAsync(IComputerAccess access,
@@ -139,6 +162,7 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
             return MethodResult.of(null, "Peripheral Is Not A Receiver");
         }
         if(receiver.isRemoved()){
+            scheduleRemoveInvalid(peripheralPos);
             ControlCraft.LOGGER.error("Async Receiver is already removed!: {}", peripheralName);
         }
         return receiver
@@ -152,8 +176,9 @@ public class PeripheralProxyBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void tick(){
-        if(level.isClientSide)return;
+    public void tickServer() {
+        super.tickServer();
+        invalidatorExecutor.tick();
     }
 
     @Override

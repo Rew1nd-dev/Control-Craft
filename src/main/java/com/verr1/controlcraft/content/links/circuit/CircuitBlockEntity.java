@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.links.circuit;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
@@ -79,11 +80,11 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         wrapper = new WrappedChannel(pos);
 
         buildRegistry(CIRCUIT).withBasic(
-                CompoundTagPort.of(
-                        () -> PAIR_SER.serialize(linkPort().viewStatus()),
-                        t -> linkPort().setStatus(PAIR_SER.deserialize(t))
+                        CompoundTagPort.of(
+                                () -> PAIR_SER.serialize(linkPort().viewStatus()),
+                                t -> linkPort().setStatus(PAIR_SER.deserialize(t))
+                        )
                 )
-            )
                 .withClient(ClientBuffer.UNIT.get())
                 .runtimeOnly()
                 .register();
@@ -119,26 +120,30 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         this.useDecimalNetwork = useDecimalNetwork;
     }
 
+    private Circuit linkCircuit(){
+        return linkPort().circuit();
+    }
+
     private void updateIOName(){
         AtomicInteger ioIndex = new AtomicInteger(0);
-        linkPort().inputsNamesExcludeSignals()
-            .forEach(s -> {
-                int ioId = ioIndex.get();
-                if(ioId >= io.size())return;
-                ioIndex.getAndIncrement();
+        linkCircuit().inputsExcludeSignals()
+                .forEach(s -> {
+                    int ioId = ioIndex.get();
+                    if(ioId >= io.size())return;
+                    ioIndex.getAndIncrement();
 
-                WirelessIO wirelessIO = io.get(ioId);
-                wirelessIO.setAsInput(s);
-            });
-        linkPort().outputsNames()
-            .forEach(s -> {
-                int ioId = ioIndex.get();
-                if(ioId >= io.size())return;
-                ioIndex.getAndIncrement();
+                    WirelessIO wirelessIO = io.get(ioId);
+                    wirelessIO.setAsInput(s);
+                });
+        linkCircuit().outputs()
+                .forEach(s -> {
+                    int ioId = ioIndex.get();
+                    if(ioId >= io.size())return;
+                    ioIndex.getAndIncrement();
 
-                WirelessIO wirelessIO = io.get(ioId);
-                wirelessIO.setAsOutput(s);
-            });
+                    WirelessIO wirelessIO = io.get(ioId);
+                    wirelessIO.setAsOutput(s);
+                });
         for(int i = ioIndex.get(); i < io.size(); i++){
             WirelessIO wirelessIO = io.get(i);
             wirelessIO.setAsRedundant();
@@ -147,7 +152,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     }
 
     private void removeFromNetwork(){
-        io.stream().filter(o -> o.isRedundant).forEach(e -> {
+        io.forEach(e -> {  //  stream().filter(o -> !o.isRedundant)
             DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
             REDSTONE_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
         });
@@ -291,7 +296,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         public int getTransmittedStrength() {
             if(!isInput && !isRedundant) {
                 try{
-                    double out = linkPort().output(ioName);
+                    double out = linkCircuit().output(ioName);
                     return (int)out;
                 } catch (Exception e){
                     ControlCraft.LOGGER.error("Error while getting transmitted strength for circuit: {}", e.getMessage());
@@ -326,7 +331,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
             double ratio = select();
             double value = minMax.getFirst() + ratio * (minMax.getSecond() - minMax.getFirst());
             try{
-                linkPort().input(ioName, value);
+                linkPort().circuit().input(ioName, value);
             }catch (Exception e){
                 ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
             }
@@ -334,9 +339,9 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public double $getTransmittedStrength() {
-            if(!isInput && !isRedundant) {
+            if(!isInput && !isRedundant && useDecimalNetwork) {
                 try{
-                    double out = linkPort().output(ioName);
+                    double out = linkCircuit().output(ioName);
                     return out;
                 } catch (Exception e){
                     ControlCraft.LOGGER.error("Error while getting transmitted decimal strength for circuit: {}", e.getMessage());
@@ -352,7 +357,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public void setReceivedStrength(int power) {
-            if(!isInput)return;
+            if(!isInput || useDecimalNetwork)return;
 
             if (lastReceivedStrength == power)return;
             lastReceivedStrength = power;
@@ -362,7 +367,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
 
         @Override
         public void $setReceivedStrength(double decimal) {
-            if(!isInput)return;
+            if(!isInput || !useDecimalNetwork)return;
 
             if (Math.abs(decimal - $lastReceivedStrength) < 1e-6)return;
             $lastReceivedStrength = decimal;

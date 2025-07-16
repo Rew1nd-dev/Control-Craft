@@ -11,12 +11,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TweakedLecternControllerBlockEntity.class)
 public class MixinTweakedLecternControllerBlockEntity {
 
-
-    @Inject(method = "shouldUseFullPrecision", at = @At("HEAD"), remap = false, cancellable = true)
+/*
+@Inject(method = "shouldUseFullPrecision", at = @At("HEAD"), remap = false, cancellable = true)
     void controlCraft$shouldUseFullPrecision(CallbackInfoReturnable<Boolean> cir){
         if(!BlockPropertyConfig._TWEAKED_CONTROLLER_256)return;
         cir.setReturnValue(true);
         cir.cancel();
     }
+* */
+
 
 }

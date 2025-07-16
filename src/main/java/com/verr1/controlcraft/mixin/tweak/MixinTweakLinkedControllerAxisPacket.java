@@ -22,9 +22,8 @@ import java.util.*;
 
 @Mixin(TweakedLinkedControllerAxisPacket.class)
 public class MixinTweakLinkedControllerAxisPacket {
-
-
-    @Shadow(remap = false)
+/*
+@Shadow(remap = false)
     private float[] fullAxis;
 
     @Inject(method = "handleLectern", at = @At("HEAD"), remap = false)
@@ -69,5 +68,8 @@ public class MixinTweakLinkedControllerAxisPacket {
                 _LX, LX_, _LY, LY_, _RX, RX_, _RY, RY_, LT, RT
         );
     }
+* */
+
+
 
 }

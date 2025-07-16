@@ -105,6 +105,10 @@ public abstract class NamedComponent extends Component {
         return inputs;
     }
 
+    public final List<String> inputsExcludeSignals(){
+        return inputs().stream().filter(s -> !s.contains("@")).toList();
+    }
+
     public List<String> outputs() {
         return outputs;
     }

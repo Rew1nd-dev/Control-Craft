@@ -21,7 +21,10 @@ public class CameraBoundFakePlayer extends FakePlayer {
     private int liveCounter = 10;
     private final CameraBlockEntity owner;
 
-
+    @Override
+    public boolean isSpectator() {
+        return super.isSpectator();
+    }
 
     public CameraBoundFakePlayer(ServerLevel level, CameraBlockEntity owner) {
         super(level, new GameProfile(UUID.randomUUID(), "CameraBoundFakePlayer"));

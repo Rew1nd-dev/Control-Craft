@@ -41,7 +41,7 @@ public class OmegaSensor extends NamedComponent {
 
     @Override
     public void onPositiveEdge() {
-        Matrix3dc transform = transformToLocal ? sp.getTs2w() : new Matrix3d();
+        Matrix3dc transform = transformToLocal ? sp.getTw2s() : new Matrix3d();
         Vector3dc omega = transform.transform(sp.getAngularVelocity(), new Vector3d());
         updateOutput(List.of(omega.x(), omega.y(), omega.z()));
     }

@@ -1,12 +1,10 @@
-package com.verr1.controlcraft.content.compact.tweak.impl;
+package com.verr1.controlcraft.foundation.redstone;
 
 import com.simibubi.create.Create;
 
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.WorldHelper;
-import com.simibubi.create.infrastructure.config.AllConfigs;
-import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import net.minecraft.world.level.LevelAccessor;
 
 import java.util.*;
@@ -62,7 +60,7 @@ public class RedstoneLinkNetworkHandlerExtension {
 
         network.stream().filter(o -> !o.isAlive()).toList().forEach(network::remove);
 
-        double power =network.stream()
+        double power = network.stream()
                 .filter(other -> other.isSource() && other.isAlive() && withinRange(other, actor))
                 .map($IRedstoneLinkable::$getTransmittedStrength)
                 .max(Double::compare)
