@@ -47,10 +47,7 @@ public class PeripheralInterfaceBlock extends DirectionalBlock implements IBE<Pe
         ScreenOpener.open(GenericUIFactory.createPeripheralInterfaceScreen(pos));
     }
 
-    @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving){
-        IBE.onRemove(state, worldIn, pos, newState);
-    }
+    
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -68,7 +65,7 @@ public class PeripheralInterfaceBlock extends DirectionalBlock implements IBE<Pe
         ControlCraftServer.SERVER_EXECUTOR.executeLater(
                 () -> {
                     BlockEntity entity = world.getExistingBlockEntity(pos);
-                    if(entity instanceof PeripheralInterfaceBlockEntity_ receiver){
+                    if(entity instanceof PeripheralInterfaceBlockEntity receiver){
                         receiver.updateAttachedPeripheral();
                     }
                 },

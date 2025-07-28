@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.utils;
 
 import net.minecraft.util.Mth;
+import org.joml.Quaterniond;
+import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.primitives.AABBd;
@@ -19,9 +21,17 @@ public class MathUtils {
         return Math.max(min, Math.min(max, value));
     }
 
+    public static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
     public static double clamp(double value, double max) {
         max = Math.abs(max);
         return clamp(value, -max, max);
+    }
+
+    public static double lerp(double factor, double min, double max){
+        return min + factor * (max - min);
     }
 
     public static double safeDiv(double x, double y){
@@ -105,12 +115,29 @@ public class MathUtils {
 
     // a bit cursed
     public static double angleReset(double angle){
-        return Math.IEEEremainder(angle, 360);
+        // return Math.IEEEremainder(angle, 360);
+        angle = angle % 360;
+
+        // 2. 调整到[-180, 180]区间
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+        return angle;
     }
 
     // a bit cursed
     public static double radianReset(double radian){
-        return Math.IEEEremainder(radian, 2 * Math.PI);
+        // return Math.IEEEremainder(radian, 2 * Math.PI);
+        radian = radian % (2 * Math.PI);
+
+        if (radian > Math.PI) {
+            radian -= 2 * Math.PI;
+        } else if (radian < -Math.PI) {
+            radian += 2 * Math.PI;
+        }
+        return radian;
     }
 
     public static double toControlCraftAngular(double createSpeed){
@@ -170,8 +197,30 @@ public class MathUtils {
 
     public static Vector3d safeNormalize(Vector3dc hvt) {
         double length = hvt.length();
-        if (length == 0) {
+        if (length < 1e-9) {
             return new Vector3d(0, 0, 0);
+        }
+        return new Vector3d(hvt.x() / length, hvt.y() / length, hvt.z() / length);
+    }
+
+    public static Vector3d nonNan(Vector3dc v){
+        if (Double.isNaN(v.x()) || Double.isNaN(v.y()) || Double.isNaN(v.z())) {
+            return new Vector3d(0, 0, 0);
+        }
+        return new Vector3d(v);
+    }
+
+    public static Quaterniond nonNan(Quaterniondc v){
+        if (Double.isNaN(v.x()) || Double.isNaN(v.y()) || Double.isNaN(v.z()) || Double.isNaN(v.z())) {
+            return new Quaterniond(0, 0, 0, 1);
+        }
+        return new Quaterniond(v);
+    }
+
+    public static Vector3d safeNormalize(Vector3dc hvt, Vector3dc orElse) {
+        double length = hvt.length();
+        if (length < 1e-9) {
+            return new Vector3d(orElse);
         }
         return new Vector3d(hvt.x() / length, hvt.y() / length, hvt.z() / length);
     }

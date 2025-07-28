@@ -12,6 +12,7 @@ import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -36,7 +37,7 @@ public class ControlCraftEvents {
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftAttachments.register();
-
+        /**/
         // VSEvents.ShipLoadEvent.Companion.on(ControlCraftAttachments::onShipLoad);
     }
 

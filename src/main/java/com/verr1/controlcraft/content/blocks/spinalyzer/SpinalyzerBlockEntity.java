@@ -4,6 +4,7 @@ package com.verr1.controlcraft.content.blocks.spinalyzer;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.cctweaked.peripheral.SpinalyzerPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.QueueForceInducer;
 import com.verr1.controlcraft.foundation.data.ExpirableListener;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
@@ -100,7 +101,25 @@ public class SpinalyzerBlockEntity extends OnShipBlockEntity {
         return readSelf().omega();
     }
 
+    public void applyInvariantForce(double x, double y, double z){
+        Optional.ofNullable(getLoadedServerShip()).map(QueueForceInducer::getOrCreate)
+                .ifPresent(qfi -> qfi.applyInvariantForce(new Vector3d(x, y, z)));
+    }
 
+    public void applyInvariantTorque(double x, double y, double z){
+        Optional.ofNullable(getLoadedServerShip()).map(QueueForceInducer::getOrCreate)
+                .ifPresent(qfi -> qfi.applyInvariantTorque(new Vector3d(x, y, z)));
+    }
+
+    public void applyRotDependentForce(double x, double y, double z){
+        Optional.ofNullable(getLoadedServerShip()).map(QueueForceInducer::getOrCreate)
+                .ifPresent(qfi -> qfi.applyRotDependentForce(new Vector3d(x, y, z)));
+    }
+
+    public void applyRotDependentTorque(double x, double y, double z){
+        Optional.ofNullable(getLoadedServerShip()).map(QueueForceInducer::getOrCreate)
+                .ifPresent(qfi -> qfi.applyRotDependentTorque(new Vector3d(x, y, z)));
+    }
 
     @Override
     public void lazyTickServer() {

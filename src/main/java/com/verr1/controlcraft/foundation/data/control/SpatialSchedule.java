@@ -67,7 +67,7 @@ public class SpatialSchedule implements ISerializableSchedule {
         inertia = ship.getMomentOfInertia().m00();
 
         int id = ship.getTransform().getShipToWorldScaling().minComponent();
-        scale = ship.getTransform().getShipToWorldScaling().get(id);
+        scale = 1;// ship.getTransform().getShipToWorldScaling().get(id);
 
         q_curr = ship.getTransform().getShipToWorldRotation();
         p_curr = ship.getTransform().getPositionInWorld();

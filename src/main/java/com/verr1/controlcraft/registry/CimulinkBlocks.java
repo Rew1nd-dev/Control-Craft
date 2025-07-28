@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.verr1.controlcraft.content.blocks.loader.ChunkLoaderBlock;
+import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
@@ -227,6 +228,19 @@ public class CimulinkBlocks {
             .lang("Inertial Measurement Unit")
             .register();
 
+    public static final BlockEntry<CCBridgeBlock> CC_BRIDGE = REGISTRATE
+            .block(CCBridgeBlock.ID, CCBridgeBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+            .transform(customItemModel())
+            .lang("Computer Controlled Source")
+            .register();
+
     public static final BlockEntry<OscilloscopeBlock> SCOPE = REGISTRATE
             .block(OscilloscopeBlock.ID, OscilloscopeBlock::new)
             .initialProperties(SharedProperties::stone)
@@ -240,6 +254,8 @@ public class CimulinkBlocks {
             .transform(customItemModel())
             .lang("Oscilloscope")
             .register();
+
+
 
     public static void register(){}
 }

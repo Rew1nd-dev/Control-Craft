@@ -89,6 +89,8 @@ public class ControlCraft
         ControlCraftBlockEntities.register();
         CimulinkBlocks.register();
         CimulinkBlockEntities.register();
+        AIBlocks.register();
+        AIBlockEntities.register();
         ControlCraftPackets.registerPackets();
         ControlCraftItems.register();
         ControlCraftMenuTypes.register();
@@ -140,6 +142,8 @@ public class ControlCraft
         ControlCraftBlockEntities.register();
         CimulinkBlocks.register();
         CimulinkBlockEntities.register();
+        AIBlocks.register();
+        AIBlockEntities.register();
         ControlCraftPackets.registerPackets();
         ControlCraftItems.register();
         ControlCraftMenuTypes.register();

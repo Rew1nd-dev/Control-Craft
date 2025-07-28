@@ -56,6 +56,7 @@ public class BlockEntityGetter {
 
 
     public <T> Optional<T> getBlockEntityAt(GlobalPos globalPos, Class<T> clazz){
+
         return Optional
                 .ofNullable(server.getLevel(globalPos.dimension()))
                 .map(world -> world.getExistingBlockEntity(globalPos.pos()))

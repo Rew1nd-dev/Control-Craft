@@ -16,7 +16,6 @@ import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
@@ -25,7 +24,6 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.joml.Matrix4d;
 import org.joml.Matrix4dc;
-import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.awt.*;
@@ -130,7 +128,7 @@ public class WandGUI implements IGuiOverlay {
                 motor -> {
                     Matrix4dc transform = Optional.ofNullable(motor.getShipOn()).map(s -> s.getTransform().getShipToWorld()).orElse(new Matrix4d());
                     Vector3dc offsetCenter = transform.transformPosition(motor.getRotationCenterPosJOML());
-                    ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), Color.RED.getRGB(), "portPos", 0.4);
+                    ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(offsetCenter, 0.05)), Color.RED.getRGB(), "portPos", 0.4, 1f / 16);
                 }
             );
     }

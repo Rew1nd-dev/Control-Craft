@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.cctweaked.peripheral;
 
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlockEntity;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.QueueForceInducer;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.utils.CCUtils;
 import dan200.computercraft.api.lua.LuaFunction;
@@ -9,9 +10,11 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3dc;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
+import org.joml.Vector3d;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class SpinalyzerPeripheral extends AbstractAttachedPeripheral<SpinalyzerBlockEntity> {
 
@@ -35,6 +38,26 @@ public class SpinalyzerPeripheral extends AbstractAttachedPeripheral<SpinalyzerB
     public final Map<String, Double> getQuaternion(){
         Quaterniondc q = getTarget().getQuaternion();
         return CCUtils.dumpVec4(q);
+    }
+
+    @LuaFunction
+    public void applyInvariantForce(double x, double y, double z){
+        getTarget().applyInvariantForce(x, y, z);
+    }
+
+    @LuaFunction
+    public void applyInvariantTorque(double x, double y, double z){
+        getTarget().applyInvariantTorque(x, y, z);
+    }
+
+    @LuaFunction
+    public void applyRotDependentForce(double x, double y, double z){
+        getTarget().applyRotDependentForce(x, y, z);
+    }
+
+    @LuaFunction
+    public void applyRotDependentTorque(double x, double y, double z){
+        getTarget().applyRotDependentTorque(x, y, z);
     }
 
     @LuaFunction

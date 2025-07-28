@@ -6,8 +6,8 @@ public class CameraPlant extends Plant{
 
     public CameraPlant(CameraBlockEntity cbe) {
         super(new builder()
-                .out("yaw", cbe::getYaw)
-                .out("pitch", cbe::getPitch)
+                .out("yaw", cbe::getTransformedYaw)
+                .out("pitch", cbe::getTransformedPitch)
         );
     }
 }

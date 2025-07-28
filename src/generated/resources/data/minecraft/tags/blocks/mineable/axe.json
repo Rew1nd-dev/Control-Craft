@@ -16,6 +16,8 @@
     "vscontrolcraft:dc",
     "vscontrolcraft:functions",
     "vscontrolcraft:link_sensor",
-    "vscontrolcraft:scope"
+    "vscontrolcraft:cc_bridge",
+    "vscontrolcraft:scope",
+    "vscontrolcraft:ai_cruiser"
   ]
 }

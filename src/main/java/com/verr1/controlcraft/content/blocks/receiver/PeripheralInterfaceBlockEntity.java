@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +41,8 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     public static final NetworkKey FORCED = NetworkKey.create("forced");
     public static final NetworkKey ONLINE = NetworkKey.create("online");
     public static final NetworkKey OFFLINE = NetworkKey.create("offline");
+
+
 
     private IPeripheral attachedPeripheral;
     private final ConcurrentHashMap<String, PeripheralMethod> methods = new ConcurrentHashMap<>();
@@ -110,6 +113,10 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
             }
         });
         return MethodResult.of("queued");
+    }
+
+    public @Nullable IPeripheral attachedPeripheral() {
+        return attachedPeripheral;
     }
 
     public void enqueueTask(String slot, Runnable r){
@@ -235,6 +242,8 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
         executeAll();
     }
 
+
+
     @Override
     public void lazyTickServer() {
         updateAttachedPeripheral();
@@ -294,24 +303,9 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     }
 
     @Override
-    public void remove(){
-        super.remove();
-        if(level == null || level.isClientSide)return;
-
-        //
-
+    public void removeServer() {
+        super.removeServer();
+        ControlCraft.LOGGER.info("Peripheral Interface gets removed at {}", getBlockPos());
     }
 
-
-
-
-
-
-    private class InvalidPeripheralCallBack implements InvalidateCallback{
-        @Override
-        public void run() {
-            ControlCraft.LOGGER.info("Peripheral {} Invalidated", Optional.ofNullable(attachedPeripheral).map(IPeripheral::getType).orElse("null"));
-            enqueueTask("invalidate", PeripheralInterfaceBlockEntity.this::deleteAttachedPeripheral);
-        }
-    }
 }

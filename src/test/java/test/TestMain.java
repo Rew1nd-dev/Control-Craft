@@ -1,13 +1,10 @@
 package test;
 
-import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogTypes;
 import com.verr1.controlcraft.utils.MathUtils;
-import test.game.BlockLinkPortTest;
-import test.game.FactoryTest;
-import test.module.Packaging;
+import org.joml.Quaterniond;
 
-public class Main {
+public class TestMain {
     public static void main(String[] args) {
         System.out.println("Hello, Cimulink!");
         // Here you can add code to test your components or run simulations
@@ -17,7 +14,7 @@ public class Main {
         // Packaging.packageTest_1();
         // BlockLinkPortTest.loopTest();
 
-        System.out.println(AnalogTypes.MAX);
+        System.out.println(new Quaterniond(0.4963, 0.3301, 0.7746, 0.2115).lengthSquared());
 
         // Debug.TEST_ENVIRONMENT = true;
 

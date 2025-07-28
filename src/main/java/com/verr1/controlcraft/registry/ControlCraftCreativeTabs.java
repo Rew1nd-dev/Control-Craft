@@ -1,10 +1,12 @@
 package com.verr1.controlcraft.registry;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllCreativeModeTabs;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.verr1.controlcraft.ControlCraft;
+import dan200.computercraft.ComputerCraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -47,6 +49,25 @@ public class ControlCraftCreativeTabs {
                         List<ItemStack> items = ControlCraft.REGISTRATE.getAll(Registries.ITEM)
                                 .stream()
                                 .filter(e -> CreateRegistrate.isInCreativeTab(e, ControlCraftCreativeTabs.CIMULINK))
+                                .map(RegistryEntry::get)
+                                .map(ItemStack::new)
+                                .toList();
+
+                        output.acceptAll(items);
+
+                    })
+                    .build());
+
+    public static final RegistryObject<CreativeModeTab> AI = REGISTER.register("ai",
+            () -> CreativeModeTab.builder()
+                    .title(Components.translatable("itemGroup."+ ControlCraft.MODID +".ai"))
+                    .withTabsBefore(AllCreativeModeTabs.BASE_CREATIVE_TAB.getKey())
+                    .icon(AllBlocks.DISPLAY_LINK::asStack)
+                    .displayItems((params, output) -> {
+
+                        List<ItemStack> items = ControlCraft.REGISTRATE.getAll(Registries.ITEM)
+                                .stream()
+                                .filter(e -> CreateRegistrate.isInCreativeTab(e, ControlCraftCreativeTabs.AI))
                                 .map(RegistryEntry::get)
                                 .map(ItemStack::new)
                                 .toList();

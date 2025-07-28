@@ -55,6 +55,8 @@ public enum UIContents implements Descriptive<UIContents> {
     CAMERA_LINK_RESET(Component.literal("Camera Reset"), literals("Dump All Camera Link")),
     CAMERA_LINK_VALIDATE(Component.literal("Camera Validate"), literals("Dump Unloaded Or Removed Camera Link")),
     CAMERA_VIEW_RESET(Component.literal("Camera View Reset"), literals("Reset Camera Ray")),
+    CAMERA_STAB(Component.literal("Stabilizer"), literals("")),
+    CAMERA_3(Component.literal("F5 Stab"), literals("")),
 
     ASSEMBLY(Component.literal("Assembly"), literals("Assemble Contraption or Ship")),
     DISASSEMBLY(Component.literal("Dis Assembly"), literals("Disassemble Contraption or Ship")),
@@ -107,8 +109,17 @@ public enum UIContents implements Descriptive<UIContents> {
     MASK_IN(Component.literal("Negate Input"), literals("Negate Input Signal")),
     MASK_OUT(Component.literal("Negate Output"), literals("Negate Output Signal")),
 
-    PLACE_HOLDER(Component.literal(""), literals(""))
-    ;
+    PLACE_HOLDER(Component.literal(""), literals("")),
+
+
+
+
+
+    AI_VEL(Component.literal("Vel"), literals("")),
+    AI_RAD(Component.literal("Radius"), literals("")),
+    AI_TOL(Component.literal("Tol"), literals("")),
+    AI_TAR(Component.literal("Target"), literals("")),
+    AI_TWI(Component.literal("Twist"), literals(""));
 
 
 

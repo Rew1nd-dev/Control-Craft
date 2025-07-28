@@ -69,14 +69,18 @@ abstract class MixinGameRenderer {
             return;
         }
 
+        boolean transformRotation = linkedCamera.transformRotation();
+        boolean third = linkedCamera.thirdPerson();
+
         ((ICameraDuck) mainCamera).controlCraft$setupWithShipMounted(
                 this.minecraft.level,
                 this.minecraft.getCameraEntity() == null ? this.minecraft.player : this.minecraft.getCameraEntity(),
-                true,
+                third,
                 false,
                 partialTicks,
                 cameraClientShip,
-                cameraPosOnShip
+                cameraPosOnShip,
+                transformRotation
         );
 
         // Apply the ship render transform to [matrixStack]
@@ -90,17 +94,16 @@ abstract class MixinGameRenderer {
         );
 
 
+
         final Quaternionf invShipRenderRotation = new Quaternionf(
                 renderTransform.getShipToWorldRotation().conjugate(new Quaterniond())
         );
-        matrixStack.mulPose(invShipRenderRotation);
+        matrixStack.mulPose(transformRotation ? invShipRenderRotation : new Quaternionf());
 
         // We also need to recompute [inverseViewRotationMatrix] after updating [matrixStack]
-        {
-            final Matrix3f matrix3f = new Matrix3f(matrixStack.last().normal());
-            matrix3f.invert();
-            RenderSystem.setInverseViewRotationMatrix(matrix3f);
-        }
+        final Matrix3f matrix3f = new Matrix3f(matrixStack.last().normal());
+        matrix3f.invert();
+        RenderSystem.setInverseViewRotationMatrix(matrix3f);
 
         // Camera FOV changes based on the position of the camera, so recompute FOV to account for the change of camera
         // position.

@@ -5,6 +5,7 @@
     "MixinAt",
     "MixinCommonHooks",
     "MixinContraption",
+    "MixinCustomPayloadPacket",
     "MixinEntity",
     "accessor.ShipObjectServerWorldAccessor",
     "camera.MixinChunkMap",

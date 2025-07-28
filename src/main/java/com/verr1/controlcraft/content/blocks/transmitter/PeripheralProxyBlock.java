@@ -47,11 +47,6 @@ public class PeripheralProxyBlock extends DirectionalBlock implements IBE<Periph
         return PeripheralProxyBlockEntity.class;
     }
 
-    @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving){
-        //ControlCraftMod.LOGGER.info("ChunkLoaderBlock.onRemove called at" + pos.toString());
-        IBE.onRemove(state, worldIn, pos, newState);
-    }
 
     @Override
     public BlockEntityType<? extends PeripheralProxyBlockEntity> getBlockEntityType() {

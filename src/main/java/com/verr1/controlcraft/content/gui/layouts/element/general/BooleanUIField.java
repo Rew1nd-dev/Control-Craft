@@ -14,6 +14,7 @@ public class BooleanUIField extends TypedUIPort<Boolean> implements TitleLabelPr
 
     private final FormattedLabel title;
     private final SmallCheckbox field;
+    private boolean inverted = false;
 
     public BooleanUIField(BlockPos boundPos, NetworkKey key, LabelProvider titleText) {
         super(boundPos, key, Boolean.class, false);
@@ -21,6 +22,10 @@ public class BooleanUIField extends TypedUIPort<Boolean> implements TitleLabelPr
         field = new SmallCheckbox(0, 0, 60, 10, Component.literal(""), false);
     }
 
+    public BooleanUIField inverted(){
+        inverted = true;
+        return this;
+    }
 
     @Override
     protected void initLayout(GridLayout gridLayout){
@@ -41,12 +46,12 @@ public class BooleanUIField extends TypedUIPort<Boolean> implements TitleLabelPr
 
     @Override
     protected Boolean readGUI() {
-        return field.selected();
+        return inverted ^ field.selected();
     }
 
     @Override
     protected void writeGUI(Boolean value) {
-        field.setSelected(value);
+        field.setSelected(inverted ^ value);
     }
 
     @Override

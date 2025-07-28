@@ -164,6 +164,16 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
     }
 
     @LuaFunction
+    public final double getTransformedPitch(){
+        return getTarget().getTransformedPitch();
+    }
+
+    @LuaFunction
+    public final double getTransformedYaw(){
+        return getTarget().getTransformedYaw();
+    }
+
+    @LuaFunction
     public final Map<String, Object> latestShip(){
         ShipHitResult hitResult = getTarget().latestShipHitResult;
         if(hitResult == null)return null;

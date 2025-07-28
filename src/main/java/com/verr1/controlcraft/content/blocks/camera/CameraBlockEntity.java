@@ -39,6 +39,7 @@ import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.*;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import kotlin.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -93,6 +94,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
 {
     public static NetworkKey RESET = NetworkKey.create("reset_view");
 
+    public static NetworkKey TR = NetworkKey.create("transform_rotation");
+
     public static NetworkKey PITCH = NetworkKey.create("pitch");
     public static NetworkKey YAW = NetworkKey.create("yaw");
     public static NetworkKey IS_ACTIVE_SENSOR = NetworkKey.create("sensor");
@@ -101,6 +104,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public static NetworkKey SHIP_TYPE = NetworkKey.create("ship_type");
     public static NetworkKey ENTITY_TYPE = NetworkKey.create("entity_type");
 
+    public static NetworkKey THIRD_PERSON = NetworkKey.create("3_person");
 
     public ShipHitResult latestShipHitResult = null;
     public EntityHitResult latestEntityHitResult = null;
@@ -121,6 +125,12 @@ public class CameraBlockEntity extends OnShipBlockEntity
     private double yaw = 0;
 
 
+
+    private boolean transformRotation = true;
+
+
+
+    private boolean thirdPerson = false;
 
     private CameraClipType rayType = CameraClipType.NO_RAY;
 
@@ -151,6 +161,22 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     private CameraBoundFakePlayer fp;
 
+    public static Pair<Double, Double> angle(Vector3dc view){
+        return new Pair<>(
+                -MathUtils.radianReset(
+                        Math.PI + Math.atan2(-view.x(), -view.z())
+                ),
+                Math.asin(-view.y())
+        );
+
+    }
+    public boolean thirdPerson() {
+        return thirdPerson;
+    }
+
+    public void setThirdPerson(boolean thirdPerson) {
+        this.thirdPerson = thirdPerson;
+    }
     public void clipNewShip(){
         latestShipHitResult = clipShip();
     }
@@ -219,6 +245,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setConeAngle(double coneAngle) {
         this.coneAngle = coneAngle;
+    }
+
+    public boolean transformRotation() {
+        return transformRotation;
+    }
+
+    public void setTransformRotation(boolean transformRotation) {
+        this.transformRotation = transformRotation;
     }
 
     @Override
@@ -349,6 +383,19 @@ public class CameraBlockEntity extends OnShipBlockEntity
         return yaw;
     }
 
+    public double getTransformedPitch() {
+        if(transformRotation){
+            return pitch;
+        }
+        return Math.toDegrees(angle(getLocViewForward()).getSecond());
+    }
+
+    public double getTransformedYaw() {
+        if(transformRotation){
+            return yaw;
+        }
+        return Math.toDegrees(angle(getLocViewForward()).getFirst());
+    }
 
 
     @Override
@@ -694,8 +741,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 VectorConversionsMCKt.toMinecraft(hitResult.ship().getWorldAABB()),
                 Color.SPRING_GREEN.getRGB(),
                 "camera_clip_ship",
-                distance / 5
-        );
+                distance / 5,
+                1f / 16);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -764,7 +811,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
         Ship ship = getShipOn();
         if(ship == null)return q;
         if(ship instanceof ClientShip cs)return cs.getRenderTransform().getShipToWorldRotation();
-        return ship.getTransform().getShipToWorldRotation();
+        return readSelf().quaternion();
     }
 
 
@@ -783,7 +830,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
-        syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD);
+        syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD, TR, THIRD_PERSON);
     }
 
 
@@ -812,29 +859,45 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     public Quaterniond getAbsViewTransform(){
-        Quaterniondc originalRotation =
-                new Quaterniond().rotateY(Math.toRadians(-yaw)).rotateX(Math.toRadians(pitch)).normalize();
-        return getCameraBaseRotation().mul(originalRotation, new Quaterniond());
+        Quaterniond originalRotation =
+                new Quaterniond()
+                        .rotateY(Math.toRadians(-getYaw()))
+                        .rotateX(Math.toRadians(getPitch()))
+                        .normalize();
+
+        return transformRotation ?
+                getCameraBaseRotation().mul(originalRotation, new Quaterniond()) :
+                originalRotation;
+
     }
 
     public Vector3d getAbsViewForward(){
-        return getAbsViewTransform().transform(new Vector3d(0, 0, 1));
+        return getAbsViewTransform().transform(new Vector3d(0, 0, 1)).normalize();
     }
 
     public Quaterniond getLocViewTransform(){
-        return new Quaterniond().rotateY(Math.toRadians(-yaw)).rotateX(Math.toRadians(pitch)).normalize();
+
+        Quaterniond originalRotation =
+                new Quaterniond()
+                        .rotateY(Math.toRadians(-getYaw()))
+                        .rotateX(Math.toRadians(getPitch()))
+                        .normalize();
+
+        return transformRotation ?
+                originalRotation :
+                getCameraBaseRotation().conjugate(new Quaterniond()).mul(originalRotation, new Quaterniond());
     }
 
     public Vector3d getLocViewForward(){
-        return getLocViewTransform().transform(new Vector3d(0, 0, 1));
+        return getLocViewTransform().transform(new Vector3d(0, 0, 1)).normalize();
     }
 
 
     public void syncServer(String uuid){
         if(level == null || !level.isClientSide)return;
         var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_0)
-                .withDouble(pitch)
-                .withDouble(yaw)
+                .withDouble(getPitch())
+                .withDouble(getYaw())
                 .withUtf8(uuid)
                 .build();
         ControlCraftPackets.getChannel().sendToServer(p);
@@ -843,8 +906,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void syncServerNoChunkLoading(String uuid){
         if(level == null || !level.isClientSide)return;
         var p = new BlockBoundServerPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
-                .withDouble(pitch)
-                .withDouble(yaw)
+                .withDouble(getPitch())
+                .withDouble(getYaw())
                 .withUtf8(uuid)
                 .build();
         ControlCraftPackets.getChannel().sendToServer(p);
@@ -861,8 +924,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void syncForOtherPlayers(){
         if(level == null || level.isClientSide)return;
         var p = new BlockBoundClientPacket.builder(getBlockPos(), RegisteredPacketType.SETTING_1)
-                .withDouble(pitch)
-                .withDouble(yaw)
+                .withDouble(getPitch())
+                .withDouble(getYaw())
                 .build();
         ControlCraftPackets.getChannel().send(
                 PacketDistributor.ALL.noArg(),
@@ -989,6 +1052,18 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
         buildRegistry(PITCH).withBasic(SerializePort.of(this::getPitch, this::setPitch, SerializeUtils.DOUBLE)).register();
         buildRegistry(YAW).withBasic(SerializePort.of(this::getYaw, this::setYaw, SerializeUtils.DOUBLE)).register();
+        buildRegistry(TR)
+                .withBasic(SerializePort.of(this::transformRotation, this::setTransformRotation, SerializeUtils.BOOLEAN))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .dispatchToSync()
+                .register();
+
+        buildRegistry(THIRD_PERSON)
+                .withBasic(SerializePort.of(this::thirdPerson, this::setThirdPerson, SerializeUtils.BOOLEAN))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .dispatchToSync()
+                .register();
+
         buildRegistry(IS_ACTIVE_SENSOR)
                 .withBasic(SerializePort.of(
                         this::isActiveDistanceSensor,

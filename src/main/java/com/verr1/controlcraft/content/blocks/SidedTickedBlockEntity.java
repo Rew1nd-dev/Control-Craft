@@ -19,6 +19,14 @@ public class SidedTickedBlockEntity extends SmartBlockEntity {
 
     }
 
+    public boolean isServerSide(){
+        return level != null && !level.isClientSide;
+    }
+
+    public boolean isClientSide(){
+        return level != null && level.isClientSide;
+    }
+
     public void initializeServer(){}
     public void initializeClient(){}
     public void initializeCommon(){}

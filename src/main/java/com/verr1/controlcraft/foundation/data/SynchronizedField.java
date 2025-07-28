@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.foundation.data;
 
 public class SynchronizedField<T> {
-    T data;
+    volatile T data;
     final Object lock = new Object();
 
     public SynchronizedField(T data){

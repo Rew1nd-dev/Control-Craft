@@ -3,28 +3,17 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.outliner.LineOutline;
-import com.simibubi.create.foundation.outliner.Outline;
 import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
-import com.simibubi.create.foundation.utility.Color;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
-import com.verr1.controlcraft.foundation.data.render.Line;
-import com.verr1.controlcraft.foundation.data.render.RayLerpHelper;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import kotlin.Pair;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3dc;
-import org.joml.Vector4f;
-
-import java.awt.*;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
@@ -43,7 +32,7 @@ public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
             int overlay
     ) {
         CameraBlockEntity linkedCamera = ClientCameraManager.getLinkedCamera();
-        if(linkedCamera != null && linkedCamera.getBlockPos().equals(be.getBlockPos()))return;
+        if(linkedCamera != null && linkedCamera.getBlockPos().equals(be.getBlockPos()) && !linkedCamera.thirdPerson())return;
 
         Vector3dc view = be.getLocViewForward();
 
@@ -79,7 +68,7 @@ public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
     }
 
 
-    private static Pair<Double, Double> angle(Direction face, Vector3dc view){
+    public static Pair<Double, Double> angle(Direction face, Vector3dc view){
         double horizontal = switch (face){
             case NORTH -> Math.atan2(-view.x(), -view.y()); // -z
             case SOUTH -> -Math.atan2(-view.x(), -view.y());// +z

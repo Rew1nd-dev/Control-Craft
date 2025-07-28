@@ -4,7 +4,6 @@ import com.simibubi.create.CreateClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,7 +13,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix4dc;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientOutliner {
@@ -89,10 +87,10 @@ public class ClientOutliner {
     }
 
 
-    public static void drawOutline(@NotNull AABB aabb, int color, String slot, double scale) {
+    public static void drawOutline(@NotNull AABB aabb, int color, String slot, double scale, double width) {
         CreateClient.OUTLINER.showAABB(slot, aabb)
                 .colored(color)
-                .lineWidth(1 / 16f * (float)scale * 2f);
+                .lineWidth((float) (width * (float)scale * 2f));
     }
 
     public static void drawOutline(BlockPos selection, Direction face, int color, String slot) {

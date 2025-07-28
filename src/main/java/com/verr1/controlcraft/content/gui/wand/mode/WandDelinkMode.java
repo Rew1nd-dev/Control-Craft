@@ -54,7 +54,7 @@ public class WandDelinkMode extends WandAbstractMultipleSelectionMode {
         ClientViewContext cvc = CimulinkRenderCenter.computeContext(lookingAtPos, lookingAtVec, level);
         if(cvc == null)return;
         Color c = cvc.isInput() ? Color.GREEN.darker() : Color.RED.darker();
-        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), "link_looking", 0.4);
+        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), "link_looking", 0.4, 1f / 16);
 
     }
 

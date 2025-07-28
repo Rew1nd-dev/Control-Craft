@@ -79,14 +79,6 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
         return super.getCapability(cap, side);
     }
 
-    @Override
-    public void invalidate(){
-        super.invalidate();
-        if(peripheralCap != null){
-            peripheralCap.invalidate();
-            peripheralCap = null;
-        }
-    }
 
     @Override
     public void tickServer() {

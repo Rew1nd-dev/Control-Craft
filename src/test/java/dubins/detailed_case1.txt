@@ -1,0 +1,26 @@
+# Start: (0.000, 0.000), Heading: 0.000°
+# Goal: (5.000, 5.000), Heading: 90.000°
+# Path Type: LSL
+# Total Length: 6.925
+# Turning Radius: 1.0
+# Segments:
+Segment 1: LEFT_TURN
+  Length: 0.424
+  Start: (0.000, 0.000)
+  End: (0.911, 1.411)
+  Center: (0.000, 1.000)
+  Radius: 1.000
+  StartAngle: 0.000°
+  EndAngle: 24.295°
+Segment 2: STRAIGHT
+  Length: 5.292
+  Start: (0.911, 1.411)
+  End: (5.734, 3.589)
+Segment 3: LEFT_TURN
+  Length: 1.209
+  Start: (5.734, 3.589)
+  End: (5.000, 5.000)
+  Center: (4.000, 5.000)
+  Radius: 1.000
+  StartAngle: 204.295°
+  EndAngle: 90.000°

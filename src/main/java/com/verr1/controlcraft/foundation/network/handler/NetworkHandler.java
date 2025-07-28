@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.network.handler;
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.simibubi.create.foundation.networking.SimplePacketBase;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.api.Slot;
@@ -10,8 +11,11 @@ import com.verr1.controlcraft.foundation.network.packets.specific.LazyRequestBlo
 import com.verr1.controlcraft.foundation.network.packets.specific.SyncBlockEntityClientPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.SyncBlockEntityServerPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
@@ -144,11 +148,20 @@ public class NetworkHandler {
         if(delegate.getLevel() == null)return;
         if (!delegate.getLevel().isClientSide) {
             var p = new SyncBlockEntityClientPacket(delegate.getBlockPos(), tag);
+            // warnIfNeeded(p);
             ControlCraftPackets.getChannel().send(target, p);
         }
         if (delegate.getLevel().isClientSide) {
             var p = new SyncBlockEntityServerPacket(delegate.getBlockPos(), tag);
             ControlCraftPackets.getChannel().sendToServer(p);
+        }
+    }
+
+    private void warnIfNeeded(SimplePacketBase packetBase){
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        packetBase.write(buf);
+        if (buf.writerIndex() > 1048576 / 2){
+            ControlCraft.LOGGER.warn("This Packet May Be Too Big, send by: {}, at {}", delegate.getClass().getSimpleName(), delegate.getBlockPos());
         }
     }
 

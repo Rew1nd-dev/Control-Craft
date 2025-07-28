@@ -190,8 +190,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
     @OnlyIn(Dist.CLIENT)
     private void requestConnectionStatusOnFocus(){
-        BlockPos p = MinecraftUtils.lookingAtPos();
-        // if(p == null || !p.equals(getBlockPos()))return;
+        // if(!beingLookedAt())return;
         handler().request(SharedKeys.CONNECTION_STATUS);
     }
 
@@ -203,6 +202,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
     @OnlyIn(Dist.CLIENT)
     private void requestValueStatusOnFocus(){
+        // if(!beingLookedAt())return;
         handler().request(SharedKeys.VALUE_STATUS);
     }
 

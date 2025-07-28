@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.registry;
 
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
+import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
+import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlockEntity;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
@@ -119,6 +121,12 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<SensorBlockEntity> SENSOR_BLOCKENTITY = REGISTRATE
             .blockEntity(SensorBlock.ID, SensorBlockEntity::new)
             .validBlock(CimulinkBlocks.SENSOR)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<CCBridgeBlockEntity> BRIDGE_BLOCKENTITY = REGISTRATE
+            .blockEntity(CCBridgeBlock.ID, CCBridgeBlockEntity::new)
+            .validBlock(CimulinkBlocks.CC_BRIDGE)
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 

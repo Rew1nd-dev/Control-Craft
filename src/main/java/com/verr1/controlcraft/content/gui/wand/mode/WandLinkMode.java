@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.gui.wand.mode;
 
-import com.simibubi.create.CreateClient;
 import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractDualSelectionMode;
 import com.verr1.controlcraft.foundation.api.IWandMode;
 import com.verr1.controlcraft.foundation.data.WandSelection;
@@ -11,14 +10,10 @@ import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.foundation.network.packets.specific.CimulinkLinkPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MathUtils;
-import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -92,7 +87,7 @@ public class WandLinkMode extends WandAbstractDualSelectionMode {
         if(cvc == null)return;
 
         Color c = cvc.isInput() ? Color.GREEN.darker() : Color.RED.darker();
-        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), slot, 0.4);
+        ClientOutliner.drawOutline(toMinecraft(MathUtils.centerWithRadius(toJOML(cvc.portPos()), 0.05)), c.getRGB(), slot, 0.4, 1f / 16);
     }
 
 

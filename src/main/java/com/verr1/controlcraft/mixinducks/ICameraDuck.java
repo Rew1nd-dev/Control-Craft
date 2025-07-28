@@ -22,9 +22,8 @@ public interface ICameraDuck {
             boolean thirdPersonReverse,
             float partialTicks,
             @Nullable ClientShip shipMountedTo,
-            @NotNull Vector3dc inShipPlayerPosition
+            @NotNull Vector3dc inShipPlayerPosition,
+            boolean transformRotation
     );
-
-    void controlCraft$setRotationWithShipTransform(final float yaw, final float pitch, final ShipTransform renderTransform);
 
 }
