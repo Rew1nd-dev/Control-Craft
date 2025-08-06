@@ -5,7 +5,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.ponder.CimulinkPonderIndex;
 import com.verr1.controlcraft.registry.*;
 import net.minecraft.resources.ResourceLocation;
@@ -24,8 +24,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.joml.Random;
 import org.slf4j.Logger;
 

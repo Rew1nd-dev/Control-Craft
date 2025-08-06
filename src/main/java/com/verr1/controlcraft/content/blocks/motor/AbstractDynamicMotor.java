@@ -83,26 +83,22 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
     public void setTargetAccordingly(double target){
         switch (targetMode){
-            case POSITION : controller.setTarget(MathUtils.clamp(target, Math.PI));
+            case POSITION : controller.setTarget(MathUtils.radianReset(target));
             case VELOCITY : controller.setTarget(target);
         }
-        setChanged();
     }
 
     public void setLockMode(LockMode lockMode) {
         this.lockMode = lockMode;
         if(lockMode == LockMode.OFF)tryUnlock();
-        setChanged();
     }
 
     public void setCheatMode(CheatMode cheatMode) {
         this.cheatMode = cheatMode;
-        setChanged();
     }
 
     public void setReverseCreateInput(boolean reverseCreateInput) {
         this.reverseCreateInput = reverseCreateInput;
-        setChanged();
     }
 
     public TargetMode getTargetMode() {return targetMode;}
@@ -114,20 +110,6 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public void setSpeedLimit(double speedLimit) {this.speedLimit = Math.max(speedLimit, 2);}
     public void setTargetMode(TargetMode targetMode) {
         this.targetMode = targetMode;
-        /*
-        // if(this.targetMode == targetMode)return;
-        // delay this because client screen will also call to set PID values of last mode
-        Runnable task = () -> {if(targetMode == TargetMode.POSITION){
-            controller.PID(DEFAULT_POSITION_MODE_PARAMS);
-        }
-        if(targetMode == TargetMode.VELOCITY){
-            controller.PID(DEFAULT_VELOCITY_MODE_PARAMS);
-        }};
-
-        if(level == null || level.isClientSide)return;
-        ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
-        * */
-        setChanged();
     }
 
     @Override

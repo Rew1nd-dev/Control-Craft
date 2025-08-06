@@ -21,6 +21,7 @@ public class SensorLinkPort extends SwitchableLinkPort<SensorTypes> {
             case VELOCITY -> new VelocitySensor(sbe);
             case ROTATION -> new RotationSensor(sbe);
             case EULER_YXZ -> new EulerSensor(sbe);
+            case GPS -> new GPSSensor(sbe);
         };
     }
 

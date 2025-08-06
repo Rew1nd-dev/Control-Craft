@@ -3,9 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.types;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Functions;
-import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.Cross;
-import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.Dot;
-import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.QTransform;
+import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.*;
 import com.verr1.controlcraft.foundation.cimulink.game.ComponentInstances;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;
@@ -64,14 +62,45 @@ public enum AnalogTypes implements
             ComponentInstances.Inspector.of(QTransform::new),
             List.of(Component.literal("Output the quaternion transformation of a vector")),
             AnalogGroups.Vector
+    ),
+
+    V_NORM(
+            ComponentInstances.Inspector.of(SafeNorm::new),
+            List.of(Component.literal("Output the norm of a vector (length)")),
+            AnalogGroups.Vector
+    ),
+
+    V_MAG(
+            ComponentInstances.Inspector.of(Magnitude::new),
+            List.of(Component.literal("Output the magnitude of a vector (length)")),
+            AnalogGroups.Vector
+    ),
+
+    V_LOOK_ALONG(
+            ComponentInstances.Inspector.of(LookAlong::new),
+            List.of(Component.literal("See org.joml.Quaterniondc#lookAlong for more information")),
+            AnalogGroups.Vector
+    ),
+
+    Q_SLERP(
+            ComponentInstances.Inspector.of(Slerp::new),
+            List.of(Component.literal("Output the spherical linear interpolation of two quaternions")),
+            AnalogGroups.Vector
+    ),
+
+    Q_MUL(
+            ComponentInstances.Inspector.of(QMul::new),
+            List.of(Component.literal("Output the multiplication of two quaternions")),
+            AnalogGroups.Vector
     )
+
     ;
 
 
 
     public static final AnalogTypes[] BASIC = new AnalogTypes[]{AnalogTypes.MIN, AnalogTypes.MAX, AnalogTypes.PRODUCT, AnalogTypes.DIV, AnalogTypes.POWER, AnalogTypes.ABS};
     public static final AnalogTypes[] TRIGONOMETRIC = new AnalogTypes[]{AnalogTypes.ANGLE_FIX, AnalogTypes.SIN, AnalogTypes.COS, AnalogTypes.TAN, AnalogTypes.ASIN, AnalogTypes.ACOS, AnalogTypes.ATAN};
-    public static final AnalogTypes[] VECTOR = new AnalogTypes[]{AnalogTypes.DOT, AnalogTypes.CROSS, AnalogTypes.Q_TRANSFORM};
+    public static final AnalogTypes[] VECTOR = new AnalogTypes[]{AnalogTypes.DOT, AnalogTypes.CROSS, AnalogTypes.Q_TRANSFORM, AnalogTypes.V_NORM, AnalogTypes.V_MAG, AnalogTypes.V_LOOK_ALONG, AnalogTypes.Q_SLERP, AnalogTypes.Q_MUL};
 
 
 

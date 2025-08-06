@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.links.func;
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;

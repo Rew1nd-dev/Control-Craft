@@ -2,7 +2,6 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.types;
 
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
 import com.verr1.controlcraft.foundation.cimulink.game.ComponentInstances;
 import com.verr1.controlcraft.utils.LangUtils;
 import net.minecraft.network.chat.Component;

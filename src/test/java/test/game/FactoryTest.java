@@ -3,6 +3,7 @@ package test.game;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitWorldBuilder;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
@@ -13,7 +14,6 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
-import com.verr1.controlcraft.foundation.cimulink.game.registry.CimulinkFactory;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.ArrayList;

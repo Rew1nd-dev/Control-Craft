@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port.sensors;
 
-import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlockEntity;
 import com.verr1.controlcraft.content.links.sensor.SensorBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import org.joml.Matrix3d;
@@ -9,7 +8,6 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class OmegaSensor extends NamedComponent {
 

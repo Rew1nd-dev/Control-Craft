@@ -1,6 +1,10 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
+import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -24,7 +28,7 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
                         List.of("clk")
                 ),
                 ArrayUtils.createOutputNames(parallel),
-                () -> new AsyncShifter.AsyncShifterQueue(delay, parallel)
+                () -> new AsyncShifterQueue(delay, parallel)
         );
         this.delay = delay;
         this.parallel = parallel;
@@ -34,10 +38,19 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
         return n() - 1;
     }
 
+    public ComponentPortName __dat(int i){
+        ArrayUtils.AssertRange(i, n() - 1);
+        return __in(i);
+    }
+
+    public ComponentPortName __clk(){
+        return __in(clk());
+    }
+
     @Override
-    protected Pair<List<Double>, AsyncShifter.AsyncShifterQueue> transit(
+    protected Pair<List<Double>, AsyncShifterQueue> transit(
             List<Double> input,
-            AsyncShifter.AsyncShifterQueue state
+            AsyncShifterQueue state
     ) {
         List<Double> inputs = input.subList(0, n() - 1);
         boolean clk = input.get(clk()) > 0.5;
@@ -65,6 +78,11 @@ public class AsyncShifter extends Temporal<AsyncShifter.AsyncShifterQueue> {
                 SerializeUtils.INT.deserializeOrElse(tag.getCompound("delay"), 0),
                 SerializeUtils.INT.deserializeOrElse(tag.getCompound("parallel"), 1)
         );
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.ASYNC_SHIFTER;
     }
 
     public static class AsyncShifterQueue{

@@ -69,6 +69,18 @@ public class SensorBlockEntity extends CimulinkBlockEntity<SensorLinkPort> {
 
     }
 
+    public Vector3dc getSensorPosition() {
+        Vector3d p_sc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter());
+        return Optional
+                .ofNullable(getShipOn())
+                .map(ship -> ship
+                        .getTransform()
+                        .getShipToWorld()
+                        .transformPosition(p_sc)
+                )
+                .orElse(p_sc);
+    }
+
     public Vector3dc getAngularVelocity(){
         return readSelf().omega();
     }
@@ -85,4 +97,6 @@ public class SensorBlockEntity extends CimulinkBlockEntity<SensorLinkPort> {
     protected SensorLinkPort create() {
         return new SensorLinkPort(this);
     }
+
+
 }

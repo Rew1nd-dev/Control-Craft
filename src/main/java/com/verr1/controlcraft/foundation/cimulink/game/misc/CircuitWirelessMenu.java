@@ -4,7 +4,6 @@ import com.simibubi.create.foundation.gui.menu.GhostItemMenu;
 import com.verr1.controlcraft.content.gui.container.PageItemSlot;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.circuit.WrappedChannel;
-import com.verr1.controlcraft.foundation.redstone.TerminalMenu;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;

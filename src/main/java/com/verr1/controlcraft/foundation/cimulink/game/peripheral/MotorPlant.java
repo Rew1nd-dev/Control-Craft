@@ -1,13 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 
 import com.verr1.controlcraft.content.blocks.motor.AbstractDynamicMotor;
-import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.utils.MathUtils;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class MotorPlant extends Plant {
 
@@ -20,12 +13,7 @@ public class MotorPlant extends Plant {
     ) {
         super(
                 new builder()
-                        .in("target", t -> plant.getController().setTarget(
-                                plant.getTargetMode() == TargetMode.POSITION ?
-                                        MathUtils.radianReset(t):
-                                        t
-                                )
-                        )
+                        .in("target", plant::setTargetAccordingly)
                         .in("lock", l -> plant.tryLock(l > 0.5))
                         .in("torque", plant::setOutputTorque)
                         .out("current", () -> plant.getController().getValue())
@@ -40,8 +28,31 @@ public class MotorPlant extends Plant {
         return plant;
     }
 
-    private static double orElse(boolean condition, double value, double defaultValue) {
-        return condition ? value : defaultValue;
+/*
+private final List<Consumer<Double>> inputHandlers = List.of(
+            t -> plant().getController().setTarget(t),
+            l -> plant().tryLock(l > 0.5),
+            t -> plant().setOutputTorque(t)
+    );
+
+    @Override
+    public List<Integer> propagateTo(int inputIndex) {
+        return List.of();
     }
+
+    @Override
+    public void onInputChange(Integer... inputIndexes) {
+        Arrays.stream(inputIndexes).forEach(i -> inputHandlers.get(i).accept(retrieveInput(i)));
+    }
+
+    @Override
+    public void onPositiveEdge() {
+        updateOutput(List.of(
+                plant.getController().getValue(),
+                plant.getCachedServoAngle(),
+                plant.getCachedServoAngularVelocity()
+        ));
+    }
+* */
 
 }

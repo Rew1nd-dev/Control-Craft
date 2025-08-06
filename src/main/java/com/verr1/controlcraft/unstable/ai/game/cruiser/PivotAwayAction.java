@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
 
-import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
@@ -67,17 +66,17 @@ public class PivotAwayAction extends Action {
 //        Vector3dc finalTarget = targetP.add(randDir, new Vector3d());
 //        Vector3dc finalDirection = finalTarget.sub(currentP, new Vector3d());
 
-        ClientOutliner.drawOutline(
-                toMinecraft(MathUtils.centerWithRadius(currentP, 6)),
-                Color.RED.getRGB(),
-                "debug_evade_target" + context.getBlockPos(),
-                4.0,
-                1f / 16
-        );
+//        ClientOutliner.drawOutline(
+//                toMinecraft(MathUtils.centerWithRadius(currentP, 6)),
+//                Color.RED.getRGB(),
+//                "debug_evade_target" + context.getBlockPos(),
+//                4.0,
+//                1f / 16
+//        );
 
 
         controller.setAction(CruiseActions.AWAY);
-        controller.setAction(CruiseActions.TEST);
+        // controller.setAction(CruiseActions.TEST);
         controller.overrideTarget(finalDirection);
         Vector3dc actualDirection = targetP.sub(currentP, new Vector3d());
         if(

@@ -54,7 +54,7 @@ public class PivotToAction extends Action {
         }
 
         controller.setAction(CruiseActions.TOWARDS);
-        controller.setAction(CruiseActions.TEST);
+        // controller.setAction(CruiseActions.TEST);
         controller.overrideTarget(op_wc); //-finalTheta
 
         return Status.RUNNING;

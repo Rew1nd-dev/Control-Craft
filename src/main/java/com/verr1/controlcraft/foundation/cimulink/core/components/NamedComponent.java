@@ -4,10 +4,13 @@ package com.verr1.controlcraft.foundation.cimulink.core.components;
 
 
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
+import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 
 import java.util.*;
 
+import static com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils.AssertPresence;
 import static com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils.checkName;
 
 
@@ -89,6 +92,16 @@ public abstract class NamedComponent extends Component {
         return new ComponentPortName(name(), out(index));
     }
 
+    public ComponentPortName __in(String index){
+        AssertPresence(namedInputs.keySet(), index);
+        return new ComponentPortName(name(), index);
+    }
+
+    public ComponentPortName __out(String index){
+        AssertPresence(namedOutputs.keySet(), index);
+        return new ComponentPortName(name(), index);
+    }
+
     public String in(){
         return in(0);
     }
@@ -105,10 +118,6 @@ public abstract class NamedComponent extends Component {
         return inputs;
     }
 
-    public final List<String> inputsExcludeSignals(){
-        return inputs().stream().filter(s -> !s.contains("@")).toList();
-    }
-
     public List<String> outputs() {
         return outputs;
     }
@@ -122,7 +131,9 @@ public abstract class NamedComponent extends Component {
         return namedOutputs;
     }
 
-
+    public List<String> inputsExcludeSignals() {
+        return inputs().stream().filter(s -> !s.contains("@")).toList();
+    }
 
     public double retrieveOutput(String name) {
         ArrayUtils.AssertPresence(outputs, name);
@@ -186,5 +197,14 @@ public abstract class NamedComponent extends Component {
     public static NamedComponent combinational(Component raw){
         return null;
     }
+
+    public Factory<? extends NamedComponent> factory(){
+        throw new UnsupportedOperationException("Factory method not implemented for " + this.getClass().getSimpleName());
+    }
+
+    public Summary summary(){
+        return factory().summarize(this);
+    }
+
 
 }

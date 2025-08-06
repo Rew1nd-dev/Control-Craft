@@ -1,6 +1,10 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.vectors;
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 
 import java.util.List;
 
@@ -9,7 +13,7 @@ public class Cross extends Combinational {
     public Cross() {
         super(
                 List.of("x0", "y0", "z0", "x1", "y1", "z1"),
-                List.of("cx", "cy", "cz")
+                List.of(x(), y(), z())
         );
     }
 
@@ -27,5 +31,34 @@ public class Cross extends Combinational {
         double cz = x0 * y1 - y0 * x1;
 
         return List.of(cx, cy, cz);
+    }
+
+    public static String x(){
+        return "cx";
+    }
+
+    public static String y(){
+        return "cy";
+    }
+
+    public static String z(){
+        return "cz";
+    }
+
+    public ComponentPortName __x(){
+        return new ComponentPortName(name(), x());
+    }
+
+    public ComponentPortName __y(){
+        return new ComponentPortName(name(), y());
+    }
+
+    public ComponentPortName __z(){
+        return new ComponentPortName(name(), z());
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.V_CROSS;
     }
 }

@@ -31,6 +31,14 @@ public class ArrayUtils {
         return IntStream.range(0, n).mapToObj(i -> prefix + i).toList();
     }
 
+    public static double nonNan(double in, double orElse){
+        return Double.isNaN(in) ? orElse : in;
+    }
+
+    public static double nonNan(double in){
+        return nonNan(in, 0.0);
+    }
+
     public static void AssertSize(Collection<?> array, int size) throws IllegalArgumentException{
         if (array.size() != size) {
             throw new IllegalArgumentException("Expected size: " + size + ", but got: " + array.size());

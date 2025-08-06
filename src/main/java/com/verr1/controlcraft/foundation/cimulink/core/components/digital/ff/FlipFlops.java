@@ -2,8 +2,11 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.digital.ff;
 
 
 import com.verr1.controlcraft.foundation.cimulink.core.api.StateFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanTemporal;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import kotlin.Pair;
 
@@ -34,6 +37,11 @@ public class FlipFlops {
 
             return new Pair<>(List.of(nextState, !nextState), nextState);
         }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.RS_FF;
+        }
     };
 
     public static final Supplier<Temporal<Boolean>> D_FF = () -> new FF11<>(() -> false){
@@ -42,6 +50,10 @@ public class FlipFlops {
         protected Pair<Boolean, Boolean> transit(Boolean input, Boolean state) {
             return new Pair<>(input, false);
         }
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.D_FF;
+        }
     };
 
     public static final Supplier<Temporal<Boolean>> T_FF = () -> new FF11<>(() -> false){
@@ -49,6 +61,10 @@ public class FlipFlops {
         @Override
         protected Pair<Boolean, Boolean> transit(Boolean input, Boolean state) {
             return new Pair<>(!input, false);
+        }
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.T_FF;
         }
     };
 
@@ -73,6 +89,10 @@ public class FlipFlops {
             }
 
             return new Pair<>(List.of(nextState, !nextState), nextState);
+        }
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.JK_FF;
         }
     };
 

@@ -2,7 +2,10 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.analog;
 
 
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -11,6 +14,7 @@ import kotlin.Pair;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -29,6 +33,12 @@ public class LinearAdder extends Combinational {
         );
         this.coefficients = new ArrayList<>(coefficients);
         coefficientsView = Collections.unmodifiableList(this.coefficients);
+    }
+
+    public LinearAdder(double... coeffs){
+        this(
+                Arrays.stream(coeffs).boxed().toList()
+        );
     }
 
     public void setCoefficients(List<Double> newCoefficients){
@@ -79,5 +89,10 @@ public class LinearAdder extends Combinational {
             result += inputs.get(i) * coefficients.get(i);
         }
         return List.of(result);
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.FMA;
     }
 }

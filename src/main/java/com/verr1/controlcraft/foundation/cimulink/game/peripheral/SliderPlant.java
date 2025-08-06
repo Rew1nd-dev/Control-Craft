@@ -1,12 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 
-import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
-import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class SliderPlant extends Plant {
     private final DynamicSliderBlockEntity dsb;

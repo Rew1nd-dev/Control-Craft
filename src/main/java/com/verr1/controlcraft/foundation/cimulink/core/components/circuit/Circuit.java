@@ -6,6 +6,8 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.Component;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.PlaceHolder;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPort;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import net.minecraft.nbt.CompoundTag;
 
@@ -64,6 +66,11 @@ public class Circuit extends NamedComponent {
     public Circuit withBuildContext(CircuitNbt nbt){
         this.circuitNbt = nbt;
         return this;
+    }
+
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.CIRCUIT;
     }
 
     // this excludes helper input ports for SignalGenerator

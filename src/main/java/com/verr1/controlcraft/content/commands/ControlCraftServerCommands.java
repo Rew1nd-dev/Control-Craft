@@ -228,6 +228,7 @@ public class ControlCraftServerCommands {
             return 0;
         }
         CircuitCompilerItem.load(saveName, stack);
+        source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         return 1;
     }
 

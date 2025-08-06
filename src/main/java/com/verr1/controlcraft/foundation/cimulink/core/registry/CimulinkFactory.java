@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.foundation.cimulink.game.registry;
+package com.verr1.controlcraft.foundation.cimulink.core.registry;
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.AsyncShifter;
@@ -12,19 +12,14 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.Cross;
-import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.Dot;
-import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.QTransform;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
+import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.*;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.nbt.CompoundTag;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class CimulinkFactory {
@@ -52,9 +47,9 @@ public class CimulinkFactory {
     );
 
     public static final Factory<Comparator> COMPARATOR = register(
-        createParamLess(Comparator::new),
-        Comparator.class,
-        defaultID("comparator")
+            createParamLess(Comparator::new),
+            Comparator.class,
+            defaultID("comparator")
     );
 
     public static final Factory<NamedComponent> D_FF = register(
@@ -202,6 +197,16 @@ public class CimulinkFactory {
 
     public static final Factory<QTransform> V_TRANSFORM = register(QTransform::new, QTransform.class);
 
+    public static final Factory<SafeNorm> V_NORM = register(SafeNorm::new, SafeNorm.class);
+
+    public static final Factory<Magnitude> V_MAG = register(Magnitude::new, Magnitude.class);
+
+    public static final Factory<LookAlong> Q_LOOK_ALONG = register(LookAlong::new, LookAlong.class);
+
+    public static final Factory<QMul> Q_MUL = register(QMul::new, QMul.class);
+
+    public static final Factory<Slerp> Q_SLERP = register(Slerp::new, Slerp.class);
+
 
     public static final Factory<Functions.FunctionN> TAN = register(
             SerializeUtils.of(
@@ -333,11 +338,6 @@ public class CimulinkFactory {
         );
     }
 
-    private static ComponentDeserializer register(
-            Function<Summary, NamedComponent> deserializeFunc
-    ){
-        throw new NotImplementedException();
-    }
 
     private static String defaultID(String name){
         return PREFIX + name;
@@ -369,48 +369,6 @@ public class CimulinkFactory {
         NamedComponent deserialize(CompoundTag tag);
     }
 
-    public static class CircuitFactory implements ComponentDeserializer{
-        public static final String ID = defaultID("circuit");
 
-
-        public CompoundTag serialize(CircuitNbt nbt){
-            return nbt.serialize();
-        }
-
-
-        @Override
-        public NamedComponent deserialize(CompoundTag tag) {
-            return CircuitNbt.deserialize(tag).buildCircuit();
-        }
-    }
-
-    public static class Factory<T extends NamedComponent> implements ComponentDeserializer{
-        Serializer<T> serializer;
-        Class<T> clazz;
-        String ID;
-
-        Factory(Serializer<T> serializer, Class<T> clazz, String ID) {
-            this.ID = ID;
-            this.serializer = serializer;
-            this.clazz = clazz;
-        }
-
-        public String getID(){return ID;}
-
-        public Summary summarize(NamedComponent component){
-            if(!clazz.isAssignableFrom(component.getClass())){
-                throw new IllegalArgumentException("Component " + component.getClass().getName() + " is not assignable to " + clazz.getName());
-            }
-            return new Summary(
-                    ID,
-                    serializer.serialize(clazz.cast(component))
-            );
-        }
-
-        @Override
-        public NamedComponent deserialize(CompoundTag tag) {
-            return serializer.deserialize(tag);
-        }
-    }
 
 }

@@ -118,7 +118,7 @@ public class AIControls {
 
         target.poseController().overridePhysics(ship);
 
-        // ship.applyInvariantForce(MathUtils.nonNan(f));
+        ship.applyInvariantForce(MathUtils.nonNan(f));
         ship.applyInvariantTorque(MathUtils.nonNan(t));
     }
 

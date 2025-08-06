@@ -2,8 +2,8 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.circuit;
 
 
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPort;
+import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
 import kotlin.Pair;
 
 import java.util.*;
@@ -109,6 +109,15 @@ public class CircuitDebugger {
         }
     }
 
+    public void trackAllOut(){
+        trackedPort.clear();
+        trackedPort.addAll(oiMap.keySet());
+    }
+
+    public void trackOut(){
+        track(toDebug.outputs().stream().map(toDebug::__out).toArray(ComponentPortName[]::new));
+    }
+
     public void printTracked(Function<Double, String> formatter){
         printOutputs(formatter, trackedPort.toArray(new ComponentPortName[0]));
     }
@@ -119,9 +128,11 @@ public class CircuitDebugger {
 
     public static void PrintConnections(Collection<ConnectionId> connectionIds){
         System.out.println("Observed Connections: ");
+        List<String> prints = new ArrayList<>();
         for (var c: connectionIds){
-            System.out.println("out: " + c.cpo() + " in: " + c.cpi() + " wid: " + c.wireId);
+            prints.add("out: " + c.cpo() + " in: " + c.cpi() + " wid: " + c.wireId);
         }
+        prints.stream().sorted().forEach(System.out::println);
     }
 
     public static List<String> PrintConnectionsAsString(Collection<ConnectionId> connectionIds){

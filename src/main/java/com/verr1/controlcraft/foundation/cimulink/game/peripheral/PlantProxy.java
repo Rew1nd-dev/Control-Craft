@@ -3,7 +3,9 @@ package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PlantProxy extends NamedComponent {
 

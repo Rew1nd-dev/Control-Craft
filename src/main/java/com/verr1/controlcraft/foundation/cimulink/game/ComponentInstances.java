@@ -3,11 +3,8 @@ package com.verr1.controlcraft.foundation.cimulink.game;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.analog.Functions;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanCombinational;
-import com.verr1.controlcraft.foundation.cimulink.core.components.digital.BooleanTemporal;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.ff.*;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.Gates;
-import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
-import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
 
 import java.util.List;
 import java.util.function.Supplier;

@@ -1,9 +1,12 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.general.da;
 
 
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.Decoder;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Combinational;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
+import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -16,18 +19,18 @@ public class Multiplexer extends Combinational {
     private final int bits;
 
 
-    public Multiplexer(int n) {
+    public Multiplexer(int bits) {
         super(
                 ArrayUtils.flatten(
                         ArrayUtils.createWithPrefix(
                                 "sel_",
-                                n
+                                bits
                         ),
-                        ArrayUtils.createInputNames(1 << n)
+                        ArrayUtils.createInputNames(1 << bits)
                 ),
                 ArrayUtils.SINGLE_OUTPUT
         );
-        bits = n;
+        this.bits = bits;
     }
 
     public String dat(int i){
@@ -75,4 +78,8 @@ public class Multiplexer extends Combinational {
 
     }
 
+    @Override
+    public Factory<? extends NamedComponent> factory() {
+        return CimulinkFactory.MUX;
+    }
 }

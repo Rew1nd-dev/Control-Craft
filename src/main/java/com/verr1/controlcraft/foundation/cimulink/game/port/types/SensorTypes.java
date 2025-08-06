@@ -20,6 +20,7 @@ public enum SensorTypes implements Descriptive<SensorTypes> {
             "2. Turn around Z-axis after step 1.",
             "3. Turn around X-axis after step 2."
     )),
+    GPS(literals("GPS Sensor"))
     ;
 
 
