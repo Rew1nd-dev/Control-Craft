@@ -99,6 +99,7 @@ public class ControlCraftDataGen {
         UIContents.register();
         TargetMode.register();
         CameraClipType.register();
+        CameraViewType.register();
         TabType.register();
         GroupPolicy.register();
         LerpType.register();

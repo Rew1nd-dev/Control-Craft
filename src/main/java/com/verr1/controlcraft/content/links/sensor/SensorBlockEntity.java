@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.links.sensor;
 
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.sensors.SensorLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.SensorTypes;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
@@ -30,7 +29,7 @@ public class SensorBlockEntity extends CimulinkBlockEntity<SensorLinkPort> {
                         t -> linkPort().setCurrentType(t),
                         SerializeUtils.ofEnum(SensorTypes.class)
                 ))
-                .withClient(ClientBuffer.of(SensorTypes.class))
+                .withClient(ClientBuffer.ofEnum(SensorTypes.class))
                 .runtimeOnly()
                 .register();
 

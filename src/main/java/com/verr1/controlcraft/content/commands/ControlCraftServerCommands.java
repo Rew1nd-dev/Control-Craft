@@ -227,7 +227,13 @@ public class ControlCraftServerCommands {
             source.sendFailure(Component.literal("No compiler found in your main hand"));
             return 0;
         }
-        CircuitCompilerItem.load(saveName, stack);
+        try{
+            CircuitCompilerItem.load(saveName, stack);
+        }catch (Exception e){
+            source.sendFailure(Component.literal("Failed to load circuit: " + e.getMessage()));
+            ControlCraft.LOGGER.error("Failed to load circuit: " + e.getMessage(), e);
+            return 0;
+        }
         source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         return 1;
     }

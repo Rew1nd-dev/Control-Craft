@@ -41,6 +41,7 @@
     "vscontrolcraft:link_sensor",
     "vscontrolcraft:cc_bridge",
     "vscontrolcraft:scope",
-    "vscontrolcraft:ai_cruiser"
+    "vscontrolcraft:ai_cruiser",
+    "vscontrolcraft:ai_jet"
   ]
 }

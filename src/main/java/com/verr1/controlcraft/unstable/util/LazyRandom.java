@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.unstable.ai.game.util;
+package com.verr1.controlcraft.unstable.util;
 
 public class LazyRandom {
 

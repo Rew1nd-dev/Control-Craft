@@ -245,7 +245,7 @@ public class DubinsCalculator {
         double startAngle1 = Math.atan2(p0.y() - center1.y(), p0.x() - center1.x());
         double endAngle1 = Math.atan2(p1.y() - center1.y(), p1.x() - center1.x());
 
-        double startAngle2 = Math.atan2(p2.y() - center2.y(), p2.x() - center2.y());
+        double startAngle2 = Math.atan2(p2.y() - center2.y(), p2.x() - center2.x());
         double endAngle2 = Math.atan2(p3.y() - center2.y(), p3.x() - center2.x());
 
         // 添加第一段（圆弧）

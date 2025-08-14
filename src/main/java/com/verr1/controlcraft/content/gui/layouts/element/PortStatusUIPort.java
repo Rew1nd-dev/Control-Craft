@@ -23,7 +23,7 @@ import static com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory.title
 import static com.verr1.controlcraft.content.gui.factory.Converter.alignLabel;
 
 public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
-    private final int max_size = 6;
+    private final int max_size = 12;
     private int currentSize = 0;
     private final List<NameEnableWidget> widgets =
             ArrayUtils.ListOf(max_size, () -> NameEnableWidget.create(Minecraft.getInstance().font));

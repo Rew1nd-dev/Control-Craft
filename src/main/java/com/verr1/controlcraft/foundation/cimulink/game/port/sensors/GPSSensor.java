@@ -11,7 +11,7 @@ public class GPSSensor extends NamedComponent {
     private final SensorBlockEntity sp;
 
     public GPSSensor(SensorBlockEntity sp) {
-        super(List.of(), List.of("wx", "wy", "wz"));
+        super(List.of(), List.of("x", "y", "z"));
         this.sp = sp;
     }
 

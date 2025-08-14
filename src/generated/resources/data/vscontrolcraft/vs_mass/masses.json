@@ -104,6 +104,10 @@
     "mass": 1.0
   },
   {
+    "block": "vscontrolcraft:flexible_gate",
+    "mass": 1.0
+  },
+  {
     "block": "vscontrolcraft:ff",
     "mass": 1.0
   },
@@ -154,5 +158,9 @@
   {
     "block": "vscontrolcraft:scope",
     "mass": 10.0
+  },
+  {
+    "block": "vscontrolcraft:cc_bridge",
+    "mass": 1.0
   }
 ]

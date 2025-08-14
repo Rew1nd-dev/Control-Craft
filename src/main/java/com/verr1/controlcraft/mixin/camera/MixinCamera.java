@@ -22,6 +22,7 @@ import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 
 import java.lang.Math;
+import java.math.BigInteger;
 import java.util.Optional;
 
 @Mixin(Camera.class)
@@ -116,7 +117,7 @@ public abstract class MixinCamera implements ICameraDuck {
 
                 dist = dist > 4 ? dist : 4;
 
-                inShipPlayerPosition = shipMountedTo.getRenderTransform().getPositionInShip();
+                // inShipPlayerPosition = shipMountedTo.getRenderTransform().getPositionInShip();
                 playerBasePos = renderTransform.getShipToWorld().transformPosition(inShipPlayerPosition, new Vector3d());
                 this.setPosition(playerBasePos.x(), playerBasePos.y(), playerBasePos.z());
 
@@ -127,7 +128,6 @@ public abstract class MixinCamera implements ICameraDuck {
                     this.move(-this.getMaxZoom(4.0 * (dist / 4.0)), 0.0, 0.0);
                 }
             }
-
         }
 
 

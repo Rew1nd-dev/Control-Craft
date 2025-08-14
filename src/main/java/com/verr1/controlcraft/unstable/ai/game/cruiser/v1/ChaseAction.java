@@ -1,9 +1,9 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser.v1;
 
-import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
 import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.Vector3d;
@@ -14,7 +14,7 @@ public class ChaseAction extends Action {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        CruiserBlockEntity context = blackboard.get(CruiserBlockEntity.CONTEXT);
+        CruiserBlockEntity context = blackboard.get(SharedAIKeys.CONTEXT);
 
         if (context == null)return Status.FAILURE;
 

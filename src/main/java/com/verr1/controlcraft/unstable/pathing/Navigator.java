@@ -107,20 +107,6 @@ public class Navigator {
             }
 
 
-            /*
-            public int segments() {
-                return path2D.segments();
-            }
-
-
-            public Vector3d lerp(int seg) {
-                Vector2d point2D = path2D.lerp(seg);
-                Vector3d point3D = new Vector3d(s);
-                point3D.add(u.mul(point2D.x, new Vector3d()));
-                point3D.add(v.mul(point2D.y, new Vector3d()));
-                return point3D;
-            }
-            * */
         };
     }
 

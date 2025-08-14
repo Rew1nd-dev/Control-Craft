@@ -1,19 +1,14 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
-import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
+import com.verr1.controlcraft.unstable.ai.api.IAirController;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.Situation;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
-import com.verr1.controlcraft.unstable.valkyrienskies.context.CruiserControllerV4;
-import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-
-import static com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils.*;
-import static com.verr1.controlcraft.utils.MathUtils.*;
 
 public class PivotToAction extends Action {
 
@@ -42,19 +37,19 @@ public class PivotToAction extends Action {
     * */
     @Override
     protected Status perform(Blackboard blackboard) {
-        CruiserBlockEntity context = blackboard.get(CruiserBlockEntity.CONTEXT);
-        Situation situation = blackboard.get(CruiserBlockEntity.AWARENESS);
-        if (context == null || situation == null)return Status.RUNNING;
-        CruiserControllerV4 controller = context.controller();
-        Vector3dc op_wc = situation.targetPosition().sub(situation.currentPosition(), new Vector3d());
+        IAirContext context = blackboard.get(SharedAIKeys.CONTEXT);
+        AirAwareness awareness = blackboard.get(CruiserBlockEntity.AWARENESS);
+        if (context == null || awareness == null)return Status.RUNNING;
+        IAirController controller = context.controller();
+        Vector3dc op_wc = awareness.targetPosition().sub(awareness.currentPosition(), new Vector3d());
 
         // ControlCraft.LOGGER.debug("pivoting  towards  target: {}", context.debugTargetName());
-        if(situation.isInLossCone() || situation.attackScore() < 5 || situation.mayCollide()){ //|| situation.mayCollide() situation.attackScore() < 5
-            return Status.FAILURE;
-        }
+//        if(situation.isInLossCone() || situation.attackScore() < 5 || situation.mayCollide()){ //|| situation.mayCollide() situation.attackScore() < 5
+//            return Status.FAILURE;
+//        }
 
-        controller.setAction(CruiseActions.TOWARDS);
-        // controller.setAction(CruiseActions.TEST);
+//        controller.setAction(CruiseActions.TOWARDS);
+//        controller.setAction(CruiseActions.VIEW);
         controller.overrideTarget(op_wc); //-finalTheta
 
         return Status.RUNNING;

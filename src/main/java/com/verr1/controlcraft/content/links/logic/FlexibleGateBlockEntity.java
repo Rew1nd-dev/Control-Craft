@@ -7,10 +7,8 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
-import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,7 +39,7 @@ public class FlexibleGateBlockEntity extends CimulinkBlockEntity<FlexibleGateLin
                         this::setGateType,
                         SerializeUtils.ofEnum(GateTypes.class)
                 ))
-                .withClient(ClientBuffer.of(GateTypes.class))
+                .withClient(ClientBuffer.ofEnum(GateTypes.class))
                 .register();
 
         buildRegistry(OUTPUT_MASK)

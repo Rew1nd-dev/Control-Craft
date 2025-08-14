@@ -13,6 +13,8 @@ public class FuncOperations {
     public static final MultiValFactory MIN = wrap(Functions.MIN);
     public static final MultiValFactory MUL = wrap(Functions.PRODUCT);
     public static final OneValFactory ANGLE_FIX = oneVal(Functions.ANGLE_FIX);
+    public static final OneValFactory RAD = oneVal(Functions.RAD);
+    public static final OneValFactory DEG = oneVal(Functions.DEG);
     public static final OneValFactory ABS = oneVal(Functions.ABS);
     public static final OneValFactory SIN = oneVal(Functions.SIN);
     public static final OneValFactory COS = oneVal(Functions.COS);

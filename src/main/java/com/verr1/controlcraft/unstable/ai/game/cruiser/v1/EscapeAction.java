@@ -6,6 +6,8 @@ import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.AirAwareness;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
 import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.Vector3d;
@@ -21,12 +23,12 @@ public class EscapeAction extends Action {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        CruiserBlockEntity context = blackboard.get(CruiserBlockEntity.CONTEXT);
-        Situation situation = blackboard.get(CruiserBlockEntity.AWARENESS);
-        if (context == null || situation == null)return Status.RUNNING;
+        CruiserBlockEntity context = blackboard.get(SharedAIKeys.CONTEXT);
+        AirAwareness awearness = blackboard.get(CruiserBlockEntity.AWARENESS);
+        if (context == null || awearness == null)return Status.RUNNING;
         ControlCraft.LOGGER.debug("escaping");
-        Vector3dc targetP = situation.targetPosition();
-        Vector3dc targetV = situation.targetVelocity();
+        Vector3dc targetP = awearness.targetPosition();
+        Vector3dc targetV = awearness.targetVelocity();
         Vector3dc currentP = context.getPosition();
         Vector3dc currentV = context.getVelocity();
 
@@ -36,8 +38,8 @@ public class EscapeAction extends Action {
         double idealR = context.controller().radius();
 
         double safeDistance = 1.2 * targetV.length() * idealR / idealV;
-        double randAn = situation.peekRandom(0);
-        double randSi = situation.peekRandom(1);
+        double randAn = awearness.peekRandom(0);
+        double randSi = awearness.peekRandom(1);
 
         double evadeAngle = blackboard.computeIfAbsent(EVADE_TARGET_ANGLE, () -> 0.0);
         double evadeOmega = MathUtils.lerp(randAn, 5, 8) * randSi > 0.5 ? 1 : -1;

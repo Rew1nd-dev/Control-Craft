@@ -38,7 +38,7 @@ public class ClientBuffer<T> implements Slot<CompoundTag> {
         this.clazz = clazz;
     }
 
-    public static<T extends Enum<?>> ClientBuffer<T> of(Class<T> enumClass){
+    public static<T extends Enum<?>> ClientBuffer<T> ofEnum(Class<T> enumClass){
         return new ClientBuffer<>(SerializeUtils.ofEnum(enumClass), enumClass);
     }
 

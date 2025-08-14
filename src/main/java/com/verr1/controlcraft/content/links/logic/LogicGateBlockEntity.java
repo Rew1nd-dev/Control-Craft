@@ -1,9 +1,7 @@
 package com.verr1.controlcraft.content.links.logic;
 
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
-import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.GateLinkPort;
-import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -32,7 +30,7 @@ public class LogicGateBlockEntity extends CimulinkBlockEntity<GateLinkPort> {
                     this::setCurrentType,
                 SerializeUtils.ofEnum(GateTypes.class)
             ))
-            .withClient(ClientBuffer.of(GateTypes.class))
+            .withClient(ClientBuffer.ofEnum(GateTypes.class))
             .runtimeOnly()
             .register();
 

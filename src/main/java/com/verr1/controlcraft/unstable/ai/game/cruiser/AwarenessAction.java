@@ -1,9 +1,10 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.Situation;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
 import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils;
 import org.joml.Vector3d;
@@ -16,21 +17,21 @@ public class AwarenessAction extends Action {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        CruiserBlockEntity context = blackboard.get(CruiserBlockEntity.CONTEXT);
-        Situation situation = blackboard.get(CruiserBlockEntity.AWARENESS);
+        IAirContext context = blackboard.get(SharedAIKeys.CONTEXT);
+        AirAwareness awareness = blackboard.get(CruiserBlockEntity.AWARENESS);
 
-        if (context == null || situation == null)return Status.RUNNING;
+        if (context == null || awareness == null)return Status.RUNNING;
 
-        double ratio = situation
+        double ratio = awareness
                 .state()
-                .newY(context.readSelf().position().y())
+                .newY(context.getPosition().y())
                 .cruiseRatio();
 
         context.controller().setVelocity(context.cruiseVelocity() * ratio);
 
-        Vector3dc targetPNullable = context.debug_getTarget();
+        Vector3dc targetPNullable = context.getTargetPosition();
         Vector3dc targetVNullable =
-                Optional.ofNullable(context.debug_getTargetVelocity())
+                Optional.ofNullable(context.getTargetVelocity())
                 .orElse(new Vector3d());
 
         if(targetPNullable == null)return Status.RUNNING;
@@ -39,7 +40,7 @@ public class AwarenessAction extends Action {
         Vector3dc fireP = currentP.fma(10, context.getHeading(), new Vector3d());
         Vector3dc aim = AIControlUtils.aimPredict(targetPNullable, targetVNullable, fireP, 140);
         Vector3dc finalTarget = aim == null ? targetPNullable : aim;
-        situation.overrideDual(
+        awareness.overrideDual(
                 finalTarget,
                 targetVNullable,
                 currentP,
@@ -47,7 +48,7 @@ public class AwarenessAction extends Action {
                 context.getHeading()
         );
 
-        situation.tick();
+        awareness.tick();
 
         return Status.RUNNING;
     }

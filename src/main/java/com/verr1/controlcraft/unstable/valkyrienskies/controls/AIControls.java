@@ -105,7 +105,7 @@ public class AIControls {
 
         Vector3dc vc_sc = ship.getTransform().getWorldToShip().transformDirection(vc_wc, new Vector3d());
         Vector3dc accel_xy = vc_sc.mul(-10, new Vector3d()).setComponent(2, 0);
-        Vector3dc accel_z = new Vector3d(0, 0, (targetV - vc_sc.z()) * 10);
+        Vector3dc accel_z = new Vector3d(0, 0, (targetV - vc_sc.z()) * 30);
         Vector3dc f_sc = accel_z.add(accel_xy, new Vector3d()).mul(mass);
         Vector3dc f = ship.getTransform().getShipToWorld().transformDirection(f_sc, new Vector3d());
 
@@ -117,6 +117,11 @@ public class AIControls {
         Vector3dc t = target.poseController().calcControlTorque();
 
         target.poseController().overridePhysics(ship);
+
+        if(target.disableDirectControl()){
+            target.controller().overrideNext(ship.getTransform().getShipToWorldRotation());
+            return;
+        }
 
         ship.applyInvariantForce(MathUtils.nonNan(f));
         ship.applyInvariantTorque(MathUtils.nonNan(t));

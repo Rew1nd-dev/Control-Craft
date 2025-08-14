@@ -1,22 +1,26 @@
 package com.verr1.controlcraft.content.compact.createbigcannons.impl;
 
 import com.verr1.controlcraft.ControlCraft;
-import com.verr1.controlcraft.content.compact.createbigcannons.ICannonMountPeripheralGetter;
+import com.verr1.controlcraft.content.compact.createbigcannons.APAutocannonAccess;
+import com.verr1.controlcraft.content.compact.createbigcannons.APAutocannonAccessImpl;
+import com.verr1.controlcraft.content.compact.createbigcannons.ICBCCompactAccess;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.mixinducks.ICannonDuck;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.cannon_control.cannon_mount.CannonMountBlockEntity;
 import rbasamoyai.createbigcannons.index.CBCBlocks;
+import rbasamoyai.createbigcannons.index.CBCEntityTypes;
+import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CannonMountPeripheralGetter implements ICannonMountPeripheralGetter {
+public class CBCCompactAccessImpl implements ICBCCompactAccess {
     @Override
     public IPeripheral getComputercraft(ServerLevel level, BlockPos pos) {
         AtomicBoolean found = new AtomicBoolean(false);
@@ -47,5 +51,10 @@ public class CannonMountPeripheralGetter implements ICannonMountPeripheralGetter
             case 1 -> CBCBlocks.FIXED_CANNON_MOUNT.getDefaultState();
             default -> null;
         };
+    }
+
+    @Override
+    public APAutocannonAccess createAutocannonAp(Level level) {
+        return new APAutocannonAccessImpl(new APAutocannonProjectile(CBCEntityTypes.AP_AUTOCANNON.get(), level));
     }
 }

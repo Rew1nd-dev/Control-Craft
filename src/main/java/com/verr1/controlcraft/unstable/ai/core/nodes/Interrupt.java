@@ -22,8 +22,8 @@ public class Interrupt extends Decorator {
         // 如果条件状态发生变化（从满足变为不满足）
         if (wasConditionMet && !isConditionMet) {
             // 中断子节点
-            if (child instanceof Interruptible) {
-                ((Interruptible) child).interrupt();
+            if (child instanceof Interruptible it) {
+                it.interrupt(null);
             }
             child.reset();
             hasInterrupted = true;

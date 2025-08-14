@@ -10,7 +10,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 
 import java.util.List;
 
-public class FPV {
+public class FPV_ {
     public static CircuitNbt fpv_decomposition(){
         LinearAdder[] decomposition = new LinearAdder[]{
                 new LinearAdder(List.of(0.25, -0.25, 0.25, 0.25)),

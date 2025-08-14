@@ -274,17 +274,17 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         plant = new SliderPlant(this);
         buildRegistry(CHEAT_MODE)
                 .withBasic(SerializePort.of(this::getCheatMode, this::setCheatMode, SerializeUtils.ofEnum(CheatMode.class)))
-                .withClient(ClientBuffer.of(CheatMode.class))
+                .withClient(ClientBuffer.ofEnum(CheatMode.class))
                 .register();
 
         buildRegistry(TARGET_MODE)
                 .withBasic(SerializePort.of(this::getTargetMode, this::setTargetMode, SerializeUtils.ofEnum(TargetMode.class)))
-                .withClient(ClientBuffer.of(TargetMode.class))
+                .withClient(ClientBuffer.ofEnum(TargetMode.class))
                 .register();
 
         buildRegistry(LOCK_MODE)
                 .withBasic(SerializePort.of(this::getLockMode, this::setLockMode, SerializeUtils.ofEnum(LockMode.class)))
-                .withClient(ClientBuffer.of(LockMode.class))
+                .withClient(ClientBuffer.ofEnum(LockMode.class))
                 .register();
 
         buildRegistry(IS_LOCKED)

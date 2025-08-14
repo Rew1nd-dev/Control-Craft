@@ -24,7 +24,7 @@ public class FFBlockEntity extends CimulinkBlockEntity<FFLinkPort> {
                         this::setCurrentType,
                         SerializeUtils.ofEnum(FFTypes.class)
                 ))
-                .withClient(ClientBuffer.of(FFTypes.class))
+                .withClient(ClientBuffer.ofEnum(FFTypes.class))
                 .runtimeOnly()
                 .register();
     }

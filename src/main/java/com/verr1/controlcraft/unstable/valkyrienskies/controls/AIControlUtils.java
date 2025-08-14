@@ -145,6 +145,21 @@ public class AIControlUtils {
 
     }
 
+    public static double pedalFromA(Vector3dc A, Vector3dc B, Vector3dc P) {
+        Vector3d AB = new Vector3d(B).sub(A); // Vector AB
+        Vector3d AP = new Vector3d(P).sub(A); // Vector AP
+
+        double abLengthSquared = AB.lengthSquared();
+        if (abLengthSquared < 1e-10) {
+            // Handle degenerate case where A and B are the same point
+            return Double.POSITIVE_INFINITY;
+        }
+
+        // Project AP onto AB, clamping the result to the range [0, 1]
+        return AP.dot(AB) / abLengthSquared;
+
+    }
+
     public static Vector3d circumcenter(Vector3dc a, Vector3dc b, Vector3dc c) {
         Vector3d abMid = new Vector3d(a).add(b).mul(0.5); // Midpoint of AB
         Vector3d bcMid = new Vector3d(b).add(c).mul(0.5); // Midpoint of BC

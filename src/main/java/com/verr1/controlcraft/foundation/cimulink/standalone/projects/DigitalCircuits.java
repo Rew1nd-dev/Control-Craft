@@ -14,10 +14,29 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Com
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
+import com.verr1.controlcraft.foundation.cimulink.standalone.eval.Evaluator;
+import com.verr1.controlcraft.foundation.cimulink.standalone.eval.Val;
 
 import java.util.List;
 
 public class DigitalCircuits {
+
+    public static CircuitNbt decoder8(){
+        Evaluator eval = new Evaluator();
+
+        Val v = eval.newVal("in");
+        Val[] zs = new Val[8];
+        for (int i = 0; i < 8; i++){
+            zs[i] = eval.newVal(i);
+        }
+        for (int i = 0; i < 8; i++){
+            eval.asOut("o" + i, v.equal(zs[i]));
+        }
+
+
+        return eval.evaluate().buildContext();
+    }
+
 
     public static CircuitNbt rangeAdder(){
 

@@ -80,6 +80,31 @@ public class Functions {
         }
     };
 
+    public static final Supplier<FunctionN> RAD = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(Math.toRadians(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.RAD;
+        }
+    };
+
+    public static final Supplier<FunctionN> DEG = () -> new FunctionN(1) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            return List.of(Math.toDegrees(inputs.get(0)));
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.DEG;
+        }
+    };
+
+
     public static final Supplier<FunctionN> POWER = () -> new FunctionN(2) {
         @Override
         protected List<Double> transform(List<Double> inputs) {

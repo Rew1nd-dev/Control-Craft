@@ -113,13 +113,15 @@ public enum UIContents implements Descriptive<UIContents> {
 
 
 
+    AI_FLIGHT(Component.literal("Actual Flight"), literals("Use Real Flight")),
+    AI_WEAPON(Component.literal("Actual Weapon"), literals("Use Real Weapon")),
 
-
-    AI_VEL(Component.literal("Vel"), literals("")),
-    AI_RAD(Component.literal("Radius"), literals("")),
-    AI_TOL(Component.literal("Tol"), literals("")),
-    AI_TAR(Component.literal("Target"), literals("")),
-    AI_TWI(Component.literal("Twist"), literals(""));
+    AI_YAW(Component.literal("Yaw"), literals("Yaw Omega")),
+    AI_VEL(Component.literal("Vel"), literals("Cruise Velocity")),
+    AI_RAD(Component.literal("Radius"), literals("Cruise Radius")),
+    AI_TOL(Component.literal("Tol"), literals("Shoot Angle Tolerance")),
+    AI_TAR(Component.literal("Target"), literals("Track A Spinalyzer With Peripheral Interface Named By This Setting")),
+    AI_TWI(Component.literal("Twist"), literals("Roll Omega"));
 
 
 

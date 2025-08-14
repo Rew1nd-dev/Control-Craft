@@ -155,20 +155,17 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.CLIP_ENTITY, Converter::titleStyle)
         );
 
-        BooleanUIField stab = new BooleanUIField(
+        OptionUIField<CameraViewType> stab = new OptionUIField<>(
                 boundAnchorPos,
                 CameraBlockEntity.TR,
+                CameraViewType.class,
                 Converter.convert(UIContents.CAMERA_STAB, Converter::titleStyle)
-        ).inverted();
-
-        BooleanUIField third = new BooleanUIField(
-                boundAnchorPos,
-                CameraBlockEntity.THIRD_PERSON,
-                Converter.convert(UIContents.CAMERA_3, Converter::titleStyle)
         );
 
+
+
         Runnable alignLabels = () -> {
-            Converter.alignLabel(is_sensor, cast_ray, ship_ray, entity_ray, stab, third);
+            Converter.alignLabel(is_sensor, cast_ray, ship_ray, entity_ray, stab);
             Converter.alignLabel(cast_ray.valueLabel(), ship_ray.valueLabel(), entity_ray.valueLabel());
         };
 
@@ -177,7 +174,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundAnchorPos)
-                                .withPort(is_sensor, cast_ray, ship_ray, entity_ray, stab, third)
+                                .withPort(is_sensor, cast_ray, ship_ray, entity_ray, stab)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )

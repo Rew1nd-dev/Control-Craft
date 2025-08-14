@@ -109,10 +109,6 @@ public class Val {
         return eval().acos(this);
     }
 
-    public Val atan() {
-        return eval().atan(this);
-    }
-
     public Val max(Val... other) {
         return eval().max(join(other));
     }

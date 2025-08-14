@@ -31,6 +31,7 @@ import com.verr1.controlcraft.foundation.network.packets.specific.ReceiveLatestW
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.CameraClipType;
+import com.verr1.controlcraft.foundation.type.descriptive.CameraViewType;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
@@ -126,11 +127,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
 
 
-    private boolean transformRotation = true;
-
-
-
-    private boolean thirdPerson = false;
+    private CameraViewType viewType = CameraViewType.ROT;
 
     private CameraClipType rayType = CameraClipType.NO_RAY;
 
@@ -171,12 +168,9 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     }
     public boolean thirdPerson() {
-        return thirdPerson;
+        return viewType == CameraViewType.F5;
     }
 
-    public void setThirdPerson(boolean thirdPerson) {
-        this.thirdPerson = thirdPerson;
-    }
     public void clipNewShip(){
         latestShipHitResult = clipShip();
     }
@@ -248,11 +242,15 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     public boolean transformRotation() {
-        return transformRotation;
+        return viewType == CameraViewType.ROT;
     }
 
-    public void setTransformRotation(boolean transformRotation) {
-        this.transformRotation = transformRotation;
+    public CameraViewType viewType(){
+        return viewType;
+    }
+
+    public void setViewType(CameraViewType viewType){
+        this.viewType = viewType;
     }
 
     @Override
@@ -383,15 +381,16 @@ public class CameraBlockEntity extends OnShipBlockEntity
         return yaw;
     }
 
+
     public double getTransformedPitch() {
-        if(transformRotation){
+        if(transformRotation()){
             return pitch;
         }
         return Math.toDegrees(angle(getLocViewForward()).getSecond());
     }
 
     public double getTransformedYaw() {
-        if(transformRotation){
+        if(transformRotation()){
             return yaw;
         }
         return Math.toDegrees(angle(getLocViewForward()).getFirst());
@@ -865,7 +864,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                         .rotateX(Math.toRadians(getPitch()))
                         .normalize();
 
-        return transformRotation ?
+        return transformRotation() ?
                 getCameraBaseRotation().mul(originalRotation, new Quaterniond()) :
                 originalRotation;
 
@@ -883,7 +882,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                         .rotateX(Math.toRadians(getPitch()))
                         .normalize();
 
-        return transformRotation ?
+        return transformRotation() ?
                 originalRotation :
                 getCameraBaseRotation().conjugate(new Quaterniond()).mul(originalRotation, new Quaterniond());
     }
@@ -1053,14 +1052,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
         buildRegistry(PITCH).withBasic(SerializePort.of(this::getPitch, this::setPitch, SerializeUtils.DOUBLE)).register();
         buildRegistry(YAW).withBasic(SerializePort.of(this::getYaw, this::setYaw, SerializeUtils.DOUBLE)).register();
         buildRegistry(TR)
-                .withBasic(SerializePort.of(this::transformRotation, this::setTransformRotation, SerializeUtils.BOOLEAN))
-                .withClient(ClientBuffer.BOOLEAN.get())
-                .dispatchToSync()
-                .register();
-
-        buildRegistry(THIRD_PERSON)
-                .withBasic(SerializePort.of(this::thirdPerson, this::setThirdPerson, SerializeUtils.BOOLEAN))
-                .withClient(ClientBuffer.BOOLEAN.get())
+                .withBasic(SerializePort.of(this::viewType, this::setViewType, SerializeUtils.ofEnum(CameraViewType.class)))
+                .withClient(ClientBuffer.ofEnum(CameraViewType.class))
                 .dispatchToSync()
                 .register();
 
@@ -1081,7 +1074,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                     )
                 )
                 .withClient(
-                    ClientBuffer.of(CameraClipType.class)
+                    ClientBuffer.ofEnum(CameraClipType.class)
                 )
                 .dispatchToSync()
                 .register();
@@ -1095,7 +1088,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                         )
                 )
                 .withClient(
-                        ClientBuffer.of(CameraClipType.class)
+                        ClientBuffer.ofEnum(CameraClipType.class)
                 )
                 .dispatchToSync()
                 .register();
@@ -1109,7 +1102,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                         )
                 )
                 .withClient(
-                        ClientBuffer.of(CameraClipType.class)
+                        ClientBuffer.ofEnum(CameraClipType.class)
                 )
                 .dispatchToSync()
                 .register();

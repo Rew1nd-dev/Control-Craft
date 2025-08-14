@@ -16,9 +16,9 @@ public enum SensorTypes implements Descriptive<SensorTypes> {
             "Euler Angle Sensor,",
             "Y:yaw | X:pitch | Z:roll",
             "Rotation Sequence: ",
-            "1. Turn around Y-axis",
-            "2. Turn around Z-axis after step 1.",
-            "3. Turn around X-axis after step 2."
+            "1. Turn around Y-axis for yaw",
+            "2. Turn around X-axis for pitch after step 1.",
+            "3. Turn around Z-axis for roll after step 2."
     )),
     GPS(literals("GPS Sensor"))
     ;

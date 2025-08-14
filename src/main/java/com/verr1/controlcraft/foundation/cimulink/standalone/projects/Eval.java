@@ -57,7 +57,7 @@ public class Eval {
         Val ne = eval.neg(a);
         Val asin = eval.asin(a);
         Val acos = eval.acos(a);
-        Val atan = eval.atan(a);
+        Val atan = eval.atan(a, b);
         Val pow = eval.power(a, b);
         Val abs = eval.abs(a);
         Val sin = eval.sin(a);

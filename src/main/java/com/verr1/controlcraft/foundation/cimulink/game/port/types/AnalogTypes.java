@@ -26,6 +26,14 @@ public enum AnalogTypes implements
     ABS(ComponentInstances.ABS, literals("Output the absolute value of the input"), AnalogGroups.Basic),
 
     ANGLE_FIX(ComponentInstances.ANGLE_FIX, literals("Coerce the input into (-pi, pi)"), AnalogGroups.Trigonometric),
+    RAD(ComponentInstances.Inspector.of(Functions.RAD::get),
+            List.of(Component.literal("Convert the input from degrees to radians")),
+            AnalogGroups.Trigonometric
+    ),
+    DEG(ComponentInstances.Inspector.of(Functions.DEG::get),
+            List.of(Component.literal("Convert the input from radians to degrees")),
+            AnalogGroups.Trigonometric
+    ),
     SIN(ComponentInstances.SIN, literals("Output the sine of the input"), AnalogGroups.Trigonometric),
     COS(ComponentInstances.COS, literals("Output the cosine of the input"), AnalogGroups.Trigonometric),
     TAN(ComponentInstances.TAN, literals("Output the tangent of the input"), AnalogGroups.Trigonometric),
@@ -99,7 +107,7 @@ public enum AnalogTypes implements
 
 
     public static final AnalogTypes[] BASIC = new AnalogTypes[]{AnalogTypes.MIN, AnalogTypes.MAX, AnalogTypes.PRODUCT, AnalogTypes.DIV, AnalogTypes.POWER, AnalogTypes.ABS};
-    public static final AnalogTypes[] TRIGONOMETRIC = new AnalogTypes[]{AnalogTypes.ANGLE_FIX, AnalogTypes.SIN, AnalogTypes.COS, AnalogTypes.TAN, AnalogTypes.ASIN, AnalogTypes.ACOS, AnalogTypes.ATAN};
+    public static final AnalogTypes[] TRIGONOMETRIC = new AnalogTypes[]{AnalogTypes.ANGLE_FIX, AnalogTypes.RAD, AnalogTypes.DEG, AnalogTypes.SIN, AnalogTypes.COS, AnalogTypes.TAN, AnalogTypes.ASIN, AnalogTypes.ACOS, AnalogTypes.ATAN};
     public static final AnalogTypes[] VECTOR = new AnalogTypes[]{AnalogTypes.DOT, AnalogTypes.CROSS, AnalogTypes.Q_TRANSFORM, AnalogTypes.V_NORM, AnalogTypes.V_MAG, AnalogTypes.V_LOOK_ALONG, AnalogTypes.Q_SLERP, AnalogTypes.Q_MUL};
 
 

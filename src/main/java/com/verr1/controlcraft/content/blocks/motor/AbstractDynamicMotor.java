@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.blocks.motor;
 
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.utility.Couple;
-import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.DMotorKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.DynamicMotorForceInducer;
@@ -83,8 +82,8 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
     public void setTargetAccordingly(double target){
         switch (targetMode){
-            case POSITION : controller.setTarget(MathUtils.radianReset(target));
-            case VELOCITY : controller.setTarget(target);
+            case POSITION -> controller.setTarget(MathUtils.radianReset(target));
+            case VELOCITY -> controller.setTarget(target);
         }
     }
 
@@ -316,17 +315,17 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
                         this::getCheatMode,
                         this::setCheatMode,
                         SerializeUtils.ofEnum(CheatMode.class)))
-                .withClient(ClientBuffer.of(CheatMode.class))
+                .withClient(ClientBuffer.ofEnum(CheatMode.class))
                 .register();
 
         buildRegistry(TARGET_MODE)
                 .withBasic(SerializePort.of(this::getTargetMode, this::setTargetMode, SerializeUtils.ofEnum(TargetMode.class)))
-                .withClient(ClientBuffer.of(TargetMode.class))
+                .withClient(ClientBuffer.ofEnum(TargetMode.class))
                 .register();
 
         buildRegistry(LOCK_MODE)
                 .withBasic(SerializePort.of(this::getLockMode, this::setLockMode, SerializeUtils.ofEnum(LockMode.class)))
-                .withClient(ClientBuffer.of(LockMode.class))
+                .withClient(ClientBuffer.ofEnum(LockMode.class))
                 .register();
 
         buildRegistry(IS_LOCKED)
@@ -362,8 +361,8 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
         buildRegistry(TARGET)
                 .withBasic(SerializePort.of(
-                        () -> getController().getTarget(),
-                        t -> getController().setTarget(t),
+                        this::getTarget,
+                        this::setTargetAccordingly,
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(

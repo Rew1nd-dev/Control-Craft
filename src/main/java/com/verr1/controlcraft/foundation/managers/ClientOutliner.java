@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.managers;
 
 import com.simibubi.create.CreateClient;
+import com.simibubi.create.foundation.outliner.Outline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,6 +14,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientOutliner {
@@ -68,27 +70,27 @@ public class ClientOutliner {
         };
     }
 
-    public static void drawOutline(BlockPos selection, int color, String slot) {
+    public static @Nullable Outline.OutlineParams drawOutline(BlockPos selection, int color, String slot) {
         Level world = Minecraft.getInstance().level;
         if (selection == null)
-            return;
-        if(world == null)return;
+            return null;
+        if(world == null)return null;
 
         BlockState state = world.getBlockState(selection);
         VoxelShape shape = state.getShape(world, selection);
         AABB boundingBox = shape.isEmpty() ? new AABB(BlockPos.ZERO) : shape.bounds();
-        CreateClient.OUTLINER.showAABB(slot, boundingBox.move(selection))
+        return CreateClient.OUTLINER.showAABB(slot, boundingBox.move(selection))
                 .colored(color)
                 .lineWidth(1 / 16f);
     }
 
-    public static void drawOutline(Entity e){
-        CreateClient.OUTLINER.showAABB(e.getUUID(), e.getBoundingBox(), 1);
+    public static Outline.OutlineParams drawOutline(Entity e){
+        return CreateClient.OUTLINER.showAABB(e.getUUID(), e.getBoundingBox(), 1);
     }
 
 
-    public static void drawOutline(@NotNull AABB aabb, int color, String slot, double scale, double width) {
-        CreateClient.OUTLINER.showAABB(slot, aabb)
+    public static Outline.OutlineParams drawOutline(@NotNull AABB aabb, int color, String slot, double scale, double width) {
+        return CreateClient.OUTLINER.showAABB(slot, aabb)
                 .colored(color)
                 .lineWidth((float) (width * (float)scale * 2f));
     }

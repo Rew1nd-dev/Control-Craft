@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.links.func;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.analog.FunctionsLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.AnalogTypes;
-import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -24,7 +23,7 @@ public class FunctionsBlockEntity extends CimulinkBlockEntity<FunctionsLinkPort>
                         t ->  linkPort().setCurrentType(t),
                         SerializeUtils.ofEnum(AnalogTypes.class)
                 ))
-                .withClient(ClientBuffer.of(AnalogTypes.class))
+                .withClient(ClientBuffer.ofEnum(AnalogTypes.class))
                 .runtimeOnly() // types will be saved by port itself
                 .register();
     }

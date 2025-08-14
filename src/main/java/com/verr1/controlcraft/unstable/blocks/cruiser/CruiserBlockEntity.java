@@ -5,27 +5,36 @@ import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlockEntity;
 import com.verr1.controlcraft.content.cctweaked.peripheral.SpinalyzerPeripheral;
+import com.verr1.controlcraft.content.compact.createbigcannons.APAutocannonAccess;
+import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
-import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
+import com.verr1.controlcraft.unstable.ai.compact.links.CruiserPlant;
 import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.BehaviorTree;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.nodes.*;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.*;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.ChaseAction;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.EvadeEnterCondition;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.EvadeExitCondition;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.PullEnterCondition;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.PullExitCondition;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.AirAwareness;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.DubinsHolderV2;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.EscapeAction;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.Situation;
 import com.verr1.controlcraft.unstable.valkyrienskies.attachments.ConstantCruiseNavigator;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.*;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,8 +43,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-import rbasamoyai.createbigcannons.index.CBCEntityTypes;
-import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
 
 import java.awt.*;
 import java.util.Objects;
@@ -44,24 +51,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
-public class CruiserBlockEntity extends OnShipBlockEntity {
-    public static final NetworkKey GOAL = NetworkKey.create("cruiser_goal");
-    public static final NetworkKey PATH = NetworkKey.create("cruiser_path");
+public class CruiserBlockEntity extends OnShipBlockEntity implements
+        IPlant, IAirContext
+{
 
 
-    public static final NetworkKey VEL = NetworkKey.create("cruiser_vel");
-    public static final NetworkKey RAD = NetworkKey.create("cruiser_rad");
-    public static final NetworkKey TAR = NetworkKey.create("db_tar");
-    public static final NetworkKey TOL = NetworkKey.create("shoot_tol");
-    public static final NetworkKey TWI = NetworkKey.create("cruise_twist");
-    public static final Address<Situation> AWARENESS = new Address<>("awareness", Situation.class);
+    public static final Address<AirAwareness> AWARENESS = new Address<>("awareness", AirAwareness.class);
 
 
-    public static Address<CruiserBlockEntity> CONTEXT = new Address<>("cruiser", CruiserBlockEntity.class);
     private final Blackboard storage = new Blackboard();
     private final BehaviorTree ai;
     private final CruiserControllerV4 cruiseController = new CruiserControllerV4();
-    private final Situation awareness = new Situation(this);
+
+
+    private final CruiserPlant plant = new CruiserPlant(this);
+    private final AirAwareness awareness = new AirAwareness(this);
 
 
     private final PoseController poseController = new PoseController();
@@ -72,51 +76,72 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
     private double cruiseVelocity = 50;
     private double shootTolerance = 7.5;
 
+    private boolean useActualFlight = false;
+    private boolean useActualWeapon = false;
 
-
-    private double twistOmega = 7;
 
     public CruiserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
 
 
 
-        buildRegistry(VEL)
+        buildRegistry(SharedAIKeys.VEL)
                 .withBasic(SerializePort.of(this::cruiseVelocity, this::setCruiseVelocity, SerializeUtils.DOUBLE))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 
-        buildRegistry(RAD)
+        buildRegistry(SharedAIKeys.RAD)
                 .withBasic(SerializePort.of(this::cruiseRadius, this::setCruiseRadius, SerializeUtils.DOUBLE))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 
-        buildRegistry(TOL)
+        buildRegistry(SharedAIKeys.TOL)
                 .withBasic(SerializePort.of(this::shootTolerance, this::setShootTolerance, SerializeUtils.DOUBLE))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 
-        buildRegistry(TAR)
+        buildRegistry(SharedAIKeys.TAR)
                 .withBasic(SerializePort.of(this::debugTargetName, this::setDebugTargetName, SerializeUtils.STRING))
                 .withClient(ClientBuffer.STRING.get())
                 .register();
 
-        buildRegistry(TWI)
+        buildRegistry(SharedAIKeys.TWI)
                 .withBasic(SerializePort.of(this::twistOmega, this::setTwistOmega, SerializeUtils.DOUBLE))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .register();
 
-        storage.set(CONTEXT, this);
+        buildRegistry(SharedAIKeys.YAW)
+                .withBasic(SerializePort.of(this::yawOmega, this::setYawOmega, SerializeUtils.DOUBLE))
+                .withClient(ClientBuffer.DOUBLE.get())
+                .register();
+
+        buildRegistry(SharedAIKeys.ACTUAL_FLIGHT)
+                .withBasic(SerializePort.of(this::useActualFlight, this::setUseActualFlight, SerializeUtils.BOOLEAN))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .register();
+
+        buildRegistry(SharedAIKeys.ACTUAL_WEAPON)
+                .withBasic(SerializePort.of(this::useActualWeapon, this::setUseActualWeapon, SerializeUtils.BOOLEAN))
+                .withClient(ClientBuffer.BOOLEAN.get())
+                .register();
+
+        storage.set(SharedAIKeys.CONTEXT, this);
         storage.set(AWARENESS, awareness);
 
         Node root = new Parallel(ParallelPolicy.SUCCEED_ON_ALL).addChild(
                 new Always(
-                        new Selector().addChild(
-                                new PivotToAction(),
-                                new PivotAwayAction())
-                        ),
-                // new PivotToAction(),
-                // new PivotAwayAction(),
+                        new ThenUntilElse(
+                                new PullEnterCondition(),
+                                new PivotUpAction(),
+                                new PullExitCondition(),
+                                new ThenUntilElse(
+                                        new EvadeEnterCondition(),
+                                        new PivotAwayAction(),
+                                        new EvadeExitCondition(),
+                                        new PivotToAction()
+                                )
+                        )
+                    ),
                 new FireAction(),
                 new AwarenessAction()
         );
@@ -124,6 +149,34 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
 
         ai = new BehaviorTree(root);
 
+    }
+
+    public AirAwareness awareness() {
+        return awareness;
+    }
+
+    public boolean useActualWeapon() {
+        return useActualWeapon;
+    }
+
+    public void setUseActualWeapon(boolean useActualWeapon) {
+        this.useActualWeapon = useActualWeapon;
+    }
+
+    public boolean useActualFlight() {
+        return controller().useActualFlight();
+    }
+
+    public void setUseActualFlight(boolean useActualFlight) {
+        controller().setUseActualFlight(useActualFlight);
+    }
+
+    public double yawOmega(){
+        return controller().yawOmega();
+    }
+
+    public void setYawOmega(double yawOmega){
+        controller().setYawOmega(yawOmega);
     }
 
     public double twistOmega() {
@@ -160,6 +213,16 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
         this.cruiseVelocity = cruiseVelocity;
     }
 
+    @Override
+    public Level world() {
+        return getLevel();
+    }
+
+    @Override
+    public Long shipId() {
+        return getShipOrGroundID();
+    }
+
     public double cruiseRadius(){
         return controller().radius();
     }
@@ -171,7 +234,7 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
 
 
     public LogicalDirectionTarget getLogical(){
-        return new LogicalDirectionTarget(cruiseController, poseController);
+        return new LogicalDirectionTarget(cruiseController, poseController, useActualFlight());
     }
 
     public PoseController poseController() {
@@ -195,18 +258,19 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
 
     public void fireAt(Vector3dc direction){
         if(isClientSide())return;
+        if(useActualWeapon())return;
+
         Objects.requireNonNull(level);
         Vector3dc p = readSelf().position();
         Vector3dc front = readSelf().s2wTransform().transformDirection(new Vector3d(0, 0, 1));
         Vector3dc spawn = p.fma(10.0, front, new Vector3d());
-        APAutocannonProjectile ap = new APAutocannonProjectile(CBCEntityTypes.AP_AUTOCANNON.get(), level);
-        // Arrow ap = new Arrow(EntityType.ARROW, level);
+        APAutocannonAccess ap = CreateBigCannonsCompact.createAutocannonAp(level);
+        if(ap == null)return;
         ap.setPos(toMinecraft(spawn));
         ap.setTracer(true);
-        ap.setChargePower(8);
         ap.setLifetime(40);
         ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
-        level.addFreshEntity(ap);
+        ap.addToLevel();
     }
 
     public @NotNull Vector3dc getPosition(){
@@ -250,11 +314,11 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
     }
 
     private Vector3dc readClientGoal(){
-        return handler().readClientBuffer(GOAL, Vector3dc.class);
+        return handler().readClientBuffer(SharedAIKeys.GOAL, Vector3dc.class);
     }
 
     private DubinsHolderV2 readClientPath(){
-        return handler().readClientBuffer(PATH, DubinsHolderV2.class);
+        return handler().readClientBuffer(SharedAIKeys.PATH, DubinsHolderV2.class);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -287,7 +351,12 @@ public class CruiserBlockEntity extends OnShipBlockEntity {
     public void tickServer() {
         super.tickServer();
         tickAI();
-        syncForAllPlayers(false, GOAL, PATH);
+        syncForAllPlayers(false, SharedAIKeys.GOAL, SharedAIKeys.PATH);
         syncCruiseTarget();
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
     }
 }

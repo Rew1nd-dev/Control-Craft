@@ -663,8 +663,9 @@ public abstract class BlockLinkPort {
     public final void recreate(){
         realTimeComponent = create();
         ControlCraft.LOGGER.info("calling recreate() at: {}", pos());
-        inputsNames().forEach(this::disconnectInput);
-        outputsNames().forEach(this::disconnectOutput);
+        removeInvalid();
+        // inputsNames().forEach(this::disconnectInput);
+        // outputsNames().forEach(this::disconnectOutput);
     }
 
     public void onInputChange(String... changedInput) {

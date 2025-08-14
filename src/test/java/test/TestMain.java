@@ -14,8 +14,8 @@ public class TestMain {
         // Packaging.packageTest_1();
         // BlockLinkPortTest.loopTest();
 
-        System.out.println(new Quaterniond(0.4963, 0.3301, 0.7746, 0.2115).lengthSquared());
-
+        // System.out.println(new Quaterniond(0.4963, 0.3301, 0.7746, 0.2115).lengthSquared());
+        System.out.println(MathUtils.radianReset(4.2));
         // Debug.TEST_ENVIRONMENT = true;
 
         // FactoryTest.buildTag();

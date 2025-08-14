@@ -1,19 +1,26 @@
-package com.verr1.controlcraft.unstable.ai.game.cruiser.v1;
+package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
-import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
-import com.verr1.controlcraft.unstable.ai.game.util.LazyRandom;
-import com.verr1.controlcraft.unstable.ai.game.util.SchmittTrigger;
-import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.CruiseState;
+import com.verr1.controlcraft.unstable.util.LazyRandom;
+import com.verr1.controlcraft.unstable.util.SchmittTrigger;
 import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils;
 import com.verr1.controlcraft.utils.MathUtils;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.BlockHitResult;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Situation {
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+
+public class AirAwareness {
 
     private final List<LazyRandom> lazyRandoms;
 
@@ -36,9 +43,41 @@ public class Situation {
 
     private final Vector3d currentFront = new Vector3d();
 
-    private final CruiserBlockEntity context;
+    private final IAirContext context;
 
-    public Situation(CruiserBlockEntity context) {
+    private double currentHeight = 0;
+    private double headingObstacleDistance = 0;
+
+    public void tickAltitude(){
+        Level world = context.world();
+        if(world == null)return;
+        int x = (int)currentPosition.x();
+        int z = (int)currentPosition.z();
+        double height = world.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+        currentHeight = currentPosition.y() - height;
+        long shipId = context.shipId();
+        ClipContext ctx = new ClipContext(
+                toMinecraft(currentPosition),
+                toMinecraft(currentPosition.fma(context.cruiseRadius() * 3, currentFront, new Vector3d())),
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.ANY,
+                null
+        );
+
+        BlockHitResult result = RaycastUtilsKt.clipIncludeShips(world, ctx, true, shipId);
+        headingObstacleDistance = result.getLocation().distanceTo(toMinecraft(currentPosition));
+
+    }
+
+    public boolean shouldPullUp(){
+        return currentHeight < 1.5 * context.cruiseRadius() || headingObstacleDistance < 1.5 * context.cruiseRadius();
+    }
+
+    public boolean obstacleSafe(){
+        return currentHeight > 1.5 * context.cruiseRadius() && headingObstacleDistance > 1.5 * context.cruiseRadius();
+    }
+
+    public AirAwareness(IAirContext context) {
         this.context = context;
         AtomicInteger delay = new AtomicInteger(0);
         lazyRandoms = ArrayUtils.ListOf(10, () -> new LazyRandom(20 * delay.getAndIncrement()));
@@ -116,9 +155,20 @@ public class Situation {
     }
 
     public void tick(){
+        lazyTick();
+
         tickThreat();
         tickAttack();
         tickRandoms();
+    }
+
+    private int lazyTickCounter = 0;
+    private int lazyTickRate = 5;
+
+    public void lazyTick(){
+        if(lazyTickCounter-->0)return;
+        lazyTickCounter = lazyTickRate;
+        tickAltitude();
     }
 
     public void overrideDual(
@@ -179,6 +229,10 @@ public class Situation {
 
     public double distance(){
         return targetRelative().length();
+    }
+
+    public double safeDistance(){
+        return Math.max(targetVelocity().length(), context.cruiseVelocity()) * context.cruiseRadius() / context.cruiseVelocity();
     }
 
     public double heuristicWindow(){

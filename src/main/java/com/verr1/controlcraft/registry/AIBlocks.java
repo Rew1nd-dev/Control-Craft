@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlock;
+import com.verr1.controlcraft.unstable.blocks.jet.AiJetBlock;
 import net.minecraft.world.level.material.MapColor;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
@@ -26,6 +27,17 @@ public class AIBlocks {
             .item()
             .transform(customItemModel())
             .lang("cruiser")
+            .register();
+
+    public static final BlockEntry<AiJetBlock> JET = REGISTRATE
+            .block(AiJetBlock.ID, AiJetBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(BlockStateGen.directionalBlockProvider(true))
+            .item()
+            .transform(customItemModel())
+            .lang("jet")
             .register();
 
     public static void register(){}

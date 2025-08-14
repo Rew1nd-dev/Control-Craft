@@ -1,54 +1,44 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
 
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
+import com.verr1.controlcraft.unstable.ai.api.IAirController;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.v1.Situation;
+import com.verr1.controlcraft.unstable.ai.core.nodes.Interruptible;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
-import com.verr1.controlcraft.unstable.valkyrienskies.context.CruiserControllerV4;
 import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
-import java.awt.*;
-
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.cruiser.v1.EscapeAction.EVADE_TARGET_ANGLE;
 
-public class PivotAwayAction extends Action {
+public class PivotAwayAction extends Action implements Interruptible {
 
-    /*
-    * Vector3dc op_wc = situation.targetPosition().sub(situation.currentPosition(), new Vector3d());
-        double randAn = situation.peekRandom(0);
-        double randPhi = randAn * Math.PI * 2;
-        double radius = controller.radius();
-        Vector3dc randDir = new Vector3d(Math.cos(randPhi), 0, Math.sin(randPhi)).mul(radius * 12);
-        ControlCraft.LOGGER.debug("pivoting away from target: {}", context.debugTargetName());
-        controller.setAction(CruiseActions.AWAY);
-        Vector3dc target = op_wc.add(randDir, new Vector3d());
-    * */
+
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        CruiserBlockEntity context = blackboard.get(CruiserBlockEntity.CONTEXT);
-        Situation situation = blackboard.get(CruiserBlockEntity.AWARENESS);
-        if (context == null || situation == null)return Status.FAILURE;
-        CruiserControllerV4 controller = context.controller();
+        IAirContext context = blackboard.get(SharedAIKeys.CONTEXT);
+        AirAwareness awareness = blackboard.get(CruiserBlockEntity.AWARENESS);
+        if (context == null || awareness == null)return Status.FAILURE;
+        IAirController controller = context.controller();
         // ControlCraft.LOGGER.debug("pivoting away from target: {}", context.debugTargetName());
-        Vector3dc targetP = situation.targetPosition();
-        Vector3dc targetV = situation.targetVelocity();
+        Vector3dc targetP = awareness.targetPosition();
+        Vector3dc targetV = awareness.targetVelocity();
         Vector3dc currentP = context.getPosition();
         Vector3dc currentV = context.getVelocity();
 
-        // context.controller().setEscaping(true);
 
-        double idealV = context.controller().velocity();
-        double idealR = context.controller().radius();
+//        double idealV = context.controller().velocity();
+//        double idealR = context.controller().radius();
 
-        double safeDistance = Math.max(targetV.length(), idealV) * idealR / idealV;
-        double randAn = situation.peekRandom(4);
-        double randSi = situation.peekRandom(1);
+        double safeDistance = awareness.safeDistance();
+        double randAn = awareness.peekRandom(4);
+        double randSi = awareness.peekRandom(1);
 
         double evadeAngle = blackboard.computeIfAbsent(EVADE_TARGET_ANGLE, () -> 0.0);
         double evadeOmega = MathUtils.lerp(randAn, 5, 8) * randSi > 0.5 ? 1 : -1;
@@ -75,23 +65,30 @@ public class PivotAwayAction extends Action {
 //        );
 
 
-        controller.setAction(CruiseActions.AWAY);
+//        controller.setAction(CruiseActions.VIEW);
         // controller.setAction(CruiseActions.TEST);
         controller.overrideTarget(finalDirection);
-        Vector3dc actualDirection = targetP.sub(currentP, new Vector3d());
-        if(
-                   !situation.isInLossCone()
-                 || situation.distance() > 3 * safeDistance
-                 // || situation.heuristicWindow() > 0.7
 
-        ){ // actualDirection.length() > 2 * safeDistance || !situation.peekDecision()
-            situation.resetAttackScore();
-            return Status.SUCCESS;
-        }
+//        Vector3dc actualDirection = targetP.sub(currentP, new Vector3d());
+//        if(
+//                !situation.isInLossCone()
+//                        || situation.distance() > 3 * situation.safeDistance()
+//            // || situation.heuristicWindow() > 0.7
+//
+//        ){ // actualDirection.length() > 2 * safeDistance || !situation.peekDecision()
+//            situation.resetAttackScore();
+//            return Status.SUCCESS;
+//        }
 
         return Status.RUNNING;
     }
 
 
+    @Override
+    public void interrupt(Blackboard blackboard) {
+        AirAwareness awearness = blackboard.get(CruiserBlockEntity.AWARENESS);
+        if (awearness == null)return;
+        awearness.resetAttackScore();
+    }
 }
 

@@ -34,6 +34,13 @@ public class MathUtils {
         return min + factor * (max - min);
     }
 
+    public static double reverseLerp(double start, double end, double val){
+        if (start == end) {
+            return 0.0; // Avoid division by zero
+        }
+        return (val - start) / (end - start);
+    }
+
     public static double safeDiv(double x, double y){
         if(Math.abs(y) < eps && Math.abs(x) < eps){
             return 0;

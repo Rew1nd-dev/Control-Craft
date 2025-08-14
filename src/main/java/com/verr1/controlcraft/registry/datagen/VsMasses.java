@@ -22,12 +22,14 @@ import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlock;
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlock;
 import com.verr1.controlcraft.content.blocks.terminal.TerminalBlock;
 import com.verr1.controlcraft.content.blocks.transmitter.PeripheralProxyBlock;
+import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
 import com.verr1.controlcraft.content.links.func.FunctionsBlock;
 import com.verr1.controlcraft.content.links.input.InputPortBlock;
+import com.verr1.controlcraft.content.links.logic.FlexibleGateBlock;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
 import com.verr1.controlcraft.content.links.output.OutputPortBlock;
@@ -67,6 +69,7 @@ public enum VsMasses {
     COMPACT_FLAP(CompactFlapBlock.ID, 5),
 
     LOGIC_GATES(LogicGateBlock.ID, 1),
+    FLEXIBLE_LOGIC_GATE(FlexibleGateBlock.ID, 1),
     FF(FFBlock.ID, 1),
     INPUT(InputPortBlock.ID, 1),
     OUTPUT(OutputPortBlock.ID, 1),
@@ -79,7 +82,8 @@ public enum VsMasses {
     DC(DirectCurrentBlock.ID, 1),
     FUNC(FunctionsBlock.ID, 1),
     IMU(SensorBlock.ID, 1),
-    SCOPE(OscilloscopeBlock.ID, 10)
+    SCOPE(OscilloscopeBlock.ID, 10),
+    CC_BRIDGE(CCBridgeBlock.ID, 1)
 
     ;
 

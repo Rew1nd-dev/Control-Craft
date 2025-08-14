@@ -155,6 +155,24 @@ public class CimulinkFactory {
             defaultID("angle_fix")
     );
 
+    public static final Factory<Functions.FunctionN> RAD = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.RAD.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("toRadians")
+    );
+
+    public static final Factory<Functions.FunctionN> DEG = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.DEG.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("toDegrees")
+    );
+
     public static final Factory<Functions.FunctionN> POWER = register(
             SerializeUtils.of(
                     Functions.FunctionN::serialize,

@@ -129,7 +129,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         buildRegistry(COMPLIANCE).withBasic(SerializePort.of(this::getCompliance, this::setCompliance, SerializeUtils.DOUBLE)).withClient(ClientBuffer.DOUBLE.get()).register();
         buildRegistry(TARGET_MODE)
                 .withBasic(SerializePort.of(this::getTargetMode, this::setTargetMode, SerializeUtils.ofEnum(TargetMode.class)))
-                .withClient(ClientBuffer.of(TargetMode.class))
+                .withClient(ClientBuffer.ofEnum(TargetMode.class))
                 .register();
         buildRegistry(CONNECT_CONTEXT).withBasic(SerializePort.of(() -> context, ctx -> context = ctx, SerializeUtils.CONNECT_CONTEXT)).register();
 
