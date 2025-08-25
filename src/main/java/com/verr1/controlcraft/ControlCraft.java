@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 *    1.  add tool tips for blocks, need data syncing.
 *    2.√ render servo top part as a moving segment, rotate as angle changes
 *    3.√ remake wing controller model, make a moving part connected with wing block
-*    4.  Flames of jet
+*    4.  Flames of attacker
 *    Functionality:
 *    1.√ extract ServoConstrainAssembleSchedule run() function, make it inside an class specific for ship aligning task
 *    2.√ VS constrain serialize utilities

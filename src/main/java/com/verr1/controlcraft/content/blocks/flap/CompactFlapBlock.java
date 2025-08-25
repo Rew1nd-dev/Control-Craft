@@ -60,27 +60,27 @@ public class CompactFlapBlock extends BearingBlock implements
             return InteractionResult.SUCCESS;
         }
 
-        if(hit.getDirection() == state.getValue(FlapBearingBlock.FACING)){
-            if (!player.mayBuild())
-                return InteractionResult.FAIL;
-            if (player.isShiftKeyDown())
-                return InteractionResult.FAIL;
-            if (player.getItemInHand(handIn)
-                    .isEmpty()) {
-                if (worldIn.isClientSide)
-                    return InteractionResult.SUCCESS;
-                withBlockEntityDo(worldIn, pos, be -> {
-                    if(!be.running){
-                        be.assemble();
-                    }else{
-                        be.disassemble();
-                    }
-
-                });
-                return InteractionResult.SUCCESS;
-            }
-            return InteractionResult.PASS;
-        }
+//        if(hit.getDirection() == state.getValue(FlapBearingBlock.FACING)){
+//            if (!player.mayBuild())
+//                return InteractionResult.FAIL;
+//            if (player.isShiftKeyDown())
+//                return InteractionResult.FAIL;
+//            if (player.getItemInHand(handIn)
+//                    .isEmpty()) {
+//                if (worldIn.isClientSide)
+//                    return InteractionResult.SUCCESS;
+//                withBlockEntityDo(worldIn, pos, be -> {
+//                    if(!be.running){
+//                        be.assemble();
+//                    }else{
+//                        be.disassemble();
+//                    }
+//
+//                });
+//                return InteractionResult.SUCCESS;
+//            }
+//            return InteractionResult.PASS;
+//        }
 
         return InteractionResult.PASS;
     }

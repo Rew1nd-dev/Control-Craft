@@ -9,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,6 +25,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -197,7 +199,14 @@ public class MinecraftUtils {
         );
     }
 
+    public static void broadcastMessage(Component message){
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        server.getPlayerList().getPlayers().forEach(p -> p.sendSystemMessage(message));
+    }
 
-
+    public static void broadcastMessage(String message){
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        server.getPlayerList().getPlayers().forEach(p -> p.sendSystemMessage(Component.literal(message)));
+    }
 
 }

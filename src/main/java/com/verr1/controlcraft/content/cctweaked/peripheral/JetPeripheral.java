@@ -13,7 +13,7 @@ public class JetPeripheral extends AbstractAttachedPeripheral<JetBlockEntity> {
 
     @Override
     public String getType() {
-        return "jet";
+        return "attacker";
     }
 
     @Override

@@ -68,13 +68,13 @@ public abstract class BlockLinkPort {
 
     // make it concurrent
 
-    public static final Serializer<HashMap<BlockPos, String>> POS_NAME_MAP =
+    public static final Serializer<Map<BlockPos, String>> POS_NAME_MAP =
             SerializeUtils.ofMap(SerializeUtils.BLOCK_POS, SerializeUtils.STRING);
 
-    public static final Serializer<HashMap<String, BlockPort>> BACKWARD =
+    public static final Serializer<Map<String, BlockPort>> BACKWARD =
             SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.BLOCK_PORT);
 
-    public static final Serializer<HashMap<String, Set<BlockPort>>> FORWARD =
+    public static final Serializer<Map<String, Set<BlockPort>>> FORWARD =
             SerializeUtils.ofMap(SerializeUtils.STRING, SerializeUtils.ofSet(SerializeUtils.BLOCK_PORT));
 
     private static final Set<BlockPort> EMPTY = new HashSet<>();

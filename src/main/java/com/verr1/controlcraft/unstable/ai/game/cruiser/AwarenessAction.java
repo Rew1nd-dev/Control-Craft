@@ -1,11 +1,10 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
-import com.verr1.controlcraft.unstable.ai.api.IAirContext;
+import com.verr1.controlcraft.unstable.ai.api.IFighterJetContext;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
-import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
 import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -17,8 +16,8 @@ public class AwarenessAction extends Action {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        IAirContext context = blackboard.get(SharedAIKeys.CONTEXT);
-        AirAwareness awareness = blackboard.get(CruiserBlockEntity.AWARENESS);
+        IFighterJetContext context = blackboard.get(SharedAIKeys.FIGHTER_CONTEXT);
+        AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
 
         if (context == null || awareness == null)return Status.RUNNING;
 
@@ -27,7 +26,7 @@ public class AwarenessAction extends Action {
                 .newY(context.getPosition().y())
                 .cruiseRatio();
 
-        context.controller().setVelocity(context.cruiseVelocity() * ratio);
+        context.controller().setVelocity(context.cruiseVelocity());
 
         Vector3dc targetPNullable = context.getTargetPosition();
         Vector3dc targetVNullable =
@@ -45,6 +44,7 @@ public class AwarenessAction extends Action {
                 targetVNullable,
                 currentP,
                 currentV,
+                context.getTargetPosition(),
                 context.getHeading()
         );
 

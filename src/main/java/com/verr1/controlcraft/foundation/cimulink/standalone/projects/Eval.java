@@ -165,7 +165,7 @@ public class Eval {
         Evaluator jet = jet();
         Evaluator eval = new Evaluator();
 
-        eval.defineSubmodule("jet", jet);
+        eval.defineSubmodule("attacker", jet);
 
         Val x0 = eval.newVal("x0");
         Val y0 = eval.newVal("y0");
@@ -175,13 +175,13 @@ public class Eval {
         Val y1 = eval.newVal("y1");
         Val z1 = eval.newVal("z1");
 
-        Map<String, Val> out_0 = eval.invoke("jet", Map.of(
+        Map<String, Val> out_0 = eval.invoke("attacker", Map.of(
                 "x", x0,
                 "y", y0,
                 "z", z0
         ));
 
-        Map<String, Val> out_1 = eval.invoke("jet", Map.of(
+        Map<String, Val> out_1 = eval.invoke("attacker", Map.of(
                 "x", x1,
                 "y", y1,
                 "z", z1

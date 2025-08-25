@@ -170,6 +170,31 @@ public class WarThunderFlight {
         return eval;
     }
 
+    public static CircuitNbt Sel(){
+        Evaluator eval = new Evaluator();
+
+        Val pitch_k = eval.newVal("pitch_k");
+        Val yaw_k = eval.newVal("yaw_k");
+        Val roll_k = eval.newVal("roll_k");
+
+        Val pitch_v = eval.newVal("pitch_v");
+        Val yaw_v = eval.newVal("yaw_v");
+        Val roll_v = eval.newVal("roll_v");
+
+        Val sel = eval.newVal("sel");
+
+        Val cond = sel.greaterThan(0.5);
+
+        Val pitch_c = eval.orElse(cond, pitch_v, pitch_k);
+        Val yaw_c = eval.orElse(cond, yaw_v, yaw_k);
+        Val roll_c = eval.orElse(cond, roll_v, roll_k);
+
+        eval.asOut("pitch_c", pitch_c).asOut("yaw_c", yaw_c).asOut("roll_c", roll_c);
+
+        return eval.evaluate().buildContext();
+    }
+
+
     public static CircuitNbt create(){
         Evaluator eval = new Evaluator();
         eval.defineSubmodule("lerpView", lerp());
@@ -314,6 +339,100 @@ public class WarThunderFlight {
         Val vCon = (vt.mul(g_vel).sub(vf.mul(g_feed))).mul(g_con);
 
         eval.asOut("right", right).asOut("left", left).asOut("mid", mid).asOut("vcon", vCon);
+
+        return eval.evaluate().buildContext();
+    }
+
+    public static CircuitNbt flight2(){
+        Evaluator eval = new Evaluator();
+        Val pitch = eval.newVal("pitch");
+        Val yaw = eval.newVal("yaw");
+        Val roll = eval.newVal("roll");
+        Val vt = eval.newVal("vel");
+        Val vf = eval.newVal("velFeed");
+
+        Val g_vel = eval.newVal("g_vel");
+        Val g_feed = eval.newVal("g_vfeed");
+        Val g_con = eval.newVal("g_vcon");
+
+        Val nOne = eval.newVal(-1);
+        Val one = eval.newVal(1);
+
+        Val g_pitch = eval.newVal("g_pitch");
+        Val g_yaw = eval.newVal("g_yaw");
+        Val g_roll = eval.newVal("g_roll");
+
+        Val g_right = eval.newVal("g_right");
+        Val g_left = eval.newVal("g_left");
+        Val g_mid = eval.newVal("g_mid");
+
+        Val gained_pitch = pitch.mul(g_pitch);
+        Val gained_yaw = yaw.mul(g_yaw);
+        Val gained_roll = roll.mul(g_roll);
+
+        Val right = gained_pitch.add(gained_roll).mul(g_right);
+        Val left = gained_pitch.sub(gained_roll).mul(g_left);
+        Val mid = gained_yaw.mul(g_mid);
+
+        Val vCon = (vt.mul(g_vel).sub(vf.mul(g_feed))).mul(g_con);
+
+        eval.asOut("right", right).asOut("left", left).asOut("mid", mid).asOut("vcon", vCon);
+
+        return eval.evaluate().buildContext();
+    }
+
+
+    public static CircuitNbt flight3(){
+        Evaluator eval = new Evaluator();
+        Val pitch = eval.newVal("pitch");
+        Val yaw = eval.newVal("yaw");
+        Val roll = eval.newVal("roll");
+        Val vt = eval.newVal("vel");
+        Val vf = eval.newVal("velFeed");
+
+        Val g_vel = eval.newVal("g_vel");
+        Val g_feed = eval.newVal("g_vfeed");
+        Val g_con = eval.newVal("g_vcon");
+
+        Val nOne = eval.newVal(-1);
+        Val one = eval.newVal(1);
+
+        Val g_pitch = eval.newVal("g_pitch");
+        Val g_yaw = eval.newVal("g_yaw");
+        Val g_roll = eval.newVal("g_roll");
+
+        Val g_right = eval.newVal("g_right");
+        Val g_left = eval.newVal("g_left");
+        Val g_mid = eval.newVal("g_mid");
+
+        Val g_pitch_b = eval.newVal("g_pitch_b");
+        Val g_yaw_b = eval.newVal("g_yaw_b");
+        Val g_roll_b = eval.newVal("g_roll_b");
+
+        Val g_right_b = eval.newVal("g_right_b");
+        Val g_left_b = eval.newVal("g_left_b");
+        Val g_mid_b = eval.newVal("g_mid_b");
+
+        Val gained_pitch = eval.clamp(pitch, nOne, one).mul(g_pitch);
+        Val gained_yaw = eval.clamp(yaw, nOne, one).mul(g_yaw);
+        Val gained_roll = eval.clamp(roll, nOne, one).mul(g_roll);
+
+        Val gained_pitch_b = eval.clamp(pitch, nOne, one).mul(g_pitch_b);
+        Val gained_yaw_b = eval.clamp(yaw, nOne, one).mul(g_yaw_b);
+        Val gained_roll_b = eval.clamp(roll, nOne, one).mul(g_roll_b);
+
+        Val right = gained_pitch.add(gained_roll).mul(g_right);
+        Val left = gained_pitch.sub(gained_roll).mul(g_left);
+        Val mid = gained_yaw.mul(g_mid);
+
+        Val right_b = gained_pitch_b.add(gained_roll_b).mul(g_right_b);
+        Val left_b = gained_pitch_b.sub(gained_roll_b).mul(g_left_b);
+        Val mid_b = gained_yaw_b.mul(g_mid_b);
+
+        Val vCon = (vt.mul(g_vel).sub(vf.mul(g_feed))).mul(g_con);
+
+        eval.asOut("right", right).asOut("left", left).asOut("mid", mid).asOut("vcon", vCon)
+                .asOut("right_b", right_b).asOut("left_b", left_b).asOut("mid_b", mid_b);
 
         return eval.evaluate().buildContext();
     }

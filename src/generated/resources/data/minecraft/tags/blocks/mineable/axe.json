@@ -19,6 +19,8 @@
     "vscontrolcraft:cc_bridge",
     "vscontrolcraft:scope",
     "vscontrolcraft:ai_cruiser",
-    "vscontrolcraft:ai_jet"
+    "vscontrolcraft:ai_jet",
+    "vscontrolcraft:ai_monitor",
+    "vscontrolcraft:ai_schematic"
   ]
 }

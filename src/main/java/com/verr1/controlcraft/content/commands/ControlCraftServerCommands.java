@@ -20,8 +20,13 @@ import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.registry.ControlCraftItems;
+import com.verr1.controlcraft.unstable.AIServer;
+import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
+import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
+import com.verr1.controlcraft.unstable.management.AIPool;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -31,9 +36,13 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.joml.Quaterniond;
+import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ControlCraftServerCommands {
@@ -129,8 +138,11 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+
+
     private static int countFPCommand(CommandContext<CommandSourceStack> context){
         CommandSourceStack source = context.getSource();
+
         if(source.getPlayer() == null){
             source.sendFailure(Component.literal("You must be a player to set neglect a block!"));
             return 0;
@@ -222,7 +234,7 @@ public class ControlCraftServerCommands {
             return 0;
         }
         ServerPlayer player = source.getPlayer();
-        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+        ItemStack stack = player.isCreative() ? ControlCraftItems.CIRCUIT_COMPILER.asStack() : player.getItemInHand(InteractionHand.MAIN_HAND);
         if(!stack.is(ControlCraftItems.CIRCUIT_COMPILER.get())){
             source.sendFailure(Component.literal("No compiler found in your main hand"));
             return 0;
@@ -339,6 +351,8 @@ public class ControlCraftServerCommands {
                             .executes(ControlCraftServerCommands::toggleCimulinkDebugMode)
                         )
         );
+
+
     }
 
 

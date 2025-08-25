@@ -143,7 +143,7 @@ public class Jet {
     public static CircuitNbt create(){
         Evaluator eval = new Evaluator();
 
-        eval.defineSubmodule("jet", jet())
+        eval.defineSubmodule("attacker", jet())
             .defineSubmodule("decomposition", decomposition())
             .defineSubmodule("input", input())
             .defineSubmodule("closeRotLoop", closeRotLoop())
@@ -209,13 +209,13 @@ public class Jet {
                 "Fz", F_xyz.get("Fz")
         ));
 
-        Map<String, Val> out_l = eval.invoke("jet", Map.of(
+        Map<String, Val> out_l = eval.invoke("attacker", Map.of(
                 "x", rl_xyz.get("lx"),
                 "y", rl_xyz.get("ly"),
                 "z", rl_xyz.get("lz")
         ));
 
-        Map<String, Val> out_r = eval.invoke("jet", Map.of(
+        Map<String, Val> out_r = eval.invoke("attacker", Map.of(
                 "x", rl_xyz.get("rx"),
                 "y", rl_xyz.get("ry"),
                 "z", rl_xyz.get("rz")

@@ -7,6 +7,14 @@ import java.util.List;
 
 public class AIControlUtils {
 
+    public static Vector3dc randUnit3d(){
+        double theta = Math.random() * 2 * Math.PI; // 随机角度
+        double phi = Math.acos(2 * Math.random() - 1); // 随机极角
+        double x = Math.sin(phi) * Math.cos(theta);
+        double y = Math.sin(phi) * Math.sin(theta);
+        double z = Math.cos(phi);
+        return new Vector3d(x, y, z);
+    }
 
     public static double circumcircleRadius(Vector3dc A, Vector3dc B, Vector3dc C) {
         // 1. 计算各边长度

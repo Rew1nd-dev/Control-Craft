@@ -117,10 +117,10 @@ public class SerializeUtils {
         };
     }
 
-    public static <K, V> Serializer<HashMap<K, V>> ofMap(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+    public static <K, V> Serializer<Map<K, V>> ofMap(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
         return new Serializer<>() {
             @Override
-            public CompoundTag serialize(@NotNull HashMap<K, V> map) {
+            public CompoundTag serialize(@NotNull Map<K, V> map) {
                 CompoundTagBuilder builder = new CompoundTagBuilder();
                 builder.withLong("count", (long) map.size());
                 int index = 0;

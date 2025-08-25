@@ -41,6 +41,11 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
     }
 
     @LuaFunction
+    public final boolean isBeingUsed(){
+        return getTarget().isLinkedCamera();
+    }
+
+    @LuaFunction
     public final String getDirection(){
         return getTarget().getDirection().getName();
     }

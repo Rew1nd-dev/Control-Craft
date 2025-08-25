@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
 public class CruiserBlock extends DirectionalBlock implements IBE<CruiserBlockEntity> {
     public static final String ID = "ai_cruiser";
 
-    public CruiserBlock(Properties p_49795_) {
-        super(p_49795_);
+    public CruiserBlock(Properties p) {
+        super(p.strength(-1f, 3600000.0f));
     }
 
     @Override

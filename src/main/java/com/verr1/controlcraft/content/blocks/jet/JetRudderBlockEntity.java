@@ -88,7 +88,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
                 .map(JetBlockEntity::getVertical).orElse(Direction.UP);
     }
 
-    // jet rudder's direction is the opposite of jet
+    // attacker rudder's direction is the opposite of attacker
     public void updateHorizontal(){
         // if(!(level instanceof ServerLevel lvl))return Direction.NORTH;
         horizontal = BlockEntityGetter.getLevelBlockEntityAt(level, getBlockPos().relative(getDirection().getOpposite()), JetBlockEntity.class)
@@ -100,7 +100,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         return vertical;
     }
 
-    // jet rudder's direction is the opposite of jet
+    // attacker rudder's direction is the opposite of attacker
     public Direction getHorizontal(){
         // if(!(level instanceof ServerLevel lvl))return Direction.NORTH;
         return horizontal;
@@ -246,7 +246,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     private Vector3d getRenderThrustDir() {
         Vector3dc basis_h = getHorizontalJOML();
         Vector3dc basis_v = getVerticalJOML();
-        Vector3dc basis_t = getDirectionJOML().mul(-1);  // make it the opposite (set to bounded jet direction)
+        Vector3dc basis_t = getDirectionJOML().mul(-1);  // make it the opposite (set to bounded attacker direction)
 
         float h = targetHorizontalAngle;
         float v = targetVerticalAngle;

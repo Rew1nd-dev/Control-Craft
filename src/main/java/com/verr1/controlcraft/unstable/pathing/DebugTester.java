@@ -57,7 +57,7 @@ public class DebugTester {
 
     public static void compute(){
 
-        currentPath = DubinsCalculatorV2.dubins(
+        currentPath = DubinsCalculatorV2.dubinsMatchStart(
                 currentStart,
                 currentStartHeading,
                 currentEnd,

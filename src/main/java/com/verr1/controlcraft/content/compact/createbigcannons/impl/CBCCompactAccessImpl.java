@@ -16,7 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import rbasamoyai.createbigcannons.cannon_control.cannon_mount.CannonMountBlockEntity;
 import rbasamoyai.createbigcannons.index.CBCBlocks;
 import rbasamoyai.createbigcannons.index.CBCEntityTypes;
+import rbasamoyai.createbigcannons.index.CBCItems;
 import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
+import rbasamoyai.createbigcannons.munitions.autocannon.flak.FlakAutocannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonProjectile;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,6 +58,9 @@ public class CBCCompactAccessImpl implements ICBCCompactAccess {
 
     @Override
     public APAutocannonAccess createAutocannonAp(Level level) {
-        return new APAutocannonAccessImpl(new APAutocannonProjectile(CBCEntityTypes.AP_AUTOCANNON.get(), level));
+        APAutocannonProjectile ap = new APAutocannonProjectile(CBCEntityTypes.AP_AUTOCANNON.get(), level);
+        FlakAutocannonProjectile he = new FlakAutocannonProjectile(CBCEntityTypes.FLAK_AUTOCANNON.get(), level);
+        he.setFuze(CBCItems.IMPACT_FUZE.asStack());
+        return new APAutocannonAccessImpl(he);
     }
 }

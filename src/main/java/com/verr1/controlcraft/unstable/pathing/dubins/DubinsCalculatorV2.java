@@ -5,8 +5,6 @@ import com.verr1.controlcraft.unstable.pathing.path.ArcPath;
 import com.verr1.controlcraft.unstable.pathing.path.CombinedPath;
 import com.verr1.controlcraft.unstable.pathing.path.IPath;
 import com.verr1.controlcraft.unstable.pathing.path.LinePath;
-import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils;
-import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.*;
 
 import java.lang.Math;
@@ -143,7 +141,7 @@ public class DubinsCalculatorV2 {
         return new Vector3d(v.x(), v.y(), 0.0);
     }
 
-    public static IPath dubins(
+    public static IPath dubinsMatchStart(
             Vector3dc start, Vector3dc startHeading,
             Vector3dc end, Vector3dc endHeading,
             double radius) {
@@ -218,6 +216,99 @@ public class DubinsCalculatorV2 {
 
         // 调用2D Dubins路径计算
 
+        return calculateDubinsPath(
+                new Vector2d(0, 0), 0.0,
+                new Vector2d(endX, endY), goalHeading,
+                radius, transform
+        );
+    }
+
+
+    public static IPath dubinsMatchEnd(
+            Vector3dc start, Vector3dc startHeading,
+            Vector3dc end, Vector3dc endHeading,
+            double radius) {
+
+        // 将不可变的Vector3dc转换为可变的Vector3d
+        Vector3dc s = new Vector3d(start);
+        Vector3dc e = new Vector3d(end);
+
+        // 计算起点到终点的向量
+        Vector3dc v2 = new Vector3d(e).sub(s);
+
+        // 计算平面法向量：n = startHeading × (end - start)
+        Vector3d n = new Vector3d(startHeading).cross(v2, new Vector3d());
+
+        // 处理共线情况
+        if (n.lengthSquared() < 1e-10) {
+            Vector3d aux = new Vector3d(0, 1, 0);
+            n.set(startHeading).cross(aux);
+            if (n.lengthSquared() < 1e-10) {
+                aux.set(0, 0, 1);
+                n.set(startHeading).cross(aux);
+                if (n.lengthSquared() < 1e-10) {
+                    n.set(0, 0, 1);
+                } else {
+                    n.normalize();
+                }
+            } else {
+                n.normalize();
+            }
+        } else {
+            n.normalize();
+        }
+
+        // 将起始方向投影到平面
+        double startDot = startHeading.dot(n);
+        Vector3d projStartHeading = new Vector3d(startHeading).sub(n.mul(startDot, new Vector3d()));
+        if (projStartHeading.lengthSquared() < 1e-10) {
+            Vector3d aux = new Vector3d(0, 1, 0);
+            n.cross(aux, projStartHeading);
+            if (projStartHeading.lengthSquared() > 1e-10) {
+                projStartHeading.normalize();
+            } else {
+                projStartHeading.set(aux).normalize();
+            }
+        } else {
+            projStartHeading.normalize();
+        }
+
+        // 将目标方向投影到平面
+        double endDot = endHeading.dot(n);
+        Vector3d projEndHeading = new Vector3d(endHeading).sub(n.mul(endDot, new Vector3d()));
+        if (projEndHeading.lengthSquared() < 1e-10) {
+            projStartHeading.cross(n, projEndHeading);
+            if (projEndHeading.lengthSquared() > 1e-10) {
+                projEndHeading.normalize();
+            } else {
+                projEndHeading.set(projStartHeading).normalize();
+            }
+        } else {
+            projEndHeading.normalize();
+        }
+
+        // 构建平面局部坐标系
+        Vector3d u = new Vector3d(projStartHeading).normalize();
+        Vector3d v = n.cross(u, new Vector3d());
+        v.normalize();
+
+        // 构建变换矩阵
+        Matrix4d transform = new Matrix4d().translate(s.x(), s.y(), s.z()).mul(new Matrix4d(new Matrix3d(
+                u.x(), u.y(), u.z(),
+                v.x(), v.y(), v.z(),
+                n.x(), n.y(), n.z()
+        )));
+
+        // 计算目标点在局部坐标系的2D坐标
+        double endX = v2.dot(u);
+        double endY = v2.dot(v);
+
+        // 计算目标方向在局部坐标系的2D角度
+        double projX = projEndHeading.dot(u);
+        double projY = projEndHeading.dot(v);
+        double goalHeading = Math.atan2(projY, projX);
+
+        // 调用2D Dubins路径计算
         return calculateDubinsPath(
                 new Vector2d(0, 0), 0.0,
                 new Vector2d(endX, endY), goalHeading,

@@ -1,13 +1,13 @@
 package com.verr1.controlcraft.utils;
 
 import net.minecraft.util.Mth;
-import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
+import org.joml.*;
 import org.joml.primitives.AABBd;
 import org.joml.primitives.AABBdc;
+import org.joml.primitives.AABBi;
+import org.joml.primitives.AABBic;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,6 +179,17 @@ public class MathUtils {
             maxZ = Math.max(maxZ, point.z());
         }
         return new AABBd(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public static AABBi offset(AABBic aabb, Vector3ic offset){
+        return new AABBi(
+                aabb.minX() + offset.x(),
+                aabb.minY() + offset.y(),
+                aabb.minZ() + offset.z(),
+                aabb.maxX() + offset.x(),
+                aabb.maxY() + offset.y(),
+                aabb.maxZ() + offset.z()
+        );
     }
 
     public static double clampDigit(double value, int digits){

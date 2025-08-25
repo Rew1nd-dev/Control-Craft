@@ -156,6 +156,10 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     private final DirectReceiver receiver = new DirectReceiver();
 
+    public CameraBoundFakePlayer watcher() {
+        return fp;
+    }
+
     private CameraBoundFakePlayer fp;
 
     public static Pair<Double, Double> angle(Vector3dc view){

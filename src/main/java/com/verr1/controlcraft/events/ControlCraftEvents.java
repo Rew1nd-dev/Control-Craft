@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
+import com.verr1.controlcraft.unstable.AIServer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,14 +33,23 @@ public class ControlCraftEvents {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
+
+
         // AttachmentRegistry.register();
         BlockEntityGetter.create(event.getServer());
         ConstraintCenter.onServerStaring(event.getServer());
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftAttachments.register();
+
+        AIServer.init(event.getServer());
         /**/
         // VSEvents.ShipLoadEvent.Companion.on(ControlCraftAttachments::onShipLoad);
+    }
+
+    @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event) {
+        AIServer.MANAGER.onServerStarted();
     }
 
     @SubscribeEvent
@@ -51,6 +62,7 @@ public class ControlCraftEvents {
             ControlCraftServer.CC_NETWORK.tick();
             BlockLinkPort.preMainTick();
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
+            AIServer.MANAGER.tick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();
         }

@@ -30,7 +30,9 @@ public class Blackboard {
     }
 
 
-
+    public<T> void remove(Address<T> key){
+        data.remove(key);
+    }
 
     // 其他快捷方法...
 }

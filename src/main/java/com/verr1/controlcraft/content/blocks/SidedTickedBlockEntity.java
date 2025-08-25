@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.blocks;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,6 +26,10 @@ public class SidedTickedBlockEntity extends SmartBlockEntity {
 
     public boolean isClientSide(){
         return level != null && level.isClientSide;
+    }
+
+    public WorldBlockPos getWorldBlockPos(){
+        return WorldBlockPos.of(level, worldPosition);
     }
 
     public void initializeServer(){}

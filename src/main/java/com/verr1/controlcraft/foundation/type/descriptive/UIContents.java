@@ -119,9 +119,21 @@ public enum UIContents implements Descriptive<UIContents> {
     AI_YAW(Component.literal("Yaw"), literals("Yaw Omega")),
     AI_VEL(Component.literal("Vel"), literals("Cruise Velocity")),
     AI_RAD(Component.literal("Radius"), literals("Cruise Radius")),
+    AI_E_RAD(Component.literal("Radius"), literals("Cruise Radius")),
     AI_TOL(Component.literal("Tol"), literals("Shoot Angle Tolerance")),
     AI_TAR(Component.literal("Target"), literals("Track A Spinalyzer With Peripheral Interface Named By This Setting")),
-    AI_TWI(Component.literal("Twist"), literals("Roll Omega"));
+    AI_TWI(Component.literal("Twist"), literals("Roll Omega")),
+
+    AI_P_COMMON(Component.literal("P"), literals("")),
+    AI_P_YAW(Component.literal("PYaw"), literals("")),
+    AI_P_PITCH(Component.literal("PPitch"), literals("")),
+    AI_P_AG_ROLL(Component.literal("PAGRoll"), literals("")),
+    AI_P_LV_ROLL(Component.literal("PLVRoll"), literals("")),
+
+    AI_SCHEME_NAME(Component.literal("Name"), literals("Schematic Name")),
+    AI_SCHEME_NAMESPACE(Component.literal("Namespace"), literals("Schematic Namespace")),
+    AI_EXPORT_SCHEME(Component.literal("Export"), literals("Export Schematic To ", ".minecraft/ai_schematics"))
+    ;
 
 
 

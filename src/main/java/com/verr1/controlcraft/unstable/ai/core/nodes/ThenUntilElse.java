@@ -3,20 +3,20 @@ package com.verr1.controlcraft.unstable.ai.core.nodes;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 
-public class ThenUntilElse implements Node{
+public class ThenUntilElse implements Node, Interruptible{
 
     private final Node thenNode;
     private final Node elseNode;
 
-    private final Condition enter;
-    private final Condition exit;
+    private final Node enter;
+    private final Node exit;
 
     private boolean isEntered = false;
 
     public ThenUntilElse(
-            Condition enter,
+            Node enter,
             Node thenNode,
-            Condition exit,
+            Node exit,
             Node elseNode
     ) {
         this.thenNode = thenNode;
@@ -70,5 +70,14 @@ public class ThenUntilElse implements Node{
         isEntered = false;
         thenNode.reset();
         elseNode.reset();
+    }
+
+    @Override
+    public void interrupt(Blackboard board) {
+        if (isEntered) {
+            interrupt(thenNode, board);
+        } else {
+            interrupt(elseNode, board);
+        }
     }
 }

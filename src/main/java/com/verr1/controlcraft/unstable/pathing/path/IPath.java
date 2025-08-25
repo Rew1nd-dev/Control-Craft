@@ -1,6 +1,9 @@
 package com.verr1.controlcraft.unstable.pathing.path;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3dc;
+
+import java.util.List;
 
 public interface IPath {
 
@@ -16,6 +19,8 @@ public interface IPath {
 
     Vector3dc start();
 
-
+    static @NotNull IPath concat(@NotNull IPath... ps){
+        return new CombinedPath(List.of(ps));
+    }
 
 }

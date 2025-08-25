@@ -1,14 +1,15 @@
 package com.verr1.controlcraft.content.compact.createbigcannons;
 
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
 import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
 
 import java.util.Optional;
 
 public class APAutocannonAccessImpl implements APAutocannonAccess {
-    private final APAutocannonProjectile ap;
+    private final AbstractAutocannonProjectile ap;
 
-    public APAutocannonAccessImpl(APAutocannonProjectile ap) {
+    public APAutocannonAccessImpl(AbstractAutocannonProjectile ap) {
         this.ap = ap;
     }
 

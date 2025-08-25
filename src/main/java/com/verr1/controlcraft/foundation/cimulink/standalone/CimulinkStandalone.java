@@ -1,10 +1,7 @@
 package com.verr1.controlcraft.foundation.cimulink.standalone;
 
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
-import com.verr1.controlcraft.foundation.cimulink.standalone.projects.DigitalCircuits;
-import com.verr1.controlcraft.foundation.cimulink.standalone.projects.Jet;
-import com.verr1.controlcraft.foundation.cimulink.standalone.projects.View;
-import com.verr1.controlcraft.foundation.cimulink.standalone.projects.WarThunderFlight;
+import com.verr1.controlcraft.foundation.cimulink.standalone.projects.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 
@@ -40,13 +37,15 @@ public class CimulinkStandalone {
         // DigitalCircuits.test();
         // save(DigitalCircuits.cycleAdder(), Path.of(DataPath), "cycleAdder");
         // save(DigitalCircuits.integralUnit(), Path.of(DataPath), "integralUnit");
-        // Eval.jet();
+        // Eval.attacker();
         // Eval.testSubModule();
         // Eval.test();
-        // save(Jet.create(), Path.of(DataPath), "jet");
+        // save(Jet.create(), Path.of(DataPath), "attacker");
         // save(WarThunderFlight.flight(), Path.of(DataPath), "yprFlight");
-        save(View.create(), Path.of(DataPath), "view");
-        save(DigitalCircuits.decoder8(), Path.of(DataPath), "decoder8");
+        // save(View.create(), Path.of(DataPath), "view");
+        // save(DigitalCircuits.decoder8(), Path.of(DataPath), "decoder8");
+        // save(WarThunderFlight.Sel(), Path.of(DataPath), "viewManualSel");
+        save(WtHeli.pd3(), Path.of(DataPath), "pd3");
         // System.out.println(1 - Math.exp(-5 * 0.01667));
     }
 

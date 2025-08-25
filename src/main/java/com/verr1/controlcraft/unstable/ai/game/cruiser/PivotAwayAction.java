@@ -8,13 +8,12 @@ import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Interruptible;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
-import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
 import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
-import static com.verr1.controlcraft.unstable.ai.game.cruiser.v1.EscapeAction.EVADE_TARGET_ANGLE;
+import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.EVADE_TARGET_ANGLE;
 
 public class PivotAwayAction extends Action implements Interruptible {
 
@@ -22,8 +21,8 @@ public class PivotAwayAction extends Action implements Interruptible {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        IAirContext context = blackboard.get(SharedAIKeys.CONTEXT);
-        AirAwareness awareness = blackboard.get(CruiserBlockEntity.AWARENESS);
+        IAirContext context = blackboard.get(SharedAIKeys.AIR_COMMON);
+        AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
         if (context == null || awareness == null)return Status.FAILURE;
         IAirController controller = context.controller();
         // ControlCraft.LOGGER.debug("pivoting away from target: {}", context.debugTargetName());
@@ -86,9 +85,9 @@ public class PivotAwayAction extends Action implements Interruptible {
 
     @Override
     public void interrupt(Blackboard blackboard) {
-        AirAwareness awearness = blackboard.get(CruiserBlockEntity.AWARENESS);
-        if (awearness == null)return;
-        awearness.resetAttackScore();
+        AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
+        if (awareness == null)return;
+        // awareness.resetAttackScore();
     }
 }
 
