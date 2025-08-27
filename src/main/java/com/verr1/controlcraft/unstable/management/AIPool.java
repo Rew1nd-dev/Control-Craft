@@ -55,6 +55,7 @@ public class AIPool extends SavedData {
 
     public static Vector3d SIMPLE_CREATE_POSITION = new Vector3d(0, 96, 0);
 
+
     private final Map<Long, AIPersistentData> persistent = new HashMap<>();
 
     private final AIYardAllocator allocator = new AIYardAllocator.Simple(SIMPLE_YARD_POSITION);
@@ -384,6 +385,10 @@ public class AIPool extends SavedData {
         );
     }
 
+    public void setYardPosition(double x, double y, double z){
+        SIMPLE_YARD_POSITION.set(x, y, z);
+        setDirty();
+    }
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
@@ -395,6 +400,7 @@ public class AIPool extends SavedData {
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()
                 .withCompound("database", PERSISTENT.serialize(persistent))
+                .withCompound("yard", SerializeUtils.VECTOR3D.serialize(SIMPLE_YARD_POSITION))
                 .build();
     }
 
@@ -404,6 +410,7 @@ public class AIPool extends SavedData {
         allocator.clear();
         persistent.clear();
         persistent.putAll(PERSISTENT.deserialize(tag.getCompound("database")));
+        SIMPLE_YARD_POSITION = SerializeUtils.VECTOR3D.deserialize(tag.getCompound("yard"));
     }
 
     private static AIPool load(@NotNull CompoundTag tag) {

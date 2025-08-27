@@ -22,6 +22,7 @@ public class CruiseController implements IAirController {
 
 
     final Vector3d actualVelocity = new Vector3d();
+    final Quaterniond actualQuaternion = new Quaterniond();
     final Vector3d targetDirection = new Vector3d();
 
     private static final double ts = 0.016667;
@@ -151,20 +152,74 @@ public class CruiseController implements IAirController {
 
     private final Quaterniond lerpQuaternion = new Quaterniond();
 
+    double pCom = 1;
+    double pYaw = 3;
+    double pPitch = 8;
+    double pAgRoll = 15;
+    double pLvRoll = 3;
+    double aTol = 20;
+
+    public double aTol() {
+        return aTol;
+    }
+
+    public void setATol(double aTol) {
+        this.aTol = aTol;
+    }
+
+    public double pLvRoll() {
+        return pLvRoll;
+    }
+
+    public void setPLvRoll(double pLvRoll) {
+        this.pLvRoll = pLvRoll;
+    }
+
+    public double pAgRoll() {
+        return pAgRoll;
+    }
+
+    public void setPAgRoll(double pAgRoll) {
+        this.pAgRoll = pAgRoll;
+    }
+
+    public double pPitch() {
+        return pPitch;
+    }
+
+    public void setPPitch(double pPitch) {
+        this.pPitch = pPitch;
+    }
+
+    public double pYaw() {
+        return pYaw;
+    }
+
+    public void setPYaw(double pYaw) {
+        this.pYaw = pYaw;
+    }
+
+    public double pCom() {
+        return pCom;
+    }
+
+    public void setPCom(double p) {
+        this.pCom = p;
+    }
 
     public void nextView(){
         Quaterniond q_tar = new Quaterniond().lookAlong(targetDirection, new Vector3d(0, 1, 0)).conjugate();
 
-        lerpQuaternion.slerp(q_tar, 1 - Math.exp(-5 * ts)).normalize();
+        lerpQuaternion.set(MathUtils.nonNan(lerpQuaternion.slerp(q_tar, 0.08).normalize()));
         Vector3dc nextView_wc = lerpQuaternion.transform(new Vector3d(0, 0, -1));
-        Vector3dc nextView_sc = new Quaterniond(pose).conjugate().transform(nextView_wc, new Vector3d()).normalize();
-        double p = 1;
-        double yaw = 3 * p * nextView_sc.x();
-        double pitch = -8 * p * nextView_sc.y();
-        double ag_roll = -25 * p * nextView_sc.x();
-        double lv_roll = -25 * p * pose.transform(new Vector3d(1, 0, 0)).y();
+        Vector3dc nextView_sc = new Quaterniond(actualQuaternion).conjugate().transform(nextView_wc, new Vector3d()).normalize();
+        double p = pCom;
+        double yaw = pYaw * p * nextView_sc.x();
+        double pitch = -pPitch * p * nextView_sc.y();
+        double ag_roll = -pAgRoll * p * nextView_sc.x();
+        double lv_roll = -pLvRoll * p * actualQuaternion.transform(new Vector3d(1, 0, 0)).y();
         double angle = nextView_sc.angle(new Vector3d(0, 0, 1));
-        double rate = MathUtils.clamp(MathUtils.reverseLerp(0, Math.toRadians(10), angle), 0, 1);
+        double rate = MathUtils.clamp(MathUtils.reverseLerp(0, Math.toRadians(aTol), angle), 0, 1);
         double roll = MathUtils.lerp(rate, lv_roll, ag_roll);
 
 
@@ -175,7 +230,7 @@ public class CruiseController implements IAirController {
         currentTurnRate = Math.sqrt(
                 clampedPitch * clampedPitch +
                 clampedYaw * clampedYaw +
-                clampedTwist * clampedTwist
+                clampedTwist * clampedTwist + 1e-8
         );
 
         Quaterniond next = new Quaterniond(pose)
@@ -202,19 +257,20 @@ public class CruiseController implements IAirController {
     }
 
     public double speedGain(){
-        return actualVelocity.length() / velocity;
+        return actualVelocity.length() / velocity; //1; //1; //
     }
 
     public double inducedResistance(){
         return turnResistance * currentTurnRate();
     }
 
-    public void overridePhysics(Vector3dc actualVelocity){
+    public void overridePhysics(Vector3dc actualVelocity, Quaterniondc actualQuaternion){
         this.actualVelocity.set(actualVelocity);
+        this.actualQuaternion.set(actualQuaternion);
     }
 
     public void nextAway(){
-        Quaterniondc q = calcPose();
+        Quaterniondc q = new Quaterniond(actualQuaternion);
         Vector3dc op = q.conjugate(new Quaterniond()).transform(targetDirection, new Vector3d());
         double phi = Math.atan2(op.x(), op.y());
         double theta = op.angle(new Vector3d(0, 0, 1));
@@ -244,7 +300,7 @@ public class CruiseController implements IAirController {
     }
 
     public void overrideNext(Quaterniondc nextPose){
-        this.pose.set(nextPose);
+        this.pose.set(MathUtils.nonNan(nextPose));
     }
 
 

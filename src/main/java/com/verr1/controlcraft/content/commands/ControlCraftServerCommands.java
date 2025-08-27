@@ -246,6 +246,15 @@ public class ControlCraftServerCommands {
             ControlCraft.LOGGER.error("Failed to load circuit: " + e.getMessage(), e);
             return 0;
         }
+
+        if(player.isCreative()){
+            player.drop(stack, false);
+        } else{
+            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+        }
+
+
+
         source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         return 1;
     }

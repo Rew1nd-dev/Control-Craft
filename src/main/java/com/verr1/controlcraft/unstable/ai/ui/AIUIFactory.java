@@ -42,9 +42,9 @@ public class AIUIFactory {
                 UIContents.AI_TOL.convertTo(Converter::titleStyle)
         );
 
-        DoubleUIField rad = new DoubleUIField(
+        DoubleUIField e_rad = new DoubleUIField(
                 pos,
-                SharedAIKeys.RAD,
+                SharedAIKeys.E_RAD,
                 UIContents.AI_RAD.convertTo(Converter::titleStyle)
         );
 
@@ -67,8 +67,73 @@ public class AIUIFactory {
                 UIContents.AI_WEAPON.convertTo(Converter::titleStyle)
         );
 
+        // -------controller setting--------- //
+
+        DoubleUIField p_common = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_COMMON,
+                UIContents.AI_P_COMMON.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_pitch = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_PITCH,
+                UIContents.AI_P_PITCH.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_yaw = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_YAW,
+                UIContents.AI_P_YAW.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_ag_roll = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_AG_ROLL,
+                UIContents.AI_P_AG_ROLL.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_lv_roll = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_LV_ROLL,
+                UIContents.AI_P_LV_ROLL.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_drive = new DoubleUIField(
+                pos,
+                SharedAIKeys.P_DRIVE,
+                UIContents.AI_P_DRIVE.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField i_drive = new DoubleUIField(
+                pos,
+                SharedAIKeys.I_DRIVE,
+                UIContents.AI_I_DRIVE.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField turn = new DoubleUIField(
+                pos,
+                SharedAIKeys.TURN_RESIST,
+                UIContents.AI_TURN_RESIST.convertTo(Converter::titleStyle)
+        );
+
+        //----other----//
+
+        DoubleUIField fire = new DoubleUIField(
+                pos,
+                SharedAIKeys.FIRE_RATE,
+                UIContents.AI_FIRE_RATE.convertTo(Converter::titleStyle)
+        );
+
+        BooleanUIField arrow = new BooleanUIField(
+                pos,
+                SharedAIKeys.ARROW,
+                UIContents.AI_DB_ARROW.convertTo(Converter::titleStyle)
+        );
+
         Runnable alignLabels = () -> {
-            Converter.alignLabel(tar, vel, tol, rad, twi, yaw);
+            Converter.alignLabel(tar, vel, tol, e_rad, twi, yaw, fire, arrow);
+            Converter.alignLabel(p_common, p_yaw, p_lv_roll, p_ag_roll, p_pitch, p_drive, i_drive, turn);
             Converter.alignLabel(flight, weapon);
         };
 
@@ -78,7 +143,14 @@ public class AIUIFactory {
                 .withTab(
                         GenericUIFactory.GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(pos)
-                                .withPort(tar, vel, tol, rad, twi, yaw)
+                                .withPort(tar, vel, tol, e_rad, twi, yaw, fire, arrow)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTab(
+                        GenericUIFactory.CONTROLLER_TAB,
+                        new VerticalFlow.builder(pos)
+                                .withPort(p_common, p_yaw, p_lv_roll, p_ag_roll, p_pitch, p_drive, i_drive, turn)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
@@ -129,14 +201,88 @@ public class AIUIFactory {
                 UIContents.AI_E_RAD.convertTo(Converter::titleStyle)
         );
 
+        // -------controller setting--------- //
 
-        Runnable alignLabels = () -> Converter.alignLabel(tar, vel, tol, rad, e_rad, twi, yaw);
+        DoubleUIField p_common = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_COMMON,
+                UIContents.AI_P_COMMON.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_pitch = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_PITCH,
+                UIContents.AI_P_PITCH.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_yaw = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_YAW,
+                UIContents.AI_P_YAW.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_ag_roll = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_AG_ROLL,
+                UIContents.AI_P_AG_ROLL.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_lv_roll = new DoubleUIField(
+                pos,
+                MonitorBlockEntity.P_LV_ROLL,
+                UIContents.AI_P_LV_ROLL.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField p_drive = new DoubleUIField(
+                pos,
+                SharedAIKeys.P_DRIVE,
+                UIContents.AI_P_DRIVE.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField i_drive = new DoubleUIField(
+                pos,
+                SharedAIKeys.I_DRIVE,
+                UIContents.AI_I_DRIVE.convertTo(Converter::titleStyle)
+        );
+
+        DoubleUIField turn = new DoubleUIField(
+                pos,
+                SharedAIKeys.TURN_RESIST,
+                UIContents.AI_TURN_RESIST.convertTo(Converter::titleStyle)
+        );
+
+        //----other----//
+
+        DoubleUIField fire = new DoubleUIField(
+                pos,
+                SharedAIKeys.FIRE_RATE,
+                UIContents.AI_FIRE_RATE.convertTo(Converter::titleStyle)
+        );
+
+        BooleanUIField arrow = new BooleanUIField(
+                pos,
+                SharedAIKeys.ARROW,
+                UIContents.AI_DB_ARROW.convertTo(Converter::titleStyle)
+        );
+
+
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(tar, vel, tol, rad, e_rad, twi, yaw, fire, arrow);
+            Converter.alignLabel(p_common, p_yaw, p_lv_roll, p_ag_roll, p_pitch, p_drive, i_drive, turn);
+        };
 
         return new GenericSettingScreen.builder(pos)
                 .withTab(
                         GenericUIFactory.GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(pos)
-                                .withPort(tar, vel, tol, rad, e_rad, twi, yaw)
+                                .withPort(tar, vel, tol, rad, e_rad, twi, yaw, fire, arrow)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .withTab(
+                        GenericUIFactory.CONTROLLER_TAB,
+                        new VerticalFlow.builder(pos)
+                                .withPort(p_common, p_yaw, p_lv_roll, p_ag_roll, p_pitch, p_drive, i_drive, turn)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )

@@ -153,7 +153,8 @@ public abstract class BlockLinkPort {
             this.portPos = portPos;
             add(portPos);
         }else {
-            throw new IllegalStateException("BlockLinkPort Pos has already been set!");
+            return;
+            // throw new IllegalStateException("BlockLinkPort Pos has already been set!");
         }
     }
 
@@ -504,7 +505,7 @@ public abstract class BlockLinkPort {
         ).filter(e -> {
 
             if(!ready(e.getSecond().pos())){
-                ControlCraft.LOGGER.info("block at: {} is not loaded fully, output: {} -> {}, skipping output check", pos(), e.getFirst(), e.getSecond());
+                ControlCraft.LOGGER.debug("block at: {} is not loaded fully, output: {} -> {}, skipping output check", pos(), e.getFirst(), e.getSecond());
                 return false; // if the block is loaded, it is valid
             }
 
@@ -513,7 +514,7 @@ public abstract class BlockLinkPort {
             BlockLinkPort blp = of(bp.pos()).orElse(null);
 
             if(blp == null){
-                ControlCraft.LOGGER.info("found null blp at: {} output: {} bp: {}", pos(), outputName, bp);
+                ControlCraft.LOGGER.debug("found null blp at: {} output: {} bp: {}", pos(), outputName, bp);
                 return true;
             }
 
@@ -600,14 +601,14 @@ public abstract class BlockLinkPort {
 
     public static boolean ready(WorldBlockPos wbp){
         if(!BlockEntityGetter.INSTANCE.isLoaded(wbp)){
-            ControlCraft.LOGGER.info("ready() call --> state: unloaded at: {}", wbp);
+            ControlCraft.LOGGER.debug("ready() call --> state: unloaded at: {}", wbp);
             return false;
         }
         Optional<CimulinkBlockEntity<?>> oc = ofBlockEntity(wbp);
         if(oc.isPresent()){
             boolean initialized = oc.get().initialized();
             if(!initialized){
-                ControlCraft.LOGGER.info("ready() call --> state: uninitialized at: {}", wbp);
+                ControlCraft.LOGGER.debug("ready() call --> state: uninitialized at: {}", wbp);
             }
             return initialized;
         }

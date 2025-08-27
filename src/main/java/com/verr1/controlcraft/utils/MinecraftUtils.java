@@ -14,6 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -129,6 +130,10 @@ public class MinecraftUtils {
             if(len > maxLen.get()) maxLen.set(len);
         });
         return maxLen.get();
+    }
+
+    public static boolean _isChunkInRange(int x1, int z1, int x2, int z2, int viewDistance){
+        return new ChunkPos(x1, z1).getChessboardDistance(new ChunkPos(x2, z2)) <= viewDistance + 1;
     }
 
     @OnlyIn(Dist.CLIENT)

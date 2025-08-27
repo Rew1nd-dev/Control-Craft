@@ -5,13 +5,17 @@ import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Condition;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.AirBaseAwareness;
-import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity;
 
-public class PullEnterCondition extends Condition {
+public class AttackerPullExitCondition extends Condition {
     @Override
     protected boolean check(Blackboard blackboard) {
         AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
-        if (awareness == null)return false;
-        return awareness.tooLow() || awareness.tooClose();
+        IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
+        if(awareness == null)return false;
+        double height = awareness.currentHeight();
+        double obstacle = awareness.currentObstacleDistance();
+        double collideT0 = obstacle / context.cruiseVelocity();
+
+        return height > 2 * context.cruiseRadius() && collideT0 > 2;
     }
 }

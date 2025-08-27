@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
 
 import java.util.Map;
@@ -113,7 +114,7 @@ public class VSchematicCompactCenter {
             @Nullable CompoundTag tagToModify
     ){
 
-        ControlCraft.LOGGER.info("PreMotorReadVModCompact: " + tagToModify);
+        ControlCraft.LOGGER.info("PreMotorReadVModCompact: "); // + tagToModify
         ControlCraft.LOGGER.info("Map: " + map);
 
 
@@ -139,7 +140,7 @@ public class VSchematicCompactCenter {
                 ).asLong()
         );
 
-        ControlCraft.LOGGER.info("PreMotorReadVModCompact Modified: " + tagToModify);
+        ControlCraft.LOGGER.info("PreMotorReadVModCompact Modified: "); // + tagToModify
         return tagToModify;
     }
 
@@ -147,7 +148,7 @@ public class VSchematicCompactCenter {
     public static void PostMotorReadVModCompact(AbstractMotor motor, CompoundTag tag){
         CompoundTag compact = tag.getCompound("compact");
 
-        ControlCraft.LOGGER.info("PostMotorReadVModCompact: " + compact);
+        ControlCraft.LOGGER.info("PostMotorReadVModCompact: ");
 
         if(!compact.contains("offset"))return;
 
@@ -250,7 +251,7 @@ public class VSchematicCompactCenter {
             @Nullable CompoundTag tagToModify
     ){
 
-        ControlCraft.LOGGER.info("PreCimulinkReadVModCompact: {}", tagToModify);
+        ControlCraft.LOGGER.info("PreCimulinkReadVModCompact"); //, tagToModify
         ControlCraft.LOGGER.info("lMap: {}", map);
 
         if(tagToModify == null)return null;
@@ -269,14 +270,14 @@ public class VSchematicCompactCenter {
                 ).asLong()
         );
 
-        ControlCraft.LOGGER.info("PreCimulinkReadVModCompact Modified: {}", tagToModify);
+        ControlCraft.LOGGER.info("PreCimulinkReadVModCompact Modified:"); //, tagToModify
         return tagToModify;
     }
 
     public static void PostCimulinkReadVModCompact(CimulinkBlockEntity<?> cbe, CompoundTag modifiedTag){
         CompoundTag compact = modifiedTag.getCompound("compact");
 
-        ControlCraft.LOGGER.info("PostCimulinkReadVModCompact: {}", compact);
+        ControlCraft.LOGGER.info("PostCimulinkReadVModCompact"); //, compact
 
         if(!compact.contains("offset"))return;
 
@@ -287,6 +288,12 @@ public class VSchematicCompactCenter {
 
     public static BlockPos centerPosOf(int x, int z){
         return new BlockPos(((x / 16 / 256 - 1) * 256 + 128) * 16, 0, ((z / 16 / 256) * 256 + 128) * 16);
+    }
+
+    public static Vector3d centerVecOf(int x, int z){
+        int cx = ((x / 16 / 256 - 1) * 256 + 128) * 16;
+        int cz = ((z / 16 / 256) * 256 + 128) * 16;
+        return new Vector3d(cx, 0, cz);
     }
 
 }

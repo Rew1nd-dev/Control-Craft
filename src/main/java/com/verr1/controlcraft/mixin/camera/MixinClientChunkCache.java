@@ -28,6 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
+import static com.verr1.controlcraft.utils.MinecraftUtils._isChunkInRange;
+import static net.minecraft.server.level.ChunkMap.isChunkInRange;
+
 @Mixin(ClientChunkCache.class)
 public abstract class MixinClientChunkCache {
 
@@ -66,9 +69,13 @@ public abstract class MixinClientChunkCache {
             boolean shouldAddChunk = false;
 
             Vec3 cameraPos = ClientCameraManager.getLinkOrQueryCameraWorldPosition();
+
             if(cameraPos == null)return;
+            ChunkPos cPos = new ChunkPos(BlockPos.containing(cameraPos));
             // Is Not Querying Or Linking
-            if (pos.getChessboardDistance(new ChunkPos(BlockPos.containing(cameraPos))) <= (renderDistance + 1)){
+            // isChunkInRange(pos.x, pos.z, cPos.x, cPos.z, renderDistance + 1)
+            //
+            if (_isChunkInRange(pos.x, pos.z, cPos.x, cPos.z, renderDistance + 1)){
                 // ControlCraft.LOGGER.info("Should Add Chunk: {} {} cam: {}", x, z, new ChunkPos(BlockPos.containing(cameraPos)));
                 shouldAddChunk = true;
             }else{
@@ -85,6 +92,8 @@ public abstract class MixinClientChunkCache {
 
 
     }
+
+
 
     @Inject(method = "drop", at = @At(value = "HEAD"))
     private void drop(int x, int z, CallbackInfo ci){

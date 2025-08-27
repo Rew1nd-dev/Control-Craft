@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser.conditions;
 
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Condition;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
@@ -9,9 +10,10 @@ public class EvadeExitCondition extends Condition {
     @Override
     protected boolean check(Blackboard blackboard) {
         AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
-        if(awareness == null)return false;
+        IAirContext context = blackboard.get(SharedAIKeys.AIR_COMMON);
+        if(awareness == null || context == null)return false;
 
-        return !awareness.isInLossCone()
+        return !awareness.isInLossCone(2.5 * context.cruiseVelocity())
                 || awareness.distance() > 3 * awareness.safeDistance();
 
 

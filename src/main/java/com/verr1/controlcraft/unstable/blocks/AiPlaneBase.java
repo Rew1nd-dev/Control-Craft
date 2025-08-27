@@ -23,6 +23,7 @@ import com.verr1.controlcraft.unstable.valkyrienskies.context.CruiseController;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.LogicalDirectionTarget;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.PoseController;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -41,6 +42,8 @@ import rbasamoyai.createbigcannons.munitions.autocannon.flak.FlakExplosion;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static com.verr1.controlcraft.unstable.blocks.monitor.MonitorBlockEntity.*;
 
 public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         IAirContext
@@ -65,9 +68,16 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         registerDouble(this::extremeRadius, this::setExtremeRadius, SharedAIKeys.E_RAD);
         registerDouble(this::twistOmega, this::setTwistOmega, SharedAIKeys.TWI);
         registerDouble(this::yawOmega, this::setYawOmega, SharedAIKeys.YAW);
+
+
         registerDouble(this::pDrive, this::setPDrive, SharedAIKeys.P_DRIVE);
         registerDouble(this::iDrive, this::setIDrive, SharedAIKeys.I_DRIVE);
         registerDouble(this::turnResistance, this::setTurnResistance, SharedAIKeys.TURN_RESIST);
+        registerDouble(() -> controller().pCom(), p -> controller().setPCom(p), P_COMMON);
+        registerDouble(() -> controller().pPitch(), p -> controller().setPPitch(p), P_PITCH);
+        registerDouble(() -> controller().pYaw(), p -> controller().setPYaw(p), P_YAW);
+        registerDouble(() -> controller().pAgRoll(), p -> controller().setPAgRoll(p), P_AG_ROLL);
+        registerDouble(() -> controller().pLvRoll(), p -> controller().setPLvRoll(p), P_LV_ROLL);
 
         buildRegistry(SharedAIKeys.TAR)
                 .withBasic(SerializePort.of(this::debugTargetName, this::setDebugTargetName, SerializeUtils.STRING))
@@ -78,9 +88,17 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     }
 
     protected void registerDouble(Supplier<Double> getter, Consumer<Double> setter, NetworkKey key){
+        register(getter, setter, SerializeUtils.DOUBLE, ClientBuffer.DOUBLE.get(), key);
+    }
+
+    protected void registerBoolean(Supplier<Boolean> getter, Consumer<Boolean> setter, NetworkKey key){
+        register(getter, setter, SerializeUtils.BOOLEAN, ClientBuffer.BOOLEAN.get(), key);
+    }
+
+    protected<T> void register(Supplier<T> getter, Consumer<T> setter, Serializer<T> ser, ClientBuffer<T> buf, NetworkKey key){
         buildRegistry(key)
-                .withBasic(SerializePort.of(getter, setter, SerializeUtils.DOUBLE))
-                .withClient(ClientBuffer.DOUBLE.get())
+                .withBasic(SerializePort.of(getter, setter, ser))
+                .withClient(buf)
                 .register();
     }
 
@@ -146,7 +164,7 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     }
 
     public void setCruiseVelocity(double cruiseVelocity) {
-        this.cruiseVelocity = cruiseVelocity;
+        controller().setVelocity(cruiseVelocity);
     }
 
     @Override
@@ -198,8 +216,8 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void scheduleDeath(){
         if(!isAI() || isDead)return;
         isDead = true;
-        ControlCraftServer.SERVER_EXECUTOR.executeOnSchedule(getBlockPos().toShortString() + " + explode", this::explode, 4, 3);
-        ControlCraftServer.SERVER_EXECUTOR.executeLater(getBlockPos().toShortString() + " + discard", this::discard, 30);
+        ControlCraftServer.SERVER_EXECUTOR.executeOnSchedule(getBlockPos().toShortString() + " + explode", this::explode, 10, 3);
+        ControlCraftServer.SERVER_EXECUTOR.executeLater(getBlockPos().toShortString() + " + discard", this::discard, 50);
     }
 
 
@@ -215,6 +233,7 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void onSpawn() {
         isDead = false;
         awareness.resetStuckScore();
+        poseController.overrideTarget(getRotation());
     }
 
     public void syncNetwork(){
@@ -232,7 +251,7 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
                 null,
                 p.x(), p.y(), p.z(),
                 3,
-                Level.ExplosionInteraction.MOB
+                Level.ExplosionInteraction.NONE
         );
         ShellExplosion impact2 = new ShellExplosion(
                 level,
@@ -241,7 +260,7 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
                 p.x(), p.y(), p.z(),
                 3,
                 false,
-                Level.ExplosionInteraction.MOB
+                Level.ExplosionInteraction.NONE
         );
         FlakExplosion impact3 = new FlakExplosion(
                 level,
@@ -249,7 +268,7 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
                 null,
                 p.x(), p.y(), p.z(),
                 3,
-                Level.ExplosionInteraction.MOB
+                Level.ExplosionInteraction.NONE
         );
         CreateBigCannons.handleCustomExplosion(level, impact);
         CreateBigCannons.handleCustomExplosion(level, impact2);
@@ -265,6 +284,12 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         return poseController;
     }
 
+    @Override
+    public void tickServer() {
+        super.tickServer();
+    }
+
+    @Override
     public void kill() {
         if(!isAI())return;
         scheduleDeath();
@@ -333,5 +358,6 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void lazyTickServer() {
         super.lazyTickServer();
         tickHealth();
+        syncNetwork();
     }
 }

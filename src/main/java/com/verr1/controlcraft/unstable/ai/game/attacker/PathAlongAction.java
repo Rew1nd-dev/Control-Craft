@@ -8,6 +8,8 @@ import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
+import com.verr1.controlcraft.unstable.ai.core.nodes.Interruptible;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity;
 import com.verr1.controlcraft.unstable.pathing.path.IPath;
 import com.verr1.controlcraft.utils.MathUtils;
@@ -19,14 +21,14 @@ import java.awt.*;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity.CURRENT_CRUISE;
 
-public class PathAlongAction extends Action {
+public class PathAlongAction extends Action implements Interruptible {
     public static Address<Double> LATEST_ACCUMULATED = new Address<>("latest_acc", Double.class);
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        ControlCraft.LOGGER.info("pathing along");
+        // ControlCraft.LOGGER.info("pathing along");
 
-        IAttackerContext context = blackboard.get(AiAttackerBlockEntity.CONTEXT);
+        IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
         IPath current = blackboard.get(CURRENT_CRUISE);
         if (context == null)return Status.RUNNING;
         if (current == null)return Status.FAILURE;
@@ -40,16 +42,10 @@ public class PathAlongAction extends Action {
         Vector3dc lookAhead = current.point(acc); // Optional.ofNullable(context.debug_getTarget()).orElse(new Vector3d(0, 0, 0)); // current.point(acc);
         controller.overrideTarget(lookAhead.sub(pos, new Vector3d()));
 
-        ClientOutliner.drawOutline(
-                toMinecraft(MathUtils.centerWithRadius(lookAhead, 1)),
-                Color.RED.getRGB(),
-                "debug_evade_target " + this,
-                4.0,
-                1f / 16
-        );
+        unsafeRenderPosition(lookAhead, this);
 
         Vector3dc close = current.point(distance);
-        if(close.distance(pos) > context.extremeRadius() * 0.8){
+        if(close.distance(pos) > context.extremeRadius() * 2){
             ControlCraft.LOGGER.info("off path {}", this);
             return Status.FAILURE;
         }
@@ -63,4 +59,19 @@ public class PathAlongAction extends Action {
         return Status.RUNNING;
     }
 
+    public static void unsafeRenderPosition(Vector3dc lookAhead, Object token){
+//        ClientOutliner.drawOutline(
+//                toMinecraft(MathUtils.centerWithRadius(lookAhead, 1)),
+//                Color.RED.getRGB(),
+//                "debug_evade_target " + token,
+//                4.0,
+//                1f / 16
+//        );
+    }
+
+    @Override
+    public void interrupt(Blackboard blackboard) {
+        IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
+        context.fireAt(context.getHeading());
+    }
 }

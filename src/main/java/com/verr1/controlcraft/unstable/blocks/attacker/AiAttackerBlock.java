@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
 public class AiAttackerBlock extends DirectionalBlock implements IBE<AiAttackerBlockEntity> {
     public static final String ID = "ai_jet";
 
-    public AiAttackerBlock(Properties p_49795_) {
-        super(p_49795_);
+    public AiAttackerBlock(Properties properties) {
+        super(properties.strength(-1, 3600000));
     }
 
     @Override

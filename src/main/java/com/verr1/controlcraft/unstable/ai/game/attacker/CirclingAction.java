@@ -2,17 +2,21 @@ package com.verr1.controlcraft.unstable.ai.game.attacker;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
+import com.verr1.controlcraft.unstable.ai.api.ICircleContext;
 import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Interruptible;
-import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.utils.MathUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.util.Random;
+
+import static com.verr1.controlcraft.unstable.ai.game.attacker.PathAlongAction.unsafeRenderPosition;
 
 public class CirclingAction extends Action implements Interruptible {
 
@@ -22,17 +26,18 @@ public class CirclingAction extends Action implements Interruptible {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        ControlCraft.LOGGER.info("try circling");
-        IAttackerContext context = blackboard.get(AiAttackerBlockEntity.CONTEXT);
+         // ControlCraft.LOGGER.info("try circling");
+        ICircleContext context = blackboard.get(SharedAIKeys.CIRCLE_CONTEXT);
         // AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
         if(context == null)return Status.FAILURE;
         Vector3dc latestAnchor = blackboard.get(AnchorAction.LATEST);
+        if (latestAnchor == null)return Status.FAILURE;
 
         double latestY = blackboard.computeIfAbsent(LATEST_Y, () -> -256.0);
-        double y0 = context.height() + context.extremeRadius() * 1.5;
-        double cr = context.extremeRadius() * 3;
+        double y0 = context.height() + context.circleRadius() * 1.5;
+        double cr = context.circleRadius() * 3;
 
-        double yt = MathUtils.clamp(latestY, y0, y0 + context.extremeRadius());
+        double yt = MathUtils.clamp(latestY, y0, y0 + context.circleRadius());
         blackboard.set(LATEST_Y, yt);
 
         Vector3dc prevLookAhead = blackboard.computeIfAbsent(LOOKAHEAD, Vector3d::new);
@@ -43,7 +48,7 @@ public class CirclingAction extends Action implements Interruptible {
                 yt,
                 cr,
                 Math.PI / 4, // 最大偏置角度
-                context.extremeRadius() * 4, // 区域半径
+                context.circleRadius() * 4, // 区域半径
                 0.1, // 平滑因子
                 0.5, // 噪声幅度
                 prevLookAhead
@@ -53,28 +58,31 @@ public class CirclingAction extends Action implements Interruptible {
         Vector3dc dir = lookaheadPoint.sub(context.getPosition(), new Vector3d());
         context.controller().overrideTarget(dir);
 
+
+        unsafeRenderPosition(lookaheadPoint, this);
+
         return Status.RUNNING;
 
     }
 
     @Override
     public void interrupt(Blackboard board) {
-        IAttackerContext context = board.get(AiAttackerBlockEntity.CONTEXT);
+        IAttackerContext context = board.get(SharedAIKeys.ATTACKER_CONTEXT);
         if (context == null)return;
         board.remove(LOOKAHEAD);
     }
 
     public static Vector3d computeLookaheadPoint(
-            Vector3dc currentPos,
-            Vector3dc currentVel,
-            Vector3dc baseXZ,
+            @NotNull Vector3dc currentPos,
+            @NotNull Vector3dc currentVel,
+            @NotNull Vector3dc baseXZ,
             double cruiseY,
             double lookaheadDist,
             double maxBiasAngle,
             double regionRadius,
             double smoothFactor,
             double noiseAmp,
-            Vector3dc prevLookahead
+            @NotNull Vector3dc prevLookahead
     ) {
 
         // 步骤1: 获取单位方向 (处理速度为0的情况)

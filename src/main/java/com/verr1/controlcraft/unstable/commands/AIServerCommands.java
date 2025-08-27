@@ -68,6 +68,8 @@ public class AIServerCommands {
         return 1;
     }
 
+
+
     private static int debugRepairShipCommand(CommandContext<CommandSourceStack> context){
         CommandSourceStack source = context.getSource();
 
@@ -113,6 +115,12 @@ public class AIServerCommands {
 
         AIServer.MANAGER.spawnType(new SchematicKey(namespace, name), toJOML(position), new Quaterniond());
 
+        return 1;
+    }
+
+    private static int setYardPositionCommand(CommandContext<CommandSourceStack> context){
+        Vec3 position = Vec3Argument.getVec3(context, "coordinate");
+        AIServer.MANAGER.setYardPosition(position.x, position.y, position.z);
         return 1;
     }
 
@@ -238,7 +246,15 @@ public class AIServerCommands {
                                                                         .executes(AIServerCommands::debugJoinPollCommand)
                                                         )
                                         )
-                        )
+                ).then(
+                                lt("set-yard")
+                                        .then(
+                                                arg("coordinate", Vec3Argument.vec3()).executes(
+                                                        AIServerCommands::setYardPositionCommand
+                                                )
+                                        )
+                )
+
         );
     }
 

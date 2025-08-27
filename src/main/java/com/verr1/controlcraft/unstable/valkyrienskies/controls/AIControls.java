@@ -33,7 +33,7 @@ public class AIControls {
         Vector3dc t = target.poseController().calcControlTorque();
 
         target.poseController().overridePhysics(ship);
-        target.controller().overridePhysics(ship.getVelocity());
+        target.controller().overridePhysics(ship.getVelocity(), ship.getTransform().getShipToWorldRotation());
 
         ship.applyInvariantForce(MathUtils.nonNan(f));
         ship.applyInvariantTorque(MathUtils.nonNan(t));

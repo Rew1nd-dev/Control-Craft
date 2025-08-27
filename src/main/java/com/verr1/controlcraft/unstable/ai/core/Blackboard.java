@@ -1,5 +1,7 @@
 package com.verr1.controlcraft.unstable.ai.core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -26,7 +28,7 @@ public class Blackboard {
             value = factory.get();
             data.put(key, value);
         }
-        return key.clazz().isInstance(value) ? key.clazz().cast(value) : null;
+        return key.clazz().cast(value);
     }
 
 

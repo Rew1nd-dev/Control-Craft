@@ -1,11 +1,12 @@
-package com.verr1.controlcraft.unstable.ai.game.cruiser;
+package com.verr1.controlcraft.unstable.ai.game;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.unstable.ai.api.IAirContext;
 import com.verr1.controlcraft.unstable.ai.api.IAirController;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
-import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.AirBaseAwareness;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 

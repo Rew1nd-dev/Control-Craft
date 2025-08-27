@@ -1,36 +1,42 @@
 package com.verr1.controlcraft.unstable.targeting;
 
 import com.verr1.controlcraft.unstable.AIServer;
-import com.verr1.controlcraft.unstable.ai.api.IFighterJetContext;
+import com.verr1.controlcraft.unstable.ai.api.IAirContext;
 import com.verr1.controlcraft.unstable.util.LazyTicker;
 import kotlin.Pair;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AirBaseTargetSelector {
 
-    private final Set<Long> inRange = new HashSet<>();
-    private final Set<Long> air = new HashSet<>();
+    protected final Set<Long> inRange = new HashSet<>();
+    protected final Set<Long> air = new HashSet<>();
 
-    private long currentTarget = -1L;
+    protected long currentTarget = -1L;
 
-    private static double maxRange = 300;
-    private final IFighterJetContext self;
+    protected static double maxRange = 600;
+    protected final IAirContext self;
 
-    private final LazyTicker updater = new LazyTicker(60, this::updateInRange);
-    private final LazyTicker quickUpdater = new LazyTicker(10, this::updateAir);
-    private final LazyTicker constantUpdater = new LazyTicker(5, this::updateTarget);
+    protected final LazyTicker updater = new LazyTicker(60, this::updateInRange);
+    protected final LazyTicker quickUpdater = new LazyTicker(10, this::updateAir);
+    protected final LazyTicker constantUpdater = new LazyTicker(5, this::updateTarget);
 
-    public AirBaseTargetSelector(IFighterJetContext self) {
+    protected long cachedAirTarget = -1L;
+
+
+    public AirBaseTargetSelector(IAirContext self) {
         this.self = self;
+    }
+
+    protected Optional<ServerShip> getShipOf(long id){
+        return AIServer.MANAGER.getShipOf(id);
     }
 
     public void updateInRange(){
@@ -43,6 +49,10 @@ public class AirBaseTargetSelector {
                 .filter(s -> s.getId() != self.shipId())
                 .forEach(s -> inRange.add(s.getId()));
         updateAir();
+    }
+
+    public Set<Long> ground(){
+        return inRange.stream().filter(s -> !air.contains(s)).collect(Collectors.toSet());
     }
 
     public void updateAir(){
@@ -59,6 +69,8 @@ public class AirBaseTargetSelector {
         ).forEach(
                 sp -> air.add(sp.getFirst())
         );
+
+        cacheAirTarget();
     }
 
     public Vector3dc getVelocityOf(long id){
@@ -69,8 +81,8 @@ public class AirBaseTargetSelector {
         return AIServer.MANAGER.getShipOf(id).map(s -> s.getTransform().getPositionInWorld()).orElse(null);
     }
 
-    public long findTarget(){
-        return air
+    protected void cacheAirTarget(){
+        cachedAirTarget = air
                 .stream()
                 .filter(s -> !AIServer.MANAGER.isInPool(s))
                 .map(s -> new Pair<>(s, computeThreatScore(
@@ -85,8 +97,12 @@ public class AirBaseTargetSelector {
                 .orElse(-1L);
     }
 
+    public long findAirTarget(){
+        return cachedAirTarget;
+    }
+
     public void updateTarget(){
-        currentTarget = findTarget();
+        currentTarget = findAirTarget();
     }
 
     public long getTarget(){

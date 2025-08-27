@@ -63,7 +63,7 @@ public class AirBaseAwareness {
         long shipId = context.shipId();
         ClipContext ctx = new ClipContext(
                 toMinecraft(currentPosition),
-                toMinecraft(currentPosition.fma(context.extremeRadius() * 4, currentFront, new Vector3d())),
+                toMinecraft(currentPosition.fma(context.cruiseVelocity() * 3, currentFront, new Vector3d())),
                 ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.ANY,
                 null
@@ -74,28 +74,13 @@ public class AirBaseAwareness {
 
     }
 
-    public boolean shouldPullUp(){
-        return tooLow() || tooClose();
+
+    public double currentHeight(){
+        return currentHeight;
     }
 
-    public boolean tooLow(){
-        return currentHeight < 1.5 * context.extremeRadius();
-    }
-
-    public boolean safeHeight(){
-        return currentHeight > 3.5 * context.extremeRadius();
-    }
-
-    public boolean safeObstacle(){
-        return headingObstacleDistance > 3.5 * context.extremeRadius();
-    }
-
-    public boolean tooClose(){
-        return headingObstacleDistance < 1.5 * context.extremeRadius();
-    }
-
-    public boolean safeCruise(){
-        return safeHeight() && safeObstacle();
+    public double currentObstacleDistance(){
+        return headingObstacleDistance;
     }
 
     public AirBaseAwareness(IAirContext context) {
@@ -115,13 +100,12 @@ public class AirBaseAwareness {
         return lazyRandoms.get(index).peek();
     }
 
-    public boolean mayCollide(){
+    public double closingRate(){
         Vector3dc rel = targetPosition.sub(currentPosition, new Vector3d());
         Vector3dc vr = AIControlUtils.projection(targetVelocity.sub(currentVelocity, new Vector3d()), rel);
-        boolean closing = vr.dot(rel) < 0;
-        double collideT = rel.length() / (1e-8 + vr.length());
+        double closing = vr.dot(rel);
 
-        return collideT < 0.5 && closing;
+        return rel.length() / (1e-8 + vr.length()) * -Math.signum(closing);
     }
 
 
@@ -196,7 +180,7 @@ public class AirBaseAwareness {
     }
 
     private int lazyTickCounter = 0;
-    private int lazyTickRate = 5;
+    private int lazyTickRate = 0;
 
     public void lazyTick(){
         if(lazyTickCounter-- > 0)return;
@@ -204,18 +188,22 @@ public class AirBaseAwareness {
         tickAltitude();
     }
 
-    public void overrideDual(
+    public void overrideTarget(
             @NotNull Vector3dc targetPosition,@NotNull  Vector3dc targetVelocity,
-            @NotNull Vector3dc currentPosition,@NotNull  Vector3dc currentVelocity,
             @NotNull Vector3dc cruiseTarget,
             @NotNull Vector3dc currentFront
     ) {
         this.targetPosition.set(targetPosition);
         this.targetVelocity.set(targetVelocity);
-        this.currentPosition.set(currentPosition);
-        this.currentVelocity.set(currentVelocity);
         this.currentFront.set(currentFront);
         this.cruiseTarget.set(cruiseTarget);
+    }
+
+    public void overrideDual(
+            @NotNull Vector3dc currentPosition,@NotNull  Vector3dc currentVelocity
+    ) {
+        this.currentPosition.set(currentPosition);
+        this.currentVelocity.set(currentVelocity);
     }
 
 
@@ -247,10 +235,9 @@ public class AirBaseAwareness {
         return targetPosition.sub(currentPosition, new Vector3d());
     }
 
-    public boolean isInLossCone(){
-        double radius = context.extremeRadius();
+    public boolean isInLossCone(double coneRadius){
         double dh = targetRelative().length();
-        double beta = dh > radius ? Math.asin(radius/ (dh + 1e-8) ) : Math.PI / 2;  // 0 - PI / 2
+        double beta = dh > coneRadius ? Math.asin(coneRadius / (dh + 1e-8) ) : Math.PI / 2;  // 0 - PI / 2
         double gamma = frontAngle();
         return gamma > Math.PI - beta;
     }

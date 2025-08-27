@@ -54,7 +54,6 @@ public class BlockEntityGetter {
         return getBlockEntityAt(worldBlockPos.globalPos(), clazz);
     }
 
-
     public <T> Optional<T> getBlockEntityAt(GlobalPos globalPos, Class<T> clazz){
 
         return Optional
@@ -63,6 +62,24 @@ public class BlockEntityGetter {
                 .filter(clazz::isInstance)
                 .map(clazz::cast);
     }
+
+    public <T> Optional<T> getExistingEntityAt(GlobalPos globalPos, Class<T> clazz){
+
+        return Optional
+                .ofNullable(server.getLevel(globalPos.dimension()))
+                .map(world -> world.getExistingBlockEntity(globalPos.pos()))
+                .filter(clazz::isInstance)
+                .map(clazz::cast);
+    }
+
+    public <T> Optional<T> getExistingBlockEntityAt(WorldBlockPos worldBlockPos, Class<T> clazz){
+        return getExistingEntityAt(worldBlockPos.globalPos(), clazz);
+    }
+
+
+
+
+
 
     public <T> Optional<T> getCachedBlockEntityAt(GlobalPos globalPos, Class<T> clazz){
         try{

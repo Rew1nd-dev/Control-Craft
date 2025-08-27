@@ -92,6 +92,7 @@ public class ServerCameraManager {
                 .map(p -> BlockEntityGetter.INSTANCE.getBlockEntityAt(p, CameraBlockEntity.class).orElse(null))
                 .filter(Objects::nonNull)
                 .map(CameraBlockEntity::watcher)
+                .filter(Objects::nonNull)
                 .map(CameraBoundFakePlayer::toMinecraftPlayer)
                 .collect(Collectors.toSet());
     }

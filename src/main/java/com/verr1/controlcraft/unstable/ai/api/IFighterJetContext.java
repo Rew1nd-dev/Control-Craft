@@ -12,7 +12,7 @@ public interface IFighterJetContext extends IAirContext{
 
     Vector3dc getTargetVelocity();
 
-    default void kill(){};
+    double cruiseRadius();
 
     default boolean noTarget(){return false;}
 

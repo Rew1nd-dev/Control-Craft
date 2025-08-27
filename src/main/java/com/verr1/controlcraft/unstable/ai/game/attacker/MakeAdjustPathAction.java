@@ -1,10 +1,11 @@
 package com.verr1.controlcraft.unstable.ai.game.attacker;
 
 import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
+import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
-import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculatorV2;
 import com.verr1.controlcraft.unstable.pathing.path.IPath;
 import com.verr1.controlcraft.unstable.pathing.path.LinePath;
@@ -18,10 +19,15 @@ import static com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEnt
 
 import static com.verr1.controlcraft.utils.MathUtils.*;
 
-public class MakePathAction extends Action {
+public class MakeAdjustPathAction extends Action {
+
+    public static final Address<Double> ENTER_YAW = new Address<>("enter_yaw", Double.class);
+
+    public static final Address<Double> ENTER_PITCH = new Address<>("enter_pitch", Double.class);
+
     @Override
     protected Status perform(Blackboard blackboard) {
-        IAttackerContext context = blackboard.get(AiAttackerBlockEntity.CONTEXT);
+        IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
         if (context == null)return Status.RUNNING;
         Vector3dc pos = context.getPosition();
         Vector3dc vel = context.getHeading();
@@ -29,12 +35,16 @@ public class MakePathAction extends Action {
 
         if(t_pos == null)return Status.SUCCESS;
 
-        System.out.println("making new path");
+        // System.out.println("making new path");
 
         double enterYaw = Math.random() * 2 * Math.PI;
-        double enterPitch = Math.toRadians(MathUtils.lerp(Math.random(), 10, 60));
-        double safeHeight = context.extremeRadius() * 1;
-        double strikeDistance = 3 * context.extremeRadius();
+        double enterPitch = Math.toRadians(MathUtils.lerp(Math.random(), 30, 60));
+
+        blackboard.set(ENTER_YAW, enterYaw);
+        blackboard.set(ENTER_PITCH, enterPitch);
+
+        double safeHeight = context.cruiseRadius() * 1;
+        double strikeDistance = 2 * context.cruiseRadius();
         double endDistance = safeHeight / Math.sin(enterPitch);
 
         Vector3dc strikeDirection = new Vector3d(Math.cos(enterYaw), Math.tan(enterPitch), Math.sin(enterYaw)).normalize();
@@ -59,13 +69,13 @@ public class MakePathAction extends Action {
         IPath adjust0 = DubinsCalculatorV2.dubinsMatchEnd(
                 pos, safeNormalize(vel, new Vector3d(0, 1, 0)),
                 circleStart, circleStartDirection,
-                context.extremeRadius()
+                context.cruiseRadius()
         );
 
         IPath adjust1 = DubinsCalculatorV2.dubinsMatchEnd(
                 circleStart, circleStartDirection,
                 strikeStart, strikeStartDirection,
-                context.extremeRadius()
+                context.cruiseRadius()
         );
 
         if(adjust0 == null || adjust1 == null)return Status.FAILURE;

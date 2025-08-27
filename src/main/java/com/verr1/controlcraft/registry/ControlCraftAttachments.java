@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.registry;
 
 import com.verr1.controlcraft.content.valkyrienskies.attachments.*;
-import com.verr1.controlcraft.content.valkyrienskies.attachments.legacy.*;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.hooks.VSEvents;
 
@@ -18,14 +17,6 @@ public enum ControlCraftAttachments {
     PROPELLER(PropellerForceInducer.class),
     FLAP(FlapForceInducer.class),
 
-
-
-    LEGACY_ANCHOR(AnchorForceInducer_.class),
-    LEGACY_DYNAMIC_MOTOR(DynamicMotorForceInducer_.class),
-    LEGACY_SLIDER(DynamicSliderForceInducer_.class),
-    LEGACY_SPATIAL(SpatialForceInducer_.class),
-    LEGACY_JET(JetForceInducer_.class),
-    LEGACY_PROPELLER(PropellerForceInducer_.class),
 
     // CAFFEINE(Caffeine.class),
     // KINEMATIC_MOTOR(KinematicMotorForceInducer.class),

@@ -1,17 +1,17 @@
-package com.verr1.controlcraft.unstable.ai.game.cruiser.conditions;
+package com.verr1.controlcraft.unstable.ai.game.attacker.conditions;
 
-import com.verr1.controlcraft.unstable.ai.api.IAirContext;
+import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Condition;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.AirBaseAwareness;
 
-public class EvadeEnterCondition extends Condition {
+public class AttackerEvadeEnterCondition extends Condition {
     @Override
     protected boolean check(Blackboard blackboard) {
+        IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
         AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
-        IAirContext context = blackboard.get(SharedAIKeys.AIR_COMMON);
         if(awareness == null)return false;
-        return (awareness.isInLossCone(2.5 * context.cruiseVelocity()) || awareness.closingRate() < 1); // || awareness.attackScore() < 5
+        return (awareness.isInLossCone(2 * context.cruiseRadius()) || awareness.closingRate() < 2 || context.fireCooldown() > 100); // || awareness.attackScore() < 5
     }
 }

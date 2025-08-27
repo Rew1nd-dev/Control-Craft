@@ -3,7 +3,7 @@ package com.verr1.controlcraft.unstable.ai.core.nodes;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 
-public class Selector extends CompositeNode {
+public class Selector extends CompositeNode implements Interruptible{
 
 
 
@@ -31,4 +31,14 @@ public class Selector extends CompositeNode {
     }
 
 
+    @Override
+    public void interrupt(Blackboard board) {
+        if(lastStatus == Status.RUNNING && currentChildIndex < children.size()){
+            Node current = children.get(currentChildIndex);
+            if(current instanceof Interruptible interruptible){
+                interruptible.interrupt(board);
+            }
+        }
+        reset();
+    }
 }

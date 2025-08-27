@@ -1,11 +1,11 @@
 package com.verr1.controlcraft.unstable.ai.game.attacker;
 
-import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
+import com.verr1.controlcraft.unstable.ai.api.IAnchorContext;
 import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
-import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity;
+import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
@@ -18,13 +18,13 @@ public class AnchorAction extends Action {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        IAttackerContext context = blackboard.get(AiAttackerBlockEntity.CONTEXT);
+        IAnchorContext context = blackboard.get(SharedAIKeys.ANCHOR_CONTEXT);
         if(context == null)return Status.RUNNING;
 
         if(context.noGroundTarget()){
             Vector3dc latest = blackboard.computeIfAbsent(LATEST, () -> provide(context));
             Vector3dc current = context.getPosition();
-            if(xzDist(latest, current) > context.extremeRadius() * 6){
+            if(xzDist(latest, current) > context.cruiseRadius() * 6){
                 blackboard.set(LATEST, provide(context));
             }
         }else{
@@ -34,7 +34,7 @@ public class AnchorAction extends Action {
         return Status.RUNNING;
     }
 
-    private static Vector3d provide(IAttackerContext context) {
+    private static Vector3d provide(IAnchorContext context) {
         Vector3d v = new Vector3d(context.getPosition());
         v.y = context.height();
         return v;

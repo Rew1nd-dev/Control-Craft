@@ -1,8 +1,13 @@
 package com.verr1.controlcraft.unstable.data.schematic;
 
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+import com.verr1.controlcraft.registry.AIBlocks;
 import com.verr1.controlcraft.unstable.AIServer;
+import com.verr1.controlcraft.unstable.ai.api.IReplaceBlock;
 import com.verr1.controlcraft.unstable.util.SchematicSerializeUtil;
 import com.verr1.controlcraft.utils.*;
 import kotlin.Pair;
@@ -17,7 +22,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockItem;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockPaletteHashMapV1;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.ChunkyBlockData;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.ICopyableBlock;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
 import org.joml.Vector3i;
 import org.joml.primitives.AABBi;
 import org.joml.primitives.AABBic;
@@ -26,6 +33,10 @@ import org.valkyrienskies.core.api.ships.Ship;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter.centerPosOf;
+import static com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter.centerVecOf;
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 public class AISchematic {
     private static final Serializer<BlockPaletteHashMapV1> PALETTE = SerializeUtils.of(
@@ -50,18 +61,25 @@ public class AISchematic {
     private final List<CompoundTag> savedBeTags;
     private final ChunkyBlockData<BlockItem> blockData;
     private final Pair<Integer, Integer> yBound;
+    private final long oldShipId;
+    private final BlockPos oldShipChunkCenter;
     private final double mass;
 
     AISchematic(
-            BlockPaletteHashMapV1 offsetPalette,
-            List<CompoundTag> savedBeTags,
-            ChunkyBlockData<BlockItem> blockData, Pair<Integer, Integer> yBound,
+            @NotNull BlockPaletteHashMapV1 offsetPalette,
+            @NotNull List<CompoundTag> savedBeTags,
+            @NotNull ChunkyBlockData<BlockItem> blockData,
+            @NotNull Pair<Integer, Integer> yBound,
+            long oldShipId,
+            @NotNull BlockPos oldShipChunkCenter,
             double mass
     ) {
         this.offsetPalette = offsetPalette;
         this.savedBeTags = savedBeTags;
         this.blockData = blockData;
         this.yBound = yBound;
+        this.oldShipId = oldShipId;
+        this.oldShipChunkCenter = oldShipChunkCenter;
         this.mass = mass;
     }
 
@@ -105,16 +123,24 @@ public class AISchematic {
                                 try{
                                     if(state.isAir())continue;
 
-                                    state.getBlock().getDescriptionId();
-
-
                                     int paletteId = palette.toId(state);
 
                                     // VManagerMod.LOGGER.info("Saving block at: " + pos + " " + chunkToSave.getBlockState(pos).getBlock().getDescriptionId());
 
-                                    CompoundTag nullableTag = Optional.ofNullable(chunkToSave.getBlockEntity(pos)).map(BlockEntity::saveWithFullMetadata).orElse(null);
+                                    BlockEntity be = chunkToSave.getBlockEntity(pos);
 
+                                    CompoundTag nullableTag = Optional.ofNullable(be).map(BlockEntity::saveWithFullMetadata).orElse(null);
 
+                                    if(state.getBlock() instanceof ICopyableBlock cpy){
+                                        nullableTag = cpy.onCopy(
+                                                level,
+                                                pos,
+                                                state,
+                                                be,
+                                                List.of(ship),
+                                                Map.of(ship.getId(), toJOML(center.getCenter()))
+                                        );
+                                    }
 
                                     int beTagId = Optional
                                             .ofNullable(nullableTag)
@@ -144,11 +170,15 @@ public class AISchematic {
                 savedBeTags,
                 blockData,
                 new Pair<>(yBound.getFirst() - center.getY(), yBound.getSecond() - center.getY()),
+                ship.getId(),
+                center,
                 ship.getInertiaData().getMass()
         );
     }
 
     public void repairAt(BlockPos center, ServerLevel blockPlacer){
+        Ship ship = ValkyrienSkies.getShipManagingBlock(blockPlacer, center);
+        if(ship == null)return;
         AABBic aabb = AIServer.MANAGER.getShipAt(WorldBlockPos.of(blockPlacer, center)).map(Ship::getShipAABB).orElse(null);
         if(aabb == null)return;
         AABBic offsetAABB = MathUtils.offset(aabb, new Vector3i(-center.getX(), -center.getY(), -center.getZ()));
@@ -166,16 +196,24 @@ public class AISchematic {
                     chunkToCheck.add(offsetChunkPos);
                 }
         );
-
+        List<Runnable> delayLoading = new ArrayList<>();
         chunkToCheck.forEach(offsetChunkPos -> {
             Map<BlockPos, BlockItem> map = blockData.getBlocks().getOrDefault(new BlockPos(offsetChunkPos.x, 0, offsetChunkPos.z), new HashMap<>());
-            repairFullChunk(blockPlacer, offsetChunkPos, map, center, yBound);
+            repairFullChunk(ship, blockPlacer, offsetChunkPos, map, center, yBound, delayLoading);
         });
-
-
+        // ControlCraftServer.SERVER_EXECUTOR.executeLater(() -> delayLoading.forEach(Runnable::run), 5);
+        delayLoading.forEach(Runnable::run);
     }
 
-    private void repairFullChunk(ServerLevel blockPlacer, ChunkPos offsetChunkPos, Map<BlockPos, BlockItem> map, BlockPos center, Pair<Integer, Integer> yBound){
+    private void repairFullChunk(
+            Ship ship,
+            ServerLevel blockPlacer,
+            ChunkPos offsetChunkPos,
+            Map<BlockPos, BlockItem> map,
+            BlockPos center,
+            Pair<Integer, Integer> yBound,
+            List<Runnable> delayLoadings
+    ){
         for(int ix = 0; ix < 16; ix++){
             for(int iy = yBound.getFirst(); iy < yBound.getSecond(); iy++){
                 for(int iz = 0; iz < 16; iz++) {
@@ -209,20 +247,47 @@ public class AISchematic {
                                 .map(savedBeTags::get)
                                 .orElse(new CompoundTag());
 
+
+
                         BlockPos realPos = offsetPos.offset(center);
 
                         if(!original.isAir()){
-                            ControlCraft.LOGGER.info("fixing: " + realPos + " with state: " + original + " and beTag: " + beTag);
+                            ControlCraft.LOGGER.info("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
+                        }
+                        if(original.getBlock() instanceof IReplaceBlock){
+                            blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 3); // destroy and replace, in order to clear be
+                        }
+                        blockPlacer.setBlock(realPos, original, 3);
+
+
+
+                        if(original.getBlock() instanceof ICopyableBlock cpy){
+                            Vector3d newChunkCenter = toJOML(center.getCenter());
+                            Vector3d oldChunkCenter = toJOML(oldShipChunkCenter.getCenter());
+                            beTag = cpy.onPaste(
+                                    blockPlacer,
+                                    realPos,
+                                    original,
+                                    Map.of(oldShipId, ship.getId()),
+                                    Map.of(oldShipId, new Pair<>(oldChunkCenter, newChunkCenter)),
+                                    beTag
+                            );
                         }
 
-                        blockPlacer.setBlock(realPos, original, 3);
+                        CompoundTag finalBeTag = beTag;
+                        if(beTag == null)return;
+
                         Optional.ofNullable(
                                 blockPlacer.getBlockEntity(realPos)
                         ).ifPresent(
-                                be -> be.load(beTag)
+                                be -> delayLoadings.add(() -> {
+                                    be.load(finalBeTag);
+                                })
                         );
+
                     } catch (Exception e) {
                         ControlCraft.LOGGER.error("Exception caught during rewinding: pos: {}, state: {}, exception: {}", offsetPos.toShortString(), original, DebugUtils.stackTrace(e));
+                        ControlCraft.LOGGER.error(DebugUtils.stackTrace(e));
                     }
 
 
@@ -262,6 +327,8 @@ public class AISchematic {
                 .withCompound("block_data", BLOCK_DATA.serialize(blockData))
                 .withCompound("y_bound", Y_BOUND.serialize(yBound))
                 .withCompound("mass", SerializeUtils.DOUBLE.serialize(mass))
+                .withCompound("old", SerializeUtils.LONG.serialize(oldShipId))
+                .withCompound("oldChunkCenter", SerializeUtils.BLOCK_POS.serialize(oldShipChunkCenter))
                 .build();
 
     }
@@ -272,6 +339,8 @@ public class AISchematic {
                 BE_TAGS.deserialize(tag.getCompound("saved_be_tags")),
                 BLOCK_DATA.deserialize(tag.getCompound("block_data")),
                 Y_BOUND.deserialize(tag.getCompound("y_bound")),
+                SerializeUtils.LONG.deserialize(tag.getCompound("old")),
+                SerializeUtils.BLOCK_POS.deserialize(tag.getCompound("oldChunkCenter")),
                 SerializeUtils.DOUBLE.deserialize(tag.getCompound("mass"))
         );
     }

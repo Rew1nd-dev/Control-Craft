@@ -23,12 +23,15 @@ import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.BehaviorTree;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.nodes.*;
+import com.verr1.controlcraft.unstable.ai.game.PivotAwayAction;
+import com.verr1.controlcraft.unstable.ai.game.PivotToAction;
+import com.verr1.controlcraft.unstable.ai.game.PivotUpAction;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.*;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.EvadeEnterCondition;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.EvadeExitCondition;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.PullEnterCondition;
-import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.PullExitCondition;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.FighterPullEnterCondition;
+import com.verr1.controlcraft.unstable.ai.game.cruiser.conditions.FighterPullExitCondition;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.CruiseMonitor;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
@@ -137,9 +140,9 @@ public class MonitorBlockEntity extends OnShipBlockEntity implements
         Node root = new Parallel(ParallelPolicy.SUCCEED_ON_ALL).addChild(
                 new Always(
                         new ThenUntilElse(
-                                new PullEnterCondition(),
+                                new FighterPullEnterCondition(),
                                 new PivotUpAction(),
-                                new PullExitCondition(),
+                                new FighterPullExitCondition(),
                                 new ThenUntilElse(
                                         new EvadeEnterCondition(),
                                         new PivotAwayAction(),
@@ -149,7 +152,7 @@ public class MonitorBlockEntity extends OnShipBlockEntity implements
                         )
                 ),
                 new FireAction(),
-                new AwarenessAction()
+                new FighterAwarenessAction()
         );
 
 
@@ -227,6 +230,11 @@ public class MonitorBlockEntity extends OnShipBlockEntity implements
         return debug_getTargetVelocity();
     }
 
+    @Override
+    public double cruiseRadius() {
+        return 60;
+    }
+
     public void syncPose(){
         Optional
                 .ofNullable(getLoadedServerShip())
@@ -275,6 +283,11 @@ public class MonitorBlockEntity extends OnShipBlockEntity implements
 
     public Vector3dc getHeading(){
         return readSelf().s2wTransform().transformDirection(new Vector3d(0, 0, 1)); // assuming is facing +z
+    }
+
+    @Override
+    public void kill() {
+
     }
 
     private void tickAI(){

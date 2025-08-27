@@ -1,16 +1,16 @@
-package com.verr1.controlcraft.unstable.ai.game.attacker.conditions;
+package com.verr1.controlcraft.unstable.ai.game.cruiser.conditions;
 
 import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
+import com.verr1.controlcraft.unstable.ai.api.IFighterJetContext;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Condition;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
-import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity;
 
-public class AttackEnterCondition extends Condition {
+public class FighterEnterCondition extends Condition {
     @Override
     protected boolean check(Blackboard blackboard) {
-        IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
+        IFighterJetContext context = blackboard.get(SharedAIKeys.FIGHTER_CONTEXT);
         if (context == null)return false;
-        return !context.noGroundTarget(); // && !context.hasAirThreat();
+        return !context.noTarget(); // && !context.hasAirThreat();
     }
 }

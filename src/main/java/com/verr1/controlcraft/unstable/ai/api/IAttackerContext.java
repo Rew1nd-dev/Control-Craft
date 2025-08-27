@@ -5,16 +5,19 @@ import org.joml.Vector3dc;
 
 public interface IAttackerContext extends IAirContext{
 
-    double extremeRadius();
+    double cruiseRadius();
 
     void fireAt(Vector3dc direction);
 
-    default double height(){
-        Vector3dc p = getPosition();
-        return world().getHeight(Heightmap.Types.MOTION_BLOCKING, (int) p.x(), (int) p.z());
-    }
+
 
     IAirController controller();
+
+    double shootTolerance();
+
+    double fireCooldown();
+
+    Vector3dc getCruiseTarget();
 
     Vector3dc getGroundTarget();
 
