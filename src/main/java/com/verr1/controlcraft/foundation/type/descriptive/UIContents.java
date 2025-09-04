@@ -94,6 +94,15 @@ public enum UIContents implements Descriptive<UIContents> {
 
     STATUS(Component.literal("Available Ports"), literals("Ports of this plant")),
 
+    AVAILABLE_PORTS(Component.literal("Available Ports"), literals("Name With Ports of this ship")),
+
+    AVAILABLE_IN_PORTS(Component.literal("Available In"), literals("Input Ports of this ship")),
+    AVAILABLE_OUT_PORTS(Component.literal("Available Out"), literals("Output Ports of this ship")),
+
+    ADD_PORT_TO_BUS(Component.literal("Add"), literals("Add This Port To Bus")),
+    EXPOSED_PORTS(Component.literal("Exposed Ports"), literals("The ports that can be connected")),
+    RET_PORT_FROM_BUS(Component.literal("Remove"), literals("Remove This Port From Bus")),
+
     SENSOR_SETTINGS(Component.literal("Sensor Settings"), literals("Settings for the sensor")),
     SENSOR_TYPE(Component.literal("Type"), literals("Which metric to measure")),
     SENSOR_LOCAL(Component.literal("Local"), literals("Transform vector to local coordinate")),
@@ -115,6 +124,7 @@ public enum UIContents implements Descriptive<UIContents> {
 
     AI_FLIGHT(Component.literal("Actual Flight"), literals("Use Real Flight")),
     AI_WEAPON(Component.literal("Actual Weapon"), literals("Use Real Weapon")),
+    AI_DEAD(Component.literal("Dead"), literals("Is Discarded")),
 
     AI_YAW(Component.literal("Yaw"), literals("Yaw Omega")),
     AI_VEL(Component.literal("Vel"), literals("Cruise Velocity")),
@@ -124,10 +134,18 @@ public enum UIContents implements Descriptive<UIContents> {
     AI_I_DRIVE(Component.literal("IDrive"), literals("Integral Drive Coefficient")),
     AI_TURN_RESIST(Component.literal("TurnResist"), literals("Turn Resistance Coefficient")),
     AI_FIRE_RATE(Component.literal("fire_rate"), literals("fire rate")),
+    AI_DEATH_RATIO(Component.literal("Ratio"), literals("Discard When Achieve Mass Percentage")),
+    AI_PROJ_VEL(Component.literal("Vel"), literals("Projectile Velocity m/t")),
     AI_DB_ARROW(Component.literal("shoot_arrow"), literals("no damage")),
     AI_TOL(Component.literal("Tol"), literals("Shoot Angle Tolerance")),
+    AI_SPREAD(Component.literal("Spread"), literals("Spread")),
     AI_TAR(Component.literal("Target"), literals("Track A Spinalyzer With Peripheral Interface Named By This Setting")),
     AI_TWI(Component.literal("Twist"), literals("Roll Omega")),
+
+    AI_STRIKE_D(Component.literal("StrikeD"), literals("Strike Distance")),
+    AI_STRIKE_H(Component.literal("StrikeH"), literals("Strike End Height")),
+    AI_ENTER_MIN(Component.literal("EnterMin"), literals("Enter Min Pitch")),
+    AI_ENTER_MAX(Component.literal("EnterMax"), literals("Enter Max Pitch")),
 
     AI_P_COMMON(Component.literal("P"), literals("")),
     AI_P_YAW(Component.literal("PYaw"), literals("")),
@@ -135,8 +153,17 @@ public enum UIContents implements Descriptive<UIContents> {
     AI_P_AG_ROLL(Component.literal("PAGRoll"), literals("")),
     AI_P_LV_ROLL(Component.literal("PLVRoll"), literals("")),
 
+    AI_DEPLOY_ROT(Component.literal("Rot"), literals("")),
+    AI_DEPLOY_POS(Component.literal("Pos"), literals("")),
+    AI_LOCAL(Component.literal("Local"), literals("")),
+    AI_INHERIT(Component.literal("Inherit"), literals("Inherit Base Velocity And Angular Velocity")),
+    AI_DEPLOY(Component.literal("Deploy"), literals("Deploy This AI")),
+    AI_DISTANCE(Component.literal("Distance"), literals("Projectile Spawn Distance")),
+
+
     AI_SCHEME_NAME(Component.literal("Name"), literals("Schematic Name")),
     AI_SCHEME_NAMESPACE(Component.literal("Namespace"), literals("Schematic Namespace")),
+    AI_SCHEME_NAMESPACE2(Component.literal("Space"), literals("Schematic Namespace")),
     AI_EXPORT_SCHEME(Component.literal("Export"), literals("Export Schematic To ", ".minecraft/ai_schematics"))
     ;
 

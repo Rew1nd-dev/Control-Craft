@@ -10,7 +10,7 @@ import java.util.List;
 import static com.verr1.controlcraft.utils.ComponentUtils.literals;
 
 public enum LockMode implements Descriptive<LockMode> {
-    // lock when no target (velocity) or error < 1e-3 (position)
+    // lock when no deploy (velocity) or error < 1e-3 (position)
     ON(literals("Auto Lock When:", " .Target Speed = 0", " .Target Angle Reached")),
     OFF(literals("No Lock")),
     ;

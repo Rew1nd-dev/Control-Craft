@@ -5,7 +5,6 @@ import com.verr1.controlcraft.content.valkyrienskies.attachments.AnchorForceIndu
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.content.valkyrienskies.attachments.legacy.AnchorForceInducer_;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.logical.LogicalAnchor;

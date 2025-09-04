@@ -14,7 +14,7 @@ public class MixinCustomPayloadPacket {
             method = "<init>(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/network/FriendlyByteBuf;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/network/FriendlyByteBuf;writerIndex()I"
+                    deploy = "Lnet/minecraft/network/FriendlyByteBuf;writerIndex()I"
             )
     )
     int printStackTrace(FriendlyByteBuf buffer){
@@ -29,7 +29,7 @@ public class MixinCustomPayloadPacket {
             method = "<init>(Lnet/minecraft/network/FriendlyByteBuf;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/network/FriendlyByteBuf;readableBytes()I"
+                    deploy = "Lnet/minecraft/network/FriendlyByteBuf;readableBytes()I"
             )
     )
     int printStackTrace2(FriendlyByteBuf buffer){

@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.camera.CameraMovementTracker;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -93,6 +94,14 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft
 public class CameraBlockEntity extends OnShipBlockEntity
         implements IPacketHandler, IReceiver, IHaveGoggleInformation, IPlant
 {
+    enum LatestClip{
+        SHIP,
+        ENTITY,
+        BLOCK,
+        SERVER_PLAYER
+    }
+
+
     public static NetworkKey RESET = NetworkKey.create("reset_view");
 
     public static NetworkKey TR = NetworkKey.create("transform_rotation");
@@ -111,6 +120,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public EntityHitResult latestEntityHitResult = null;
     public EntityHitResult latestServerPlayerHitResult = null;
     public BlockHitResult latestBlockHitResult = null;
+
+    private LatestClip latestClipType = LatestClip.BLOCK;
 
     public RayLerpHelper rayLerpHelper = new RayLerpHelper();
 
@@ -177,10 +188,69 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void clipNewShip(){
         latestShipHitResult = clipShip();
+        latestClipType = LatestClip.SHIP;
+    }
+
+    private static Vector3dc vel(Entity entity){
+        if(entity instanceof IEntityDuck de){
+            return toJOML(de.controlCraft$velocityObserver());
+        }
+        return toJOML(entity.getDeltaMovement().scale(0.05));
+    }
+
+    public Vector3dc latestShipPosition(){
+        return Optional.ofNullable(latestShipHitResult).map(ShipHitResult::getPosition).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestEntityPosition(){
+        return Optional.ofNullable(latestEntityHitResult).map(r -> toJOML(r.getEntity().position())).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestBlockPosition(){
+        return Optional.ofNullable(latestBlockHitResult).map(r -> toJOML(r.getLocation())).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestServerPlayerPosition(){
+        return Optional.ofNullable(latestServerPlayerHitResult).map(r -> toJOML(r.getLocation())).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestShipVelocity(){
+        return Optional.ofNullable(latestShipHitResult).map(ShipHitResult::getVelocity).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestEntityVelocity(){
+        return Optional.ofNullable(latestEntityHitResult).map(r -> vel(r.getEntity())).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestBlockVelocity(){
+        return new Vector3d();
+    }
+
+    public Vector3dc latestServerPlayerVelocity(){
+        return Optional.ofNullable(latestServerPlayerHitResult).map(r -> vel(r.getEntity())).orElse(new Vector3d());
+    }
+
+    public Vector3dc latestClipPosition(){
+        return switch (latestClipType) {
+            case BLOCK -> latestBlockPosition();
+            case ENTITY -> latestEntityPosition();
+            case SHIP -> latestShipPosition();
+            case SERVER_PLAYER -> latestServerPlayerPosition();
+        };
+    }
+
+    public Vector3dc latestClipVelocity(){
+        return switch (latestClipType) {
+            case BLOCK -> latestBlockVelocity();
+            case ENTITY -> latestEntityVelocity();
+            case SHIP -> latestShipVelocity();
+            case SERVER_PLAYER -> latestServerPlayerVelocity();
+        };
     }
 
     public void clipNewEntity(){
         latestEntityHitResult = clipEntity(Entity::isAlive);
+        latestClipType = LatestClip.ENTITY;
     }
 
     public void clipNewEntityInView(){
@@ -191,6 +261,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                         !e.isRemoved() &&
                         lv.getHealth() > 0.1
         );
+        latestClipType = LatestClip.ENTITY;
     }
 
     public CameraClipType rayType() {
@@ -219,10 +290,12 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void clipNewServerPlayer(){
         latestServerPlayerHitResult = clipServerPlayer();
+        latestClipType = LatestClip.SERVER_PLAYER;
     }
 
     public void clipNewBlock(){
         latestBlockHitResult = clipBlock(false);
+        latestClipType = LatestClip.BLOCK;
     }
 
     public double getClipRange() {
@@ -316,7 +389,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
         double a = receiver().view().get(0).view().get(0).min_max.get(true);
         double b = receiver().view().get(0).view().get(0).min_max.get(false);
         double ratio = MathUtils.clampHalf(
-                Math.abs(d - a) / (Math.abs(a - b) + 1e-8), 1
+                (b - d) / (Math.abs(a - b) + 1e-8), 1
         );
 
         int newSignal = (int)(ratio * 15);

@@ -1,9 +1,13 @@
 package com.verr1.controlcraft.unstable.pathing.dubins;
 
-import com.verr1.controlcraft.unstable.pathing.LerpPath;
-import com.verr1.controlcraft.unstable.pathing.LerpPathV2;
-import org.joml.Vector2d;
-import org.joml.Vector2dc;
+
+import com.verr1.controlcraft.unstable.pathing.path.ArcPath;
+import com.verr1.controlcraft.unstable.pathing.path.CombinedPath;
+import com.verr1.controlcraft.unstable.pathing.path.IPath;
+import com.verr1.controlcraft.unstable.pathing.path.LinePath;
+import org.joml.*;
+
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,165 +23,12 @@ public class DubinsCalculator {
         LSL, LSR, RSL, RSR, RLR, LRL
     }
 
-    public static class PathSegment implements LerpPath<Vector2dc>, LerpPathV2<Vector2dc> {
 
-
-        public final SegmentType type;
-        public final double length;
-        public final Vector2dc startPoint;
-        public final Vector2dc endPoint;
-        public final Vector2dc center;
-        public final double radius;
-        public final double startAngle;
-        public final double endAngle;
-
-        public PathSegment(SegmentType type, double length,
-                           Vector2d startPoint, Vector2d endPoint,
-                           Vector2d center, double radius,
-                           double startAngle, double endAngle) {
-            this.type = type;
-            this.length = length;
-            this.startPoint = startPoint;
-            this.endPoint = endPoint;
-            this.center = center;
-            this.radius = radius;
-            this.startAngle = startAngle;
-            this.endAngle = endAngle;
-        }
-
-        @Override
-        public int segments() {
-            return SEGMENT_PRECISION;
-        }
-
-        @Override
-        public Vector2dc lerp(int seg) {
-            double t = (double) seg / SEGMENT_PRECISION;
-            if (type == SegmentType.STRAIGHT) {
-                return new Vector2d(
-                        startPoint.x() + t * (endPoint.x() - startPoint.x()),
-                        startPoint.y() + t * (endPoint.y() - startPoint.y())
-                );
-            } else {
-                Vector2d startVec = new Vector2d(startPoint).sub(center);
-                Vector2d endVec = new Vector2d(endPoint).sub(center);
-                double currentRadialAngle = currentRadialAngle(startVec, endVec, t);
-                return new Vector2d(
-                        center.x() + radius * Math.cos(currentRadialAngle),
-                        center.y() + radius * Math.sin(currentRadialAngle)
-                );
-            }
-        }
-
-        private double currentRadialAngle(Vector2dc startVec, Vector2dc endVec, double t) {
-            double startRadialAngle = Math.atan2(startVec.y(), startVec.x());
-            double endRadialAngle = Math.atan2(endVec.y(), endVec.x());
-            double angularDistance;
-
-            if (type == SegmentType.LEFT_TURN) {
-                if (endRadialAngle < startRadialAngle) {
-                    angularDistance = endRadialAngle - startRadialAngle + 2 * Math.PI;
-                } else {
-                    angularDistance = endRadialAngle - startRadialAngle;
-                }
-            } else {
-                if (endRadialAngle < startRadialAngle) {
-                    angularDistance = endRadialAngle - startRadialAngle;
-                } else {
-                    angularDistance = endRadialAngle - startRadialAngle - 2 * Math.PI;
-                }
-            }
-            return startRadialAngle + t * angularDistance;
-        }
-
-        @Override
-        public double length() {
-            return length;
-        }
-
-        @Override
-        public Vector2dc point(double length) {
-            double t = length / this.length;
-            if (type == SegmentType.STRAIGHT) {
-                return new Vector2d(
-                        startPoint.x() + t * (endPoint.x() - startPoint.x()),
-                        startPoint.y() + t * (endPoint.y() - startPoint.y())
-                );
-            } else {
-                Vector2d startVec = new Vector2d(startPoint).sub(center);
-                Vector2d endVec = new Vector2d(endPoint).sub(center);
-                double currentRadialAngle = currentRadialAngle(startVec, endVec, t);
-                return new Vector2d(
-                        center.x() + radius * Math.cos(currentRadialAngle),
-                        center.y() + radius * Math.sin(currentRadialAngle)
-                );
-            }
-        }
-    }
-
-    public static class DubinsPathResult implements LerpPath<Vector2d>, LerpPathV2<Vector2d> {
-
-        public final PathType pathType;
-        public final double totalLength;
-        public final List<PathSegment> segments = new ArrayList<>();
-
-        public DubinsPathResult(PathType pathType, double totalLength) {
-            this.pathType = pathType;
-            this.totalLength = totalLength;
-        }
-
-        @Override
-        public int segments() {
-            return segments.size() * SEGMENT_PRECISION;
-        }
-
-        @Override
-        public Vector2d lerp(int seg) {
-            int segmentIndex = seg / SEGMENT_PRECISION;
-            int segmentOffset = seg % SEGMENT_PRECISION;
-
-            if (segmentIndex < segments.size()) {
-                PathSegment segment = segments.get(segmentIndex);
-                Vector2dc point = segment.lerp(segmentOffset);
-                return new Vector2d(point.x(), point.y());
-            } else {
-                PathSegment lastSegment = segments.get(segments.size() - 1);
-                return new Vector2d(lastSegment.endPoint.x(), lastSegment.endPoint.y());
-            }
-        }
-
-        @Override
-        public double length() {
-            return totalLength;
-        }
-
-        @Override
-        public Vector2d point(double length) {
-            double len0 = segments.get(0).length;
-            double len1 = segments.get(1).length + len0;
-            double len2 = segments.get(2).length + len1;
-
-            if (length <= len0 && length > 0){
-                return new Vector2d(segments.get(0).point(length));
-            }
-
-            if (length <= len1){
-                return new Vector2d(segments.get(1).point(length - len0));
-            }
-
-            if (length <= len2){
-                return new Vector2d(segments.get(2).point(length - len1));
-            }
-
-            return new Vector2d(segments.get(2).endPoint);
-        }
-    }
-
-    // 主计算函数
-    public static DubinsPathResult calculateDubinsPath(
+    public static IPath calculateDubinsPath(
             Vector2d start, double startHeading,
             Vector2d end, double endHeading,
-            double radius) {
+            double radius, Matrix4dc transform
+    ) {
 
         // 计算相对位置和角度
         double dx = end.x() - start.x();
@@ -217,13 +68,10 @@ public class DubinsCalculator {
         }
 
         // 提取最佳路径参数
-        double t = paths[bestIndex][1]; // 第一段长度（弧度）
-        double p = paths[bestIndex][2]; // 第二段长度（直线距离或弧度）
-        double q = paths[bestIndex][3]; // 第三段长度（弧度）
+        double t = paths[bestIndex][1];
+        double p = paths[bestIndex][2];
+        double q = paths[bestIndex][3];
         PathType pathType = types[bestIndex];
-
-        // 创建路径结果
-        DubinsPathResult result = new DubinsPathResult(pathType, bestLength * radius);
 
         // 计算各段路径（在起点坐标系下）
         Vector2dWithAngle p0 = new Vector2dWithAngle(0, 0, 0);
@@ -244,56 +92,230 @@ public class DubinsCalculator {
         // 计算圆弧角度
         double startAngle1 = Math.atan2(p0.y() - center1.y(), p0.x() - center1.x());
         double endAngle1 = Math.atan2(p1.y() - center1.y(), p1.x() - center1.x());
-
         double startAngle2 = Math.atan2(p2.y() - center2.y(), p2.x() - center2.x());
         double endAngle2 = Math.atan2(p3.y() - center2.y(), p3.x() - center2.x());
 
-        // 添加第一段（圆弧）
-        result.segments.add(new PathSegment(
-                getSegmentType(pathType, 0),
-                t * radius,
-                p0, p1,
-                center1, radius,
-                startAngle1, endAngle1
+        // 创建路径段
+        List<IPath> segments = new ArrayList<>();
+        // 第一段（圆弧）
+        segments.add(new ArcPath(
+                startAngle1,
+                endAngle1,
+                radius,
+                transform.translate(expand(center1), new Matrix4d()),
+                getSegmentType(pathType, 0) == SegmentType.RIGHT_TURN
         ));
 
-        // 添加第二段（直线或圆弧）
+        // 第二段（直线或圆弧）
         if (pathType == PathType.RLR || pathType == PathType.LRL) {
-            // 第二段是圆弧
             Vector2d centerMid = calculateCenter(p1, p1.angle, radius, getSegmentType(pathType, 1));
             double startAngleMid = Math.atan2(p1.y() - centerMid.y(), p1.x() - centerMid.x());
             double endAngleMid = Math.atan2(p2.y() - centerMid.y(), p2.x() - centerMid.x());
-
-            result.segments.add(new PathSegment(
-                    getSegmentType(pathType, 1),
-                    p * radius,
-                    p1, p2,
-                    centerMid, radius,
-                    startAngleMid, endAngleMid
+            segments.add(new ArcPath(
+                    startAngleMid,
+                    endAngleMid,
+                    radius,
+                    transform.translate(expand(centerMid), new Matrix4d()),
+                    getSegmentType(pathType, 1) == SegmentType.RIGHT_TURN
             ));
         } else {
-            // 第二段是直线
-            result.segments.add(new PathSegment(
-                    SegmentType.STRAIGHT,
-                    p * radius,
-                    p1, p2,
-                    null, 0, 0, 0
+            segments.add(new LinePath(
+                    transform.transformPosition(new Vector3d(p1.x(), p1.y(), 0)),
+                    transform.transformPosition(new Vector3d(p2.x(), p2.y(), 0))
             ));
         }
 
-        // 添加第三段（圆弧）
-        result.segments.add(new PathSegment(
-                getSegmentType(pathType, 2),
-                q * radius,
-                p2, p3,
-                center2, radius,
-                startAngle2, endAngle2
+        // 第三段（圆弧）
+        segments.add(new ArcPath(
+                startAngle2,
+                endAngle2,
+                radius,
+                transform.translate(expand(center2), new Matrix4d()),
+                getSegmentType(pathType, 2) == SegmentType.RIGHT_TURN
         ));
 
-        return result;
+        return new CombinedPath(segments);
     }
 
-    // 工具方法：计算圆心
+    private static Vector3dc expand(Vector2dc v){
+        return new Vector3d(v.x(), v.y(), 0.0);
+    }
+
+    public static IPath dubinsMatchStart(
+            Vector3dc start, Vector3dc startHeading,
+            Vector3dc end, Vector3dc endHeading,
+            double radius) {
+
+        // 将不可变的Vector3dc转换为可变的Vector3d
+        Vector3dc s = new Vector3d(start);
+        Vector3dc sh = new Vector3d(startHeading);
+        Vector3dc e = new Vector3d(end);
+        Vector3dc eh = new Vector3d(endHeading);
+
+        // 计算起点到终点的向量
+        Vector3dc v2 = new Vector3d(e).sub(s);
+
+        // 计算平面法向量：n = startHeading × (end - start)
+        Vector3d n = sh.cross(v2, new Vector3d());
+
+
+        // 处理共线情况
+        if (n.lengthSquared() < 1e-10) {
+            Vector3d aux = new Vector3d(0, 1, 0);
+            n.set(sh).cross(aux);
+            if (n.lengthSquared() < 1e-10) {
+                aux.set(0, 0, 1);
+                n.set(sh).cross(aux);
+                if (n.lengthSquared() < 1e-10) {
+                    n.set(0, 0, 1);
+                } else {
+                    n.normalize();
+                }
+            } else {
+                n.normalize();
+            }
+        } else {
+            n.normalize();
+        }
+
+        // 将目标方向投影到平面
+        double dot = eh.dot(n);
+        Vector3d projEndHeading = new Vector3d(eh).sub(n.mul(dot, new Vector3d()));
+        if (projEndHeading.lengthSquared() < 1e-10) {
+            sh.cross(n, projEndHeading);
+            if (projEndHeading.lengthSquared() > 1e-10) {
+                projEndHeading.normalize();
+            } else {
+                projEndHeading.set(sh).normalize();
+            }
+        } else {
+            projEndHeading.normalize();
+        }
+
+        // 构建平面局部坐标系
+        Vector3d u = new Vector3d(sh).normalize();
+        Vector3d v = n.cross(u, new Vector3d());
+
+        v.normalize();
+
+        // 构建变换矩阵
+        Matrix4d transform = new Matrix4d().translate(s.x(), s.y(), s.z()).mul(new Matrix4d(new Matrix3d(
+                u.x(), u.y(), u.z(),
+                v.x(), v.y(), v.z(),
+                n.x(), n.y(), n.z()
+        )));
+
+        // 计算目标点在局部坐标系的2D坐标
+        double endX = v2.dot(u);
+        double endY = v2.dot(v);
+
+        // 计算目标方向在局部坐标系的2D角度
+        double projX = projEndHeading.dot(u);
+        double projY = projEndHeading.dot(v);
+        double goalHeading = Math.atan2(projY, projX);
+
+        // 调用2D Dubins路径计算
+
+        return calculateDubinsPath(
+                new Vector2d(0, 0), 0.0,
+                new Vector2d(endX, endY), goalHeading,
+                radius, transform
+        );
+    }
+
+
+    public static IPath dubinsMatchEnd(
+            Vector3dc start, Vector3dc startHeading,
+            Vector3dc end, Vector3dc endHeading,
+            double radius) {
+
+        // 将不可变的Vector3dc转换为可变的Vector3d
+        Vector3dc s = new Vector3d(start);
+        Vector3dc e = new Vector3d(end);
+
+        // 计算起点到终点的向量
+        Vector3dc v2 = new Vector3d(e).sub(s);
+
+        // 计算平面法向量：n = startHeading × (end - start)
+        Vector3d n = new Vector3d(startHeading).cross(v2, new Vector3d());
+
+        // 处理共线情况
+        if (n.lengthSquared() < 1e-10) {
+            Vector3d aux = new Vector3d(0, 1, 0);
+            n.set(startHeading).cross(aux);
+            if (n.lengthSquared() < 1e-10) {
+                aux.set(0, 0, 1);
+                n.set(startHeading).cross(aux);
+                if (n.lengthSquared() < 1e-10) {
+                    n.set(0, 0, 1);
+                } else {
+                    n.normalize();
+                }
+            } else {
+                n.normalize();
+            }
+        } else {
+            n.normalize();
+        }
+
+        // 将起始方向投影到平面
+        double startDot = startHeading.dot(n);
+        Vector3d projStartHeading = new Vector3d(startHeading).sub(n.mul(startDot, new Vector3d()));
+        if (projStartHeading.lengthSquared() < 1e-10) {
+            Vector3d aux = new Vector3d(0, 1, 0);
+            n.cross(aux, projStartHeading);
+            if (projStartHeading.lengthSquared() > 1e-10) {
+                projStartHeading.normalize();
+            } else {
+                projStartHeading.set(aux).normalize();
+            }
+        } else {
+            projStartHeading.normalize();
+        }
+
+        // 将目标方向投影到平面
+        double endDot = endHeading.dot(n);
+        Vector3d projEndHeading = new Vector3d(endHeading).sub(n.mul(endDot, new Vector3d()));
+        if (projEndHeading.lengthSquared() < 1e-10) {
+            projStartHeading.cross(n, projEndHeading);
+            if (projEndHeading.lengthSquared() > 1e-10) {
+                projEndHeading.normalize();
+            } else {
+                projEndHeading.set(projStartHeading).normalize();
+            }
+        } else {
+            projEndHeading.normalize();
+        }
+
+        // 构建平面局部坐标系
+        Vector3d u = new Vector3d(projStartHeading).normalize();
+        Vector3d v = n.cross(u, new Vector3d());
+        v.normalize();
+
+        // 构建变换矩阵
+        Matrix4d transform = new Matrix4d().translate(s.x(), s.y(), s.z()).mul(new Matrix4d(new Matrix3d(
+                u.x(), u.y(), u.z(),
+                v.x(), v.y(), v.z(),
+                n.x(), n.y(), n.z()
+        )));
+
+        // 计算目标点在局部坐标系的2D坐标
+        double endX = v2.dot(u);
+        double endY = v2.dot(v);
+
+        // 计算目标方向在局部坐标系的2D角度
+        double projX = projEndHeading.dot(u);
+        double projY = projEndHeading.dot(v);
+        double goalHeading = Math.atan2(projY, projX);
+
+        // 调用2D Dubins路径计算
+        return calculateDubinsPath(
+                new Vector2d(0, 0), 0.0,
+                new Vector2d(endX, endY), goalHeading,
+                radius, transform
+        );
+    }
+
     private static Vector2d calculateCenter(Vector2d origin, double heading,
                                             double radius, SegmentType type) {
         double offsetAngle = heading;
@@ -306,23 +328,21 @@ public class DubinsCalculator {
         }
 
         return new Vector2d(
-                origin.x() + radius * Math.cos(offsetAngle), // + point.x()
+                origin.x() + radius * Math.cos(offsetAngle),
                 origin.y() + radius * Math.sin(offsetAngle)
         );
     }
 
-    // 工具方法：转换到世界坐标系
     private static Vector2dWithAngle toWorldCoord(Vector2dWithAngle point, Vector2d origin, double heading, double radius) {
         double cosTheta = Math.cos(heading);
         double sinTheta = Math.sin(heading);
         return new Vector2dWithAngle(
-                radius* (origin.x() + point.x() * cosTheta - point.y() * sinTheta),
-                radius* (origin.y() + point.x() * sinTheta + point.y() * cosTheta),
+                radius * (origin.x() + point.x() * cosTheta - point.y() * sinTheta),
+                radius * (origin.y() + point.x() * sinTheta + point.y() * cosTheta),
                 point.angle + heading
         );
     }
 
-    // 工具方法：获取路径段的类型
     private static SegmentType getSegmentType(PathType pathType, int index) {
         char c = pathType.name().charAt(index);
         return c == 'L' ? SegmentType.LEFT_TURN :
@@ -330,7 +350,6 @@ public class DubinsCalculator {
                         SegmentType.STRAIGHT;
     }
 
-    // Dubins 路径段计算
     private static Vector2dWithAngle dubinsSegment(double segParam, Vector2d segInit, SegmentType segType) {
         Vector2dWithAngle segEnd = new Vector2dWithAngle();
         double x = segInit.x();
@@ -353,7 +372,6 @@ public class DubinsCalculator {
         return segEnd;
     }
 
-    // 角度归一化 [0, 2π)
     private static double mod2pi(double angle) {
         angle %= 2 * Math.PI;
         if (angle < 0) {
@@ -362,7 +380,6 @@ public class DubinsCalculator {
         return angle;
     }
 
-    // 带角度的Vector2d扩展
     private static class Vector2dWithAngle extends Vector2d {
         public double angle;
 
@@ -374,8 +391,6 @@ public class DubinsCalculator {
         public Vector2dWithAngle() {
         }
     }
-
-    // ================ 路径类型计算函数 ================
 
     private static double[] LSL(double alpha, double beta, double d) {
         double tmp0 = d + Math.sin(alpha) - Math.sin(beta);

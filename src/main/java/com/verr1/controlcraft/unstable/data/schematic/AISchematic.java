@@ -223,11 +223,7 @@ public class AISchematic {
                             offsetChunkPos.getMinBlockZ() + iz
                     );
 
-                    BlockPos posKey = new BlockPos(
-                            ix,
-                            iy,
-                            iz
-                    );
+                    BlockPos posKey = new BlockPos(ix, iy, iz);
 
 
                     BlockState original = null;
@@ -243,16 +239,17 @@ public class AISchematic {
 
                         int extraId = Optional.ofNullable(saved).map(BlockItem::getExtraDataId).orElse(-1);
 
+
                         CompoundTag beTag = Optional.of(extraId).filter(id -> id >= 0 && id < savedBeTags.size())
                                 .map(savedBeTags::get)
+                                .map(CompoundTag::copy) // we don't want to modify original
                                 .orElse(new CompoundTag());
-
 
 
                         BlockPos realPos = offsetPos.offset(center);
 
                         if(!original.isAir()){
-                            ControlCraft.LOGGER.info("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
+                            ControlCraft.LOGGER.debug("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
                         }
                         if(original.getBlock() instanceof IReplaceBlock){
                             blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 3); // destroy and replace, in order to clear be
@@ -264,7 +261,7 @@ public class AISchematic {
                         if(original.getBlock() instanceof ICopyableBlock cpy){
                             Vector3d newChunkCenter = toJOML(center.getCenter());
                             Vector3d oldChunkCenter = toJOML(oldShipChunkCenter.getCenter());
-                            beTag = cpy.onPaste(
+                            cpy.onPaste(
                                     blockPlacer,
                                     realPos,
                                     original,
@@ -274,14 +271,12 @@ public class AISchematic {
                             );
                         }
 
-                        CompoundTag finalBeTag = beTag;
-                        if(beTag == null)return;
 
                         Optional.ofNullable(
                                 blockPlacer.getBlockEntity(realPos)
                         ).ifPresent(
                                 be -> delayLoadings.add(() -> {
-                                    be.load(finalBeTag);
+                                    be.load(beTag);
                                 })
                         );
 

@@ -2,6 +2,7 @@ package com.verr1.controlcraft.mixin.ai;
 
 
 import com.verr1.controlcraft.foundation.managers.ServerCameraManager;
+import com.verr1.controlcraft.unstable.blocks.AiBoundFakePlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,8 +27,10 @@ public class MixinShipObjectServerWorld {
     @ModifyVariable(method = "setPlayers", at = @At("HEAD"), remap = false, argsOnly = true)
     public Set<? extends IPlayer> setPlayers(final Set<? extends IPlayer> players) {
         Set<IPlayer> ps = ServerCameraManager.getAllWatchers();
+        Set<IPlayer> p1 = AiBoundFakePlayer.getAllWatchers();
         final HashSet<IPlayer> playerSet = new HashSet<>(players);
         playerSet.addAll(ps);
+        playerSet.addAll(p1);
         return playerSet;
     }
 

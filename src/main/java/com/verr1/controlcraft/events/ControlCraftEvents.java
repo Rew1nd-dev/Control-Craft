@@ -1,8 +1,10 @@
 package com.verr1.controlcraft.events;
 
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
 import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
@@ -50,6 +52,7 @@ public class ControlCraftEvents {
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         AIServer.MANAGER.onServerStarted();
+        BlockLinkPort.RUN_AT_PHYSICS_THREAD = BlockPropertyConfig._PHYSICS_THREAD_CIMULINK;
     }
 
     @SubscribeEvent
@@ -63,6 +66,7 @@ public class ControlCraftEvents {
             BlockLinkPort.preMainTick();
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
             AIServer.MANAGER.tick();
+            CimulinkBus.tickAll();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();
         }

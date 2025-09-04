@@ -45,6 +45,9 @@ public class Executor {
         named.put(name, task);
     }
 
+    public void executeIfAbsent(String name, Executable task){
+        named.putIfAbsent(name, task);
+    }
 
     public void executeLater(Runnable task, int tick){
         if(tick <= 0){
@@ -69,8 +72,21 @@ public class Executor {
         named.put(name, new DeferralExecutable(task, tick));
     }
 
+    public void executeLaterIfAbsent(String name, Runnable task, int tick){
+        if(tick <= 0){
+            ControlCraft.LOGGER.warn(
+                    "a task will probably be neglected because deferral tick is <= 0, " +
+                            "set tick = 1 if you want it to execute next tick task key: {}", name);
+        }
+        named.putIfAbsent(name, new DeferralExecutable(task, tick));
+    }
+
     public void execute(String name, Runnable task){
         executeLater(name, task, 1);
+    }
+
+    public void executeIfAbsent(String name, Runnable task){
+        executeLaterIfAbsent(name, task, 1);
     }
 
     public void execute(Runnable task){
@@ -79,6 +95,10 @@ public class Executor {
 
     public void executeOnSchedule(String name, Runnable task, int interval, int cycles){
         named.put(name, new IntervalExecutable(task, interval, cycles));
+    }
+
+    public void executeOnScheduleIfAbsent(String name, Runnable task, int interval, int cycles){
+        named.putIfAbsent(name, new IntervalExecutable(task, interval, cycles));
     }
 
 

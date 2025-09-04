@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.compact.createbigcannons;
 
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 
 public interface APAutocannonAccess {
@@ -12,5 +13,7 @@ public interface APAutocannonAccess {
     void shoot(double x, double y, double z, double vel, double spread);
 
     void addToLevel();
+
+    Projectile getProjectile();
 
 }

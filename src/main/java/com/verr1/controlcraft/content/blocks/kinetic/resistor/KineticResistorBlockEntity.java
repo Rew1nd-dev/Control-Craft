@@ -5,14 +5,18 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 import com.simibubi.create.infrastructure.config.CKinetics;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.cctweaked.peripheral.JetPeripheral;
 import com.verr1.controlcraft.content.cctweaked.peripheral.KineticResistorPeripheral;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
+import com.verr1.controlcraft.foundation.api.IOnShipBlockEntity;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.ResistorPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.NumericField;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -20,6 +24,7 @@ import com.verr1.controlcraft.foundation.network.handler.NetworkHandler;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -27,17 +32,24 @@ import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
+import org.valkyrienskies.core.impl.game.ships.DummyShipWorldServer;
+
+import java.util.Optional;
 
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
 public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
-        IReceiver, INetworkHandle, IPlant
+        IReceiver, INetworkHandle, IPlant, IOnShipBlockEntity
 {
     public static final NetworkKey RATIO = NetworkKey.create("ratio");
 
@@ -86,6 +98,12 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
                         ClientBuffer.DOUBLE.get()
                 ).register();
 
+        handler
+                .buildRegistry(SharedKeys.COMPONENT_NAME)
+                .withBasic(SerializePort.of(this::name, this::setName, SerializeUtils.STRING))
+                .withClient(ClientBuffer.STRING.get())
+                .register();
+
         receiver().register(
                 new NumericField(
                         this::ratio,
@@ -100,6 +118,14 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
                 new DirectReceiver.InitContext(SlotType.RATIO, Couple.create(0.0, 1.0))
         );
 
+    }
+
+
+    @Override
+    public void lazyTick() {
+        super.lazyTick();
+        if(level == null || level.isClientSide)return;
+        tickBus();
     }
 
     @Override

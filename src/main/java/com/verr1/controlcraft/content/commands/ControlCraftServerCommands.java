@@ -33,6 +33,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -148,7 +149,7 @@ public class ControlCraftServerCommands {
             return 0;
         }
         ServerPlayer player = source.getPlayer();
-        var fps = player.level().players().stream().filter(CameraBoundFakePlayer.class::isInstance).toList();
+        var fps = player.level().players().stream().filter(FakePlayer.class::isInstance).toList();
         source.sendSuccess(() -> Component.literal("There are " + fps.size() + " fake players in the world."), false);
         fps.forEach(
                 fp -> {

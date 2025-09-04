@@ -5,7 +5,6 @@ import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEn
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlockEntity;
 import com.verr1.controlcraft.content.cctweaked.peripheral.SpinalyzerPeripheral;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
-import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -17,13 +16,11 @@ import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.AirBaseAwareness;
 import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
-import com.verr1.controlcraft.unstable.valkyrienskies.attachments.AIBlockNetwork;
 import com.verr1.controlcraft.unstable.valkyrienskies.attachments.ConstantCruiseNavigator;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.CruiseController;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.LogicalDirectionTarget;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.PoseController;
 import com.verr1.controlcraft.utils.SerializeUtils;
-import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,10 +37,6 @@ import rbasamoyai.createbigcannons.munitions.ShellExplosion;
 import rbasamoyai.createbigcannons.munitions.autocannon.flak.FlakExplosion;
 
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import static com.verr1.controlcraft.unstable.blocks.monitor.MonitorBlockEntity.*;
 
 public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         IAirContext
@@ -73,11 +66,11 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         registerDouble(this::pDrive, this::setPDrive, SharedAIKeys.P_DRIVE);
         registerDouble(this::iDrive, this::setIDrive, SharedAIKeys.I_DRIVE);
         registerDouble(this::turnResistance, this::setTurnResistance, SharedAIKeys.TURN_RESIST);
-        registerDouble(() -> controller().pCom(), p -> controller().setPCom(p), P_COMMON);
-        registerDouble(() -> controller().pPitch(), p -> controller().setPPitch(p), P_PITCH);
-        registerDouble(() -> controller().pYaw(), p -> controller().setPYaw(p), P_YAW);
-        registerDouble(() -> controller().pAgRoll(), p -> controller().setPAgRoll(p), P_AG_ROLL);
-        registerDouble(() -> controller().pLvRoll(), p -> controller().setPLvRoll(p), P_LV_ROLL);
+        registerDouble(() -> controller().pCom(), p -> controller().setPCom(p), SharedAIKeys.P_COMMON);
+        registerDouble(() -> controller().pPitch(), p -> controller().setPPitch(p), SharedAIKeys.P_PITCH);
+        registerDouble(() -> controller().pYaw(), p -> controller().setPYaw(p), SharedAIKeys.P_YAW);
+        registerDouble(() -> controller().pAgRoll(), p -> controller().setPAgRoll(p), SharedAIKeys.P_AG_ROLL);
+        registerDouble(() -> controller().pLvRoll(), p -> controller().setPLvRoll(p), SharedAIKeys.P_LV_ROLL);
 
         buildRegistry(SharedAIKeys.TAR)
                 .withBasic(SerializePort.of(this::debugTargetName, this::setDebugTargetName, SerializeUtils.STRING))
@@ -87,22 +80,10 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         ai = constructAI();
     }
 
-    protected void registerDouble(Supplier<Double> getter, Consumer<Double> setter, NetworkKey key){
-        register(getter, setter, SerializeUtils.DOUBLE, ClientBuffer.DOUBLE.get(), key);
-    }
 
-    protected void registerBoolean(Supplier<Boolean> getter, Consumer<Boolean> setter, NetworkKey key){
-        register(getter, setter, SerializeUtils.BOOLEAN, ClientBuffer.BOOLEAN.get(), key);
-    }
-
-    protected<T> void register(Supplier<T> getter, Consumer<T> setter, Serializer<T> ser, ClientBuffer<T> buf, NetworkKey key){
-        buildRegistry(key)
-                .withBasic(SerializePort.of(getter, setter, ser))
-                .withClient(buf)
-                .register();
-    }
 
     protected abstract BehaviorTree constructAI();
+
 
     public AirBaseAwareness awareness() {
         return awareness;
@@ -172,6 +153,8 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         return cruiseController;
     }
 
+
+
     @Override
     public Level world() {
         return getLevel();
@@ -233,14 +216,11 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void onSpawn() {
         isDead = false;
         awareness.resetStuckScore();
+        cruiseController.overrideNext(getRotation());
         poseController.overrideTarget(getRotation());
     }
 
-    public void syncNetwork(){
-        Optional.ofNullable(getLoadedServerShip())
-                .map(AIBlockNetwork::getOrCreate)
-                .ifPresent(s -> s.activateListener(getWorldBlockPos(), this));
-    }
+
 
     public void explode(){
         if(level == null)return;
@@ -358,6 +338,5 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void lazyTickServer() {
         super.lazyTickServer();
         tickHealth();
-        syncNetwork();
     }
 }

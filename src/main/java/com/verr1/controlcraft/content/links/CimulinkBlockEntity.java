@@ -89,6 +89,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
         lateInitLinkPort.load(); // restore connections
         lateInitVModCompact.load(); // load with vmod compact (offset all links)
+        linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
         initializeExtra();
         isInitialized = true;
         syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
@@ -217,13 +218,18 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     public void removeServer() {
         super.removeServer();
         linkPort().quit();
+        linkStorage().ifPresent(s -> s.remove(getWorldBlockPos()));
     }
+
+
 
     @Override
     public void lazyTickClient() {
         super.lazyTickClient();
         requestConnectionStatusOnFocus();
     }
+
+
 
 
 

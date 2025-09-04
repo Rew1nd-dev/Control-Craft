@@ -113,7 +113,7 @@ public class AIServerCommands {
         String namespace = context.getArgument("namespace", String.class);
         String name = context.getArgument("name", String.class);
 
-        AIServer.MANAGER.spawnType(new SchematicKey(namespace, name), toJOML(position), new Quaterniond());
+        AIServer.MANAGER.spawn(new SchematicKey(namespace, name), toJOML(position), new Quaterniond());
 
         return 1;
     }
@@ -151,6 +151,11 @@ public class AIServerCommands {
     }
 
     private static int debugDiscardAllCommand(CommandContext<CommandSourceStack> context){
+        AIServer.MANAGER.resetAlive();
+        return 1;
+    }
+
+    private static int debugResetCommand(CommandContext<CommandSourceStack> context){
         AIServer.MANAGER.reset();
         return 1;
     }
@@ -234,25 +239,28 @@ public class AIServerCommands {
                                 .executes(AIServerCommands::debugDiscardCommand)
                 ).then(
                         lt("kill-all")
+                                .executes(AIServerCommands::debugResetCommand)
+                ).then(
+                        lt("kill-alive")
                                 .executes(AIServerCommands::debugDiscardAllCommand)
                 ).then(
-                                lt("join")
-                                        .then(
-                                                arg("namespace", StringArgumentType.string())
-                                                        .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
-                                                        .then(
-                                                                arg("name", StringArgumentType.string())
-                                                                        .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
-                                                                        .executes(AIServerCommands::debugJoinPollCommand)
-                                                        )
-                                        )
-                ).then(
-                                lt("set-yard")
-                                        .then(
-                                                arg("coordinate", Vec3Argument.vec3()).executes(
-                                                        AIServerCommands::setYardPositionCommand
+                        lt("join")
+                                .then(
+                                        arg("namespace", StringArgumentType.string())
+                                                .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
+                                                .then(
+                                                        arg("name", StringArgumentType.string())
+                                                                .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
+                                                                .executes(AIServerCommands::debugJoinPollCommand)
                                                 )
+                                )
+                ).then(
+                        lt("set-yard")
+                                .then(
+                                        arg("coordinate", Vec3Argument.vec3()).executes(
+                                                AIServerCommands::setYardPositionCommand
                                         )
+                                )
                 )
 
         );

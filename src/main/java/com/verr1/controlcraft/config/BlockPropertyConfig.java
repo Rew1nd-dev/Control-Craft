@@ -37,6 +37,13 @@ public class BlockPropertyConfig
                     )
             .define("Enable Double Precision Tweaked Controller", false);
 
+    private static final ForgeConfigSpec.BooleanValue PHYSICS_THREAD_CIMULINK = BUILDER
+            .comment(
+                    "  Propagate Cimulink Bus Update To Physics Thread, May Reduce Latency When Using Cimulink In Physics Related Logic",
+                    "  Some Time-Related Logic May Be Affected, Such As Delays (Which Are Based On Game Tick)",
+                    "  This Is Stable, After Heavily Tested"
+            )
+            .define("Physics Thread Cimulink", true);
 
     private static final ForgeConfigSpec.IntValue MAX_DISTANCE_SPATIAL_CAN_LINK = BUILDER
             .comment(
@@ -87,6 +94,18 @@ public class BlockPropertyConfig
             .define("Can Jet Thrust Back", true);
 
 
+    private static final ForgeConfigSpec.BooleanValue ALWAYS_ADD_CAMERA_CHUNK = BUILDER
+            .comment(
+                    "  Always Add Client Chunk Packet From Server, This May Avoid Client Chunk Hollowing Issue"
+            )
+            .define("Always Add Client Chunk", false);
+
+    private static final ForgeConfigSpec.BooleanValue ALWAYS_RENDER_WIRE = BUILDER
+            .comment(
+                    "  Always Render Cimulink Wire, Turn Off If You Think It's Ugly"
+            )
+            .define("Always Render Cimulink Wire", false);
+
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
@@ -110,7 +129,13 @@ public class BlockPropertyConfig
 
     public static int _JET_MAX_THRUST;
 
+    public static boolean _ALWAYS_ADD_CAMERA_CHUNK;
+
     public static boolean _CAN_JET_THRUST_BACK;
+
+    public static boolean _ALWAYS_RENDER_WIRE;
+
+    public static boolean _PHYSICS_THREAD_CIMULINK;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
@@ -125,5 +150,8 @@ public class BlockPropertyConfig
         _PROPELLER_MAX_TORQUE = PROPELLER_MAX_TORQUE.get();
         _JET_MAX_THRUST = JET_MAX_THRUST.get();
         _CAN_JET_THRUST_BACK = CAN_JET_THRUST_BACK.get();
+        _ALWAYS_ADD_CAMERA_CHUNK = ALWAYS_ADD_CAMERA_CHUNK.get();
+        _ALWAYS_RENDER_WIRE = ALWAYS_RENDER_WIRE.get();
+        _PHYSICS_THREAD_CIMULINK = PHYSICS_THREAD_CIMULINK.get();
     }
 }

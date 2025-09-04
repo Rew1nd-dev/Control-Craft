@@ -60,7 +60,7 @@ public class KMotorKineticPeripheral implements IKineticPeripheral {
                 double speed = Math.abs(MathUtils.toControlCraftAngular(current));
 
                 // This Executor ticks at game thread, this task is named "p_velocity"
-                // and it will run every 1 tick (20 times per second) which is exactly a control task (adjusting speed) to meet target angle
+                // and it will run every 1 tick (20 times per second) which is exactly a control task (adjusting speed) to meet deploy angle
                 // if a new task is added, it will cancel the previous one, because the task in a map
                 // it will automatically be removed after 40 ticks (2 seconds)
 

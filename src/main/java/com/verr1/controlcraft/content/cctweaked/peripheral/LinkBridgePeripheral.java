@@ -24,7 +24,12 @@ public class LinkBridgePeripheral extends AbstractAttachedPeripheral<CCBridgeBlo
 
     @LuaFunction
     public final void setInput(int index, double val){
-        getTarget().setInput(index, val);
+        getTarget().setToCircuit(index, val);
+    }
+
+    @LuaFunction
+    public final double getOutput(int index){
+        return getTarget().getFromCircuit(index);
     }
 
 }

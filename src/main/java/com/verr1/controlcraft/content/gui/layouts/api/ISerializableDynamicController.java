@@ -14,7 +14,7 @@ public interface ISerializableDynamicController {
         tag.putDouble("p", pid.p());
         tag.putDouble("i", pid.i());
         tag.putDouble("d", pid.d());
-        // tag.putDouble("target", target);
+        // tag.putDouble("deploy", deploy);
         return tag;
     }
 
@@ -24,7 +24,7 @@ public interface ISerializableDynamicController {
                 tag.getDouble("i"),
                 tag.getDouble("d")
         ));
-        // target = tag.getDouble("target");
+        // deploy = tag.getDouble("deploy");
     }
 
 }

@@ -44,6 +44,8 @@ public class ControlCraftBlocks {
         REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.MAIN);
     }
 
+    public static final int EXPLOSIVE_RESISTANCE = 10;
+
     public static final BlockEntry<ChunkLoaderBlock> CHUNK_LOADER = REGISTRATE
             .block(ChunkLoaderBlock.ID, ChunkLoaderBlock::new)
             .initialProperties(SharedProperties::stone)
@@ -59,7 +61,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<AnchorBlock> ANCHOR_BLOCK = REGISTRATE
             .block(AnchorBlock.ID, AnchorBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -74,7 +76,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<DynamicRevoluteMotorBlock> SERVO_MOTOR_BLOCK = REGISTRATE
             .block(DynamicRevoluteMotorBlock.ID, DynamicRevoluteMotorBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -89,7 +91,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<DynamicJointMotorBlock> JOINT_MOTOR_BLOCK = REGISTRATE
             .block(DynamicJointMotorBlock.ID, DynamicJointMotorBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -104,7 +106,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<DynamicSliderBlock> SLIDER_CONTROLLER_BLOCK = REGISTRATE
             .block(DynamicSliderBlock.ID, DynamicSliderBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -119,7 +121,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<RevoluteJointBlock> REVOLUTE_JOINT_BLOCK = REGISTRATE
             .block(RevoluteJointBlock.ID, RevoluteJointBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -133,7 +135,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<FreeJointBlock> SPHERE_HINGE_BLOCK = REGISTRATE
             .block(FreeJointBlock.ID, FreeJointBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -147,7 +149,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<PivotJointBlock> PIVOT_JOINT_BLOCK = REGISTRATE
             .block(PivotJointBlock.ID, PivotJointBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -161,7 +163,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<TerminalBlock> TERMINAL_BLOCK = REGISTRATE
             .block(TerminalBlock.ID, TerminalBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -175,7 +177,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<PeripheralProxyBlock> TRANSMITTER_BLOCK = REGISTRATE
             .block(PeripheralProxyBlock.ID, PeripheralProxyBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -190,7 +192,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<PeripheralInterfaceBlock> RECEIVER_BLOCK = REGISTRATE
             .block(PeripheralInterfaceBlock.ID, PeripheralInterfaceBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -204,7 +206,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<SpatialAnchorBlock> SPATIAL_ANCHOR_BLOCK = REGISTRATE
             .block(SpatialAnchorBlock.ID, SpatialAnchorBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     SpatialAnchorBlock.SpatialAnchorDataGenerator.generate()
@@ -220,7 +222,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<JetBlock> JET_BLOCK = REGISTRATE
             .block(JetBlock.ID, JetBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -234,7 +236,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<JetRudderBlock> JET_RUDDER_BLOCK = REGISTRATE
             .block(JetRudderBlock.ID, JetRudderBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -249,7 +251,7 @@ public class ControlCraftBlocks {
             .block(PropellerControllerBlock.ID, PropellerControllerBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .transform(TagGen.axeOrPickaxe())
             .lang("Propeller Controller")
@@ -264,7 +266,7 @@ public class ControlCraftBlocks {
             .block(PropellerBlock.ID, PropellerBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -277,7 +279,7 @@ public class ControlCraftBlocks {
             .block(SpinalyzerBlock.ID, SpinalyzerBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -290,7 +292,7 @@ public class ControlCraftBlocks {
             .block(FlapBearingBlock.ID, FlapBearingBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -304,7 +306,7 @@ public class ControlCraftBlocks {
             .block(KinematicRevoluteMotorBlock.ID, KinematicRevoluteMotorBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -321,7 +323,7 @@ public class ControlCraftBlocks {
             .block(KinematicJointMotorBlock.ID, KinematicJointMotorBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalAxisBlockProvider()
@@ -341,7 +343,7 @@ public class ControlCraftBlocks {
             .block(KinematicSliderBlock.ID, KinematicSliderBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .blockstate(
                     BlockStateGen.directionalBlockProvider(true)
@@ -357,7 +359,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<CameraBlock> CAMERA_BLOCK = REGISTRATE
             .block(CameraBlock.ID, CameraBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(64))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -371,7 +373,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<KineticProxyBlock> KINETIC_PROXY_BLOCK = REGISTRATE
             .block(KineticProxyBlock.ID, KineticProxyBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -384,7 +386,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<KineticResistorBlock> KINETIC_RESISTOR_BLOCK = REGISTRATE
             .block(KineticResistorBlock.ID, KineticResistorBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
@@ -397,7 +399,7 @@ public class ControlCraftBlocks {
     public static final BlockEntry<CompactFlapBlock> COMPACT_FLAP_BLOCK = REGISTRATE
             .block(CompactFlapBlock.ID, CompactFlapBlock::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(32))
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(

@@ -47,6 +47,10 @@ public abstract class NetworkUIPort<T> implements TabListener {
         layout.visitWidgets(e -> e.visible = true);
     }
 
+    protected void redoLayout(){
+        if(parent == null)return;
+        parent.redoLayout();
+    }
 
     @Override
     public void onAddRenderable(Collection<AbstractWidget> toAdd) {

@@ -60,7 +60,7 @@ public abstract class WandAbstractDualSelectionMode extends WandAbstractMultiple
         if (player == null) return;
 
         if(x != WandSelection.NULL) ClientOutliner.drawOutline(x.pos(), x.face(), 0xaaca32, "source");
-        if(y != WandSelection.NULL) ClientOutliner.drawOutline(y.pos(), y.face(), 0xffcb74, "target");
+        if(y != WandSelection.NULL) ClientOutliner.drawOutline(y.pos(), y.face(), 0xffcb74, "deploy");
     }
 
     private void confirm(){

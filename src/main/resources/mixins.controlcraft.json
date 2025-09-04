@@ -13,6 +13,7 @@
     "camera.MixinChunkMap$TrackedEntity",
     "camera.MixinServerPlayer",
     "cbc.MixinCannonMountBlockEntity",
+    "cbc.MixinFixedCannonMountBlockEntity",
     "tweak.MixinTweakedLecternControllerBlockEntity",
     "tweak.MixinTweakLecternRangeFirst",
     "tweak.MixinTweakLecternRangeSecond",

@@ -162,5 +162,41 @@
   {
     "block": "vscontrolcraft:cc_bridge",
     "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:link_bus",
+    "mass": 1.0
+  },
+  {
+    "block": "vscontrolcraft:ai_cruiser",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_schematic",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_jet",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_monitor",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_autocannon",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_big_cannon",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_explosive",
+    "mass": 5.0
+  },
+  {
+    "block": "vscontrolcraft:ai_weight",
+    "mass": 100.0
   }
 ]

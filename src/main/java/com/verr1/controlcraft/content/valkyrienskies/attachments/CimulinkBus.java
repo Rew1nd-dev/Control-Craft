@@ -5,7 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Sets;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.port.bus.IBusContext;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.unstable.AIServer;
+import com.verr1.controlcraft.unstable.util.LazyTicker;
+import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.Map;
@@ -22,7 +26,7 @@ import java.util.stream.Collectors;
         setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CimulinkBus {
+public class CimulinkBus implements IBusContext {
     @JsonIgnore
     private final Map<String, Set<WorldBlockPos>> addresses = new ConcurrentHashMap<>();
     @JsonIgnore
@@ -31,21 +35,27 @@ public class CimulinkBus {
     private final Map<WorldBlockPos, Integer> lives = new ConcurrentHashMap<>();
     @JsonIgnore
     private final Map<WorldBlockPos, NamedComponent> devices = new ConcurrentHashMap<>();
-
+    @JsonIgnore
     private final static int MAX_LIVES = 10;
+    @JsonIgnore
+    private final static LazyTicker ticker = new LazyTicker(5, CimulinkBus::tickAllAttachments);
 
-    public void activate(WorldBlockPos address, NamedComponent device, String name){
+    public void activate(@NotNull WorldBlockPos address, @NotNull NamedComponent device, @NotNull String name){
         lives.put(address, MAX_LIVES);
         devices.put(address, device);
 
         replace(name, address);
     }
 
+    public @NotNull Set<WorldBlockPos> allPositions(){
+        return Set.copyOf(names.keySet());
+    }
+
     public void tick(){
         tickLives();
     }
 
-    public Set<NamedComponent> access(String name){
+    public @NotNull Set<NamedComponent> access(String name){
         return Optional
                 .ofNullable(addresses.get(name))
                 .map(set -> set.stream()
@@ -56,6 +66,9 @@ public class CimulinkBus {
                 .orElseGet(Sets::newConcurrentHashSet);
     }
 
+    public @NotNull Set<String> allNames(){
+        return Set.copyOf(addresses.keySet());
+    }
 
     private void tickLives(){
         lives.entrySet().forEach(e -> e.setValue(e.getValue() - 1));
@@ -68,15 +81,15 @@ public class CimulinkBus {
 
 
 
-    private void replace(String name, WorldBlockPos address){
+    private void replace(@NotNull String name, @NotNull WorldBlockPos address){
         String original = names.get(address);
-        if(!original.equals(name)){
+        if(original != null && !original.equals(name)){
             remove(original, address);
         }
-        put(original, address);
+        put(name, address);
     }
 
-    private void put(String name, WorldBlockPos address){
+    private void put(@NotNull String name, @NotNull  WorldBlockPos address){
         names.put(address, name);
         addresses.computeIfAbsent(name, $ -> Sets.newConcurrentHashSet()).add(address);
     }
@@ -110,6 +123,19 @@ public class CimulinkBus {
             ship.saveAttachment(CimulinkBus.class, obj);
         }
         return obj;
+    }
+
+    public static void tickAll(){
+        ticker.tick();
+    }
+
+    public static void tickAllAttachments(){
+        AIServer.MANAGER
+                .getAllShips()
+                .stream()
+                .map(s -> s.getAttachment(CimulinkBus.class))
+                .filter(Objects::nonNull)
+                .forEach(CimulinkBus::tick);
     }
 
 }

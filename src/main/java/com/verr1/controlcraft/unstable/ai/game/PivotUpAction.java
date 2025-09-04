@@ -14,7 +14,7 @@ public class PivotUpAction extends Action {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        // ControlCraft.LOGGER.info("Pivoting up");
+        ControlCraft.LOGGER.debug("Pivoting up");
 
         IAirContext context = blackboard.get(SharedAIKeys.AIR_COMMON);
         AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);

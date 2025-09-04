@@ -19,7 +19,7 @@ public class MixinTweakLecternRangeSecond {
 /*
 @Redirect(
             method = "tryStartUsing",
-            at = @At(value = "INVOKE", target = "Lcom/getitemfromblock/create_tweaked_controllers/block/TweakedLecternControllerBlockEntity;playerInRange(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z"),
+            at = @At(value = "INVOKE", deploy = "Lcom/getitemfromblock/create_tweaked_controllers/block/TweakedLecternControllerBlockEntity;playerInRange(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z"),
             remap = false
     )
     boolean correctMountedDistanceCheck(Player player, Level world, BlockPos pos){

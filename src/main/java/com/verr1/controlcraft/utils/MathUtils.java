@@ -17,6 +17,10 @@ public class MathUtils {
 
     public static final double eps = 1e-10;
 
+    public static double volume(AABBic aabBic){
+        return (aabBic.maxX() - aabBic.minX()) * (aabBic.maxY() - aabBic.minY()) * (aabBic.maxZ() - aabBic.minZ());
+    }
+
     public static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }

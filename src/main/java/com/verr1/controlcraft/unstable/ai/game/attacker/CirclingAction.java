@@ -26,7 +26,7 @@ public class CirclingAction extends Action implements Interruptible {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-         // ControlCraft.LOGGER.info("try circling");
+        ControlCraft.LOGGER.debug("try circling");
         ICircleContext context = blackboard.get(SharedAIKeys.CIRCLE_CONTEXT);
         // AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
         if(context == null)return Status.FAILURE;

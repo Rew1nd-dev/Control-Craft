@@ -2,6 +2,7 @@ package com.verr1.controlcraft.content.gui.widgets;
 
 import com.simibubi.create.foundation.gui.element.ScreenElement;
 import com.simibubi.create.foundation.gui.widget.SelectionScrollInput;
+import com.verr1.controlcraft.content.gui.layouts.api.SizedScreenElement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -19,6 +20,11 @@ public class IconSelectionScrollInput extends SelectionScrollInput {
 
     public IconSelectionScrollInput(int xIn, int yIn, int widthIn, int heightIn, ScreenElement icon) {
         super(xIn, yIn, widthIn, heightIn);
+        this.icon = icon;
+    }
+
+    public IconSelectionScrollInput(SizedScreenElement icon) {
+        super(0, 0, icon.width(), icon.height());
         this.icon = icon;
     }
 

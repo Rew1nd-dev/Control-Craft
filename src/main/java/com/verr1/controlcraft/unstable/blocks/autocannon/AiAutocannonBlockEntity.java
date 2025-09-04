@@ -4,42 +4,57 @@ import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.compact.createbigcannons.APAutocannonAccess;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.unstable.ai.api.IAirCannon;
+import com.verr1.controlcraft.unstable.blocks.AiCannonBaseBlockEntity;
+import com.verr1.controlcraft.unstable.blocks.AiUtilBlockEntity;
+import com.verr1.controlcraft.unstable.valkyrienskies.attachments.AIBlockNetwork;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
 
-import java.util.Objects;
+import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.ARROW;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+public class AiAutocannonBlockEntity extends AiCannonBaseBlockEntity {
 
-public class AiAutocannonBlockEntity extends OnShipBlockEntity implements IAirCannon {
+    protected boolean arrow = false;
+
 
     public AiAutocannonBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        registerBoolean(this::useArrow, this::setUseArrow, ARROW);
     }
 
 
-    @Override
-    public int getCooldown() {
-        return 0;
+
+    public boolean useArrow() {
+        return arrow;
     }
 
-    @Override
-    public void fireAt(Vector3dc direction) {
-        if(isClientSide())return;
+    public void setUseArrow(boolean arrow) {
+        this.arrow = arrow;
+    }
 
-        Objects.requireNonNull(level);
-        Vector3dc p = readSelf().position();
-        Vector3dc front = readSelf().s2wTransform().transformDirection(new Vector3d(0, 0, 1));
-        Vector3dc spawn = p.fma(10.0, front, new Vector3d());
+
+
+    @Override
+    public Projectile getProjectile() {
+        if(level == null)return null;
+        if(useArrow()){
+            Arrow a = new Arrow(EntityType.ARROW, level);
+            a.setNoGravity(true);
+            return a;
+        }
         APAutocannonAccess ap = CreateBigCannonsCompact.createAutocannonAp(level);
-        if(ap == null)return;
-        ap.setPos(toMinecraft(spawn));
-        ap.setTracer(true);
+        if(ap == null)return null;
         ap.setLifetime(40);
-        ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
-        ap.addToLevel();
+        ap.setTracer(true);
+        ap.getProjectile().setNoGravity(true);
+        return ap.getProjectile();
     }
+
+
+
+
 }

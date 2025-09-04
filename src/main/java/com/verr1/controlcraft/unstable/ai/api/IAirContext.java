@@ -13,7 +13,7 @@ public interface IAirContext {
 
     default double height(){
         Vector3dc p = getPosition();
-        return world().getHeight(Heightmap.Types.MOTION_BLOCKING, (int) p.x(), (int) p.z());
+        return world().getHeight(Heightmap.Types.WORLD_SURFACE, (int) p.x(), (int) p.z());
     }
 
     default Vector3dc below(){

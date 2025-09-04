@@ -5,6 +5,7 @@ import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
+import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.gui.wand.WandGUI;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
@@ -119,7 +120,7 @@ public class CimulinkRenderer implements IRenderer{
         tickCached();
         tickBox();
 
-        if(!WandGUI.isClientWandInHand())return;
+        if(!WandGUI.isClientWandInHand() && !BlockPropertyConfig._ALWAYS_RENDER_WIRE)return;
 
         tickCurve();
         tickFlash();

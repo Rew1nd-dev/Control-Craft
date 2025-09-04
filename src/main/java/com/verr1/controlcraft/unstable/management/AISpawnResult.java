@@ -10,8 +10,7 @@ public class AISpawnResult {
     }
 
     public AISpawnResult(long id) {
-        this.id = id;
-        this.status = id == -1 ? Status.FAILED : Status.SUCCESS;
+        this(id, id == -1 ? Status.FAILED : Status.SUCCESS);
     }
 
     public enum Status {

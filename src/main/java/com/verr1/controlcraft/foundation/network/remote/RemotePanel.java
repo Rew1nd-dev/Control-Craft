@@ -30,7 +30,7 @@ public class RemotePanel {
         NetworkKey key = NetworkKey.deserialize(tag.getCompound("key"));
         RemotePort<?> port = responses.get(key);
         if (port == null)return;
-        Object input = port.deserialize(tag);
+        Object input = port.deserialize(tag.getCompound("data"));
         if (input == null)return;
         port.accept(input);
     }

@@ -36,6 +36,7 @@ public class SchematicBlockEntity extends AIBaseBlockEntity {
                 .withClient(ClientBuffer.STRING.get())
                 .register();
 
+
         panel().registerUnit(EXPORT_SCHEMATIC, this::createSchematic);
 
 

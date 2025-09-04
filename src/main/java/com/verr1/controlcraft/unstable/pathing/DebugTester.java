@@ -2,7 +2,7 @@ package com.verr1.controlcraft.unstable.pathing;
 
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
-import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculatorV2;
+import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculator;
 import com.verr1.controlcraft.unstable.pathing.path.IPath;
 import com.verr1.controlcraft.utils.MathUtils;
 import net.minecraft.client.Minecraft;
@@ -57,7 +57,7 @@ public class DebugTester {
 
     public static void compute(){
 
-        currentPath = DubinsCalculatorV2.dubinsMatchStart(
+        currentPath = DubinsCalculator.dubinsMatchStart(
                 currentStart,
                 currentStartHeading,
                 currentEnd,

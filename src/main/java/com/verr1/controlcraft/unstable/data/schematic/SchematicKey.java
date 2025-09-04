@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class SchematicKey {
+    public static final SchematicKey EMPTY = new SchematicKey("empty", "empty");
+
     final String namespace;
     final String name;
 

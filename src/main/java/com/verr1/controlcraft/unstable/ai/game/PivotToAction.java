@@ -21,7 +21,7 @@ public class PivotToAction extends Action {
         IAirController controller = context.controller();
         Vector3dc op_wc = awareness.targetPosition().sub(awareness.currentPosition(), new Vector3d());
 
-        // ControlCraft.LOGGER.debug("pivoting  towards  target");
+        // ControlCraft.LOGGER.debug("pivoting  towards  deploy");
 //        if(situation.isInLossCone() || situation.attackScore() < 5 || situation.mayCollide()){ //|| situation.mayCollide() situation.attackScore() < 5
 //            return Status.FAILURE;
 //        }

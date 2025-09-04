@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.compact.createbigcannons;
 
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
 import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
@@ -36,6 +37,11 @@ public class APAutocannonAccessImpl implements APAutocannonAccess {
     @Override
     public void addToLevel() {
         Optional.of(ap.level()).ifPresent(level -> level.addFreshEntity(ap));
+    }
+
+    @Override
+    public Projectile getProjectile() {
+        return ap;
     }
 
 

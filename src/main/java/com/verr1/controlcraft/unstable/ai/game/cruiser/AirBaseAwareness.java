@@ -58,7 +58,7 @@ public class AirBaseAwareness {
         if(world == null)return;
         int x = (int)currentPosition.x();
         int z = (int)currentPosition.z();
-        double height = world.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+        double height = world.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
         currentHeight = currentPosition.y() - height;
         long shipId = context.shipId();
         ClipContext ctx = new ClipContext(

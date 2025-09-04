@@ -54,21 +54,6 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
 
     protected double lerpSpeed = 5;
 
-    private final List<ExposedFieldWrapper> fields = List.of(
-            new ExposedFieldWrapper(
-                    () -> controller.getControlTarget(),
-                    t -> controller.setControlTarget(t),
-                    "target",
-                    SlotType.FORCED_TARGET
-            ).withSuggestedRange(0, Math.PI / 2),
-            new ExposedFieldWrapper(
-                    () -> controller.getControlTarget(),
-                    t -> controller.setControlTarget(t),
-                    "target",
-                    SlotType.FORCED_TARGET$1
-            ).withSuggestedRange(0, Math.PI / 2)
-    );
-
     private final KSliderKineticPeripheral kineticPeripheral = new KSliderKineticPeripheral(this);
 
     @Override
@@ -156,7 +141,7 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
                 new NumericField(
                         () -> getController().getTarget(),
                         t -> getController().setControlTarget(t),
-                        "target"
+                        "deploy"
                 ),
                 new DirectReceiver.InitContext(SlotType.TARGET, Couple.create(0.0, 32.0)),
                 6

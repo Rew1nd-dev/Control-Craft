@@ -264,13 +264,13 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
 
 
     }
-    private void dispatchPacket(PacketDistributor.PacketTarget target, CompoundTag tag){
-        handler.dispatchPacket(target, tag);
+    private void dispatchPacket(PacketDistributor.PacketTarget deploy, CompoundTag tag){
+        handler.dispatchPacket(deploy, tag);
 
         if(level == null)return;
         if (!level.isClientSide) {
             var p = new SyncBlockEntityClientPacket(getBlockPos(), tag);
-            ControlCraftPackets.getChannel().send(target, p);
+            ControlCraftPackets.getChannel().send(deploy, p);
         }
         if (level.isClientSide) {
             var p = new SyncBlockEntityServerPacket(getBlockPos(), tag);
@@ -279,17 +279,17 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
 
 
     }
-    public void dispatchChannel(PacketDistributor.PacketTarget target, boolean isSimplex, NetworkKey... key){
-        handler.dispatchChannel(target, isSimplex, key)
+    public void dispatchChannel(PacketDistributor.PacketTarget deploy, boolean isSimplex, NetworkKey... key){
+        handler.dispatchChannel(deploy, isSimplex, key)
 
-        if (isSimplex)syncSimplex(target, key);
-        else syncDuplex(target, key);
+        if (isSimplex)syncSimplex(deploy, key);
+        else syncDuplex(deploy, key);
 
 
     }
 
-    protected void syncSimplex(PacketDistributor.PacketTarget target, NetworkKey... key){
-        handler.syncSimplex(target, key);
+    protected void syncSimplex(PacketDistributor.PacketTarget deploy, NetworkKey... key){
+        handler.syncSimplex(deploy, key);
 
         if(level == null)return;
         CompoundTag syncTag = new CompoundTag();
@@ -301,13 +301,13 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
         );
         CompoundTag tag = new CompoundTag();
         tag.put("simplex", syncTag);
-        dispatchPacket(target, tag);
+        dispatchPacket(deploy, tag);
 
 
     }
 
-    protected void syncDuplex(PacketDistributor.PacketTarget target, NetworkKey... key){
-        handler.syncDuplex(target, key);
+    protected void syncDuplex(PacketDistributor.PacketTarget deploy, NetworkKey... key){
+        handler.syncDuplex(deploy, key);
 
         if(level == null)return;
         CompoundTag portTag = new CompoundTag();
@@ -319,7 +319,7 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
         );
         CompoundTag tag = new CompoundTag();
         tag.put("duplex", portTag);
-        dispatchPacket(target, tag);
+        dispatchPacket(deploy, tag);
 
 
     }

@@ -8,7 +8,7 @@ import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
 
-public class SensorLinkPort extends SwitchableLinkPort<SensorTypes> {
+public class SensorLinkPort extends SwitchableLinkPort<SensorTypes> implements ITransformable{
 
     public SensorLinkPort(SensorBlockEntity sbe) {
         super(SensorTypes.OMEGA, t -> create(t, sbe));
@@ -22,17 +22,16 @@ public class SensorLinkPort extends SwitchableLinkPort<SensorTypes> {
             case ROTATION -> new RotationSensor(sbe);
             case EULER_YXZ -> new EulerSensor(sbe);
             case GPS -> new GPSSensor(sbe);
+            case ALL_IN_1 -> new AllInOneSensor(sbe);
         };
     }
 
     public void setLocal(boolean local){
-        if(__raw() instanceof OmegaSensor os)os.setLocal(local);
-        else if(__raw() instanceof VelocitySensor vs)vs.setLocal(local);
+        if(__raw() instanceof ITransformable os)os.setLocal(local);
     }
 
     public boolean local(){
-        if(__raw() instanceof OmegaSensor os)return os.local();
-        else if(__raw() instanceof VelocitySensor vs)return vs.local();
+        if(__raw() instanceof ITransformable os)return os.local();
         return false;
     }
 

@@ -45,8 +45,14 @@ public class CimulinkStandalone {
         // save(View.create(), Path.of(DataPath), "view");
         // save(DigitalCircuits.decoder8(), Path.of(DataPath), "decoder8");
         // save(WarThunderFlight.Sel(), Path.of(DataPath), "viewManualSel");
-        save(WtHeli.pd3(), Path.of(DataPath), "pd3");
+        // save(WtHeli.pd3(), Path.of(DataPath), "pd3");
+        // save(Missile.deltaCoordinate(), Path.of(DataPath), "dir");
         // System.out.println(1 - Math.exp(-5 * 0.01667));
+        // save(Missile.create(), Path.of(DataPath), "missile");
+        // save(Missile.control().evaluate().buildContext(), Path.of(DataPath), "mControl");
+        save(Missile.createPredict(), Path.of(DataPath), "pGuide");
+        // AimPredict.testAim();
+        // Missile.testYP();
     }
 
 }

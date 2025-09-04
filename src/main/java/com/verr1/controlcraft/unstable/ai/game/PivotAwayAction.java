@@ -27,7 +27,7 @@ public class PivotAwayAction extends Action implements Interruptible {
         AirBaseAwareness awareness = blackboard.get(SharedAIKeys.AWARENESS);
         if (context == null || awareness == null)return Status.FAILURE;
         IAirController controller = context.controller();
-        // ControlCraft.LOGGER.debug("pivoting away from target");
+        ControlCraft.LOGGER.debug("pivoting away from deploy");
         Vector3dc targetP = awareness.targetPosition();
         Vector3dc targetV = awareness.targetVelocity();
         Vector3dc currentP = context.getPosition();

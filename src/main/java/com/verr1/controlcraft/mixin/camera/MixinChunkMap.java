@@ -208,9 +208,9 @@ public abstract class MixinChunkMap {
     ) {
         SectionPos playerPos = player.getLastSectionPos();
 
-        if (!_isChunkInRange(pos.x, pos.z, playerPos.x(), playerPos.z(), viewDistance)) {
+        if (!isChunkInRange(pos.x, pos.z, playerPos.x(), playerPos.z(), viewDistance)) {
             SectionPos camPos = ServerCameraManager.getCameraOrPlayerSection(player);
-            if(!_isChunkInRange(pos.x, pos.z, camPos.x(), camPos.z(), viewDistance))return;
+            if(!isChunkInRange(pos.x, pos.z, camPos.x(), camPos.z(), viewDistance))return;
             playerList.add(player);
         }
     }
@@ -231,8 +231,8 @@ public abstract class MixinChunkMap {
 
             for(int x = xMin; x <= xMax; ++x) {
                 for(int z = zMin; z <= zMax; ++z) {
-                    boolean loaded = _isChunkInRange(x, z, ox, oz, this.viewDistance);
-                    boolean toLoad = _isChunkInRange(x, z, nx, nz, this.viewDistance);
+                    boolean loaded = isChunkInRange(x, z, ox, oz, this.viewDistance);
+                    boolean toLoad = isChunkInRange(x, z, nx, nz, this.viewDistance);
 
                     // if(toMaintain.contains(new Pair<>(x, z)))continue;
 
@@ -245,7 +245,7 @@ public abstract class MixinChunkMap {
             // teleport
             for(int x = ox - viewDistance; x <= ox + viewDistance; ++x) {
                 for(int z = oz - viewDistance; z <= oz + viewDistance; ++z) {
-                    if (_isChunkInRange(x, z, ox, oz, this.viewDistance)) {
+                    if (isChunkInRange(x, z, ox, oz, this.viewDistance)) {
 
                         // if(toMaintain.contains(new Pair<>(x, z)))continue;
                         toUnloadSet.add(new Pair<>(x, z));
@@ -256,7 +256,7 @@ public abstract class MixinChunkMap {
 
             for(int x = nx - viewDistance; x <= nx + viewDistance; ++x) {
                 for(int z = nz - viewDistance; z <= nz + viewDistance; ++z) {
-                    if (_isChunkInRange(x, z, nx, nz, this.viewDistance)) {
+                    if (isChunkInRange(x, z, nx, nz, this.viewDistance)) {
                         // if(toMaintain.contains(new Pair<>(x, z)))continue;
 
                         toLoadSet.add(new Pair<>(x, z));

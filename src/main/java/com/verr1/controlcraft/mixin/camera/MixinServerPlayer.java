@@ -20,7 +20,7 @@ public class MixinServerPlayer implements IServerPlayerDuck {
 
 
 
-    // @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;absMoveTo(DDDFF)V"))
+    // @Redirect(method = "tick", at = @At(value = "INVOKE", deploy = "Lnet/minecraft/server/level/ServerPlayer;absMoveTo(DDDFF)V"))
     private void securitycraft$tick(ServerPlayer player, double x, double y, double z, float yaw, float pitch) {
         if (!ServerCameraManager.isRegistered(player.getUUID())) player.absMoveTo(x, y, z, yaw, pitch);
     }

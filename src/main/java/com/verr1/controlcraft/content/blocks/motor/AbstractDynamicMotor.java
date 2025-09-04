@@ -408,7 +408,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
                     new NumericField(
                             this::getTarget,
                             this::setTargetAccordingly,
-                            "target"
+                            "deploy"
                     ),
                     new DirectReceiver.InitContext(SlotType.TARGET, Couple.create(0.0, Math.PI / 2.0)),
                     6

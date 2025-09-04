@@ -162,7 +162,7 @@ public class Packaging {
         CircuitConstructor closeLoop = new CircuitConstructor();
         closeLoop.addComponent(integral, differential, proportional, err, add, plant, reg);
         closeLoop
-                .defineInput("target", err.__in(0))
+                .defineInput("deploy", err.__in(0))
                 .defineOutput("output", plant.__out(0))
                 .connect(err.__out(0), reg.__in(0))
                 .connect(reg.__out(0), proportional.__in(0))
@@ -184,7 +184,7 @@ public class Packaging {
                 plant.__in(0)
         );
 
-        close.input("target", 4.0);
+        close.input("deploy", 4.0);
         debugger.trackWithPeriod(ts, 0.2, 20.0);
     }
 

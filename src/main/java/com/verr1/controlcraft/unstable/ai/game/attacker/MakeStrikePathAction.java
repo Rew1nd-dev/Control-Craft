@@ -5,9 +5,8 @@ import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
-import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculatorV2;
+import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculator;
 import com.verr1.controlcraft.unstable.pathing.path.IPath;
-import com.verr1.controlcraft.unstable.pathing.path.LinePath;
 import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -36,7 +35,7 @@ public class MakeStrikePathAction extends Action {
         Vector3dc strikeDirection = new Vector3d(Math.cos(enterYaw), Math.tan(enterPitch), Math.sin(enterYaw)).normalize();
 
 
-        IPath adjust0 = DubinsCalculatorV2.dubinsMatchEnd(
+        IPath adjust0 = DubinsCalculator.dubinsMatchEnd(
                 pos, safeNormalize(vel, new Vector3d(0, 1, 0)),
                 t_pos, strikeDirection.negate(new Vector3d()),
                 context.cruiseRadius()

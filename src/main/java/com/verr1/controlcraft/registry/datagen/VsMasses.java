@@ -22,6 +22,7 @@ import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlock;
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlock;
 import com.verr1.controlcraft.content.blocks.terminal.TerminalBlock;
 import com.verr1.controlcraft.content.blocks.transmitter.PeripheralProxyBlock;
+import com.verr1.controlcraft.content.links.bus.BusBlock;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
@@ -39,6 +40,14 @@ import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
+import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlock;
+import com.verr1.controlcraft.unstable.blocks.autocannon.AiAutoCannonBlock;
+import com.verr1.controlcraft.unstable.blocks.cannon.AiBigCannonBlock;
+import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlock;
+import com.verr1.controlcraft.unstable.blocks.explosive.ExplosiveBlock;
+import com.verr1.controlcraft.unstable.blocks.monitor.MonitorBlock;
+import com.verr1.controlcraft.unstable.blocks.schematic.SchematicBlock;
+import com.verr1.controlcraft.unstable.blocks.weight.StandardWeightBlock;
 
 public enum VsMasses {
 
@@ -83,8 +92,18 @@ public enum VsMasses {
     FUNC(FunctionsBlock.ID, 1),
     IMU(SensorBlock.ID, 1),
     SCOPE(OscilloscopeBlock.ID, 10),
-    CC_BRIDGE(CCBridgeBlock.ID, 1)
+    CC_BRIDGE(CCBridgeBlock.ID, 1),
+    BUS(BusBlock.ID, 1),
 
+
+    AI_CRUISER(CruiserBlock.ID, 5),
+    AI_SCHEMATIC(SchematicBlock.ID, 5),
+    AI_ATTACKER(AiAttackerBlock.ID, 5),
+    AI_MONITOR(MonitorBlock.ID, 5),
+    AI_AUTOCANNON(AiAutoCannonBlock.ID, 5),
+    AI_BIG_CANNON(AiBigCannonBlock.ID, 5),
+    AI_EXPLOSIVE(ExplosiveBlock.ID, 5),
+    AI_WEIGHT(StandardWeightBlock.ID, 100)
     ;
 
     public final String ID;

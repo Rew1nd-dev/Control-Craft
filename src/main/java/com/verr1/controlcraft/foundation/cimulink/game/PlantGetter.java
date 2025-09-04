@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game;
 import com.simibubi.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
+import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
@@ -21,7 +22,7 @@ public class PlantGetter {
                 )
                 .orElse(null);
 
-        if (be instanceof IPlant iPlant){
+        if (be instanceof IPlant iPlant && !(be instanceof ProxyLinkBlockEntity)){
             return iPlant.plant();
         }
         if (be instanceof SpeedControllerBlockEntity sp){

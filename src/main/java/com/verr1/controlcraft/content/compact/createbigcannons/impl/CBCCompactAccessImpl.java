@@ -59,7 +59,8 @@ public class CBCCompactAccessImpl implements ICBCCompactAccess {
     @Override
     public APAutocannonAccess createAutocannonAp(Level level) {
         APAutocannonProjectile ap = new APAutocannonProjectile(CBCEntityTypes.AP_AUTOCANNON.get(), level);
-        FlakAutocannonProjectile he = new FlakAutocannonProjectile(CBCEntityTypes.FLAK_AUTOCANNON.get(), level);
+        AutocannonTestProjectile he = new AutocannonTestProjectile(CBCEntityTypes.FLAK_AUTOCANNON.get(), level);
+        he.setDrag(false);
         he.setNoGravity(true);
         he.setFuze(CBCItems.IMPACT_FUZE.asStack());
         return new APAutocannonAccessImpl(he);

@@ -1,15 +1,20 @@
 package com.verr1.controlcraft.mixin.cbc;
 
 
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
-import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.mixinducks.ICannonDuck;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import rbasamoyai.createbigcannons.cannon_control.cannon_mount.CannonMountBlockEntity;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
 import rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 @Mixin(CannonMountBlockEntity.class)
 public abstract class MixinCannonMountBlockEntity implements ICannonDuck {
@@ -35,6 +40,13 @@ public abstract class MixinCannonMountBlockEntity implements ICannonDuck {
 
     @Shadow(remap = false)
     public abstract void disassemble();
+
+    @Shadow(remap = false)
+    @Nullable public abstract PitchOrientedContraptionEntity getContraption();
+
+
+    @Shadow(remap = false)
+    public abstract CannonMountBlockEntity getCannonMount();
 
     public void controlCraft$setYaw(float value) {
         setYaw(value);
@@ -76,6 +88,22 @@ public abstract class MixinCannonMountBlockEntity implements ICannonDuck {
         }
     }
 
+
+
+    @Override
+    public void controlCraft$fire(int strength, boolean fireChanged){
+        CannonMountBlockEntity self = getCannonMount();
+        if(self == null)return;
+        ServerLevel sLevel = (ServerLevel) self.getLevel();
+        if(sLevel == null)return;
+        Optional.ofNullable(mountedContraption)
+                .map(AbstractContraptionEntity::getContraption)
+                .filter(AbstractMountedCannonContraption.class::isInstance)
+                .map(AbstractMountedCannonContraption.class::cast)
+                .ifPresent(contraption -> contraption.onRedstoneUpdate(sLevel, this.mountedContraption, fireChanged, strength, self));
+
+    }
+
     @Override
     public void controlCraft$disassemble() {
         if(ControlCraftServer.onMainThread()){
@@ -86,7 +114,7 @@ public abstract class MixinCannonMountBlockEntity implements ICannonDuck {
     }
 
     @Override
-    public void controlCraft$fire() {
-        // ((AbstractMountedCannonContraption)mountedContraption.getContraption()).fireShot();
+    public BlockPos controlCraft$getBlockPos() {
+        return getCannonMount().getBlockPos();
     }
 }

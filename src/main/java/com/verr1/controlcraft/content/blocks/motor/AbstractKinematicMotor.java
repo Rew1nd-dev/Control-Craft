@@ -157,7 +157,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
                 new NumericField(
                         () -> getController().getTarget(),
                         t -> getController().setControlTarget(t),
-                        "target"
+                        "deploy"
                 ),
                 new DirectReceiver.InitContext(SlotType.TARGET, Couple.create(-Math.PI, Math.PI)),
                 6

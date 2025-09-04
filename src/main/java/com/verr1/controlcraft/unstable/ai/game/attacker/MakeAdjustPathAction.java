@@ -1,12 +1,13 @@
 package com.verr1.controlcraft.unstable.ai.game.attacker;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
 import com.verr1.controlcraft.unstable.ai.core.Address;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.core.Status;
 import com.verr1.controlcraft.unstable.ai.core.nodes.Action;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
-import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculatorV2;
+import com.verr1.controlcraft.unstable.pathing.dubins.DubinsCalculator;
 import com.verr1.controlcraft.unstable.pathing.path.IPath;
 import com.verr1.controlcraft.unstable.pathing.path.LinePath;
 import com.verr1.controlcraft.utils.MathUtils;
@@ -35,16 +36,16 @@ public class MakeAdjustPathAction extends Action {
 
         if(t_pos == null)return Status.SUCCESS;
 
-        // System.out.println("making new path");
+        ControlCraft.LOGGER.debug("making new path");
 
         double enterYaw = Math.random() * 2 * Math.PI;
-        double enterPitch = Math.toRadians(MathUtils.lerp(Math.random(), 30, 60));
+        double enterPitch = Math.toRadians(MathUtils.lerp(Math.random(), context.enterMinPitch(), context.enterMaxPitch()));
 
         blackboard.set(ENTER_YAW, enterYaw);
         blackboard.set(ENTER_PITCH, enterPitch);
 
-        double safeHeight = context.cruiseRadius() * 1;
-        double strikeDistance = 2 * context.cruiseRadius();
+        double safeHeight = context.strikeEndHeight();
+        double strikeDistance = context.strikeDistance();
         double endDistance = safeHeight / Math.sin(enterPitch);
 
         Vector3dc strikeDirection = new Vector3d(Math.cos(enterYaw), Math.tan(enterPitch), Math.sin(enterYaw)).normalize();
@@ -66,13 +67,13 @@ public class MakeAdjustPathAction extends Action {
         Vector3dc circleStartDirection = strikeStartDirection.rotateY(Math.toRadians(90), new Vector3d());
 
 
-        IPath adjust0 = DubinsCalculatorV2.dubinsMatchEnd(
+        IPath adjust0 = DubinsCalculator.dubinsMatchEnd(
                 pos, safeNormalize(vel, new Vector3d(0, 1, 0)),
                 circleStart, circleStartDirection,
                 context.cruiseRadius()
         );
 
-        IPath adjust1 = DubinsCalculatorV2.dubinsMatchEnd(
+        IPath adjust1 = DubinsCalculator.dubinsMatchEnd(
                 circleStart, circleStartDirection,
                 strikeStart, strikeStartDirection,
                 context.cruiseRadius()

@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.unstable.ai.api;
 
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.joml.Vector3dc;
 
 public interface IAttackerContext extends IAirContext{
@@ -9,7 +8,13 @@ public interface IAttackerContext extends IAirContext{
 
     void fireAt(Vector3dc direction);
 
+    double strikeDistance();
 
+    double strikeEndHeight();
+
+    double enterMinPitch();
+
+    double enterMaxPitch();
 
     IAirController controller();
 

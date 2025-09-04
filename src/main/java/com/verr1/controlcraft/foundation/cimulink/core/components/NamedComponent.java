@@ -127,6 +127,14 @@ public abstract class NamedComponent extends Component {
         return namedInputs;
     }
 
+    public boolean hasInput(String name){
+        return namedInputs.containsKey(name);
+    }
+
+    public boolean hasOutput(String name){
+        return namedOutputs.containsKey(name);
+    }
+
     public Map<String, Integer> namedOutputs() {
         return namedOutputs;
     }

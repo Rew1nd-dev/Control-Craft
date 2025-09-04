@@ -10,7 +10,7 @@ public class SliderPlant extends Plant {
     public SliderPlant(DynamicSliderBlockEntity plant) {
 
         super(new builder()
-                .in("target", plant::setTarget)
+                .in("deploy", plant::setTarget)
                 .in("lock", l -> plant.tryLock(l > 0.5))
                 .in("force", plant::setOutputForce)
                 .out("current", () -> plant.getController().getValue())

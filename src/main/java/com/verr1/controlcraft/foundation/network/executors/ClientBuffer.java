@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 import java.util.function.Supplier;
 
@@ -20,6 +21,7 @@ public class ClientBuffer<T> implements Slot<CompoundTag> {
     public static Supplier<ClientBuffer<Integer>> INT = () -> new ClientBuffer<>(SerializeUtils.INT, Integer.class);
     public static Supplier<ClientBuffer<Long>> LONG = () -> new ClientBuffer<>(SerializeUtils.LONG, Long.class);
     public static Supplier<ClientBuffer<Vector3d>> VECTOR3D = () -> new ClientBuffer<>(SerializeUtils.VECTOR3D, Vector3d.class);
+    public static Supplier<ClientBuffer<Vector3dc>> VECTOR3DC = () -> new ClientBuffer<>(SerializeUtils.VECTOR3DC, Vector3dc.class);
     public static Supplier<ClientBuffer<ConnectContext>> CONNECT_CONTEXT = () -> new ClientBuffer<>(SerializeUtils.CONNECT_CONTEXT, ConnectContext.class);
     public static Supplier<ClientBuffer<CompoundTag>> UNIT = () -> new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class);
 

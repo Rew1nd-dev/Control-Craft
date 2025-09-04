@@ -26,11 +26,11 @@ public class PathAlongAction extends Action implements Interruptible {
 
     @Override
     protected Status perform(Blackboard blackboard) {
-        // ControlCraft.LOGGER.info("pathing along");
+        ControlCraft.LOGGER.debug("pathing along");
 
         IAttackerContext context = blackboard.get(SharedAIKeys.ATTACKER_CONTEXT);
         IPath current = blackboard.get(CURRENT_CRUISE);
-        if (context == null)return Status.RUNNING;
+        if (context == null)return Status.FAILURE;
         if (current == null)return Status.FAILURE;
         IAirController controller = context.controller();
         Vector3dc pos = context.getPosition();

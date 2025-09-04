@@ -1,15 +1,12 @@
 package com.verr1.controlcraft.content.links.ccbridge;
 
-import com.verr1.controlcraft.content.cctweaked.peripheral.JetPeripheral;
 import com.verr1.controlcraft.content.cctweaked.peripheral.LinkBridgePeripheral;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
-import com.verr1.controlcraft.foundation.cimulink.core.components.sources.MultiSource;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.MultiInputLinkPort;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -44,8 +41,12 @@ public class CCBridgeBlockEntity extends CimulinkBlockEntity<MultiInputLinkPort>
         return super.getCapability(cap, side);
     }
 
-    public void setInput(int index, double val){
-        linkPort().setInput(index, val);
+    public void setToCircuit(int index, double val){
+        linkPort().setToCircuit(index, val);
+    }
+
+    public double getFromCircuit(int index){
+        return linkPort().getFromCircuit(index);
     }
 
 

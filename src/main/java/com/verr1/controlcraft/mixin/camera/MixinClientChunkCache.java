@@ -3,6 +3,7 @@ package com.verr1.controlcraft.mixin.camera;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.foundation.camera.CameraClientChunkCacheExtension;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import net.minecraft.client.Minecraft;
@@ -66,7 +67,7 @@ public abstract class MixinClientChunkCache {
         boolean isInPlayerRange = storage.inRange(x, z);
 
         if(!isInPlayerRange){
-            boolean shouldAddChunk = false;
+            boolean shouldAddChunk = BlockPropertyConfig._ALWAYS_ADD_CAMERA_CHUNK; // always trust server ?
 
             Vec3 cameraPos = ClientCameraManager.getLinkOrQueryCameraWorldPosition();
 
@@ -74,8 +75,9 @@ public abstract class MixinClientChunkCache {
             ChunkPos cPos = new ChunkPos(BlockPos.containing(cameraPos));
             // Is Not Querying Or Linking
             // isChunkInRange(pos.x, pos.z, cPos.x, cPos.z, renderDistance + 1)
-            //
-            if (_isChunkInRange(pos.x, pos.z, cPos.x, cPos.z, renderDistance + 1)){
+            // _isChunkInRange(pos.x, pos.z, cPos.x, cPos.z, renderDistance + 1)
+            // pos.getChessboardDistance(cPos) < renderDistance + 1
+            if (isChunkInRange(pos.x, pos.z, cPos.x, cPos.z, 2 * renderDistance + 1)){
                 // ControlCraft.LOGGER.info("Should Add Chunk: {} {} cam: {}", x, z, new ChunkPos(BlockPos.containing(cameraPos)));
                 shouldAddChunk = true;
             }else{

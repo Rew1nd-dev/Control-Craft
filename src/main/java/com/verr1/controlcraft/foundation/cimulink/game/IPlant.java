@@ -6,4 +6,13 @@ import org.jetbrains.annotations.NotNull;
 public interface IPlant {
 
     @NotNull NamedComponent plant();
+
+    default String getName(){
+        return plant().name();
+    }
+
+    default void setName(String name){
+        plant().withName(name);
+    }
+
 }

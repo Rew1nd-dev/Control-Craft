@@ -15,8 +15,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
-public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort> {
+public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort> implements IPlant{
 
     public static final NetworkKey ALL_STATUS = NetworkKey.create("proxy_all_status");
     // public static final NetworkKey OUT_STATUS = NetworkKey.create("proxy_out_status");
@@ -49,5 +50,10 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
     @Override
     protected PlantProxyLinkPort create() {
         return new PlantProxyLinkPort(this);
+    }
+
+    @Override
+    public @NotNull NamedComponent plant() {
+        return linkPort().__raw();
     }
 }

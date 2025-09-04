@@ -5,9 +5,11 @@ import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.verr1.controlcraft.content.blocks.loader.ChunkLoaderBlock;
+import com.verr1.controlcraft.content.links.bus.BusBlock;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
+import com.verr1.controlcraft.content.links.connector.EasyConnectorBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
 import com.verr1.controlcraft.content.links.func.FunctionsBlock;
@@ -241,6 +243,19 @@ public class CimulinkBlocks {
             .lang("Computer Controlled Source")
             .register();
 
+    public static final BlockEntry<BusBlock> BUS = REGISTRATE
+            .block(BusBlock.ID, BusBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+            .transform(customItemModel())
+            .lang("Plant Bus")
+            .register();
+
     public static final BlockEntry<OscilloscopeBlock> SCOPE = REGISTRATE
             .block(OscilloscopeBlock.ID, OscilloscopeBlock::new)
             .initialProperties(SharedProperties::stone)
@@ -253,6 +268,20 @@ public class CimulinkBlocks {
 
             .transform(customItemModel())
             .lang("Oscilloscope")
+            .register();
+
+    public static final BlockEntry<EasyConnectorBlock> CONNECTOR = REGISTRATE
+            .block(EasyConnectorBlock.ID, EasyConnectorBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+
+            .transform(customItemModel())
+            .lang("Easy Connector")
             .register();
 
 

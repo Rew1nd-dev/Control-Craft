@@ -7,6 +7,7 @@ import com.verr1.controlcraft.content.compact.createbigcannons.APAutocannonAcces
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.unstable.ai.api.IAirCannon;
 import com.verr1.controlcraft.unstable.ai.api.IAnchorContext;
 import com.verr1.controlcraft.unstable.ai.api.ICircleContext;
 import com.verr1.controlcraft.unstable.ai.api.IFighterJetContext;
@@ -49,17 +50,17 @@ public class CruiserBlockEntity extends AiPlaneBase implements
 
 
 
-    private boolean db_fireArrow = true;
-
-    private int fireRate = 4;
-    private int fireCooldown = 0;
+//    private boolean db_fireArrow = true;
+//
+//    private int fireRate = 4;
+//    private int fireCooldown = 0;
 
 
     public CruiserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         registerDouble(this::shootTolerance, this::setShootTolerance, SharedAIKeys.TOL);
-        registerDouble(this::fireRate, this::setFireRate, SharedAIKeys.FIRE_RATE);
-        registerBoolean(this::db_fireArrow, this::setDb_fireArrow, ARROW);
+//        registerDouble(this::fireRate, this::setFireRate, SharedAIKeys.FIRE_RATE);
+//        registerBoolean(this::db_fireArrow, this::setDb_fireArrow, ARROW);
 
 
         storage.set(AIR_COMMON, this);
@@ -70,21 +71,21 @@ public class CruiserBlockEntity extends AiPlaneBase implements
 
     }
 
-    public double fireRate() {
-        return fireRate;
-    }
-
-    public void setFireRate(double fireRate) {
-        this.fireRate = (int)fireRate;
-    }
-
-    public boolean db_fireArrow() {
-        return db_fireArrow;
-    }
-
-    public void setDb_fireArrow(boolean db_fireArrow) {
-        this.db_fireArrow = db_fireArrow;
-    }
+//    public double fireRate() {
+//        return fireRate;
+//    }
+//
+//    public void setFireRate(double fireRate) {
+//        this.fireRate = (int)fireRate;
+//    }
+//
+//    public boolean db_fireArrow() {
+//        return db_fireArrow;
+//    }
+//
+//    public void setDb_fireArrow(boolean db_fireArrow) {
+//        this.db_fireArrow = db_fireArrow;
+//    }
 
     @Override
     protected BehaviorTree constructAI() {
@@ -157,35 +158,40 @@ public class CruiserBlockEntity extends AiPlaneBase implements
         noTargetAround.set(getPosition());
     }
 
-    public void fireAt(Vector3dc direction){
-        if(isClientSide())return;
-        if(fireCooldown != 0)return;
-        fireCooldown = fireRate;
-        Objects.requireNonNull(level);
-        Vector3dc p = readSelf().position();
-        Vector3dc front = readSelf().s2wTransform().transformDirection(new Vector3d(0, 0, 1));
-        Vector3dc spawn = p.fma(10.0, front, new Vector3d());
-        if(db_fireArrow){
-            Vec3 v = toMinecraft(spawn);
-            Projectile ap = new Arrow(level, v.x, v.y, v.z);
-            ap.setNoGravity(true);
-            ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
-            level.addFreshEntity(ap);
-        }else {
-            APAutocannonAccess ap = CreateBigCannonsCompact.createAutocannonAp(level);
-            if(ap == null)return;
-            ap.setPos(toMinecraft(spawn));
-            ap.setTracer(true);
-            ap.setLifetime(40);
-            ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
-            ap.addToLevel();
-        }
+//    public void fireAt(Vector3dc direction){
+//        if(isClientSide())return;
+//        if(fireCooldown != 0)return;
+//        fireCooldown = fireRate;
+//        Objects.requireNonNull(level);
+//        Vector3dc p = readSelf().position();
+//        Vector3dc front = readSelf().s2wTransform().transformDirection(new Vector3d(0, 0, 1));
+//        Vector3dc spawn = p.fma(10.0, front, new Vector3d());
+//        if(db_fireArrow){
+//            Vec3 v = toMinecraft(spawn);
+//            Projectile ap = new Arrow(level, v.x, v.y, v.z);
+//            ap.setNoGravity(true);
+//            ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
+//            level.addFreshEntity(ap);
+//        }else {
+//            APAutocannonAccess ap = CreateBigCannonsCompact.createAutocannonAp(level);
+//            if(ap == null)return;
+//            ap.setPos(toMinecraft(spawn));
+//            ap.setTracer(true);
+//            ap.setLifetime(40);
+//            ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
+//            ap.addToLevel();
+//        }
+//    }
 
+
+    @Override
+    public void fireAt(Vector3dc target) {
+        network().ifPresent(n -> n.forEachObject(IAirCannon.class, cannon -> cannon.fireAt(target)));
     }
 
-    public void tickCooldown(){
-        if(fireCooldown > 0)fireCooldown--;
-    }
+//    public void tickCooldown(){
+//        if(fireCooldown > 0)fireCooldown--;
+//    }
 
     @Override
     public void tickServer() {
@@ -193,7 +199,7 @@ public class CruiserBlockEntity extends AiPlaneBase implements
         tickAI();
         selector.tick();
         tickIfNoTarget();
-        tickCooldown();
+//        tickCooldown();
         syncForAllPlayers(false, SharedAIKeys.GOAL, SharedAIKeys.PATH);
         syncCruiseTarget();
 

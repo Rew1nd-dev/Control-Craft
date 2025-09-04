@@ -65,7 +65,7 @@ public class WandServoAssembleMode extends WandAbstractDualSelectionMode {
 
         ClientOutliner.drawOutline(x.pos(), face, Color.RED.getRGB(), "source");
 
-        if(y != WandSelection.NULL) ClientOutliner.drawOutline(y.pos(), y.face(), Color.YELLOW.getRGB(), "target");
+        if(y != WandSelection.NULL) ClientOutliner.drawOutline(y.pos(), y.face(), Color.YELLOW.getRGB(), "deploy");
     }
 
 

@@ -52,13 +52,13 @@ public class KinematicController {
 
     public CompoundTag serialize(){
         CompoundTag tag = new CompoundTag();
-        // tag.putDouble("target", target);
+        // tag.putDouble("deploy", deploy);
         tag.putDouble("control_target", controlTarget);
         return tag;
     }
 
     public void deserialize(CompoundTag tag){
-        // target = tag.getDouble("target");
+        // deploy = tag.getDouble("deploy");
         controlTarget = tag.getDouble("control_target");
     }
 

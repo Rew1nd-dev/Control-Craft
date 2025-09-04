@@ -39,13 +39,17 @@ public class AirBaseTargetSelector {
         return AIServer.MANAGER.getShipOf(id);
     }
 
+    public static Vector3d dropY(Vector3dc v){
+        return new Vector3d(v.x(), 0, v.z());
+    }
+
     public void updateInRange(){
         inRange.clear();
         AIServer.MANAGER
                 .getAllShips()
                 .stream()
                 .filter(s -> !AIServer.MANAGER.isInPool(s.getId()))
-                .filter(s -> s.getTransform().getPositionInWorld().distance(self.getPosition()) < 300)
+                .filter(s -> dropY(s.getTransform().getPositionInWorld()).distance(dropY(self.getPosition())) < maxRange)
                 .filter(s -> s.getId() != self.shipId())
                 .forEach(s -> inRange.add(s.getId()));
         updateAir();
@@ -116,11 +120,11 @@ public class AirBaseTargetSelector {
     }
 
     /**
-     * Computes the threat score for a target based on position, velocity, and self turn radius.
+     * Computes the threat score for a deploy based on position, velocity, and self turn radius.
      * @param selfPosition Current position of the entity (x, y, z)
-     * @param targetPosition Position of the target (x, y, z)
+     * @param targetPosition Position of the deploy (x, y, z)
      * @param selfVelocity Velocity vector of the entity
-     * @param targetVelocity Velocity vector of the target
+     * @param targetVelocity Velocity vector of the deploy
      * @param selfRadius Turn radius of the entity
      * @return Threat score (higher means more threatening)
      */
@@ -147,15 +151,15 @@ public class AirBaseTargetSelector {
         Vector3d unitRelativePos = new Vector3d(relativePos).normalize();
         double closingSpeed = -relativeVelocity.dot(unitRelativePos);
 
-        // If target is not approaching, return 0 (no threat)
+        // If deploy is not approaching, return 0 (no threat)
         if (closingSpeed <= 0) {
             return 0.0;
         }
 
-        // Calculate intent factor (how much target is heading toward self)
+        // Calculate intent factor (how much deploy is heading toward self)
         double targetSpeed = targetVelocity.length();
         if (targetSpeed < 1e-6) {
-            return 0.0; // No threat if target is stationary
+            return 0.0; // No threat if deploy is stationary
         }
 
         Vector3d unitTargetVelocity = new Vector3d(targetVelocity).normalize();
@@ -172,6 +176,6 @@ public class AirBaseTargetSelector {
     }
 
     private double getHeight(Vector3dc sp){
-        return self.world().getHeight(Heightmap.Types.MOTION_BLOCKING, (int)sp.x(), (int)sp.z());
+        return self.world().getHeight(Heightmap.Types.WORLD_SURFACE, (int)sp.x(), (int)sp.z());
     }
 }

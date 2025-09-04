@@ -19,6 +19,7 @@ import com.verr1.controlcraft.foundation.cimulink.game.exceptions.EncloseLoopExc
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.DebugUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
 import kotlin.Pair;
@@ -40,7 +41,7 @@ public abstract class BlockLinkPort {
 
     public static final Set<WorldBlockPos> ALL_BLP = ConcurrentHashMap.newKeySet();
 
-
+    // For Physics Thread Non-Blocking BlockEntity Access
     private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> CACHE = CacheBuilder.newBuilder()
             .maximumSize(1024)
             .refreshAfterWrite(2, TimeUnit.SECONDS)
@@ -65,6 +66,23 @@ public abstract class BlockLinkPort {
                                     ).map(ILinkableBlock::linkPort);
                         }
                     });
+
+    public static Optional<BlockLinkPort> get(@NotNull WorldBlockPos pos) {
+        Optional<BlockLinkPort> cachedValue = CACHE.getIfPresent(pos);
+        if (cachedValue != null) {
+            return cachedValue;
+        }
+
+        ControlCraftServer.INSTANCE.execute(() -> {
+            try {
+                CACHE.get(pos);
+            } catch (Exception e) {
+                DebugUtils.stackTrace(e);
+            }
+        });
+
+        return Optional.empty();
+    }
 
     // make it concurrent
 
@@ -129,7 +147,7 @@ public abstract class BlockLinkPort {
 
     private static Optional<BlockLinkPort> ofCache(WorldBlockPos pos){
         try{
-            return CACHE.get(pos);
+            return get(pos);
         }catch (Exception e){
             ControlCraft.LOGGER.error("Error loading BlockLinkPort at {}: {}", pos, e.getMessage());
             return Optional.empty();
@@ -303,6 +321,7 @@ public abstract class BlockLinkPort {
     public boolean isNotSignal(){
         return !(__raw() instanceof SignalGenerator<?>);
     }
+
 
     public static void postMainTick(){
         if(RUN_AT_PHYSICS_THREAD)return;

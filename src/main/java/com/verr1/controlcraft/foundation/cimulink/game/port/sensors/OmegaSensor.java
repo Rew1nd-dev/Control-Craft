@@ -9,7 +9,7 @@ import org.joml.Vector3dc;
 
 import java.util.List;
 
-public class OmegaSensor extends NamedComponent {
+public class OmegaSensor extends NamedComponent implements ITransformable{
 
     private boolean transformToLocal = false;
     private final SensorBlockEntity sp;

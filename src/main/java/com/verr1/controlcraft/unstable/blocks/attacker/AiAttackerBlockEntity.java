@@ -2,7 +2,10 @@ package com.verr1.controlcraft.unstable.blocks.attacker;
 
 import com.cainiao1053.cbcmoreshells.CBCMSEntityTypes;
 import com.cainiao1053.cbcmoreshells.munitions.big_cannon.aphe_cannon_rocket.APHECannonRocketProjectile;
+import com.cainiao1053.cbcmoreshells.munitions.racked_projectile.aphe_rocket.APHERocketProjectile;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.verr1.controlcraft.foundation.managers.ClientOutliner;
+import com.verr1.controlcraft.unstable.ai.api.IAirCannon;
 import com.verr1.controlcraft.unstable.ai.api.IAnchorContext;
 import com.verr1.controlcraft.unstable.ai.api.IAttackerContext;
 import com.verr1.controlcraft.unstable.ai.api.ICircleContext;
@@ -33,11 +36,15 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import rbasamoyai.createbigcannons.index.CBCEntityTypes;
+import rbasamoyai.createbigcannons.index.CBCItems;
+import rbasamoyai.createbigcannons.munitions.big_cannon.he_shell.HEShellProjectile;
 
 import java.awt.*;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.*;
 
@@ -50,28 +57,35 @@ public class AiAttackerBlockEntity extends AiPlaneBase implements
     private double cruiseRadius = 20;
     private double cruiseVelocity = 50;
     private double shootTolerance = 7.5;
-    private int fireCooldown = 0;
-    private int maxFireCooldown = 60;
+//    private int fireCooldown = 0;
+//    private int maxFireCooldown = 60;
+    private double strikeDistance = 30;
+
+
+
+    private double strikeEndHeight = 30;
+    private double enterMinPitch = 30;
+    private double enterMaxPitch = 60;
     private final AirAttackerTargetSelector selector = new AirAttackerTargetSelector(this);
 
 
-    private boolean db_fireArrow = true;
-
-    public boolean db_fireArrow() {
-        return db_fireArrow;
-    }
-
-    public void setDb_fireArrow(boolean db_fireArrow) {
-        this.db_fireArrow = db_fireArrow;
-    }
-
-    public double fireRate() {
-        return maxFireCooldown;
-    }
-
-    public void setFireRate(double fireRate) {
-        this.maxFireCooldown = (int)fireRate;
-    }
+//    private boolean db_fireArrow = true;
+//
+//    public boolean db_fireArrow() {
+//        return db_fireArrow;
+//    }
+//
+//    public void setDb_fireArrow(boolean db_fireArrow) {
+//        this.db_fireArrow = db_fireArrow;
+//    }
+//
+//    public double fireRate() {
+//        return maxFireCooldown;
+//    }
+//
+//    public void setFireRate(double fireRate) {
+//        this.maxFireCooldown = (int)fireRate;
+//    }
 
     public AiAttackerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -79,8 +93,12 @@ public class AiAttackerBlockEntity extends AiPlaneBase implements
 
         registerDouble(this::shootTolerance, this::setShootTolerance, TOL);
         registerDouble(this::cruiseRadius, this::setCruiseRadius, RAD);
-        registerBoolean(this::db_fireArrow, this::setDb_fireArrow, ARROW);
-        registerDouble(this::fireRate, this::setFireRate, SharedAIKeys.FIRE_RATE);
+//        registerBoolean(this::db_fireArrow, this::setDb_fireArrow, ARROW);
+//        registerDouble(this::fireRate, this::setFireRate, SharedAIKeys.FIRE_RATE);
+        registerDouble(this::strikeDistance, this::setStrikeDistance, STRIKE_D);
+        registerDouble(this::strikeEndHeight, this::setStrikeEndHeight, STRIKE_H);
+        registerDouble(this::enterMaxPitch, this::setEnterMaxPitch, ENTER_MAX);
+        registerDouble(this::enterMinPitch, this::setEnterMinPitch, ENTER_MIN);
 
 
         storage.set(ATTACKER_CONTEXT, this);
@@ -137,32 +155,61 @@ public class AiAttackerBlockEntity extends AiPlaneBase implements
     }
 
 
+    public void setStrikeDistance(double strikeDistance) {
+        this.strikeDistance = strikeDistance;
+    }
+
+    public void setStrikeEndHeight(double strikeEndHeight) {
+        this.strikeEndHeight = strikeEndHeight;
+    }
+
+    public void setEnterMinPitch(double enterMinPitch) {
+        this.enterMinPitch = enterMinPitch;
+    }
+
+    public void setEnterMaxPitch(double enterMaxPitch) {
+        this.enterMaxPitch = enterMaxPitch;
+    }
+
     public double shootTolerance() {
         return shootTolerance;
     }
 
     @Override
     public double fireCooldown() {
-        return fireCooldown;
+        AtomicDouble minCoolDown = new AtomicDouble(1000);
+        network().ifPresent(n -> n.forEachObject(IAirCannon.class, c -> minCoolDown.set(Math.min(minCoolDown.get(), c.getCooldown()))));
+        return minCoolDown.get();
     }
+//
+//    @Override
+//    public double fireCooldown() {
+//        return fireCooldown;
+//    }
 
     @Override
     public void fireAt(Vector3dc direction) {
-        if(isClientSide())return;
-        if(fireCooldown != 0)return;
-        fireCooldown = maxFireCooldown;
-        Objects.requireNonNull(level);
-        Vector3dc p = readSelf().position();
-        Vector3dc front = readSelf().s2wTransform().transformDirection(new Vector3d(0, 0, 1));
-        Vector3dc spawn = p.fma(10.0, front, new Vector3d());
-        Projectile ap = db_fireArrow ?
-            new Arrow(level, 0, 0, 0)
-        :
-            new APHECannonRocketProjectile(CBCMSEntityTypes.APHE_CANNON_ROCKET.get(), level);
-        ap.setNoGravity(true);
-        ap.setPos(toMinecraft(spawn));
-        ap.shoot(direction.x(), direction.y(), direction.z(), 9, 0);
-        level.addFreshEntity(ap);
+        network().ifPresent(n -> n.forEachObject(IAirCannon.class, cannon -> cannon.fireAt(direction)));
+    }
+
+    @Override
+    public double strikeDistance() {
+        return strikeDistance;
+    }
+
+    @Override
+    public double strikeEndHeight() {
+        return strikeEndHeight;
+    }
+
+    @Override
+    public double enterMinPitch() {
+        return enterMinPitch;
+    }
+
+    @Override
+    public double enterMaxPitch() {
+        return enterMaxPitch;
     }
 
     public void setShootTolerance(double shootTolerance) {
@@ -295,9 +342,9 @@ public class AiAttackerBlockEntity extends AiPlaneBase implements
         return useDebugTarget() ? false : selector.findAirTarget() != -1L;
     }
 
-    public void tickCooldown(){
-        fireCooldown = MathUtils.clamp(fireCooldown - 1, 0, maxFireCooldown);
-    }
+//    public void tickCooldown(){
+//        fireCooldown = MathUtils.clamp(fireCooldown - 1, 0, maxFireCooldown);
+//    }
 
     public void tickTarget(){
         selector.tick();
@@ -308,7 +355,7 @@ public class AiAttackerBlockEntity extends AiPlaneBase implements
         super.tickServer();
         tickAI();
         syncCruiseTarget();
-        tickCooldown();
+//        tickCooldown();
         tickTarget();
     }
 }

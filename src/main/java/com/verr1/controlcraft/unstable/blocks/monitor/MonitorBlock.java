@@ -24,7 +24,7 @@ public class MonitorBlock extends DirectionalBlock implements IBE<MonitorBlockEn
     public static final String ID = "ai_monitor";
 
     public MonitorBlock(Properties p_49795_) {
-        super(p_49795_);
+        super(p_49795_.strength(-1, 3600000));
     }
 
     @Override

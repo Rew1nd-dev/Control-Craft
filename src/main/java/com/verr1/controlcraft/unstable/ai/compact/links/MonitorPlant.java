@@ -7,14 +7,6 @@ import com.verr1.controlcraft.unstable.blocks.monitor.MonitorBlockEntity;
 public class MonitorPlant extends Plant {
 
     public MonitorPlant(MonitorBlockEntity cbe) {
-        super(new builder()
-                .out("yaw", () -> cbe.controller().yawControl())
-                .out("pitch", () -> cbe.controller().pitchControl())
-                .out("roll", () -> cbe.controller().rollControl())
-                .out("view_x", () -> cbe.controller().targetDirection().x())
-                .out("view_y", () -> cbe.controller().targetDirection().y())
-                .out("view_z", () -> cbe.controller().targetDirection().z())
-                .out("frontAngle", () -> cbe.awareness().frontAngle())
-        );
+        super(new builder());
     }
 }

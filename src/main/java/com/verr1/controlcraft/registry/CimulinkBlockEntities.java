@@ -1,12 +1,16 @@
 package com.verr1.controlcraft.registry;
 
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
+import com.verr1.controlcraft.content.links.bus.BusBlock;
+import com.verr1.controlcraft.content.links.bus.BusBlockEntity;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlockEntity;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlockEntity;
+import com.verr1.controlcraft.content.links.connector.EasyConnectorBlock;
+import com.verr1.controlcraft.content.links.connector.EasyConnectorBlockEntity;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
@@ -130,10 +134,21 @@ public class CimulinkBlockEntities {
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 
+    public static final BlockEntityEntry<BusBlockEntity> BUS_BLOCKENTITY = REGISTRATE
+            .blockEntity(BusBlock.ID, BusBlockEntity::new)
+            .validBlock(CimulinkBlocks.BUS)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
     public static final BlockEntityEntry<OscilloscopeBlockEntity> SCOPE_BLOCKENTITY = REGISTRATE
             .blockEntity(OscilloscopeBlock.ID, OscilloscopeBlockEntity::new)
             .validBlock(CimulinkBlocks.SCOPE)
             .renderer(() -> OscilloscopeBlockEntityRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<EasyConnectorBlockEntity> CONNECTOR_BLOCKENTITY = REGISTRATE
+            .blockEntity(EasyConnectorBlock.ID, EasyConnectorBlockEntity::new)
+            .validBlock(CimulinkBlocks.CONNECTOR)
             .register();
 
     public static void register(){}

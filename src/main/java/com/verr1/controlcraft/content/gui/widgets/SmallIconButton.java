@@ -13,10 +13,14 @@ public class SmallIconButton extends IconButton {
         super(x, y, icon.width(), icon.height(), icon);
     }
 
+    public SmallIconButton(SizedScreenElement icon) {
+        super(0, 0, icon.width(), icon.height(), icon);
+    }
+
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
-            this.icon.render(graphics, this.getX() + 1, this.getY() + 1);
+            this.icon.render(graphics, this.getX(), this.getY());
         }
     }
 

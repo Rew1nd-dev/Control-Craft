@@ -15,7 +15,7 @@ public class ControlCraftGuiLabels {
             .withStyle(GRAY);
 
     public static final Component targetLabel = Component
-            .translatable(ControlCraft.MODID + ".screen.labels.target");
+            .translatable(ControlCraft.MODID + ".screen.labels.deploy");
 
     public static final Component valueLabel = Component
             .translatable(ControlCraft.MODID + ".screen.labels.value");

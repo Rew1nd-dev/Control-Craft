@@ -392,6 +392,26 @@ public class CimulinkUIFactory {
                 .build();
     }
 
+    public static GenericSettingScreen createBusScreen(BlockPos boundPos){
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+        BusStatusUIPort bus = new BusStatusUIPort(boundPos);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(name, bus)
+                                .build()
+                )
+                .build();
+    }
+
     public static GenericSettingScreen createFlexibleGateScreen(BlockPos boundPos){
         StringUIField name = new StringUIField(
                 boundPos,
@@ -452,6 +472,22 @@ public class CimulinkUIFactory {
                 )
                 .build();
     }
+
+
+    public static GenericSettingScreen createEasyConnector(BlockPos boundPos){
+        ConnectionStatusUIPort p = new ConnectionStatusUIPort(boundPos);
+
+        return new GenericSettingScreen.builder(boundPos)
+                .withRenderedStack(CimulinkBlocks.LOGIC_GATE.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundPos)
+                                .withPort(p)
+                                .build()
+                )
+                .build();
+    }
+
 
     public static LabelProvider title(Descriptive<?> d){
         return convert(d, Converter::titleStyle);

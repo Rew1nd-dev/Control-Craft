@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.function.UnaryOperator;
 
 import static com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity.*;
+import static com.verr1.controlcraft.content.gui.factory.Converter.convert;
 import static com.verr1.controlcraft.content.gui.layouts.api.ISerializableSchedule.SCHEDULE;
 
 
@@ -124,6 +125,12 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.IS_SENSOR, Converter::titleStyle)
         );
 
+        StringUIField name = new StringUIField(
+                boundAnchorPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
         OptionUIField<CameraClipType> cast_ray = new OptionUIField<>(
                 boundAnchorPos,
                 CameraBlockEntity.RAY_TYPE,
@@ -165,7 +172,7 @@ public class GenericUIFactory {
 
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(is_sensor, cast_ray, ship_ray, entity_ray, stab);
+            Converter.alignLabel(name, is_sensor, cast_ray, ship_ray, entity_ray, stab);
             Converter.alignLabel(cast_ray.valueLabel(), ship_ray.valueLabel(), entity_ray.valueLabel());
         };
 
@@ -174,7 +181,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundAnchorPos)
-                                .withPort(is_sensor, cast_ray, ship_ray, entity_ray, stab)
+                                .withPort(name, is_sensor, cast_ray, ship_ray, entity_ray, stab)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
@@ -198,6 +205,11 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.DEGREE, Converter::viewStyle)
         );
 
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
         DoubleUIField angle = new DoubleUIField(
                 boundPos,
@@ -219,15 +231,19 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
 
-        Runnable alignLabels = () -> Converter.alignLabel(assemble, disassemble);
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(assemble, disassemble);
+            Converter.alignLabel(name, angle, angle_view);
+        };
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.WING_CONTROLLER_BLOCK.asStack())
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
+                                .withPort(name)
                                 .withPort(SharedKeys.PLACE_HOLDER, angle_view)
-                                .withPort(ANGLE, angle)
+                                .withPort(angle)
                                 .build()
                 )
                 .withTab(
@@ -251,6 +267,12 @@ public class GenericUIFactory {
                 boundPos,
                 CompactFlapBlockEntity.ANGLE,
                 Converter.convert(SlotType.DEGREE, Converter::viewStyle)
+        );
+
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
         );
 
 
@@ -299,7 +321,7 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(angle, offset);
+            Converter.alignLabel(name, angle, offset);
             Converter.alignLabel(lift, drag, bias);
             Converter.alignLabel(assemble, disassemble);
         };
@@ -309,6 +331,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
+                                .withPort(name)
                                 .withPort(SharedKeys.PLACE_HOLDER, angle_view)
                                 .withPort(angle, offset)
                                 .withPreDoLayout(alignLabels)
@@ -355,6 +378,7 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.THRUST, Converter::titleStyle)
         );
 
+
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.PROPELLER_BLOCK.asStack())
                 .withTab(
@@ -377,16 +401,22 @@ public class GenericUIFactory {
 
         var speed = new DoubleUIField(boundPos, SharedKeys.VALUE, Converter.convert(SlotType.SPEED, Converter::titleStyle));
 
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
-        Runnable alignLabels = () -> Converter.alignLabel(speed, speed_view);
+        Runnable alignLabels = () -> Converter.alignLabel(name, speed, speed_view);
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.PROPELLER_CONTROLLER.asStack())
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
+                                .withPort(name)
                                 .withPort(SharedKeys.PLACE_HOLDER, speed_view)
-                                .withPort(SharedKeys.VALUE, speed)
+                                .withPort(speed)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
@@ -401,6 +431,12 @@ public class GenericUIFactory {
 
     public static GenericSettingScreen createJetScreen(BlockPos boundPos){
 
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
         var thrust_view = new DoubleUIView(boundPos, JetBlockEntity.THRUST, Converter.convert(SlotType.THRUST, Converter::viewStyle));
 
         var horizontal_view = new DoubleUIView(boundPos, JetBlockEntity.HORIZONTAL_ANGLE, Converter.convert(SlotType.HORIZONTAL_TILT, Converter::viewStyle));
@@ -413,13 +449,14 @@ public class GenericUIFactory {
 
         var vertical = new DoubleUIField(boundPos, JetBlockEntity.VERTICAL_ANGLE, Converter.convert(SlotType.VERTICAL_TILT, Converter::titleStyle));
 
-        Runnable alignLabels = () -> Converter.alignLabel(thrust, horizontal, vertical, thrust_view, horizontal_view, vertical_view);
+        Runnable alignLabels = () -> Converter.alignLabel(name, thrust, horizontal, vertical, thrust_view, horizontal_view, vertical_view);
 
         return new GenericSettingScreen.builder(boundPos)
                 .withRenderedStack(ControlCraftBlocks.JET_BLOCK.asStack())
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
+                                .withPort(name)
                                 .withPort(SharedKeys.PLACE_HOLDER, thrust_view)
                                 .withPort(SharedKeys.PLACE_HOLDER_1, horizontal_view)
                                 .withPort(SharedKeys.PLACE_HOLDER_2, vertical_view)
@@ -448,6 +485,12 @@ public class GenericUIFactory {
                 SharedKeys.VALUE,
                 Converter.convert(UIContents.CURRENT, Converter::viewStyle)
         );  // , Math::toDegrees d -> MathUtils.clampDigit(d, 2)
+
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
         var lock_view = new BasicUIView<>(
                 boundPos,
@@ -532,7 +575,7 @@ public class GenericUIFactory {
 
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, lock_view, target_field);
+            Converter.alignLabel(name, current_view, lock_view, target_field);
             Converter.alignLabel(toggle_mode, toggle_cheat, toggle_lock_mode);
             Converter.alignLabel(toggle_mode.valueLabel(), toggle_cheat.valueLabel(), toggle_lock_mode.valueLabel());
             Converter.alignLabel(lock, unlock, asm, disasm);
@@ -543,7 +586,7 @@ public class GenericUIFactory {
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
                                 .withPort(
-                                        current_view, lock_view, target_field,
+                                        name, current_view, lock_view, target_field,
                                         toggle_mode, toggle_cheat, toggle_lock_mode
                                 )
                                 .withPreDoLayout(alignLabels)
@@ -584,6 +627,11 @@ public class GenericUIFactory {
 
         var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
 
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
         var compliance_field = new DoubleUIField(
                 boundPos,
@@ -632,7 +680,7 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, target_field);
+            Converter.alignLabel(name, current_view, target_field);
             Converter.alignLabel(compliance_field, toggle_mode);
             Converter.alignLabel(asm, disasm);
         };
@@ -641,7 +689,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(current_view, target_field, toggle_mode)
+                                .withPort(name, current_view, target_field, toggle_mode)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
@@ -678,6 +726,11 @@ public class GenericUIFactory {
 
         var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 25);
 
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
         var compliance_field = new DoubleUIField(
                 boundPos,
@@ -726,7 +779,7 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, target_field);
+            Converter.alignLabel(name, current_view, target_field);
             Converter.alignLabel(compliance_field, toggle_mode);
             Converter.alignLabel(asm, disasm);
         };
@@ -735,7 +788,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(current_view, target_field, toggle_mode)
+                                .withPort(name, current_view, target_field, toggle_mode)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )
@@ -772,6 +825,12 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.LOCKED, Converter::viewStyle),
                 Converter::lockViewComponent,
                 $ -> false
+        );
+
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
         );
 
         var target_field = new DoubleUIField(boundPos, SharedKeys.TARGET, Converter.convert(UIContents.TARGET, Converter::titleStyle), d -> MathUtils.clampDigit(d, 2), d -> d);
@@ -839,7 +898,7 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(current_view, lock_view, target_field);
+            Converter.alignLabel(name, current_view, lock_view, target_field);
             Converter.alignLabel(toggle_mode, toggle_cheat, toggle_lock_mode);
             Converter.alignLabel(toggle_mode.valueLabel(), toggle_cheat.valueLabel(), toggle_lock_mode.valueLabel());
             Converter.alignLabel(lock, unlock, asm, disasm);
@@ -849,6 +908,7 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
+                                .withPort(name)
                                 .withPort(SharedKeys.VALUE, current_view)
                                 .withPort(SharedKeys.IS_LOCKED, lock_view)
                                 .withPort(SharedKeys.TARGET, target_field)
@@ -990,7 +1050,13 @@ public class GenericUIFactory {
 
     public static GenericSettingScreen createKineticResistorScreen(BlockPos boundPos){
         var ratio = new DoubleUIField(boundPos, KineticResistorBlockEntity.RATIO, Converter.convert(SlotType.RATIO, Converter::titleStyle));
+        StringUIField name = new StringUIField(
+                boundPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
 
+        Runnable alignLabels = () -> Converter.alignLabel(name, ratio);
 
 
         return new GenericSettingScreen.builder(boundPos)
@@ -998,7 +1064,8 @@ public class GenericUIFactory {
                 .withTab(
                         GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(KineticResistorBlockEntity.RATIO, ratio)
+                                .withPort(name, ratio)
+                                .withPreDoLayout(alignLabels)
                                 .build()
                 )
                 .withTab(

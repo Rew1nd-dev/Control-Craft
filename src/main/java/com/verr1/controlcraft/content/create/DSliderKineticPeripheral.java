@@ -74,7 +74,7 @@ public class DSliderKineticPeripheral implements IKineticPeripheral {
                 double speed = toControlCraftLinear(context.current()); // Create Speed is in m/t
 
                 // This Executor ticks at physics thread, this task is named "p_velocity"
-                // and it will run every 1 tick (60 times per second) which is exactly a control task (adjusting speed) to meet target angle
+                // and it will run every 1 tick (60 times per second) which is exactly a control task (adjusting speed) to meet deploy angle
                 // if a new task is added, it will cancel the previous one, because the task in a map
                 // it will automatically be removed after 120 ticks (2 seconds)
 
