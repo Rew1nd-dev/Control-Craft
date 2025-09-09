@@ -50,7 +50,7 @@ public class CimulinkStandalone {
         // System.out.println(1 - Math.exp(-5 * 0.01667));
         // save(Missile.create(), Path.of(DataPath), "missile");
         // save(Missile.control().evaluate().buildContext(), Path.of(DataPath), "mControl");
-        save(Missile.createPredict(), Path.of(DataPath), "pGuide");
+        save(Missile.create(), Path.of(DataPath), "pGuide0");
         // AimPredict.testAim();
         // Missile.testYP();
     }

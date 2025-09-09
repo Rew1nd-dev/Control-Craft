@@ -136,7 +136,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     private double pitch = 0; // in degree
     private double yaw = 0;
 
-
+    private boolean isBeingUsed = false;
 
     private CameraViewType viewType = CameraViewType.ROT;
 
@@ -341,6 +341,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
 
+
     public void updateNeighbor(){
         if(level == null)return;
         if (!receivedSignalChanged)return;
@@ -412,6 +413,11 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void setPitchYaw(double pitch, double yaw){
         setPitch(pitch);
         setYaw(yaw);
+    }
+
+
+    public boolean isBeingUsed(){
+        return isBeingUsed;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -906,6 +912,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
+        isBeingUsed = ServerCameraManager.getUser(getWorldBlockPos()) != null;
         syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD, TR, THIRD_PERSON);
     }
 

@@ -133,7 +133,7 @@ public class DirectDeployerBlockEntity extends AbstractDeployerBlockEntity {
     }
 
     @Override
-    protected void onTickStart() {
+    protected void onTickEnd() {
         deployNextTick = false;
     }
 

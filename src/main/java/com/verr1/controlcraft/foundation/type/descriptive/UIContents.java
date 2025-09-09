@@ -164,7 +164,8 @@ public enum UIContents implements Descriptive<UIContents> {
     AI_SCHEME_NAME(Component.literal("Name"), literals("Schematic Name")),
     AI_SCHEME_NAMESPACE(Component.literal("Namespace"), literals("Schematic Namespace")),
     AI_SCHEME_NAMESPACE2(Component.literal("Space"), literals("Schematic Namespace")),
-    AI_EXPORT_SCHEME(Component.literal("Export"), literals("Export Schematic To ", ".minecraft/ai_schematics"))
+    AI_EXPORT_SCHEME(Component.literal("Export"), literals("Export Schematic To ", ".minecraft/ai_schematics")),
+    AI_DEPLOY_SCHEME(Component.literal("Deploy"), literals("Deploy Schematic Here")),
     ;
 
 

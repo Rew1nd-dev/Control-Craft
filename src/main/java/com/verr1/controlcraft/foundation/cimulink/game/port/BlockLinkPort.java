@@ -67,6 +67,7 @@ public abstract class BlockLinkPort {
                         }
                     });
 
+    // make it concurrent
     public static Optional<BlockLinkPort> get(@NotNull WorldBlockPos pos) {
         Optional<BlockLinkPort> cachedValue = CACHE.getIfPresent(pos);
         if (cachedValue != null) {
@@ -84,7 +85,7 @@ public abstract class BlockLinkPort {
         return Optional.empty();
     }
 
-    // make it concurrent
+
 
     public static final Serializer<Map<BlockPos, String>> POS_NAME_MAP =
             SerializeUtils.ofMap(SerializeUtils.BLOCK_POS, SerializeUtils.STRING);
@@ -105,16 +106,15 @@ public abstract class BlockLinkPort {
     private final Map<String, Set<BlockPort>>   forwardView  = Collections.unmodifiableMap(forwardLinks);
     private final Map<String, BlockPort>        backwardView = Collections.unmodifiableMap(backwardLinks);
 
-    private WorldBlockPos portPos;
+    private WorldBlockPos worldPosition;
 
     private NamedComponent realTimeComponent;
 
     private boolean initialized = false;
 
-    // private final BlockEntity owner;
 
     private static boolean onMainThread(){
-        return Thread.currentThread() == ControlCraftServer.INSTANCE.getRunningThread();
+        return ControlCraftServer.onMainThread();
     }
 
     public static Optional<CimulinkBlockEntity<?>> ofBlockEntity(WorldBlockPos pos){
@@ -154,21 +154,13 @@ public abstract class BlockLinkPort {
         }
     }
 
-    /*
-    protected BlockLinkPort(WorldBlockPos portPos, NamedComponent initial) {
-        this.portPos = portPos;
-        realTimeComponent = initial;
-        add(portPos);
-    }
-    * */
-
     protected BlockLinkPort(NamedComponent initial) {
         realTimeComponent = initial;
     }
 
     public void setWorldBlockPos(WorldBlockPos portPos){
-        if(this.portPos == null){
-            this.portPos = portPos;
+        if(this.worldPosition == null){
+            this.worldPosition = portPos;
             add(portPos);
         }else {
             return;
@@ -209,7 +201,7 @@ public abstract class BlockLinkPort {
                         portNames.forEach(n -> nextBlp.input(n, value));
 
                         // found output ports that need to propagate, should visit this current port
-                        // After temporal update their output, they got changedOutput() not empty() already
+                        // After temporal update their output, they got changedOutput() not empty already
                         // A temporal A0 may propagate its output to another temporal A1's input, although it won't cause
                         // immediate output change, but A1 still get non-empty changedOutput(), so propagation
                         // won't stop, which may cause watcher to mis judge a loop
@@ -635,11 +627,11 @@ public abstract class BlockLinkPort {
     }
 
     public @NotNull WorldBlockPos pos(){
-        if(portPos == null){
+        if(worldPosition == null){
             ControlCraft.LOGGER.warn("calling pos() before pos is set!");
             return WorldBlockPos.NULL;
         }
-        return portPos;
+        return worldPosition;
     }
 
     public void quit(){

@@ -56,7 +56,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
     }
 
     protected void tickDeploy(){
-        onTickStart();
+
         if(shouldDeploy()){
             var type = nextType();
             var pose = nextPose();
@@ -65,16 +65,18 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
             ServerShip serverShip = get(ship.id).orElse(null);
             if(ship.id == -1L || serverShip == null){
                 onDeployFailure(type);
-                return;
-            }
-            var network = pool().getNetworkOf(ship.id);
+            }else{
+                var network = pool().getNetworkOf(ship.id);
 
-            aliveShips.add(ship.id);
-            onDeploy(serverShip, network, type);
+                aliveShips.add(ship.id);
+                onDeploy(serverShip, network, type);
+            }
         }
+
+        onTickEnd();
     }
 
-    protected void onTickStart(){}
+    protected void onTickEnd(){}
 
     protected void removeNull(){
         aliveShips.removeIf(id -> pool().getShipOf(id).isEmpty());

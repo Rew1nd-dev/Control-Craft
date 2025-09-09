@@ -101,6 +101,8 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
 
     private void updateWidget(){
         if(allNames.isEmpty())return;
+        availNameView.setTextOnly(Component.literal("-").withStyle(Converter::optionStyle));
+        availPortView.setTextOnly(Component.literal("-").withStyle(Converter::optionStyle));
         availNames
             .forOptions(allNames.stream().map(Component::literal).toList())
             .withRange(0, allNames.size())

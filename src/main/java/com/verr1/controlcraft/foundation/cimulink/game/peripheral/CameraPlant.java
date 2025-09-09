@@ -54,6 +54,7 @@ public class CameraPlant extends MutablePlant{
                 .out("abs_view_x", self -> cbe.getAbsViewForward().x())
                 .out("abs_view_y", self -> cbe.getAbsViewForward().y())
                 .out("abs_view_z", self -> cbe.getAbsViewForward().z())
+                .out("used", self -> cbe.isBeingUsed() ? 1.0 : 0.0)
 
         );
         posToken = cbe.getBlockPos();

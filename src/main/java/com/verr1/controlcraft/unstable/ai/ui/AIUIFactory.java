@@ -342,20 +342,21 @@ public class AIUIFactory {
                 UIContents.AI_EXPORT_SCHEME.convertTo(Converter::titleStyle)
         );
 
-        Runnable alignLabels = () -> Converter.alignLabel(name, namespace);
+        UnitUIPanel repair = new UnitUIPanel(
+                pos,
+                SchematicBlockEntity.DEPLOY,
+                UIContents.AI_DEPLOY.convertTo(Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> Converter.alignLabel(name, namespace, panel, repair);
 
         return new GenericSettingScreen.builder(pos)
                 .withTab(
                         GenericUIFactory.GENERIC_SETTING_TAB,
                         new VerticalFlow.builder(pos)
                                 .withPort(namespace, name)
+                                .withPort(panel, repair)
                                 .withPreDoLayout(alignLabels)
-                                .build()
-                )
-                .withTab(
-                        GenericUIFactory.REMOTE_TAB,
-                        new VerticalFlow.builder(pos)
-                                .withPort(panel)
                                 .build()
                 )
                 .build();
@@ -390,7 +391,7 @@ public class AIUIFactory {
         DoubleUIField dis = new DoubleUIField(
                 pos,
                 SharedAIKeys.DISTANCE,
-                UIContents.AI_DEPLOY.convertTo(Converter::titleStyle)
+                UIContents.AI_DISTANCE.convertTo(Converter::titleStyle)
         );
 
         BooleanUIField arrow = new BooleanUIField(
@@ -424,7 +425,7 @@ public class AIUIFactory {
         StringUIField namespace = new StringUIField(
                 pos,
                 SchematicBlockEntity.NAMESPACE,
-                UIContents.AI_SCHEME_NAMESPACE2.convertTo(Converter::titleStyle)
+                UIContents.AI_SCHEME_NAMESPACE.convertTo(Converter::titleStyle)
         );
 
         Vector3dUIField offset_pos = new Vector3dUIField(
@@ -461,7 +462,8 @@ public class AIUIFactory {
 
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(name, namespace, offset_pos, offset_rot, tran, inherit, panel);
+            Converter.alignLabel(name, namespace);
+            Converter.alignLabel(offset_pos, offset_rot, tran, inherit, panel);
         };
 
         return new GenericSettingScreen.builder(pos)

@@ -5,6 +5,8 @@ import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.KinematicPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;

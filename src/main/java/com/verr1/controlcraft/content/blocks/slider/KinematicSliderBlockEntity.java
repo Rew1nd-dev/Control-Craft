@@ -6,6 +6,9 @@ import com.verr1.controlcraft.content.create.KSliderKineticPeripheral;
 import com.verr1.controlcraft.content.gui.layouts.api.IKinematicUIDevice;
 import com.verr1.controlcraft.foundation.api.IKineticPeripheral;
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.KinematicPlant;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
@@ -39,7 +42,7 @@ import java.util.List;
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
 
 public class KinematicSliderBlockEntity extends AbstractSlider implements
-        IReceiver, IPacketHandler, IKinematicUIDevice, IKineticDevice
+        IReceiver, IPacketHandler, IKinematicUIDevice, IKineticDevice, IPlant
 {
 
     protected KinematicController controller = new KinematicController();
@@ -55,6 +58,8 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
     protected double lerpSpeed = 5;
 
     private final KSliderKineticPeripheral kineticPeripheral = new KSliderKineticPeripheral(this);
+
+    private KinematicPlant plant = new KinematicPlant(KinematicPlant.KinematicDevice.of(this));
 
     @Override
     public DirectReceiver receiver() {
@@ -249,4 +254,8 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
     }
 
 
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
+    }
 }

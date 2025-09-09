@@ -257,11 +257,12 @@ public class CruiseController implements IAirController {
     }
 
     public double speedGain(){
-        return actualVelocity.length() / velocity; //1; //1; //
+        double oneOrdinal = actualVelocity.length() / velocity;
+        return oneOrdinal * oneOrdinal;
     }
 
     public double inducedResistance(){
-        return turnResistance * currentTurnRate();
+        return turnResistance * currentTurnRate() * speedGain();
     }
 
     public void overridePhysics(Vector3dc actualVelocity, Quaterniondc actualQuaternion){

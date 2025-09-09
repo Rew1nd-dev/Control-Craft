@@ -57,12 +57,17 @@ public class Missile {
         eval.defineSubmodule("aim", AimPredict.aim());
 
         Vector3Val p_wc = eval.newVector3("dx", "dy", "dz");
+
         QuaternionVal q = eval.newQuaternion("qx", "qy", "qz", "qw");
         Val ts = eval.newVal("ts_rev"); // 1 / ts
         Val bv = eval.newVal("bv"); // flying speed
-        Vector3Val p_sc_prev = eval.newVector3("pdx", "pdy", "pdz"); // previous view
+
+        Vector3Val p_wc_prev = eval.newVector3("pdx", "pdy", "pdz"); // previous view
+
         Vector3Val p_sc = q.conj().transform(p_wc);
-        Vector3Val dv = p_sc.sub(p_sc_prev).scale(ts);
+        Vector3Val dv_wc = p_wc.sub(p_wc_prev).scale(ts);
+
+        Vector3Val dv = q.conj().transform(dv_wc);
 
         Map<String, Val> aim_out = eval.invoke("aim", Map.of(
                 "ptx", p_sc.x(),
@@ -85,9 +90,9 @@ public class Missile {
         Val yaw = eval.atan(aim.x(), aim.z());
         Val pitch = eval.asin(aim.y());
 
-        eval.asOut("cdx", p_sc.x())
-            .asOut("cdy", p_sc.y())
-            .asOut("cdz", p_sc.z());
+        eval.asOut("cdx", p_wc.x().mul(1))
+            .asOut("cdy", p_wc.y().mul(1))
+            .asOut("cdz", p_wc.z().mul(1));
 
         eval.asLoop("cdx", "pdx").asLoop("cdy", "pdy").asLoop("cdz", "pdz");
 
@@ -133,11 +138,9 @@ public class Missile {
 
         Val yaw = eval.newVal("yaw");
         Val pitch = eval.newVal("pitch");
-        // Val roll = eval.newVal("roll");
 
         Val g_yaw = eval.newVal("g_yaw");
         Val g_pitch = eval.newVal("g_pitch");
-        // Val g_roll = eval.newVal("g_roll");
 
         Val g_com = eval.newVal("g_com");
 
@@ -158,7 +161,6 @@ public class Missile {
 
         Val gained_pitch = eval.clamp(pitch.mul(g_pitch), nOne, one);
         Val gained_yaw = eval.clamp(yaw.mul(g_yaw), nOne, one);
-        // Val gained_roll = eval.clamp(roll, nOne, one).mul(g_roll);
 
         Val left = gained_pitch.mul(g_left);
         Val right = gained_pitch.mul(g_right);
@@ -193,7 +195,7 @@ public class Missile {
         Val dv = (vel.mul(g_vel).sub(vel_feed.mul(g_vel_feed)));
 
         Val d_vel = eval.clamp(dv, maxDv.neg(), maxDv).mul(p_vel);
-
+        Val g_com = eval.newVal("g_com");
 
         Vector3Val v_wc = eval.newVector3("dx", "dy", "dz").normalize();
         QuaternionVal q = eval.newQuaternion("qx", "qy", "qz", "qw");
@@ -238,7 +240,8 @@ public class Missile {
                 "g_up", g_up,
                 "g_up_b", g_up_b,
                 "g_down", g_down,
-                "g_down_b", g_down_b
+                "g_down_b", g_down_b,
+                "g_com", g_com
         ));
 
         Map<String, Val> ctrl_out = eval.invoke("ctrl", args);
@@ -270,7 +273,6 @@ public class Missile {
         Val g_vel = eval.newVal("g__vel");
 
         Val ts = eval.newVal("ts_rev"); // 1 / ts
-        Val bv = vel.mul(g_vel); // flying speed
 
         Val g_vel_feed = eval.newVal("g__vel_f");
         Val p_vel = eval.newVal("p_vel");
@@ -291,7 +293,7 @@ public class Missile {
                 "qz", q.z(),
                 "qw", q.w(),
                 "ts_rev", ts,
-                "bv", bv
+                "bv", vel_feed
         ));
 
         Val g_yaw = eval.newVal("g__yaw");

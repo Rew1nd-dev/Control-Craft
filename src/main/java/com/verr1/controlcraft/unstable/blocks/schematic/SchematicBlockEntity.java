@@ -5,9 +5,12 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.blocks.AIBaseBlockEntity;
+import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
+import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
 import com.verr1.controlcraft.unstable.management.AIPool;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.valkyrienskies.core.api.ships.ServerShip;
@@ -15,6 +18,7 @@ import org.valkyrienskies.core.api.ships.ServerShip;
 public class SchematicBlockEntity extends AIBaseBlockEntity {
 
     public static final NetworkKey EXPORT_SCHEMATIC = NetworkKey.create("export_schematic");
+    public static final NetworkKey DEPLOY = NetworkKey.create("deploy");
     public static final NetworkKey NAMESPACE = NetworkKey.create("namespace");
     public static final NetworkKey NAME = NetworkKey.create("name");
 
@@ -38,7 +42,7 @@ public class SchematicBlockEntity extends AIBaseBlockEntity {
 
 
         panel().registerUnit(EXPORT_SCHEMATIC, this::createSchematic);
-
+        panel().registerUnit(DEPLOY, this::repair);
 
     }
 
@@ -59,11 +63,25 @@ public class SchematicBlockEntity extends AIBaseBlockEntity {
         this.namespace = namespace;
     }
 
+    public SchematicKey key(){
+        return new SchematicKey(namespace(), name());
+    }
+
     private void createSchematic(){
         if(!isOnShip())return;
         ServerShip ship = getLoadedServerShip();
         if(ship == null)return;
         AIServer.SCHEMATICS_MANAGER.createSchematicsAsync(getWorldBlockPos(), ship, namespace(), name());
+    }
+
+    public void repair(){
+        if(!isOnShip())return;
+        ServerShip ship = getLoadedServerShip();
+        if(ship == null)return;
+        if(!(level instanceof ServerLevel serverLevel))return;
+        AISchematic schematic = AIServer.SCHEMATICS_MANAGER.getLoaded(key());
+        if(schematic == null)return;
+        schematic.repairAt(getBlockPos(), serverLevel);
     }
 
 }

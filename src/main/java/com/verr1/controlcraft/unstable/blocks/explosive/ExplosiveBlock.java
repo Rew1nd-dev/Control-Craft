@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.unstable.blocks.explosive;
 
 import com.simibubi.create.foundation.gui.ScreenOpener;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.api.common.ISignalHandler;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.unstable.AIServer;
@@ -51,7 +52,7 @@ public class ExplosiveBlock extends DirectionalBlock implements ISignalHandler{
 
     @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p){
-        ScreenOpener.open(AIUIFactory.createAutoCannonScreen(p));
+        // ScreenOpener.open(AIUIFactory.createAutoCannonScreen(p));
     }
 
 
@@ -89,37 +90,26 @@ public class ExplosiveBlock extends DirectionalBlock implements ISignalHandler{
 
     public static void detonate(Level level, BlockPos pos){
         Vector3dc actual = VSGetterUtils.getAbsolutePosition(WorldBlockPos.of(level, pos));
-        ShellExplosion shell = new ShellExplosion(
+        ShellExplosion impact = new ShellExplosion(
                 level,
                 null,
                 null,
                 actual.x(), actual.y(), actual.z(),
-                12,
+                16,
                 false,
                 Level.ExplosionInteraction.BLOCK
         );
-        ImpactExplosion impact = new ImpactExplosion(
-                level,
-                null,
-                null,
-                actual.x(), actual.y(), actual.z(),
-                12,
-                Level.ExplosionInteraction.NONE
-        );
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
         CreateBigCannons.handleCustomExplosion(level, impact);
-        CreateBigCannons.handleCustomExplosion(level, shell);
     }
 
 
     @Override
     public void accept(Level level, BlockState state, BlockPos pos, Direction direction, int strength) {
         if(level.isClientSide)return;
-        WorldBlockPos wbp = WorldBlockPos.of(level, pos);
         var s = VSGetterUtils.getShip(level, pos).orElse(null);
         long id = s == null ? -1 : s.getId();
         boolean doNot = AIServer.MANAGER.isInPool(id);
-
         if(!doNot && strength > 0)detonate(level, pos);
     }
 }

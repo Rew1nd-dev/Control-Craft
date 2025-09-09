@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.content.gui.wand.mode;
 
+import com.verr1.controlcraft.content.blocks.slider.AbstractSlider;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
+import com.verr1.controlcraft.content.blocks.slider.KinematicSliderBlockEntity;
 import com.verr1.controlcraft.content.gui.wand.mode.base.WandAbstractTripleSelectionMode;
 import com.verr1.controlcraft.foundation.api.operatable.IBruteConnectable;
 import com.verr1.controlcraft.foundation.api.IWandMode;
@@ -42,7 +44,7 @@ public class WandSliderAssembleMode extends WandAbstractTripleSelectionMode {
     public void onSelection(WandSelection selection) {
         if(state == State.TO_SELECT_X){
             BlockEntity be = Minecraft.getInstance().player.level().getExistingBlockEntity(selection.pos());
-            if(!(be instanceof DynamicSliderBlockEntity))return;
+            if(!(be instanceof AbstractSlider))return;
         }
         if(state == State.TO_SELECT_Y){
             if(selection.pos().equals(x.pos()))return;
@@ -96,7 +98,7 @@ public class WandSliderAssembleMode extends WandAbstractTripleSelectionMode {
         if (player == null) return;
         if(x == WandSelection.NULL)return;
         BlockEntity be = Minecraft.getInstance().player.level().getExistingBlockEntity(x.pos());
-        if(!(be instanceof DynamicSliderBlockEntity joint))return;
+        if(!(be instanceof AbstractSlider joint))return;
 
         Direction align = joint.getAlign();
         Direction forward = joint.getForward();

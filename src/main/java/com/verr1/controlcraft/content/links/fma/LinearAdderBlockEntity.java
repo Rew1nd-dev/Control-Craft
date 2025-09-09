@@ -68,6 +68,7 @@ public class LinearAdderBlockEntity extends CimulinkBlockEntity<FMALinkPort> {
     }
 
     public void setCoefficients(Coefficients coeffs){
+        if(coeffs.content().isEmpty() || coeffs.content().size() > 6)return;
         linkPort().setNamedCoefficients(coeffs.content().stream().map(StringDouble::mapToPair).toList());
     }
 

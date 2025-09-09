@@ -3,6 +3,9 @@ package com.verr1.controlcraft.ponder;
 import com.simibubi.create.AllBlocks;
 import com.verr1.controlcraft.registry.CimulinkBlocks;
 import com.verr1.controlcraft.registry.ControlCraftItems;
+import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.shared.ModRegistry;
+import dan200.computercraft.shared.computer.blocks.ComputerBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -30,6 +33,9 @@ public class Constants {
     public static final BlockState DC = CimulinkBlocks.DC.getDefaultState().setValue(FACING, Direction.UP);
     public static final BlockState FUNCTION = CimulinkBlocks.FUNCTIONS.getDefaultState().setValue(FACING, Direction.UP);
     public static final BlockState IMU = CimulinkBlocks.SENSOR.getDefaultState().setValue(FACING, Direction.UP);
+
+    public static final BlockState CC_BRIDGE = CimulinkBlocks.CC_BRIDGE.getDefaultState().setValue(FACING, Direction.UP);
+
     public static final BlockState SCOPE = CimulinkBlocks.SCOPE.getDefaultState().setValue(FACING, Direction.UP);
 
     public static final BlockState LEVER = Blocks.LEVER.defaultBlockState().setValue(FaceAttachedHorizontalDirectionalBlock.FACE, AttachFace.FLOOR);
@@ -39,8 +45,11 @@ public class Constants {
     public static final BlockState NIXIE = AllBlocks.NIXIE_TUBES.get(DyeColor.RED).getDefaultState()
             .setValue(HorizontalDirectionalBlock.FACING, Direction.WEST);
 
+    public static final BlockState COMPUTER = ModRegistry.Blocks.COMPUTER_ADVANCED.get().defaultBlockState();
 
 
     public static final ItemStack AWE = ControlCraftItems.ALL_IN_WAND.asStack();
     public static final ItemStack COMPILER = ControlCraftItems.CIRCUIT_COMPILER.asStack();
+
+
 }

@@ -8,6 +8,9 @@ import com.verr1.controlcraft.content.valkyrienskies.transform.LerpedTransformPr
 import com.verr1.controlcraft.content.gui.layouts.api.IKinematicUIDevice;
 import com.verr1.controlcraft.foundation.api.IKineticPeripheral;
 import com.verr1.controlcraft.foundation.api.delegate.IKineticDevice;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.KinematicPlant;
 import com.verr1.controlcraft.foundation.data.GroundBodyShip;
 import com.verr1.controlcraft.foundation.data.NumericField;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -46,7 +49,7 @@ import java.util.Optional;
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
 
 public abstract class AbstractKinematicMotor extends AbstractMotor implements
-        IReceiver, IPacketHandler, IKinematicUIDevice, IKineticDevice
+        IReceiver, IPacketHandler, IKinematicUIDevice, IKineticDevice, IPlant
 {
     protected KinematicController controller = new KinematicController();
 
@@ -63,6 +66,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     private KinematicMotorPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
     private final KMotorKineticPeripheral kineticPeripheral = new KMotorKineticPeripheral(this);
+    private KinematicPlant plant = new KinematicPlant(KinematicPlant.KinematicDevice.of(this));
 
     @Override
     public IKineticPeripheral peripheral() {
@@ -87,6 +91,10 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         return super.getCapability(cap, side);
     }
 
+    @Override
+    public @NotNull NamedComponent plant() {
+        return plant;
+    }
 
     public void setCompliance(double compliance) {
         this.compliance = compliance;

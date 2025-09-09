@@ -15,8 +15,6 @@ public class JsonMergerGson {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static void main(String[] args) {
-
-
         String inputDirPath = System.getProperty("user.dir") + "\\src\\main\\resources\\assets\\vscontrolcraft\\lang\\ponder\\en_us";;
         String outputFilePath = System.getProperty("user.dir") + "\\src\\main\\resources\\assets\\vscontrolcraft\\lang\\ponder\\all.json";;
 
