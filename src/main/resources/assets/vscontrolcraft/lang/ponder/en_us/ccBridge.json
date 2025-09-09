@@ -1,0 +1,10 @@
+{
+  "vscontrolcraft.ponder.ccBridge.text.0": "ComputerCraft is a mod adds programmable computers",
+  "vscontrolcraft.ponder.ccBridge.text.1": "CC-Bridge block can connect Cimulink circuits to ComputerCraft computers",
+  "vscontrolcraft.ponder.ccBridge.text.2": "It can read and write values to/from circuits",
+  "vscontrolcraft.ponder.ccBridge.text.3": "You can use Lua language to program the computer",
+  "vscontrolcraft.ponder.ccBridge.text.4": "Find CC Bridge peripheral by calling: peripheral.find(\"cc_link_bridge\")",
+  "vscontrolcraft.ponder.ccBridge.text.5": "Call setInput(index, value) to set input values",
+  "vscontrolcraft.ponder.ccBridge.text.6": "Call getOutput(index) to get output values",
+  "vscontrolcraft.ponder.ccBridge.text.7": "Index can not be greater than 7 or lower than 0"
+}
