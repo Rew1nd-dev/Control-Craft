@@ -4,13 +4,17 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.mixinducks.ICameraDuck;
+import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 import org.spongepowered.asm.mixin.Final;
@@ -22,6 +26,7 @@ import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 
 import java.lang.Math;
+import java.util.Objects;
 import java.util.Optional;
 
 @Mixin(value = GameRenderer.class)
@@ -54,21 +59,23 @@ abstract class MixinGameRenderer {
             prepareCullFrustum.call(instance, matrixStack, vec3, matrix4f);
             return;
         }
+        // Player player = Objects.requireNonNull(this.minecraft.player);
 
+        // player.sendSystemMessage(Component.literal("stage_1"));
         final CameraBlockEntity linkedCamera = ClientCameraManager.getLinkedCamera();
         if (linkedCamera == null) {
             prepareCullFrustum.call(instance, matrixStack, vec3, matrix4f);
             return;
         }
-
+        // player.sendSystemMessage(Component.literal("stage_2"));
         ClientShip cameraClientShip = linkedCamera.getClientShip();
         Vector3dc cameraPosOnShip = linkedCamera.getCameraPositionShip();
-
+        // player.sendSystemMessage(Component.literal("stage_3"));
         if(this.minecraft.player == null) {
             prepareCullFrustum.call(instance, matrixStack, vec3, matrix4f);
             return;
         }
-
+        // player.sendSystemMessage(Component.literal("stage_4"));
         boolean transformRotation = linkedCamera.transformRotation();
         boolean third = linkedCamera.thirdPerson();
 
@@ -82,7 +89,7 @@ abstract class MixinGameRenderer {
                 cameraPosOnShip,
                 transformRotation
         );
-
+        // player.sendSystemMessage(Component.literal("stage_5"));
         // Apply the ship render transform to [matrixStack]
         ShipTransform renderTransform = Optional.ofNullable(cameraClientShip).map(ClientShip::getRenderTransform).orElse(
                 new ShipTransformImpl(
@@ -92,7 +99,7 @@ abstract class MixinGameRenderer {
                         new Vector3d(1, 1, 1)
                 )
         );
-
+        // player.sendSystemMessage(Component.literal("stage_6"));
 
 
         final Quaternionf invShipRenderRotation = new Quaternionf(

@@ -2,7 +2,10 @@ package com.verr1.controlcraft.mixin.camera;
 
 import com.verr1.controlcraft.mixinducks.ICameraDuck;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -23,6 +26,7 @@ import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 
 import java.lang.Math;
 import java.math.BigInteger;
+import java.util.Objects;
 import java.util.Optional;
 
 @Mixin(Camera.class)
@@ -82,8 +86,8 @@ public abstract class MixinCamera implements ICameraDuck {
             @NotNull Vector3dc inShipPlayerPosition,
             boolean transformRotation
     ) {
-
-
+        //        Player player = Objects.requireNonNull(Minecraft.getInstance().player);
+        // player.sendSystemMessage(Component.literal(thirdPerson + ", " + transformRotation + ", " + thirdPersonReverse + ", " + shipMountedTo + ", " + inShipPlayerPosition));
         ShipTransform renderTransform = Optional
                 .ofNullable(shipMountedTo)
                 .map(ClientShip::getRenderTransform)

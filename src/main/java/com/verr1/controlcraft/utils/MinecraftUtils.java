@@ -206,12 +206,14 @@ public class MinecraftUtils {
 
     public static void broadcastMessage(Component message){
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if(server == null){
+            return;
+        };
         server.getPlayerList().getPlayers().forEach(p -> p.sendSystemMessage(message));
     }
 
     public static void broadcastMessage(String message){
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        server.getPlayerList().getPlayers().forEach(p -> p.sendSystemMessage(Component.literal(message)));
+        broadcastMessage(Component.literal(message));
     }
 
 }

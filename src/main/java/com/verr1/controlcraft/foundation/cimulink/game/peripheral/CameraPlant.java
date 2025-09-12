@@ -47,10 +47,10 @@ public class CameraPlant extends MutablePlant{
                 .out("latest_vy", self -> cast(self).cachedVelocity().y())
                 .out("latest_vz", self -> cast(self).cachedVelocity().z())
 
-                .out("yaw", self -> cbe.getYaw())
-                .out("pitch", self -> cbe.getPitch())
-                .out("abs_yaw", self -> cbe.getTransformedYaw())
-                .out("abs_pitch", self -> cbe.getTransformedPitch())
+                .out("yaw", self -> cbe.getTransformedYaw()) // Transformed Yaw Means Camera View Yaw In Local Coordinate
+                .out("pitch", self -> cbe.getTransformedPitch())
+                .out("abs_yaw", self -> cbe.getYaw())
+                .out("abs_pitch", self -> cbe.getPitch())
                 .out("abs_view_x", self -> cbe.getAbsViewForward().x())
                 .out("abs_view_y", self -> cbe.getAbsViewForward().y())
                 .out("abs_view_z", self -> cbe.getAbsViewForward().z())
