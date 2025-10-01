@@ -100,9 +100,10 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
     }
 
     private void updateWidget(){
-        if(allNames.isEmpty())return;
         availNameView.setTextOnly(Component.literal("-").withStyle(Converter::optionStyle));
         availPortView.setTextOnly(Component.literal("-").withStyle(Converter::optionStyle));
+        usedNamePortView.setTextOnly(Component.literal("----").withStyle(Converter::optionStyle));
+        if(allNames.isEmpty())return;
         availNames
             .forOptions(allNames.stream().map(Component::literal).toList())
             .withRange(0, allNames.size())
@@ -144,7 +145,7 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
 
     private void updateUsed(){
         List<String> allUsed = allUsedName();
-
+        usedNamePortView.setTextOnly(Component.literal("----").withStyle(Converter::optionStyle));
         usedNamePort
                 .forOptions(allUsed.stream().map(Component::literal).toList())
                 .withRange(0, allUsed.size())

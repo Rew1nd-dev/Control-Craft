@@ -91,4 +91,9 @@ public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
 
     }
 
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
+
 }

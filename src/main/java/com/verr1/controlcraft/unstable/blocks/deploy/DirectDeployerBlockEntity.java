@@ -1,11 +1,9 @@
 package com.verr1.controlcraft.unstable.blocks.deploy;
 
-import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.control.ImmutablePhysPose;
 import com.verr1.controlcraft.foundation.data.control.ImmutableVel;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
 import com.verr1.controlcraft.unstable.valkyrienskies.attachments.AIBlockNetwork;
@@ -20,8 +18,6 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
-
-import java.util.Optional;
 
 import static com.verr1.controlcraft.unstable.blocks.schematic.SchematicBlockEntity.*;
 
@@ -171,7 +167,7 @@ public class DirectDeployerBlockEntity extends AbstractDeployerBlockEntity {
     }
 
     @Override
-    protected void onDiscard(@NotNull ServerShip ship, @Nullable AIBlockNetwork network, @NotNull SchematicKey type) {
+    protected void onDiscard(@NotNull ServerShip ship, @Nullable AIBlockNetwork network) {
 
     }
 }

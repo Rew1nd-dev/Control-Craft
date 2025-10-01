@@ -303,7 +303,7 @@ public class AIUIFactory {
         DoubleUIField ratio = new DoubleUIField(
                 pos,
                 SharedAIKeys.RATIO,
-                UIContents.AI_FIRE_RATE.convertTo(Converter::titleStyle)
+                UIContents.AI_DEATH_RATIO.convertTo(Converter::titleStyle)
         );
 
         BooleanUIField dead = new BooleanUIField(

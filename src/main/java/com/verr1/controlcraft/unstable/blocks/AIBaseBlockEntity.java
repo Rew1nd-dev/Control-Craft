@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -27,7 +28,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 public class AIBaseBlockEntity extends OnShipBlockEntity implements
         IAIListener
 {
-
+    protected double cachedMass = 1;
 
     public AIBaseBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -48,6 +49,23 @@ public class AIBaseBlockEntity extends OnShipBlockEntity implements
                 .register();
     }
 
+    public double currentMass(){
+        ServerShip ship = getLoadedServerShip();
+        if(ship == null)return 0;
+        return ship.getInertiaData().getMass();
+    }
+
+    public double originalMass(){
+//        long id = getShipOrGroundID();
+//        return AIServer.MANAGER
+//                .getDataOf(id)
+//                .map(d -> d.storageSchematic)
+//                .map(AIServer.SCHEMATICS_MANAGER::getLoaded)
+//                .map(AISchematic::mass)
+//                .orElse(-1.0);
+        return cachedMass;
+    }
+
     public Optional<AIBlockNetwork> network(){
         return Optional.ofNullable(getLoadedServerShip()).map(s -> s.getAttachment(AIBlockNetwork.class));
     }
@@ -66,6 +84,11 @@ public class AIBaseBlockEntity extends OnShipBlockEntity implements
 
     public Vector3d getSelfPositionWorld(){
         return readSelf().s2wTransform().transformPosition(getSelfPositionShip());
+    }
+
+    @Override
+    public void onSpawn() {
+        cachedMass = currentMass();
     }
 
     @Override

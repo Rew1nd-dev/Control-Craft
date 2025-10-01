@@ -130,6 +130,24 @@ public class Functions {
         }
     };
 
+    public static final Supplier<FunctionN> LOGARITHMIC = () -> new FunctionN(2) {
+        @Override
+        protected List<Double> transform(List<Double> inputs) {
+            double base = inputs.get(0);
+            double target = inputs.get(1);
+
+            return List.of(MathUtils.safeDiv(
+                    Math.log(Math.abs(target)),
+                    Math.log(Math.abs(base)))
+            );
+        }
+
+        @Override
+        public Factory<? extends NamedComponent> factory() {
+            return CimulinkFactory.LOGARITHM;
+        }
+    };
+
     public static final Supplier<FunctionN> ABS = () -> new FunctionN(1) {
         @Override
         protected List<Double> transform(List<Double> inputs) {

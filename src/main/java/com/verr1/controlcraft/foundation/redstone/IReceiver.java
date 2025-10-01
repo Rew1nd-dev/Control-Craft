@@ -8,7 +8,7 @@ public interface IReceiver {
 
     DirectReceiver receiver();
 
-    String name();
+    String receiverName();
 
 
 }

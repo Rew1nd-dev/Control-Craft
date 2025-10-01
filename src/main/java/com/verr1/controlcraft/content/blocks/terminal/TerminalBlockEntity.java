@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.simibubi.create.Create.REDSTONE_LINK_NETWORK_HANDLER;
-import static com.verr1.controlcraft.ControlCraftServer.DECIMAL_LINK_NETWORK_HANDLER;
 import static java.lang.Math.min;
 
 public class TerminalBlockEntity extends OnShipBlockEntity implements
@@ -121,7 +120,7 @@ public class TerminalBlockEntity extends OnShipBlockEntity implements
 
         return BlockEntityGetter
                 .getLevelBlockEntityAt(level, getBlockPos().relative(getDirection().getOpposite()), IReceiver.class)
-                .map(IReceiver::name).orElse("Not Attached");
+                .map(IReceiver::receiverName).orElse("Not Attached");
     }
 
     public void deviceChanged(){

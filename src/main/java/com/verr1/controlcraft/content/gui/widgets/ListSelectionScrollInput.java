@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class ListSelectionScrollInput<T> extends IconSelectionScrollInput{
@@ -36,6 +37,12 @@ public class ListSelectionScrollInput<T> extends IconSelectionScrollInput{
         int state = getState();
         if(state < 0 || state >= options.size())throw new IndexOutOfBoundsException("State "+state+" is out of bounds for options of size "+options.size());
         return options.get(state);
+    }
+
+    public @NotNull Optional<T> currentOptionOpt(){
+        int state = getState();
+        if(state < 0 || state >= options.size())return Optional.empty();
+        return Optional.of(options.get(state));
     }
 
 }

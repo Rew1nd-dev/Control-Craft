@@ -61,6 +61,7 @@ public class MonitorBlockEntity extends AIBaseBlockEntity
     private boolean isDead = false;
     private double ratio = 0.9;
 
+
     public MonitorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         registerDouble(this::ratio, this::setRatio, SharedAIKeys.RATIO);
@@ -89,21 +90,9 @@ public class MonitorBlockEntity extends AIBaseBlockEntity
         this.isDead = isDead;
     }
 
-    public double originalMass(){
-        long id = getShipOrGroundID();
-        return AIServer.MANAGER
-                .getDataOf(id)
-                .map(d -> d.key)
-                .map(AIServer.SCHEMATICS_MANAGER::getLoaded)
-                .map(AISchematic::mass)
-                .orElse(-1.0);
-    }
 
-    public double currentMass(){
-        ServerShip ship = getLoadedServerShip();
-        if(ship == null)return 0;
-        return ship.getInertiaData().getMass();
-    }
+
+
 
     public void tickHealth(){
         if(isDead)return;
@@ -135,9 +124,9 @@ public class MonitorBlockEntity extends AIBaseBlockEntity
         // ControlCraft.LOGGER.info("{} discarded with {}, {}", getShipOrGroundID(), readSelf().mass(), originalMass());
     }
 
-
     @Override
     public void onSpawn() {
+        super.onSpawn();
         isDead = false;
         MinecraftUtils.broadcastMessage("monitor spawned");
         setChanged();

@@ -58,7 +58,7 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
     }
 
     public void setBlockConnectContext(BlockPos blockConnectContext) {
-        ControlCraft.LOGGER.info("setBlockConnectContext: " + blockConnectContext);
+        // ControlCraft.LOGGER.debug("setBlockConnectContext: " + blockConnectContext);
         this.blockConnectContext = blockConnectContext;
     }
 
@@ -122,7 +122,7 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
 
     public void setCompanionShipDirection(@NotNull Direction direction){
         this.companionShipDirection = direction;
-        if(level != null && level.isClientSide)return;
+        if(isClientSide())return;
         handler().syncForAllPlayers(true, COMPANION_DIRECTION);
     }
 

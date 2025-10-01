@@ -43,4 +43,9 @@ public class DynamicSliderRenderer extends SafeBlockEntityRenderer<DynamicSlider
                 .light(light)
                 .renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

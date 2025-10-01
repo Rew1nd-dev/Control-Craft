@@ -85,4 +85,9 @@ public class OscilloscopeBlockEntityRenderer extends CimulinkSocketRenderer<Osci
         }
     }
 
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
+
 }

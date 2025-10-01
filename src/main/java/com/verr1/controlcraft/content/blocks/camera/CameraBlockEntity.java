@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
+import com.verr1.controlcraft.content.compact.shaolib.ShaoLibCompact;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.camera.CameraMovementTracker;
@@ -192,6 +193,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     private static Vector3dc vel(Entity entity){
+        if(entity == null)return new Vector3d();
         if(entity instanceof IEntityDuck de){
             return toJOML(de.controlCraft$velocityObserver());
         }
@@ -201,17 +203,16 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public Vector3dc latestShipPosition(){
         return Optional.ofNullable(latestShipHitResult).map(ShipHitResult::getPosition).orElse(new Vector3d());
     }
-
     public Vector3dc latestEntityPosition(){
-        return Optional.ofNullable(latestEntityHitResult).map(r -> toJOML(r.getEntity().position())).orElse(new Vector3d());
+        return Optional.ofNullable(latestEntityHitResult).map(EntityHitResult::getEntity).map(r -> toJOML(r.position())).orElse(new Vector3d());
     }
 
     public Vector3dc latestBlockPosition(){
         return Optional.ofNullable(latestBlockHitResult).map(r -> toJOML(r.getLocation())).orElse(new Vector3d());
     }
 
-    public Vector3dc latestServerPlayerPosition(){
-        return Optional.ofNullable(latestServerPlayerHitResult).map(r -> toJOML(r.getLocation())).orElse(new Vector3d());
+    public Vector3dc latestServerPlayerPosition() {
+        return Optional.ofNullable(latestServerPlayerHitResult).map(EntityHitResult::getEntity).map(r -> toJOML(r.position())).orElse(new Vector3d());
     }
 
     public Vector3dc latestShipVelocity(){
@@ -599,7 +600,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 ClipContext.Fluid.NONE,
                 null
         );
-        return RaycastUtilsKt.clipIncludeShips(level, context);
+        return ShaoLibCompact.fastClip((ServerLevel) level, toMinecraft(from), toMinecraft(to));// RaycastUtilsKt.clipIncludeShips(level, context);
     }
 
     public @Nullable ShipHitResult clipShip(){
@@ -1220,7 +1221,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "camera";
     }
 

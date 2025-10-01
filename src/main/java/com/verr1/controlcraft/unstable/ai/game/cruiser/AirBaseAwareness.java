@@ -1,14 +1,17 @@
 package com.verr1.controlcraft.unstable.ai.game.cruiser;
 
+import com.verr1.controlcraft.content.compact.shaolib.ShaoLibCompact;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.unstable.ai.api.IAirContext;
 import com.verr1.controlcraft.unstable.util.LazyRandom;
 import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils;
 import com.verr1.controlcraft.utils.MathUtils;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -22,10 +25,6 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft
 public class AirBaseAwareness {
 
     private final List<LazyRandom> lazyRandoms;
-
-    // private final SchmittTrigger decision = new SchmittTrigger(-0.5, 0.5); // true: should run
-    // private double threatScore = 0;
-    // private double attackScore = 0;
 
     private double stuckScore = 0;
 
@@ -61,15 +60,18 @@ public class AirBaseAwareness {
         double height = world.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
         currentHeight = currentPosition.y() - height;
         long shipId = context.shipId();
+
+        Vec3 start = toMinecraft(currentPosition.fma(10, currentFront, new Vector3d()));
+        Vec3 end = toMinecraft(currentPosition.fma(this.context.cruiseVelocity() * 3, currentFront, new Vector3d()));
         ClipContext ctx = new ClipContext(
                 toMinecraft(currentPosition),
-                toMinecraft(currentPosition.fma(context.cruiseVelocity() * 3, currentFront, new Vector3d())),
+                toMinecraft(currentPosition.fma(this.context.cruiseVelocity() * 3, currentFront, new Vector3d())),
                 ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.ANY,
                 null
         );
 
-        BlockHitResult result = RaycastUtilsKt.clipIncludeShips(world, ctx, true, shipId);
+        BlockHitResult result = ShaoLibCompact.fastClip((ServerLevel) world, start, end); //RaycastUtilsKt.clipIncludeShips(world, ctx, true, shipId);
         headingObstacleDistance = result.getLocation().distanceTo(toMinecraft(currentPosition));
 
     }

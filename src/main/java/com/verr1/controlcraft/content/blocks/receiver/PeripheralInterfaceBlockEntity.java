@@ -62,15 +62,15 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     public synchronized MethodResult callPeripheral(IComputerAccess access, ILuaContext context, String methodName, IArguments args) throws LuaException {
         if(level == null || level.isClientSide)return MethodResult.of(null, "You Are Calling This On The Client Side, Nothing Returned");
         if(attachedPeripheral == null){
-            ControlCraft.LOGGER.error("Peripheral h:{}, v:{} Called, But No Peripheral Attached", holdKey, valid());
+            ControlCraft.LOGGER.debug("Peripheral h:{}, v:{} Called, But No Peripheral Attached", holdKey, valid());
             return MethodResult.of(null, "Receiver Called, But No Peripheral Attached");
         }
         if(!methods.containsKey(methodName)){
-            ControlCraft.LOGGER.error("Peripheral Called, But Method {} Not Found", methodName);
+            ControlCraft.LOGGER.debug("Peripheral Called, But Method {} Not Found", methodName);
             return MethodResult.of(null, "Receiver Called, But Method Not Found");
         }
         if(access == null){
-            ControlCraft.LOGGER.error("Peripheral Called, But No Access Provided");
+            ControlCraft.LOGGER.debug("Peripheral Called, But No Access Provided");
             return MethodResult.of(null, "Receiver Called, But No Access Provided");
         }
 
@@ -81,7 +81,7 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
                 throw new RuntimeException(e);
             }catch (NullPointerException e){
                 String peripheralName = Optional.ofNullable(attachedPeripheral).map(IPeripheral::getType).orElse("null peripheral");
-                ControlCraft.LOGGER.error("Peripheral {} Called, But Method {} Not Found", peripheralName, methodName);
+                ControlCraft.LOGGER.debug("Peripheral {} Called, But Method {} Not Found", peripheralName, methodName);
             }
             return null;
         }).orElse(MethodResult.of(null, "Exception Occurred"));
@@ -92,15 +92,15 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
     public synchronized MethodResult callPeripheralAsync(IComputerAccess access, ILuaContext context, String slot, String methodName, IArguments args){
         if(level == null || level.isClientSide)return MethodResult.of(null, "You Are Calling This On The Client Side, Nothing Returned");
         if(attachedPeripheral == null){
-            ControlCraft.LOGGER.error("Async Peripheral h:{}, v:{} Called, But No Peripheral Attached", holdKey, valid());
+            ControlCraft.LOGGER.debug("Async Peripheral h:{}, v:{} Called, But No Peripheral Attached", holdKey, valid());
             return MethodResult.of(null, "Receiver Called, But No Peripheral Attached");
         }
         if(!methods.containsKey(methodName)){
-            ControlCraft.LOGGER.error("Async Peripheral Called, But Method {} Not Found", methodName);
+            ControlCraft.LOGGER.debug("Async Peripheral Called, But Method {} Not Found", methodName);
             return MethodResult.of(null, "Receiver Called, But Method Not Found");
         }
         if(access == null){
-            ControlCraft.LOGGER.error("Async Peripheral Called, But No Access Provided");
+            ControlCraft.LOGGER.debug("Async Peripheral Called, But No Access Provided");
             return MethodResult.of(null, "Receiver Called, But No Access Provided");
         }
         // attachedPeripheral may be set to null after the task being queued
@@ -109,7 +109,7 @@ public class PeripheralInterfaceBlockEntity extends NetworkBlockEntity implement
             try {
                 methods.get(methodName).apply(snapshot, context, access, args);
             } catch (Exception e) {
-                ControlCraft.LOGGER.info("Lua Exception Of: {}", e.getMessage());
+                ControlCraft.LOGGER.debug("Lua Exception Of: {}", e.getMessage());
             }
         });
         return MethodResult.of("queued");

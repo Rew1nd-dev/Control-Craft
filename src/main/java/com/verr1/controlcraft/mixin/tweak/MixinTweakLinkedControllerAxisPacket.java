@@ -1,27 +1,35 @@
 package com.verr1.controlcraft.mixin.tweak;
 
 
-import com.getitemfromblock.create_tweaked_controllers.block.TweakedLecternControllerBlockEntity;
-import com.getitemfromblock.create_tweaked_controllers.item.TweakedLinkedControllerItem;
 import com.getitemfromblock.create_tweaked_controllers.packet.TweakedLinkedControllerAxisPacket;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
-import com.verr1.controlcraft.config.BlockPropertyConfig;
-import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
+import com.verr1.controlcraft.content.compact.tweak.TweakControllerServerRecorder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
 
 @Mixin(TweakedLinkedControllerAxisPacket.class)
 public class MixinTweakLinkedControllerAxisPacket {
+
+
+    @WrapOperation(
+            method = "handleItem",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/getitemfromblock/create_tweaked_controllers/controller/TweakedLinkedControllerServerHandler;ReceiveAxis(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Ljava/util/ArrayList;Ljava/util/ArrayList;)V"),
+            remap = false
+    )
+    void saveToRecorder(LevelAccessor entryA, BlockPos iterator, UUID entryB, ArrayList<Couple<RedstoneLinkNetworkHandler.Frequency>> i, ArrayList<Byte> world, Operation<Void> original){
+        original.call(entryA, iterator, entryB, i, world);
+        TweakControllerServerRecorder.receiveAxis(entryB, world);
+    }
+
 /*
 @Shadow(remap = false)
     private float[] fullAxis;

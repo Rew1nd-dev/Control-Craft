@@ -71,22 +71,6 @@ public class CruiserBlockEntity extends AiPlaneBase implements
 
     }
 
-//    public double fireRate() {
-//        return fireRate;
-//    }
-//
-//    public void setFireRate(double fireRate) {
-//        this.fireRate = (int)fireRate;
-//    }
-//
-//    public boolean db_fireArrow() {
-//        return db_fireArrow;
-//    }
-//
-//    public void setDb_fireArrow(boolean db_fireArrow) {
-//        this.db_fireArrow = db_fireArrow;
-//    }
-
     @Override
     protected BehaviorTree constructAI() {
         Node root = new Parallel(ParallelPolicy.SUCCEED_ON_ALL).addChild(

@@ -1,4 +1,4 @@
-// 1.20.1	2025-09-03T13:19:56.4100954	Registrate Provider for vscontrolcraft [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-09-13T16:50:11.2824017	Registrate Provider for vscontrolcraft [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 b368dafc2de91561e8a67dbee8f7c44666cf2161 assets/vscontrolcraft/blockstates/ai_autocannon.json
 6f2681a5b3eef937b61eb24a459b8da9366a9d02 assets/vscontrolcraft/blockstates/ai_big_cannon.json
 9e1e30435467632506e4dd2ce2f7bafa0555a942 assets/vscontrolcraft/blockstates/ai_cruiser.json
@@ -51,8 +51,8 @@ e1657b12e4c1f2af8a6bc6150b3e69f5ece01fd4 assets/vscontrolcraft/blockstates/slide
 b850cd7eb72711c5abfd2c4e5263bbaa996b8f8e assets/vscontrolcraft/blockstates/terminal.json
 7f6e4e9d5a3ce7151a929eb7a1f8d47edf506d07 assets/vscontrolcraft/blockstates/transmitter.json
 2a6f2c9efcc11cfdf2ab3b9866ce7f4ce2695e3e assets/vscontrolcraft/blockstates/wing_controller.json
-03d6a6c551da1444f9289bb47e49cf07562cb470 assets/vscontrolcraft/lang/en_ud.json
-0a8d5d838571d718c8e5ed3f05211d112bc76fc9 assets/vscontrolcraft/lang/en_us.json
+0a1f02177bed902b27777dd1d6cd4b83ab56f4c1 assets/vscontrolcraft/lang/en_ud.json
+2ada22d252efcf07b924782b16a9f6fcdceef8af assets/vscontrolcraft/lang/en_us.json
 26dda2456a049fb119bf636323f817844d758988 assets/vscontrolcraft/models/item/ai_autocannon.json
 bc790ab92336e754477bd72efd2107baa0b5bac9 assets/vscontrolcraft/models/item/ai_big_cannon.json
 919e917f1801901d2e845f6674ce21333b959154 assets/vscontrolcraft/models/item/ai_cruiser.json

@@ -71,16 +71,19 @@ public class CameraPlant extends MutablePlant{
     }
 
     public void clipNewBlock(){
-        cbe.clipNewBlock();
-
+        schedule(token("block"), cbe::clipNewBlock);
     }
 
     public void clipNewEntity(){
-        cbe.clipNewEntity();
+        schedule(token("block"), cbe::clipNewEntityInView);
     }
 
     public void clipNewServerPlayer(){
-        cbe.clipNewServerPlayer();
+        schedule(token("block"), cbe::clipNewServerPlayer);
+    }
+
+    public void clipNewShip(){
+        schedule(token("block"), cbe::clipNewShip);
     }
 
     public Vector3dc cachedVelocity(){
@@ -91,9 +94,7 @@ public class CameraPlant extends MutablePlant{
         return cachedPosition;
     }
 
-    public void clipNewShip(){
-        cbe.clipNewShip();
-    }
+
 
     @Override
     protected void prePositiveEdge() {

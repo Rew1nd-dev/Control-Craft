@@ -173,7 +173,7 @@ public class GenericUIFactory {
 
         Runnable alignLabels = () -> {
             Converter.alignLabel(name, is_sensor, cast_ray, ship_ray, entity_ray, stab);
-            Converter.alignLabel(cast_ray.valueLabel(), ship_ray.valueLabel(), entity_ray.valueLabel());
+            Converter.alignLabel(cast_ray.valueLabel(), ship_ray.valueLabel(), entity_ray.valueLabel(), stab.valueLabel());
         };
 
         return new GenericSettingScreen.builder(boundAnchorPos)

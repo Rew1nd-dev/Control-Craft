@@ -26,4 +26,9 @@ public class KinematicRevoluteMotorRenderer extends SafeBlockEntityRenderer<Kine
                 .light(light)
                 .renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

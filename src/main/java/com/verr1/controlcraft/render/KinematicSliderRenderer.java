@@ -32,4 +32,9 @@ public class KinematicSliderRenderer extends SafeBlockEntityRenderer<KinematicSl
                 .light(light)
                 .renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

@@ -46,7 +46,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
 
     protected void onDeployFailure(@NotNull SchematicKey type){};
 
-    protected abstract void onDiscard(@NotNull ServerShip ship, @Nullable AIBlockNetwork network, @NotNull  SchematicKey type);
+    protected abstract void onDiscard(@NotNull ServerShip ship, @Nullable AIBlockNetwork network);
 
     protected Stream<ServerShip> streamAlive(){
         return aliveShips.stream()
@@ -88,7 +88,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
                 .toList()
                 .forEach(
                     ship -> {
-                        onDiscard(ship, pool().getNetworkOf(ship.getId()), pool().getTypeOf(ship.getId()));
+                        onDiscard(ship, pool().getNetworkOf(ship.getId()));
                         aliveShips.remove(ship.getId());
                     }
         );
@@ -111,8 +111,8 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
         return streamAlive().filter(predicate).toList();
     }
 
-    protected List<ServerShip> getAliveWithType(Predicate<SchematicKey> predicate){
-        return getAlive(ship -> predicate.test(pool().getTypeOf(ship.getId())));
-    }
+//    protected List<ServerShip> getAliveWithType(Predicate<SchematicKey> predicate){
+//        return getAlive(ship -> predicate.test(pool().getTypeOf(ship.getId())));
+//    }
 
 }

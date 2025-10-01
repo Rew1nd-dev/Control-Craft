@@ -31,4 +31,9 @@ public class CompactFlapRenderer extends SafeBlockEntityRenderer<CompactFlapBloc
                 .light(light)
                 .renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

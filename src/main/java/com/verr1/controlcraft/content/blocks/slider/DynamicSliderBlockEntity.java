@@ -482,7 +482,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "slider";
     }
 

@@ -456,7 +456,7 @@ public abstract class BlockLinkPort {
     public void onOutputDisconnection(String outputPortName){}
 
     protected void deleteInput(String name){
-        ControlCraft.LOGGER.info("deleting input: {} at: {}", name, pos());
+        ControlCraft.LOGGER.debug("deleting input: {} at: {}", name, pos());
         backwardLinks.remove(name);
         onInputDisconnection(name);
     }
@@ -487,14 +487,14 @@ public abstract class BlockLinkPort {
     }
 
     protected void deleteOutput(String name, BlockPort forwardPort){
-        ControlCraft.LOGGER.info("deleting output: {} -> {} at: {}", name, forwardPort, pos());
+        ControlCraft.LOGGER.debug("deleting output: {} -> {} at: {}", name, forwardPort, pos());
         forwardLinks.getOrDefault(name, EMPTY).remove(forwardPort);
         if(forwardLinks.getOrDefault(name, EMPTY).isEmpty())forwardLinks.remove(name);
         onOutputDisconnection(name);
     }
 
     public void deleteOutput(String name){
-        ControlCraft.LOGGER.info("deleting all output: {} at: {}", name, pos());
+        ControlCraft.LOGGER.debug("deleting all output: {} at: {}", name, pos());
         forwardLinks.remove(name);
         onOutputDisconnection(name);
     }
@@ -544,7 +544,7 @@ public abstract class BlockLinkPort {
 
             // blp input port does not include this output port
             if(test){
-                ControlCraft.LOGGER.info("output: {} -> {} is invalid, blp links: {}", new BlockPort(pos(), outputName), bp, blp.backwardLinks());
+                ControlCraft.LOGGER.debug("output: {} -> {} is invalid, blp links: {}", new BlockPort(pos(), outputName), bp, blp.backwardLinks());
                 return true;
             }
 
@@ -552,7 +552,7 @@ public abstract class BlockLinkPort {
         })
         .toList()
         .forEach(e -> {
-            ControlCraft.LOGGER.info("call delete output from validation: {}", e);
+            ControlCraft.LOGGER.debug("call delete output from validation: {}", e);
             deleteOutput(e.getFirst(), e.getSecond());
         });
 
@@ -570,7 +570,7 @@ public abstract class BlockLinkPort {
         backwardLinks.entrySet().stream().filter(e -> {
 
             if(!ready(e.getValue().pos())){
-                ControlCraft.LOGGER.info("block at: {} is not loaded fully, skipping input check", e.getValue().pos());
+                ControlCraft.LOGGER.debug("block at: {} is not loaded fully, skipping input check", e.getValue().pos());
                 return false;
             }
 
@@ -579,7 +579,7 @@ public abstract class BlockLinkPort {
             BlockLinkPort blp = of(bp.pos()).orElse(null);
 
             if(blp == null){
-                ControlCraft.LOGGER.info("found null blp at: {} input: {} bp: {} when checking {}", bp.pos(), inputName, bp, pos());
+                ControlCraft.LOGGER.debug("found null blp at: {} input: {} bp: {} when checking {}", bp.pos(), inputName, bp, pos());
                 return true;
             }
 
@@ -598,14 +598,14 @@ public abstract class BlockLinkPort {
                     .contains(new BlockPort(pos(), inputName));
             // blp output port does not include this input port
             if(test){
-                ControlCraft.LOGGER.info("input: {} -> {} is invalid, blp links: {}", bp, new BlockPort(pos(), inputName), blp.forwardLinks());
+                ControlCraft.LOGGER.debug("input: {} -> {} is invalid, blp links: {}", bp, new BlockPort(pos(), inputName), blp.forwardLinks());
                 return true;
             }
             return false; // if the input is not in the blp, it is invalid
         })
         .toList()
         .forEach(e -> {
-            ControlCraft.LOGGER.info("call delete input from validation: {}", e.getKey());
+            ControlCraft.LOGGER.debug("call delete input from validation: {}", e.getKey());
             deleteInput(e.getKey());
         });
     }
@@ -674,7 +674,7 @@ public abstract class BlockLinkPort {
 
     public final void recreate(){
         realTimeComponent = create();
-        ControlCraft.LOGGER.info("calling recreate() at: {}", pos());
+        ControlCraft.LOGGER.debug("calling recreate() at: {}", pos());
         removeInvalid();
         // inputsNames().forEach(this::disconnectInput);
         // outputsNames().forEach(this::disconnectOutput);
@@ -711,7 +711,7 @@ public abstract class BlockLinkPort {
     }
 
     public void modifyWithOffset(BlockPos offset){
-        ControlCraft.LOGGER.info("modifying with offset: " + offset.toShortString());
+        ControlCraft.LOGGER.debug("modifying with offset: {}", offset.toShortString());
         Map<String, BlockPort> backwardLinksNew = new HashMap<>();
         Map<String, Set<BlockPort>> forwardLinksNew = new HashMap<>();
         backwardLinks.forEach((k, v) -> backwardLinksNew.put(k, v.offset(offset)));

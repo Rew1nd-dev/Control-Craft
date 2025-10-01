@@ -17,7 +17,8 @@
     "tweak.MixinTweakedLecternControllerBlockEntity",
     "tweak.MixinTweakLecternRangeFirst",
     "tweak.MixinTweakLecternRangeSecond",
-    "tweak.MixinTweakLinkedControllerAxisPacket"
+    "tweak.MixinTweakLinkedControllerAxisPacket",
+    "tweak.MixinTweakLinkedControllerButtonPacket"
   ],
   "package": "com.verr1.controlcraft.mixin",
   "injectors": {

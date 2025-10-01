@@ -199,7 +199,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "Jet";
     }
 

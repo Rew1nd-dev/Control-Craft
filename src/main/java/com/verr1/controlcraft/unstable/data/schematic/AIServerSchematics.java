@@ -49,29 +49,6 @@ public class AIServerSchematics {
     }
 
     public void loadSchematics(MinecraftServer server){
-        /*
-        Map<ResourceLocation, CompoundTag> nbtFiles = loadAllNBTFiles(ControlCraft.MODID, SCHEMATICS_FOLDER, server);
-        nbtFiles.forEach(((resourceLocation, tag) -> {
-            if(!tag.contains(SCHEMATICS_KEY)){
-                ControlCraft.LOGGER.error("NBT file {} does not contain the required key '{}'. Skipping.", resourceLocation, SCHEMATICS_KEY);
-                return;
-            }
-
-            CompoundTag schematicKeyTag = tag.getCompound(SCHEMATICS_KEY);
-            CompoundTag schematicContentTag = tag.getCompound(SCHEMATICS_CONTENT);
-            SchematicKey key = SchematicKey.deserialize(schematicKeyTag);
-
-            if(LOADED_SCHEMATICS.containsKey(key)){
-                ControlCraft.LOGGER.warn("Schematic with key {} already loaded. Skipping duplicate.", key);
-                return;
-            }
-
-            AISchematic schematic = AISchematic.deserialize(schematicContentTag);
-
-            LOADED_SCHEMATICS.put(key, schematic);
-
-        }));
-        * */
         List<CompoundTag> nbtFiles = loadAllNBTFilesFromFolder(SCHEMATICS_FOLDER, server);
         nbtFiles.forEach(tag -> {
             if(!tag.contains(SCHEMATICS_KEY)){

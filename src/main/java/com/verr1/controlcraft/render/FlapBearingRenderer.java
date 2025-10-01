@@ -31,4 +31,9 @@ public class FlapBearingRenderer extends SafeBlockEntityRenderer<FlapBearingBloc
                 .light(light)
                 .renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

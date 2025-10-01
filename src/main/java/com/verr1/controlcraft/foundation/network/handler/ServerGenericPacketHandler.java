@@ -139,7 +139,7 @@ public class ServerGenericPacketHandler {
     public static void handleDestroyConstraints(GenericServerPacket packet, NetworkEvent.Context context){
         BlockPos pos = BlockPos.of(packet.getLongs().get(0));
         Optional
-                .ofNullable(context.getSender()).map(e -> BlockEntityGetter.INSTANCE.getLevelBlockEntityAt(e.serverLevel(), pos, IConstraintHolder.class))
+                .ofNullable(context.getSender()).map(e -> BlockEntityGetter.getLevelBlockEntityAt(e.serverLevel(), pos, IConstraintHolder.class))
                 .map(Optional::orElseThrow)
                 .ifPresent(IConstraintHolder::destroyConstraints);
     }

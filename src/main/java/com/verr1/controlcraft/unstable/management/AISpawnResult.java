@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.unstable.management;
 
 public class AISpawnResult {
+    public static final AISpawnResult FAILED = new AISpawnResult(-1, Status.FAILED);
     public final long id;
     public final Status status;
 

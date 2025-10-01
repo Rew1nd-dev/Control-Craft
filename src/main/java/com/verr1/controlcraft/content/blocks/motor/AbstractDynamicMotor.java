@@ -130,7 +130,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     }
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "motor";
     }
 
@@ -238,6 +238,8 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
             ));
     }
 
+
+
     @Override
     public void tickServer() {
         super.tickServer();
@@ -251,6 +253,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
+        validateJoint();
         syncForNear(true, FIELD, CONTROLLER);
     }
 
@@ -293,7 +296,6 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         super.destroyConstraints();
         removeConstraint("fix");
         controlTorque.write(0.0);
-
     }
 
     public void setMode(boolean adjustAngle){

@@ -297,7 +297,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "compact_flap";
     }
 

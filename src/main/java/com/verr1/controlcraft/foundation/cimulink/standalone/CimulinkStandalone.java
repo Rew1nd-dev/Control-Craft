@@ -46,12 +46,18 @@ public class CimulinkStandalone {
         // save(DigitalCircuits.decoder8(), Path.of(DataPath), "decoder8");
         // save(WarThunderFlight.Sel(), Path.of(DataPath), "viewManualSel");
         // save(WtHeli.pd3(), Path.of(DataPath), "pd3");
-        // save(Missile.deltaCoordinate(), Path.of(DataPath), "dir");
+        // save(Missile.deltaCoordinate().evaluate().buildContext(), Path.of(DataPath), "dir");
         // System.out.println(1 - Math.exp(-5 * 0.01667));
         // save(Missile.create(), Path.of(DataPath), "missile");
         // save(Missile.control().evaluate().buildContext(), Path.of(DataPath), "mControl");
         // save(FPV.create().evaluate().buildContext(), Path.of(DataPath), "fpv");
-        save(AimPredict.create(), Path.of(DataPath), "aimPredict");
+        // save(AimPredict.create(), Path.of(DataPath), "aimPredict");
+        // save(JetMissile.closeLoopXYZ().evaluate().buildContext(), Path.of(DataPath), "jetMissile");
+        // save(JetMissile.computeYP().evaluate().buildContext(), Path.of(DataPath), "cyp");
+
+        save(Flights.flight4(), Path.of(DataPath), "yprFlight5");
+
+        // System.out.println(Math.pow(1.001, -0.001));
         // AimPredict.testAim();
         // Missile.testYP();
     }

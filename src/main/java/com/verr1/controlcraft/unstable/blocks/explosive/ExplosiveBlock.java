@@ -2,6 +2,7 @@ package com.verr1.controlcraft.unstable.blocks.explosive;
 
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.foundation.api.common.ISignalHandler;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.unstable.AIServer;
@@ -12,7 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Explosion;
@@ -27,12 +27,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3dc;
-import org.valkyrienskies.core.api.ships.Ship;
-import rbasamoyai.createbigcannons.CreateBigCannons;
-import rbasamoyai.createbigcannons.munitions.ImpactExplosion;
-import rbasamoyai.createbigcannons.munitions.ShellExplosion;
 
-import java.util.Optional;
 
 public class ExplosiveBlock extends DirectionalBlock implements ISignalHandler{
 
@@ -90,17 +85,13 @@ public class ExplosiveBlock extends DirectionalBlock implements ISignalHandler{
 
     public static void detonate(Level level, BlockPos pos){
         Vector3dc actual = VSGetterUtils.getAbsolutePosition(WorldBlockPos.of(level, pos));
-        ShellExplosion impact = new ShellExplosion(
-                level,
-                null,
-                null,
-                actual.x(), actual.y(), actual.z(),
-                16,
-                false,
-                Level.ExplosionInteraction.BLOCK
+
+        CreateBigCannonsCompact.createExplosion(
+                level, actual.x(), actual.y(), actual.z(), 16, false, Level.ExplosionInteraction.BLOCK
         );
+
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        CreateBigCannons.handleCustomExplosion(level, impact);
+
     }
 
 

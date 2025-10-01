@@ -312,7 +312,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
     }
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "spatial anchor";
     }
 

@@ -108,7 +108,9 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     }
 
     public void loadCircuit(CircuitNbt nbt){
+        var savedStatus = linkPort().viewStatus();
         linkPort().load(nbt);
+        linkPort().setStatus(savedStatus);
         updateIOName();
     }
 

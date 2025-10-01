@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.cctweaked.peripheral;
 
 
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -18,6 +19,8 @@ public class FlapBearingPeripheral extends AbstractAttachedPeripheral<FlapBearin
         return getTarget().getBlockPos() == p.getTarget().getBlockPos();
     }
 
+
+
     @Override
     public String getType() {
         return "WingController";
@@ -27,6 +30,17 @@ public class FlapBearingPeripheral extends AbstractAttachedPeripheral<FlapBearin
     public final double getAngle(){
         return getTarget().getAngle();
     }
+
+    @LuaFunction
+    public final void assembleNextTick(){
+        ControlCraftServer.SERVER_EXECUTOR.executeLater(() -> getTarget().assemble(), 1);
+    }
+
+    @LuaFunction
+    public final void disassembleNextTick(){
+        ControlCraftServer.SERVER_EXECUTOR.executeLater(() -> getTarget().disassemble(), 1);
+    }
+
 
     @LuaFunction
     public final void setAngle(double angle){

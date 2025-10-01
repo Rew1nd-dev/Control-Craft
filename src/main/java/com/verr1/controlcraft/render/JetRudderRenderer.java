@@ -44,51 +44,8 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
 
     }
 
-    /*
-    Legacy rendering
-    * rudder
-                .centre()
-                .rotateToFace(be.getDirection())
-                .unCentre()
-                .rotateCentered(Direction.NORTH, 0)
-                .translate(-0.5f, 0, -0.5f)
-                .rotateCentered(Direction.UP, -horizontal + base_offset)
-
-                .light(light)
-                .renderInto(ms, solid);
-
-        rudder
-                .centre()
-                .rotateToFace(be.getDirection())
-                .unCentre()
-                .rotateCentered(Direction.NORTH, 3.14f)
-                .translate(-0.5f, 0, -0.5f)
-                .rotateCentered(Direction.UP, horizontal + base_offset)
-
-                .light(light)
-                .renderInto(ms, solid);
-
-        rudder
-                .centre()
-                .rotateToFace(be.getDirection())
-                .unCentre()
-                .rotateCentered(Direction.NORTH, -1.57f)
-                .translate(-0.5f, 0, -0.5f)
-                .rotateCentered(Direction.UP, vertical + base_offset)
-
-                .light(light)
-                .renderInto(ms, solid);
-
-        rudder
-                .centre()
-                .rotateToFace(be.getDirection())
-                .unCentre()
-                .rotateCentered(Direction.NORTH, 1.57f)
-                .translate(-0.5f, 0, -0.5f)
-                .rotateCentered(Direction.UP, -vertical + base_offset)
-
-                .light(light)
-                .renderInto(ms, solid);
-    *
-    * */
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

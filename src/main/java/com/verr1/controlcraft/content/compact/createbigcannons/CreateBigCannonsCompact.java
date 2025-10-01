@@ -33,6 +33,11 @@ public class CreateBigCannonsCompact {
         return getter.createAutocannonAp(level);
     }
 
+    public static void createExplosion(Level level, double x, double y, double z, double radius, boolean fire, Level.ExplosionInteraction interaction){
+        if(getter == null)return;
+        getter.createExplosion(level, x, y, z, radius, fire, interaction);
+    }
+
     public static void init() {
         if(!ModList.get().isLoaded("createbigcannons"))return;
 

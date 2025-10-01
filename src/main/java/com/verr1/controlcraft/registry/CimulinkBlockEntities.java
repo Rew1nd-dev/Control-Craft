@@ -37,6 +37,8 @@ import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlockEntity;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlockEntity;
+import com.verr1.controlcraft.content.links.tweakerminal.TweakerminalBlock;
+import com.verr1.controlcraft.content.links.tweakerminal.TweakerminalBlockEntity;
 import com.verr1.controlcraft.render.CimulinkSocketRenderer;
 import com.verr1.controlcraft.render.OscilloscopeBlockEntityRenderer;
 
@@ -144,6 +146,11 @@ public class CimulinkBlockEntities {
             .blockEntity(OscilloscopeBlock.ID, OscilloscopeBlockEntity::new)
             .validBlock(CimulinkBlocks.SCOPE)
             .renderer(() -> OscilloscopeBlockEntityRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<TweakerminalBlockEntity> TWEAKERMINAL_BLOCKENTITY = REGISTRATE
+            .blockEntity(TweakerminalBlock.ID, TweakerminalBlockEntity::new)
+            .validBlock(CimulinkBlocks.TWEAKERMINAL)
             .register();
 
     public static final BlockEntityEntry<EasyConnectorBlockEntity> CONNECTOR_BLOCKENTITY = REGISTRATE

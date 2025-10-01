@@ -4,6 +4,8 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.ModList;
@@ -21,6 +23,11 @@ public class TweakControllerCompact {
     public static BlockState lecternBlock(){
         if (getter == null) return null;
         return getter.lecternBlock();
+    }
+
+    public static boolean tweakControllerInHand(Player player){
+        if (getter == null) return false;
+        return  getter.tweakControllerInHand(player);
     }
 
     public static void init(){

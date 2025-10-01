@@ -23,6 +23,7 @@ import com.verr1.controlcraft.content.links.scope.OscilloscopeBlock;
 import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
+import com.verr1.controlcraft.content.links.tweakerminal.TweakerminalBlock;
 import net.minecraft.world.level.material.MapColor;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
@@ -268,6 +269,20 @@ public class CimulinkBlocks {
 
             .transform(customItemModel())
             .lang("Oscilloscope")
+            .register();
+
+    public static final BlockEntry<TweakerminalBlock> TWEAKERMINAL = REGISTRATE
+            .block(TweakerminalBlock.ID, TweakerminalBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+
+            .transform(customItemModel())
+            .lang("Tweakerminal")
             .register();
 
     public static final BlockEntry<EasyConnectorBlock> CONNECTOR = REGISTRATE

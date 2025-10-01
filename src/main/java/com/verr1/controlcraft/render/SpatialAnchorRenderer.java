@@ -39,4 +39,9 @@ public class SpatialAnchorRenderer extends SafeBlockEntityRenderer<SpatialAnchor
 
 
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

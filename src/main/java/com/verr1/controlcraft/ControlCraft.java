@@ -4,7 +4,9 @@ import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
+import com.verr1.controlcraft.content.compact.shaolib.ShaoLibCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
+import com.verr1.controlcraft.content.compact.vssw.VSSWCompact;
 import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.ponder.CimulinkPonderIndex;
 import com.verr1.controlcraft.registry.*;
@@ -28,36 +30,6 @@ import org.joml.Random;
 import org.slf4j.Logger;
 
 
-/*
-* TODO:
-*    Visualization:
-*    1.  add tool tips for blocks, need data syncing.
-*    2.√ render servo top part as a moving segment, rotate as angle changes
-*    3.√ remake wing controller model, make a moving part connected with wing block
-*    4.  Flames of attacker
-*    Functionality:
-*    1.√ extract ServoConstrainAssembleSchedule run() function, make it inside an class specific for ship aligning task
-*    2.√ VS constrain serialize utilities
-*    3.√ Make Force Inducer removing invalids by life time
-*    4. Sync Animation Packet Simplify to one, Make Interface for all blocks with only one animated data
-*    Features:
-*    1.√ suicide block, or self-disassemble block
-*    2.√ magnet block, implement using constrain or ShipForceInducer
-*    3.√ Linker tool, configurable, multi-functional tool for Control Craft
-*    4.√ Variants of bearings with different rotational behaviors
-*    5.√ Directional Jet rudders, and rudder controller consuming liquid(optional), just like propeller controller
-*    6.√ Piston with Sphere sphere_hinge connection
-*    7.  Mass-adjustable block
-*    User-Friendly:
-*    1.  Block Placement Logic
-*    2.  GUI of Client Wand
-*    3.  read write of servo settings
-*    Configuration:
-*    1.  make more fields configurable
-*/
-
-
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(ControlCraft.MODID)
 @SuppressWarnings("removal")
 public class ControlCraft
@@ -100,6 +72,8 @@ public class ControlCraft
 
         TweakControllerCompact.init();
         CreateBigCannonsCompact.init();
+        ShaoLibCompact.init();
+        VSSWCompact.init();
         modEventBus.addListener(EventPriority.LOWEST, ControlCraftDataGen::gatherData);
 
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());
@@ -151,6 +125,8 @@ public class ControlCraft
         // ControlCraftAttachments.register();
         TweakControllerCompact.init();
         CreateBigCannonsCompact.init();
+        ShaoLibCompact.init();
+        VSSWCompact.init();
         // AttachmentRegistry.register();
 
         // modEventBus.addListener((e) -> ControlCraftAttachments.register());

@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game;
 import com.simibubi.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
+import com.verr1.controlcraft.content.compact.vssw.VSSWCompact;
 import com.verr1.controlcraft.content.links.proxy.ProxyLinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -33,7 +34,12 @@ public class PlantGetter {
         if(tweak != null)return tweak;
 
         NamedComponent cannon = CreateBigCannonsCompact.cannonMountPlant(level, pos);
-        return cannon;
+        if(cannon != null)return cannon;
+
+        NamedComponent seat = VSSWCompact.vsswSeatPlant(level, pos);
+        if(seat != null)return seat;
+
+        return null;
     }
 
 }

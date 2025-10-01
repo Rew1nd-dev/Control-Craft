@@ -17,6 +17,7 @@ import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -67,7 +68,10 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
         mainScroll
                 .forOptions(main, wbp -> Component.literal(mainToName.apply(wbp)))
                 .calling(i -> {
-                    if(i >= main.size())return;
+                    if(i >= main.size()){
+                        mainView.setTextOnly(Component.literal("----").withStyle(Converter::optionStyle));
+                        return;
+                    }
                     String mainName = mainToName.apply(main.get(i));
                     List<String> subs = mainToSub.apply(main.get(i));
                     mainView.setTextOnly(Component.literal(mainName).withStyle(Converter::optionStyle));
@@ -75,7 +79,10 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
                     subScroll
                             .forOptions(subs, Component::literal)
                             .calling(j -> {
-                                if(j >= subs.size())return;
+                                if(j >= subs.size()){
+                                    subView.setTextOnly(Component.literal("----").withStyle(Converter::optionStyle));
+                                    return;
+                                }
                                 subView.setTextOnly(Component.literal(subs.get(j)).withStyle(Converter::optionStyle));
                             })
                             .setState(0)
@@ -86,12 +93,17 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
 
     }
 
-    private EasyConnectorBlockEntity.ConnectionStatus currentRequest(){
+    private @Nullable EasyConnectorBlockEntity.ConnectionStatus currentRequest(){
+        var nameOut = availNamesOut.currentOptionOpt();
+        var nameIn = availNamesIn.currentOptionOpt();
+        var portOut = availPortsOut.currentOptionOpt();
+        var portIn = availPortsIn.currentOptionOpt();
+        if(nameOut.isEmpty() || nameIn.isEmpty() || portOut.isEmpty() || portIn.isEmpty())return null;
         return new EasyConnectorBlockEntity.ConnectionStatus(
-                availNamesOut.currentOption(),
-                availNamesIn.currentOption(),
-                availPortsOut.currentOption(),
-                availPortsIn.currentOption()
+                nameOut.get(),
+                nameIn.get(),
+                portOut.get(),
+                portIn.get()
         );
     }
 
@@ -100,11 +112,15 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
     }
 
     private void add(){
-        panel().ifPresent(p -> p.request(currentRequest(), pos, EasyConnectorBlockEntity.CONNECT));
+        var r = currentRequest();
+        if(r == null)return;
+        panel().ifPresent(p -> p.request(r, pos, EasyConnectorBlockEntity.CONNECT));
     }
 
     private void ret(){
-        panel().ifPresent(p -> p.request(currentRequest(), pos, EasyConnectorBlockEntity.DISCONNECT));
+        var r = currentRequest();
+        if(r == null)return;
+        panel().ifPresent(p -> p.request(r, pos, EasyConnectorBlockEntity.DISCONNECT));
     }
 
     @Override

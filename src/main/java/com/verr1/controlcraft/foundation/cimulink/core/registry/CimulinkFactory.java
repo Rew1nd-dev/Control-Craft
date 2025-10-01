@@ -182,6 +182,15 @@ public class CimulinkFactory {
             defaultID("power")
     );
 
+    public static final Factory<Functions.FunctionN> LOGARITHM = register(
+            SerializeUtils.of(
+                    Functions.FunctionN::serialize,
+                    t -> Functions.LOGARITHMIC.get()
+            ),
+            Functions.FunctionN.class,
+            defaultID("logarithm")
+    );
+
     public static final Factory<Functions.FunctionN> ABS = register(
             SerializeUtils.of(
                     Functions.FunctionN::serialize,

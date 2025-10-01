@@ -23,6 +23,7 @@ public enum AnalogTypes implements
     PRODUCT(ComponentInstances.PRODUCT, literals("Output the product of 2 inputs"), AnalogGroups.Basic),
     DIV(ComponentInstances.DIV, literals("Output input 0 divided by input 1"), AnalogGroups.Basic),
     POWER(ComponentInstances.POWER, literals("Output i_0 raised to the power of i_1"), AnalogGroups.Basic),
+    LOGARITHM(ComponentInstances.LOGARITHM, literals("Output ln(i1) / ln(i0)"), AnalogGroups.Basic),
     ABS(ComponentInstances.ABS, literals("Output the absolute value of the input"), AnalogGroups.Basic),
 
     ANGLE_FIX(ComponentInstances.ANGLE_FIX, literals("Coerce the input into (-pi, pi)"), AnalogGroups.Trigonometric),
@@ -106,9 +107,21 @@ public enum AnalogTypes implements
 
 
 
-    public static final AnalogTypes[] BASIC = new AnalogTypes[]{AnalogTypes.MIN, AnalogTypes.MAX, AnalogTypes.PRODUCT, AnalogTypes.DIV, AnalogTypes.POWER, AnalogTypes.ABS};
-    public static final AnalogTypes[] TRIGONOMETRIC = new AnalogTypes[]{AnalogTypes.ANGLE_FIX, AnalogTypes.RAD, AnalogTypes.DEG, AnalogTypes.SIN, AnalogTypes.COS, AnalogTypes.TAN, AnalogTypes.ASIN, AnalogTypes.ACOS, AnalogTypes.ATAN};
-    public static final AnalogTypes[] VECTOR = new AnalogTypes[]{AnalogTypes.DOT, AnalogTypes.CROSS, AnalogTypes.Q_TRANSFORM, AnalogTypes.V_NORM, AnalogTypes.V_MAG, AnalogTypes.V_LOOK_ALONG, AnalogTypes.Q_SLERP, AnalogTypes.Q_MUL};
+    public static final AnalogTypes[] BASIC = new AnalogTypes[]{
+            AnalogTypes.MIN, AnalogTypes.MAX, AnalogTypes.PRODUCT,
+            AnalogTypes.DIV, AnalogTypes.POWER, AnalogTypes.LOGARITHM,
+            AnalogTypes.ABS
+    };
+    public static final AnalogTypes[] TRIGONOMETRIC = new AnalogTypes[]{
+            AnalogTypes.ANGLE_FIX, AnalogTypes.RAD, AnalogTypes.DEG,
+            AnalogTypes.SIN, AnalogTypes.COS, AnalogTypes.TAN,
+            AnalogTypes.ASIN, AnalogTypes.ACOS, AnalogTypes.ATAN
+    };
+    public static final AnalogTypes[] VECTOR = new AnalogTypes[]{
+            AnalogTypes.DOT, AnalogTypes.CROSS, AnalogTypes.Q_TRANSFORM,
+            AnalogTypes.V_NORM, AnalogTypes.V_MAG, AnalogTypes.V_LOOK_ALONG,
+            AnalogTypes.Q_SLERP, AnalogTypes.Q_MUL
+    };
 
 
 

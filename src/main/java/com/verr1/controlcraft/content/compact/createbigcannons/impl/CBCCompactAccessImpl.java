@@ -10,13 +10,16 @@ import com.verr1.controlcraft.mixinducks.ICannonDuck;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.cannon_control.cannon_mount.CannonMountBlockEntity;
 import rbasamoyai.createbigcannons.index.CBCBlocks;
 import rbasamoyai.createbigcannons.index.CBCEntityTypes;
 import rbasamoyai.createbigcannons.index.CBCItems;
+import rbasamoyai.createbigcannons.munitions.ShellExplosion;
 import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
 import rbasamoyai.createbigcannons.munitions.autocannon.flak.FlakAutocannonProjectile;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonProjectile;
@@ -64,5 +67,21 @@ public class CBCCompactAccessImpl implements ICBCCompactAccess {
         he.setNoGravity(true);
         he.setFuze(CBCItems.IMPACT_FUZE.asStack());
         return new APAutocannonAccessImpl(he);
+    }
+
+    @Override
+    public Explosion createExplosion(Level level, double x, double y, double z, double radius, boolean fire, Level.ExplosionInteraction interaction) {
+        ShellExplosion impact =new ShellExplosion(
+                level,
+                null,
+                null,
+                x, y, z,
+                (float) radius,
+                fire,
+                interaction
+        );
+        CreateBigCannons.handleCustomExplosion(level, impact);
+
+        return impact;
     }
 }

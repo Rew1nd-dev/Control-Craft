@@ -183,15 +183,9 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
         ServerShip ship = getLoadedServerShip();
         if(ship == null)return;
         if(!AIServer.MANAGER.isAI(id))return;
-        double mass = AIServer.MANAGER
-                .getDataOf(id)
-                .map(d -> d.key)
-                .map(AIServer.SCHEMATICS_MANAGER::getLoaded)
-                .map(AISchematic::mass)
-                .orElse(-1.0);
+        double mass = originalMass();
         if(mass < 0)return;
-        double currentMass = ship.getInertiaData().getMass();
-
+        double currentMass = currentMass();
         if(currentMass / mass > 0.9)return;
         scheduleDeath();
     }
@@ -225,14 +219,6 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void explode(){
         if(level == null)return;
         Vector3dc p = getPosition();
-        ImpactExplosion impact = new ImpactExplosion(
-                level,
-                null,
-                null,
-                p.x(), p.y(), p.z(),
-                3,
-                Level.ExplosionInteraction.NONE
-        );
         ShellExplosion impact2 = new ShellExplosion(
                 level,
                 null,
@@ -242,17 +228,7 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
                 false,
                 Level.ExplosionInteraction.NONE
         );
-        FlakExplosion impact3 = new FlakExplosion(
-                level,
-                null,
-                null,
-                p.x(), p.y(), p.z(),
-                3,
-                Level.ExplosionInteraction.NONE
-        );
-        CreateBigCannons.handleCustomExplosion(level, impact);
         CreateBigCannons.handleCustomExplosion(level, impact2);
-        CreateBigCannons.handleCustomExplosion(level, impact3);
         // level.explode(null, p.x(), p.y(), p.z(), 4, Level.ExplosionInteraction.NONE);
     }
 

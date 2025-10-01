@@ -290,7 +290,7 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "Wing Controller";
     }
 

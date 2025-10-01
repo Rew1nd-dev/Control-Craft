@@ -126,11 +126,17 @@ public class CircuitLinkPort extends BlockLinkPort implements ICompilable<Circui
         Set<String> newEnabledInput = inputStatus.stream()
                 .filter(CircuitPortStatus::enabled)
                 .map(CircuitPortStatus::portName)
+
+                .filter(n -> circuit().hasInput(n))
+
                 .collect(HashSet::new, HashSet::add, HashSet::addAll);
 
         Set<String> newEnabledOutput = outputStatus.stream()
                 .filter(CircuitPortStatus::enabled)
                 .map(CircuitPortStatus::portName)
+
+                .filter(n -> circuit().hasOutput(n))
+
                 .collect(HashSet::new, HashSet::add, HashSet::addAll);
 
         if(ArrayUtils.isSame(newEnabledInput, currentEnabledInput) &&

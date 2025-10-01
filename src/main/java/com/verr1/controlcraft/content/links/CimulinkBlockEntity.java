@@ -93,7 +93,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         initializeExtra();
         isInitialized = true;
         syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
-        ControlCraft.LOGGER.info("be at {} finish initialization", getBlockPos().toShortString());
+        ControlCraft.LOGGER.debug("be at {} finish initialization", getBlockPos().toShortString());
     }
 
     public boolean initialized(){
@@ -123,7 +123,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         // this will be done in link ports serializations
         buildRegistry(SharedKeys.COMPONENT_NAME)
                 .withBasic(SerializePort.of(
-                        this::name,
+                        this::receiverName,
                         this::setName,
                         SerializeUtils.STRING
                 ))
@@ -162,7 +162,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         linkPort().setName(name);
     }
 
-    public String name(){
+    public String receiverName(){
         return linkPort().name();
     }
 

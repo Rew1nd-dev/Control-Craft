@@ -384,18 +384,22 @@ public class WarThunderFlight {
 
     public static CircuitNbt flight3(){
         Evaluator eval = new Evaluator();
+        Val nOne = eval.newVal(-1);
+        Val one = eval.newVal(1);
+
         Val pitch = eval.newVal("pitch");
         Val yaw = eval.newVal("yaw");
         Val roll = eval.newVal("roll");
         Val vt = eval.newVal("vel");
         Val vf = eval.newVal("velFeed");
 
+        Val rate = eval.newVal("rate").max(one);
+
         Val g_vel = eval.newVal("g_vel");
         Val g_feed = eval.newVal("g_vfeed");
         Val g_con = eval.newVal("g_vcon");
 
-        Val nOne = eval.newVal(-1);
-        Val one = eval.newVal(1);
+
 
         Val g_pitch = eval.newVal("g_pitch");
         Val g_yaw = eval.newVal("g_yaw");
@@ -413,13 +417,17 @@ public class WarThunderFlight {
         Val g_left_b = eval.newVal("g_left_b");
         Val g_mid_b = eval.newVal("g_mid_b");
 
-        Val gained_pitch = eval.clamp(pitch, nOne, one).mul(g_pitch);
-        Val gained_yaw = eval.clamp(yaw, nOne, one).mul(g_yaw);
-        Val gained_roll = eval.clamp(roll, nOne, one).mul(g_roll);
+        Val pitchIn = eval.clamp(pitch, nOne, one).power(rate);
+        Val yawIn = eval.clamp(yaw, nOne, one).power(rate);
+        Val rollIn = eval.clamp(roll, nOne, one).power(rate);
 
-        Val gained_pitch_b = eval.clamp(pitch, nOne, one).mul(g_pitch_b);
-        Val gained_yaw_b = eval.clamp(yaw, nOne, one).mul(g_yaw_b);
-        Val gained_roll_b = eval.clamp(roll, nOne, one).mul(g_roll_b);
+        Val gained_pitch = pitchIn.mul(g_pitch);
+        Val gained_yaw = yawIn.mul(g_yaw);
+        Val gained_roll = rollIn.mul(g_roll);
+
+        Val gained_pitch_b = pitchIn.mul(g_pitch_b);
+        Val gained_yaw_b = yawIn.mul(g_yaw_b);
+        Val gained_roll_b = rollIn.mul(g_roll_b);
 
         Val right = gained_pitch.add(gained_roll).mul(g_right);
         Val left = gained_pitch.sub(gained_roll).mul(g_left);

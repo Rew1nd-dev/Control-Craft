@@ -21,5 +21,10 @@ public class SpinalyzerRenderer extends SafeBlockEntityRenderer<SpinalyzerBlockE
         SuperByteBuffer Buffer = CachedBufferer.partialFacing(ControlCraftPartialModels.SPINALYZR_AXES, be.getBlockState(), Direction.SOUTH);
         Buffer.renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }
 

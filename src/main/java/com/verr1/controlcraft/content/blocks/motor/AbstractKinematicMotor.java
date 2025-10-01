@@ -120,7 +120,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "constraint_motor";
     }
 

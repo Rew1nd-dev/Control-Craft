@@ -206,7 +206,7 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
     }
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "propeller controller";
     }
 

@@ -60,9 +60,6 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
     public AbstractMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        // registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getServoAngle, this::setClientAngle, SerializeUtils.DOUBLE, ANIMATED_ANGLE), Side.RUNTIME_SHARED);
-        // registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getOffset, this::setOffset, SerializeUtils.VECTOR3DC, OFFSET), Side.SHARED);
-
         buildRegistry(ANIMATED_ANGLE).withBasic(SerializePort.of(this::getServoAngle, this::setClientAngle, SerializeUtils.DOUBLE)).dispatchToSync().runtimeOnly().register();
         buildRegistry(SharedKeys.SELF_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getSelfOffset()), this::setSelfOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).dispatchToSync().register();
         buildRegistry(SharedKeys.COMP_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getCompOffset()), this::setCompOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).register();
@@ -75,6 +72,12 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         registerConstraintKey("revolute");
         registerConstraintKey("attach_1");
         registerConstraintKey("attach_2");
+    }
+
+    public void validateJoint(){
+        if(getConstraint("attach_1") == null || getConstraint("attach_2") == null || getConstraint("revolute") == null){
+            destroyConstraints();
+        }
     }
 
     public float getAnimatedAngle(float partialTicks) {

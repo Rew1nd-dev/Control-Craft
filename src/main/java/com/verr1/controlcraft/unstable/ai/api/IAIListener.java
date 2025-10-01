@@ -10,6 +10,10 @@ public interface IAIListener {
 
     default void onPostRepair(){};
 
+    default void onPreRestore(){};
+
+    default void onPostRestore(){};
+
     default void onProjectileImpact(){};
 
 }

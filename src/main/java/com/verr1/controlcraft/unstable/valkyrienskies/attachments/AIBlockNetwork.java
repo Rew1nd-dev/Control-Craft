@@ -114,6 +114,16 @@ public class AIBlockNetwork implements IAIListener{
     }
 
     @Override
+    public void onPreRestore() {
+        aiEventListeners.values().forEach(IAIListener::onPreRestore);
+    }
+
+    @Override
+    public void onPostRestore() {
+        aiEventListeners.values().forEach(IAIListener::onPostRestore);
+    }
+
+    @Override
     public void onProjectileImpact() {
         aiEventListeners.values().forEach(IAIListener::onProjectileImpact);
     }

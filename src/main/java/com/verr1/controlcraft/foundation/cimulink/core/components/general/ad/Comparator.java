@@ -19,7 +19,7 @@ public class Comparator extends Combinational {
     }
 
 
-
+    public static final double err = 1e-5;
 
 
     @Override
@@ -27,9 +27,9 @@ public class Comparator extends Combinational {
         double a = inputs.get(0);
         double b = inputs.get(1);
         return List.of(
-                a > b ? 1.0 : 0.0, // A > B
-                a < b ? 1.0 : 0.0, // A < B
-                Math.abs(a - b) < 1e-5 ? 1.0 : 0.0  // A = B
+                a >= b + err / 2 ? 1.0 : 0.0, // A > B
+                a <= b - err / 2 ? 1.0 : 0.0, // A < B
+                Math.abs(a - b) < err ? 1.0 : 0.0  // A = B
         );
     }
 

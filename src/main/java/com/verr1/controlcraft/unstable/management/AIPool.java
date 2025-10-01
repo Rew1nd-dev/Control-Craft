@@ -9,6 +9,8 @@ import com.verr1.controlcraft.unstable.blocks.AiBoundFakePlayer;
 import com.verr1.controlcraft.unstable.data.AIPersistentData;
 import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
 import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
+import com.verr1.controlcraft.unstable.data.v1.AIPersistentDataV1;
+import com.verr1.controlcraft.unstable.management.v1.AIPoolV1;
 import com.verr1.controlcraft.unstable.util.LazyTicker;
 import com.verr1.controlcraft.unstable.valkyrienskies.attachments.AIBlockNetwork;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
@@ -35,23 +37,20 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class AIPool extends SavedData {
+
     private static final Serializer<Map<Long, AIPersistentData>> PERSISTENT = SerializeUtils.ofMap(
             SerializeUtils.LONG,
             AIPersistentData.SER
     );
 
-    private static final Serializer<Map<Long, Long>> POINTERS = SerializeUtils.ofMap(
-            SerializeUtils.LONG,
-            SerializeUtils.LONG
-    );
-
-
     public static final String DATA_NAME = ControlCraft.MODID + "_ai_pool";
+
     public static Vector3d SIMPLE_YARD_POSITION = new Vector3d(0, 128, 0);
 
     public static Vector3d SIMPLE_CREATE_POSITION = new Vector3d(0, 96, 0);
@@ -59,11 +58,13 @@ public class AIPool extends SavedData {
 
     private final Map<Long, AIPersistentData> persistent = new HashMap<>();
 
+
     private final AIYardAllocator allocator = new AIYardAllocator.Simple(this::yard);
 
     private final Map<Long, Pair<Long, Vector3dc>> availableAIAllocatePointer = new HashMap<>();
 
     private final Set<Long> availableAI = new HashSet<>();
+
 
     private final LazyTicker lazyValidator = new LazyTicker(100, this::validate);
     private final LazyTicker lazyYardGuard = new LazyTicker(60, this::ensureStatic);
@@ -72,6 +73,9 @@ public class AIPool extends SavedData {
     private Vector3dc yard(){
         return SIMPLE_YARD_POSITION;
     }
+
+
+
 
     public void reset(){
         availableAI.clear();
@@ -137,10 +141,6 @@ public class AIPool extends SavedData {
         return Optional.ofNullable(vsWorld().getAllShips().getById(id));
     }
 
-    public SchematicKey getTypeOf(long id){
-        return persistent.getOrDefault(id, new AIPersistentData(BlockPos.ZERO, SchematicKey.EMPTY)).key;
-    }
-
     public AIBlockNetwork getNetworkOf(long id){
         return networkOf(id).orElse(null);
     }
@@ -203,11 +203,11 @@ public class AIPool extends SavedData {
 
     public void markAsAI(long id){
         getShipOf(id).ifPresentOrElse(
-            s -> {
-                AIBlockNetwork.getOrCreate(s);
-                s.setSlug("ai_" + id);
-            },
-            () -> logAbsentId(id)
+                s -> {
+                    AIBlockNetwork.getOrCreate(s);
+                    s.setSlug("ai_" + id);
+                },
+                () -> logAbsentId(id)
         );
     }
 
@@ -231,17 +231,17 @@ public class AIPool extends SavedData {
         return availableAI.contains(id);
     }
 
-    public void repairAI(long id){
+    public void repairAI(long id, @NotNull SchematicKey overrideKey){
         AIPersistentData data = persistent.get(id);
         if(data == null){
             logAbsentId(id);
             MinecraftUtils.broadcastMessage(Component.literal("Ship with id: " + id + " is not recorded as AI!"));
             return;
         }
-        AISchematic schematic = AIServer.SCHEMATICS_MANAGER.getLoaded(data.key);
+        AISchematic schematic = AIServer.SCHEMATICS_MANAGER.getLoaded(overrideKey);
         if(schematic == null){
-            logAbsentSchematic(data.key);
-            MinecraftUtils.broadcastMessage(Component.literal("AI with type: " + data.key + " has no schematic loaded!"));
+            logAbsentSchematic(overrideKey);
+            MinecraftUtils.broadcastMessage(Component.literal("AI with type: " + overrideKey + " has no schematic loaded!"));
             return;
         }
         BlockPos center = data.center;
@@ -252,8 +252,11 @@ public class AIPool extends SavedData {
             ControlCraft.LOGGER.error("Tried to repair AI with id {}, but no level found for the ship.", id);
             return;
         }
-
         schematic.repairAt(center, level);
+    }
+
+    public void restoreAI(long id){
+        repairAI(id, persistent.get(id).storageSchematic);
     }
 
     private AIBlockNetwork networkOf(ServerShip s){
@@ -286,71 +289,57 @@ public class AIPool extends SavedData {
 
         vsWorld().teleportShip(ship, withPosition(yardPosition, ship.getChunkClaimDimension()));
 
-        networkOf(ship).onPreRepair();
-        repairAI(id);
-        networkOf(ship).onPostRepair();
+        networkOf(ship).onPreRestore();
+        restoreAI(id);
+        networkOf(ship).onPostRestore();
     }
 
-
-
-    public void spawn(long id, Vector3dc position, Quaterniondc rotation){
-        spawn(id, position, rotation, new Vector3d(), new Vector3d());
-    }
-
-    public void spawn(long id, Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
-        if(!isAI(id))return;
-        if(!availableAI.contains(id))return;
+    public @NotNull AISpawnResult spawn(long id, SchematicKey overrideKey ,Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
+        if(!isAI(id))return AISpawnResult.FAILED;
+        if(!availableAI.contains(id))return AISpawnResult.FAILED;
         ServerShip ship = getShipOf(id).orElse(null);
-        if(ship == null)return;
-
-        // repairAI(id); // repair twice in case of any exceptions
+        if(ship == null)return AISpawnResult.FAILED;
 
         Long spacePointer = availableAIAllocatePointer.get(id).getFirst();
         allocator.free(spacePointer);
         availableAIAllocatePointer.remove(id);
         availableAI.remove(id);
         ship.setStatic(false);
-        vsWorld().teleportShip(ship, withPose(position, rotation, velocity, omega, ship.getChunkClaimDimension()));
 
-        // ControlCraftServer.SERVER_EXECUTOR.executeLater(() -> ship.setStatic(false), 5);
 
-        networkOf(ship).onSpawn();
+        networkOf(ship).onPreRepair();
+        repairAI(id, overrideKey);
+        networkOf(ship).onPostRepair();
+
+        Runnable task = () -> {
+            vsWorld().teleportShip(ship, withPose(position, rotation, velocity, omega, ship.getChunkClaimDimension()));
+            networkOf(ship).onSpawn();
+        };
+
+        // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 2);
+        task.run();
+
+        return new AISpawnResult(id);
     }
 
     public @NotNull AISpawnResult spawn(SchematicKey type, Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
-        AtomicLong resultId = new AtomicLong(-1L);
-        availableAI
-                .stream()
-                .filter(id -> persistent.get(id).key.equals(type))
-                .findFirst()
-                .ifPresent(
-                    id -> {
-                        spawn(id, position, rotation, velocity, omega);
-                        resultId.set(id);
-                    }
+        AtomicReference<AISpawnResult> ref = new AtomicReference<>(AISpawnResult.FAILED);
+
+        availableAI.stream().findAny().ifPresent(
+                id -> ref.set(spawn(id, type, position, rotation, velocity, omega))
         );
-        return new AISpawnResult(resultId.get());
+
+        return ref.get();
     }
 
     public @NotNull AISpawnResult spawn(SchematicKey type, Vector3dc position, Quaterniondc rotation){
-        AtomicLong resultId = new AtomicLong(-1L);
-        availableAI
-                .stream()
-                .filter(id -> persistent.get(id).key.equals(type))
-                .findFirst()
-                .ifPresent(
-                        id -> {
-                            spawn(id, position, rotation);
-                            resultId.set(id);
-                        }
-                );
-        return new AISpawnResult(resultId.get());
+        return spawn(type, position, rotation, new Vector3d(), new Vector3d());
     }
 
-    public void joinPool(SchematicKey newAI, ServerLevel level){
-        AISchematic schematic = AIServer.SCHEMATICS_MANAGER.getLoaded(newAI);
+    public void joinPool(SchematicKey defaultSchematic, ServerLevel level){
+        AISchematic schematic = AIServer.SCHEMATICS_MANAGER.getLoaded(defaultSchematic);
         if(schematic == null){
-            logAbsentSchematic(newAI);
+            logAbsentSchematic(defaultSchematic);
             return;
         }
         ServerShip newAIShip = create1Block(level);
@@ -358,7 +347,7 @@ public class AIPool extends SavedData {
         BlockPos center = BlockPos.containing(toMinecraft(createdShipCenter));
         long id = newAIShip.getId();
 
-        persistent.put(id, new AIPersistentData(center, newAI));
+        persistent.put(id, new AIPersistentData(center, defaultSchematic));
         availableAI.add(id);
         markAsAI(id);
         discard(newAIShip.getId());
@@ -397,11 +386,11 @@ public class AIPool extends SavedData {
             Optional.ofNullable(availableAIAllocatePointer.get(i))
                     .map(Pair::getSecond)
                     .ifPresent(
-                        p -> vsWorld().teleportShip(s, withPosition(
-                                p,
-                                s.getChunkClaimDimension()
-                        ))
-            );
+                            p -> vsWorld().teleportShip(s, withPosition(
+                                    p,
+                                    s.getChunkClaimDimension()
+                            ))
+                    );
         }));
     }
 
@@ -471,5 +460,4 @@ public class AIPool extends SavedData {
     public static AIPool load(MinecraftServer server){
         return server.overworld().getDataStorage().computeIfAbsent(AIPool::load, AIPool::new, DATA_NAME);
     }
-
 }

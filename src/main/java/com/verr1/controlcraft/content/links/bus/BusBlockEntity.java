@@ -48,13 +48,13 @@ public class BusBlockEntity extends CimulinkBlockEntity<BusLinkPort> implements 
     }
 
     @Override
-    public void setDeviceName(String name) {
-        this.name = name;
+    public String receiverName() {
+        return name;
     }
 
     @Override
-    public String deviceName() {
-        return name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     protected Optional<CimulinkBus> bus(){

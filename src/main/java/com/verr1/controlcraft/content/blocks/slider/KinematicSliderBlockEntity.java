@@ -104,7 +104,7 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
 
 
     @Override
-    public String name() {
+    public String receiverName() {
         return "constraint_slider";
     }
 

@@ -26,4 +26,9 @@ public class DynamicRevoluteMotorRenderer extends SafeBlockEntityRenderer<Dynami
                 .light(light)
                 .renderInto(ms, solid);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 1024;
+    }
 }

@@ -2,12 +2,15 @@ package com.verr1.controlcraft.unstable.blocks;
 
 import com.verr1.controlcraft.content.compact.createbigcannons.APAutocannonAccess;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.AiCannonPlant;
 import com.verr1.controlcraft.unstable.ai.api.IAirCannon;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
@@ -16,10 +19,10 @@ import java.util.Objects;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.ARROW;
 
-public abstract class AiCannonBaseBlockEntity extends AiUtilBlockEntity implements IAirCannon {
+public abstract class AiCannonBaseBlockEntity extends AiUtilBlockEntity implements IAirCannon, IPlant {
 
 
-
+    protected final AiCannonPlant plant = new AiCannonPlant(this);
     protected double spawnDistance = 10;
 
     protected int cooldown = 0;
@@ -97,6 +100,12 @@ public abstract class AiCannonBaseBlockEntity extends AiUtilBlockEntity implemen
         tickFire();
     }
 
+    @NotNull
+    @Override
+    public AiCannonPlant plant() {
+        return plant;
+    }
+
     public double shootTolerance() {
         return tol;
     }
@@ -106,6 +115,10 @@ public abstract class AiCannonBaseBlockEntity extends AiUtilBlockEntity implemen
     }
 
     public abstract Projectile getProjectile();
+
+    public void fire(){
+        fireAt(frontDirection());
+    }
 
     @Override
     public void fireAt(Vector3dc direction) {
