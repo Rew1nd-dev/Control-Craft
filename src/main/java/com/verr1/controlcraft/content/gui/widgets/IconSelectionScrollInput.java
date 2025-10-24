@@ -15,17 +15,32 @@ import java.util.function.Function;
 public class IconSelectionScrollInput extends SelectionScrollInput {
 
     private final ScreenElement icon;
+    private final ScreenElement hovered;
     private Function<Integer, List<Component>> mutableDescriptions = i -> List.of();
     private final ArrayList<Component> commonDescriptions = new ArrayList<>();
 
     public IconSelectionScrollInput(int xIn, int yIn, int widthIn, int heightIn, ScreenElement icon) {
         super(xIn, yIn, widthIn, heightIn);
         this.icon = icon;
+        this.hovered = icon;
+    }
+
+    public IconSelectionScrollInput(int xIn, int yIn, int widthIn, int heightIn, ScreenElement icon, ScreenElement hovered) {
+        super(xIn, yIn, widthIn, heightIn);
+        this.icon = icon;
+        this.hovered = hovered;
     }
 
     public IconSelectionScrollInput(SizedScreenElement icon) {
         super(0, 0, icon.width(), icon.height());
         this.icon = icon;
+        this.hovered = icon;
+    }
+
+    public IconSelectionScrollInput(SizedScreenElement icon, SizedScreenElement hovered) {
+        super(0, 0, icon.width(), icon.height());
+        this.icon = icon;
+        this.hovered = hovered;
     }
 
     public IconSelectionScrollInput withDescriptions(List<Component> descriptions){
@@ -43,7 +58,11 @@ public class IconSelectionScrollInput extends SelectionScrollInput {
     @Override
     protected void doRender(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.doRender(graphics, mouseX, mouseY, partialTicks);
-        icon.render(graphics, getX(), getY());
+        if(isHovered){
+            hovered.render(graphics, getX(), getY());
+        }else{
+            icon.render(graphics, getX(), getY());
+        }
     }
 
     public IconSelectionScrollInput withOptionDescriptions(Function<Integer, List<Component>> descriptions){

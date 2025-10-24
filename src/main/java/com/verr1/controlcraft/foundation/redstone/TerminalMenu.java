@@ -57,8 +57,8 @@ public class TerminalMenu extends GhostItemMenu<WrappedChannel> {
 
         int totalPages = (contentHolder.size() - 1) / LINE_BLOCK + 1;
 
-        int x = 8;
-        int y = 8;
+        int x = 12;
+        int y = 4;
         int slot = 0;
 
         for(int p = 0; p < totalPages; p++){

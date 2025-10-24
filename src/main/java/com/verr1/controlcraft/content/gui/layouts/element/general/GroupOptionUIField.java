@@ -53,8 +53,8 @@ public class GroupOptionUIField<G extends Enum<?> & EnumGroup<V> & Descriptive<?
         this.valueTitle = valueTitle.toDescriptiveLabel();
         this.groupTitle = groupTitle.toDescriptiveLabel();
 
-        values = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, defaultValue.group().members());
-        groups = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, groupType);
+        values = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, defaultValue.group().members());
+        groups = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, groupType);
 
 
         values.valueCalling(

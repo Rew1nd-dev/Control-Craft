@@ -40,13 +40,13 @@ public class TerminalDeviceUIField extends TypedUIPort<CompoundTag> {
             new SlotUI()
     );
 
-    public DescriptiveScrollInput<SlotType> fieldSelector = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION);
+    public DescriptiveScrollInput<SlotType> fieldSelector = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED);
     public FormattedLabel fieldLabel = new FormattedLabel(0,0, Component.literal("      "));
 
-    public DescriptiveScrollInput<GroupPolicy> policySelector = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, GroupPolicy.class);
+    public DescriptiveScrollInput<GroupPolicy> policySelector = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, GroupPolicy.class);
     public FormattedLabel policyLabel = new FormattedLabel(0,0, Component.literal("      "));
 
-    public DescriptiveScrollInput<LerpType> lerpSelector = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, LerpType.class);
+    public DescriptiveScrollInput<LerpType> lerpSelector = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, LerpType.class);
     public FormattedLabel lerpLabel = new FormattedLabel(0,0, Component.literal("      "));
 
 
@@ -197,7 +197,7 @@ public class TerminalDeviceUIField extends TypedUIPort<CompoundTag> {
 
         public FormattedLabel directionLabel = new FormattedLabel(0, 0, Component.literal("      "));
         public DescriptiveScrollInput<SlotDirection> directionSelector = new
-                DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, SlotDirection.class)
+                DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, SlotDirection.class)
                 .valueCalling(
                         it -> {
                             directionLabel.text = it.asComponent().copy().withStyle(Converter::optionStyle);

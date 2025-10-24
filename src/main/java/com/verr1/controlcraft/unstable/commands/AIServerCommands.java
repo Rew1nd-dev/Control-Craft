@@ -38,6 +38,12 @@ public class AIServerCommands {
         return RequiredArgumentBuilder.argument(name, type);
     }
 
+
+    private static int reloadCommand(CommandContext<CommandSourceStack> context){
+        AIServer.SCHEMATICS_MANAGER.reload();
+        return 1;
+    }
+
     private static int debugSaveSchematicCommand(CommandContext<CommandSourceStack> context){
         CommandSourceStack source = context.getSource();
 
@@ -261,6 +267,10 @@ public class AIServerCommands {
                                                 AIServerCommands::setYardPositionCommand
                                         )
                                 )
+                ).then(
+                        lt("reload-schematics").executes(
+                                AIServerCommands::reloadCommand
+                        )
                 )
 
         );

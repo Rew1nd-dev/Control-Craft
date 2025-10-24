@@ -23,4 +23,15 @@ public interface IPath {
         return new CombinedPath(List.of(ps));
     }
 
+    static @NotNull IPath concat(List<Vector3dc> wayPoints){
+        int size = wayPoints.size();
+        if(size < 2)throw new IllegalArgumentException("At least 2 points required to form a path");
+        if(size == 2)return new LinePath(wayPoints.get(0), wayPoints.get(1));
+        IPath[] paths = new IPath[size - 1];
+        for(int i = 0; i < size - 1; i++){
+            paths[i] = new LinePath(wayPoints.get(i), wayPoints.get(i + 1));
+        }
+        return new CombinedPath(List.of(paths));
+    }
+
 }

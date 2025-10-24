@@ -13,7 +13,12 @@ import net.minecraft.core.BlockPos;
 public class UnitUIPanel extends TypedUIPanel<Double> implements TitleLabelProvider {
 
     protected final FormattedLabel title;
-    protected final SmallIconButton unitButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::trigger);
+    protected final SmallIconButton unitButton = new SmallIconButton(
+            0, 0,
+            ControlCraftGuiTextures.SMALL_BUTTON_YES,
+            ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED
+    )
+            .withCallback(this::trigger);
 
 
 

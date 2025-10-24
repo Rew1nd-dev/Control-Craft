@@ -2,6 +2,7 @@ package com.verr1.controlcraft.content.links;
 
 import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
@@ -44,7 +45,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     private final T linkPort;
     // private final ClientWatcher watcher = new ClientWatcher();
     private boolean isInitialized = false;
-
 
     private IRenderer renderer;
 
@@ -191,8 +191,9 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
     @OnlyIn(Dist.CLIENT)
     private void requestConnectionStatusOnFocus(){
-        // if(!beingLookedAt())return;
-        handler().request(SharedKeys.CONNECTION_STATUS);
+        if(beingLookedAt()){
+            handler().request(SharedKeys.CONNECTION_STATUS);
+        }
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -203,8 +204,9 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
     @OnlyIn(Dist.CLIENT)
     private void requestValueStatusOnFocus(){
-        // if(!beingLookedAt())return;
-        handler().request(SharedKeys.VALUE_STATUS);
+        if(beingLookedAt()){
+            handler().request(SharedKeys.VALUE_STATUS);
+        }
     }
 
     @Override
@@ -230,8 +232,13 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     }
 
 
-
-
+    @Override
+    public void tickServer() {
+        super.tickServer();
+        if(BlockPropertyConfig._ALWAYS_REQUEST_PORT_INFO){
+            syncForNear(true, SharedKeys.VALUE_STATUS, SharedKeys.CONNECTION_STATUS);
+        }
+    }
 
     @Override
     public void lazyTickServer() {

@@ -1,7 +1,9 @@
 package com.verr1.controlcraft.unstable.data.schematic;
 
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.DebugUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -46,6 +48,10 @@ public class AIServerSchematics {
 
     public AISchematic getLoaded(SchematicKey key){
         return LOADED_SCHEMATICS.get(key);
+    }
+
+    public void reload(){
+        loadSchematics(ControlCraftServer.INSTANCE);
     }
 
     public void loadSchematics(MinecraftServer server){

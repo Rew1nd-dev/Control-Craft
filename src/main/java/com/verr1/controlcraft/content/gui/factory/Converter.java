@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.gui.factory;
 
+import com.jozufozu.flywheel.util.Color;
 import com.simibubi.create.foundation.gui.widget.Label;
 import com.verr1.controlcraft.content.gui.layouts.api.ComponentLike;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
@@ -13,8 +14,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
+import org.jline.utils.Colors;
 import org.stringtemplate.v4.ST;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -170,15 +173,15 @@ public class Converter {
     }
 
     public static Style titleStyle(Style s){
-        return s.withItalic(false).withColor(ChatFormatting.DARK_GRAY);
+        return s.withItalic(false).withColor(ChatFormatting.WHITE);
     }
 
     public static Style viewStyle(Style s){
-        return s.withBold(true).withUnderlined(true).withItalic(false).withColor(ChatFormatting.DARK_GRAY);
+        return s.withBold(true).withUnderlined(true).withItalic(false).withColor(ChatFormatting.WHITE);
     }
 
     public static Style optionStyle(Style s){
-        return s.withBold(false).withItalic(true).withUnderlined(true).withColor(ChatFormatting.DARK_AQUA);
+        return s.withBold(false).withItalic(true).withUnderlined(true).withColor(Color.SPRING_GREEN.getRGB());
     }
 
     public static Style minMaxStyle(Style s){

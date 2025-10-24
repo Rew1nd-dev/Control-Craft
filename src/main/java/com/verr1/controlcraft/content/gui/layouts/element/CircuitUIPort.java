@@ -40,8 +40,8 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     private int currentIndex = 0;
     private final IconSelectionScrollInput blockSelector = (IconSelectionScrollInput)
             new IconSelectionScrollInput(
-                    0, 0, 10, 10,
-                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION
+                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION,
+                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED
             ).calling(this::setBlock);
 
     private GridLayout blockLayout = new GridLayout();
@@ -257,7 +257,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
             layout.addChild(label, 0, 0);
             layout.addChild(value, 0, 1);
             layout.addChild(field, 0, 2);
-            layout.columnSpacing(2);
+            layout.columnSpacing(4).rowSpacing(1);
             return layout;
         }
 

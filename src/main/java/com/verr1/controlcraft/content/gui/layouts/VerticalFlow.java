@@ -173,8 +173,8 @@ public class VerticalFlow implements SwitchableTab {
     @Override
     public void doLayout(@NotNull ScreenRectangle screenRectangle) {
         listeners.forEach(SwitchableTabListener::onDoLayout);
-        this.verticalLayout.setX(screenRectangle.left() + 6);
-        this.verticalLayout.setY(screenRectangle.top() + 6);
+        this.verticalLayout.setX(screenRectangle.left() + 12);
+        this.verticalLayout.setY(screenRectangle.top() + 4);
         this.verticalLayout.arrangeElements();
         // FrameLayout.alignInRectangle(this.verticalLayout, screenRectangle, 0.5F, 0.16666667F);
     }

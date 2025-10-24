@@ -13,6 +13,6 @@ public class ShaoLibProxyImpl implements IShaoLibProxy {
 
     @Override
     public BlockHitResult fastClip(ServerLevel level, Vec3 start, Vec3 end) {
-        return LodRaycasts.clipActualOrCachedIncludeShips(level, start, end, true);
+        return LodRaycasts.clipActualOrCachedIncludeShips(level, start, end, true, false);
     }
 }

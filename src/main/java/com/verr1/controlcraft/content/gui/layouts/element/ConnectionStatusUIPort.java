@@ -44,8 +44,8 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
 
     private final FormattedLabel addLabel = title(UIContents.ADD_PORT_TO_BUS).toUILabel();
     private final FormattedLabel retLabel = title(UIContents.RET_PORT_FROM_BUS).toUILabel();
-    private final SmallIconButton add = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::add);
-    private final SmallIconButton ret = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_NO).withCallback(this::ret);
+    private final SmallIconButton add = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_YES, ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED).withCallback(this::add);
+    private final SmallIconButton ret = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_NO, ControlCraftGuiTextures.SMALL_BUTTON_NO_PRESSED).withCallback(this::ret);
 
     private final FormattedLabel ins = title(UIContents.AVAILABLE_IN_PORTS).toDescriptiveLabel();
     private final FormattedLabel outs = title(UIContents.AVAILABLE_OUT_PORTS).toUILabel();

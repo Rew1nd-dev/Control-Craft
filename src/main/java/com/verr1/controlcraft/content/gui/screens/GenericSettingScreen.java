@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.verr1.controlcraft.content.gui.layouts.TabSwitch;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+import com.verr1.controlcraft.content.gui.widgets.PressableIconButton;
 import com.verr1.controlcraft.content.gui.widgets.TabIconButton;
 import com.verr1.controlcraft.content.gui.layouts.api.SizedScreenElement;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
@@ -41,8 +42,11 @@ public class GenericSettingScreen extends AbstractSimiScreen {
 
         public builder withTab(String name, VerticalFlow tab){
             IconButton button = new TabIconButton(0, 0,
-                    SizedScreenElement.wrap(AllIcons.I_TOOLBOX),
-                    ControlCraftGuiTextures.TAB_BUTTON_FRAME, tab, tabManager)
+                    ControlCraftGuiTextures.TOOL,
+                    ControlCraftGuiTextures.TOOL_DOWN,
+                    tab,
+                    tabManager
+            )
                     .withTooltip(List.of(Component.literal(name)));
             tabs.add(new TabWithButton(tab, button));
             return this;
@@ -62,8 +66,11 @@ public class GenericSettingScreen extends AbstractSimiScreen {
             ).toList());
 
             IconButton button = new TabIconButton(0, 0,
-                    SizedScreenElement.wrap(AllIcons.I_TOOLBOX),
-                    ControlCraftGuiTextures.TAB_BUTTON_FRAME, tab, tabManager)
+                    ControlCraftGuiTextures.TOOL,
+                    ControlCraftGuiTextures.TOOL_DOWN,
+                    tab,
+                    tabManager
+            )
                     .withTooltip(tooltips);
             tabs.add(new TabWithButton(tab, button));
             return this;
@@ -102,8 +109,8 @@ public class GenericSettingScreen extends AbstractSimiScreen {
     SizedScreenElement tabBar = ControlCraftGuiTextures.TAB_BAR;
     BlockPos pos;
     GridLayout buttonLayout = new GridLayout();
-    IconButton applyButton = new IconButton(0, 0, AllIcons.I_CONFIRM).withCallback(this::apply);
-    IconButton refreshButton = new IconButton(0, 0, AllIcons.I_REFRESH).withCallback(this::refresh);
+    PressableIconButton applyButton = new PressableIconButton(0, 0, ControlCraftGuiTextures.YES, ControlCraftGuiTextures.YES_DOWN).withCallback(this::apply);
+    PressableIconButton refreshButton = new PressableIconButton(0, 0, ControlCraftGuiTextures.REFRESH, ControlCraftGuiTextures.REFRESH_DOWN).withCallback(this::refresh);
 
     GenericSettingScreen(
             BlockPos pos,
@@ -135,7 +142,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
         buttonLayout.columnSpacing(4);
         buttonLayout.arrangeElements();
         buttonLayout.setX(guiLeft + 28);
-        int common_button_y = guiTop - buttonLayout.getHeight() - 2;
+        int common_button_y = guiTop - buttonLayout.getHeight() - 8;
         buttonLayout.setY(common_button_y);
         applyButton.setX(guiLeft + 3);
         applyButton.setY(common_button_y);
@@ -197,7 +204,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
     @Override
     protected void renderWindow(GuiGraphics graphics, int i, int i1, float v) {
         background.render(graphics, guiLeft, guiTop);
-        tabBar.render(graphics, guiLeft, guiTop - 24);
+        tabBar.render(graphics, guiLeft, guiTop - 30);
         ItemStack renderStack = renderedStack();
         int x = guiLeft + 30;
         int y = guiTop + background.height();

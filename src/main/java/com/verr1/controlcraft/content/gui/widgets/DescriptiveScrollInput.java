@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.gui.element.ScreenElement;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.layouts.api.ComponentLike;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+import com.verr1.controlcraft.content.gui.layouts.api.SizedScreenElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +20,17 @@ public class DescriptiveScrollInput<T extends Enum<?> & Descriptive<?>> extends 
     private final ArrayList<T> values = new ArrayList<>();
     private Consumer<T> valueCalling = it -> {};
 
+    public DescriptiveScrollInput(SizedScreenElement icon, Class<T> clazz) {
+        super(icon);
+        this.values.addAll(Arrays.asList(clazz.getEnumConstants()));
+        lateInit();
+    }
+
+    public DescriptiveScrollInput(SizedScreenElement icon, SizedScreenElement hovered, Class<T> clazz) {
+        super(icon, hovered);
+        this.values.addAll(Arrays.asList(clazz.getEnumConstants()));
+        lateInit();
+    }
 
     public DescriptiveScrollInput(int xIn, int yIn, int widthIn, int heightIn, ScreenElement icon, Class<T> clazz) {
         super(xIn, yIn, widthIn, heightIn, icon);
@@ -32,10 +44,26 @@ public class DescriptiveScrollInput<T extends Enum<?> & Descriptive<?>> extends 
         lateInit();
     }
 
+    public DescriptiveScrollInput(SizedScreenElement icon, @NotNull T[] provided){
+        super(0, 0, icon.width(), icon.height(), icon);
+        this.values.addAll(Arrays.asList(provided));
+        lateInit();
+    }
+
+    public DescriptiveScrollInput(SizedScreenElement icon, SizedScreenElement hovered, @NotNull T[] provided){
+        super(icon, hovered);
+        this.values.addAll(Arrays.asList(provided));
+        lateInit();
+    }
+
     public DescriptiveScrollInput(int xIn, int yIn, int widthIn, int heightIn, ScreenElement icon){
         super(xIn, yIn, widthIn, heightIn, icon);
         // this.values = Arrays.asList(provided);
 
+    }
+
+    public DescriptiveScrollInput(SizedScreenElement icon, SizedScreenElement hovered){
+        super(icon, hovered);
     }
 
     public DescriptiveScrollInput<T> withValues(T[] provided){

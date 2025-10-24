@@ -39,6 +39,7 @@ import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixinducks.IEntityDuck;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.unstable.targeting.IAITarget;
 import com.verr1.controlcraft.utils.*;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
@@ -121,6 +122,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public EntityHitResult latestEntityHitResult = null;
     public EntityHitResult latestServerPlayerHitResult = null;
     public BlockHitResult latestBlockHitResult = null;
+    public final CameraLocked lastestLocked = new CameraLocked();
 
     private LatestClip latestClipType = LatestClip.BLOCK;
 
@@ -224,7 +226,9 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     public Vector3dc latestBlockVelocity(){
-        return new Vector3d();
+        return Optional.ofNullable(latestBlockHitResult).map(r -> toJOML(r.getLocation())).map(
+                p -> IAITarget._velocity(p, (ServerLevel) level)
+        ).orElse(new Vector3d());
     }
 
     public Vector3dc latestServerPlayerVelocity(){
@@ -295,7 +299,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     }
 
     public void clipNewBlock(){
-        latestBlockHitResult = clipBlock(false);
+        latestBlockHitResult = clipBlock(true);
         latestClipType = LatestClip.BLOCK;
     }
 
@@ -373,6 +377,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
         if(level.isClientSide){
+            setRemoved();
             ControlCraft.LOGGER.info("Unloading Camera: {}", getBlockPos());
         }
     }
@@ -922,13 +927,15 @@ public class CameraBlockEntity extends OnShipBlockEntity
     @Override
     public void tickClient() {
         super.tickClient();
-
+        if(isRemoved())return;
+        // sometimes there is duplicate tick on client side, avoid that
         // db_outlineConeAABB();
         if(
                 rayType() == CameraClipType.RAY_ALWAYS
                         ||
                 rayType() == CameraClipType.RAY_ON_USE && isLinkedCamera()
         ){
+
             outlineClipRayShip();
         }
 

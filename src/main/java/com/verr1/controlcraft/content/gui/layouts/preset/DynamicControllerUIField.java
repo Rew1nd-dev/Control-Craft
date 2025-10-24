@@ -54,10 +54,10 @@ public class DynamicControllerUIField extends TypedUIPort<CompoundTag> implement
         layoutToFill.addChild(title, 0, 0, 1, 5);
         layoutToFill.addChild(pLabel, 1, 0);
         layoutToFill.addChild(pField, 1, 1);
-        layoutToFill.addChild(iLabel, 1, 2);
-        layoutToFill.addChild(iField, 1, 3);
-        layoutToFill.addChild(dLabel, 1, 4);
-        layoutToFill.addChild(dField, 1, 5);
+        layoutToFill.addChild(iLabel, 2, 0);
+        layoutToFill.addChild(iField, 2, 1);
+        layoutToFill.addChild(dLabel, 3, 0);
+        layoutToFill.addChild(dField, 3, 1);
         layoutToFill.rowSpacing(4).columnSpacing(2);
     }
 

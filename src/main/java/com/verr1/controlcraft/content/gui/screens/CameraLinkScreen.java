@@ -50,8 +50,8 @@ public class CameraLinkScreen extends AbstractSimiScreen{
             $ -> {
                 var lwc = new LabelWithButtons(
                         new FormattedLabel(0, 0, Component.literal("")),
-                        new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withToolTips(UIContents.CAMERA_LINK_ACCEPT.specific()),
-                        new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_NO).withToolTips(UIContents.CAMERA_LINK_DUMP.specific())
+                        new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES, ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED).withToolTips(UIContents.CAMERA_LINK_ACCEPT.specific()),
+                        new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_NO, ControlCraftGuiTextures.SMALL_BUTTON_NO_PRESSED).withToolTips(UIContents.CAMERA_LINK_DUMP.specific())
                     );
 
                 selections.add(lwc);
@@ -74,7 +74,7 @@ public class CameraLinkScreen extends AbstractSimiScreen{
         selectionLayout.visitWidgets(this::addRenderableWidget);
         selectionLayout.columnSpacing(4);
         selectionLayout.rowSpacing(2);
-        selectionLayout.setX(guiLeft + 3);
+        selectionLayout.setX(guiLeft + 13);
         selectionLayout.setY(guiTop + 5);
 
     }
@@ -112,7 +112,7 @@ public class CameraLinkScreen extends AbstractSimiScreen{
         buttonLayout.arrangeElements();
 
         buttonLayout.setX(guiLeft + 28);
-        buttonLayout.setY(guiTop - buttonLayout.getHeight() - 2);
+        buttonLayout.setY(guiTop - buttonLayout.getHeight() - 8);
 
 
         addRenderableWidgets(resetButton, validateButton);
@@ -159,7 +159,7 @@ public class CameraLinkScreen extends AbstractSimiScreen{
     @Override
     protected void renderWindow(GuiGraphics graphics, int i, int i1, float v) {
         background.render(graphics, guiLeft, guiTop);
-        tabBar.render(graphics, guiLeft, guiTop - 24);
+        tabBar.render(graphics, guiLeft, guiTop - 30);
     }
 
 

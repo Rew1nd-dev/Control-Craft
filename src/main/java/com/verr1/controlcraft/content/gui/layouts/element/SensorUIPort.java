@@ -28,8 +28,9 @@ public class SensorUIPort extends MultipleTypedUIPort{
     FormattedLabel value = new FormattedLabel(0, 0, Component.literal("LLLLL"));
 
     DescriptiveScrollInput<SensorTypes> options = new DescriptiveScrollInput<>(
-            0, 0, 10, 10,
-            ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, SensorTypes.class
+            ControlCraftGuiTextures.SMALL_BUTTON_SELECTION,
+            ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED,
+            SensorTypes.class
     );
 
     SmallCheckbox localCheckbox = new SmallCheckbox(

@@ -11,22 +11,36 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public enum ControlCraftGuiTextures implements SizedScreenElement {
-    SIMPLE_BACKGROUND("simple_background", 176, 108),
-    SIMPLE_BACKGROUND_HALF("simple_background_half", 87, 108),
-    SIMPLE_BACKGROUND_QUARTER("simple_background_5_6", 164, 138),
+    // SIMPLE_BACKGROUND("simple_background", 179, 133),
+    // SIMPLE_BACKGROUND_HALF("simple_background_half", 87, 108),
+    SIMPLE_BACKGROUND_QUARTER("simple_background_5_6", 166, 133),
     SIMPLE_BACKGROUND_LARGE("simple_background_large", 256, 133),
     SIMPLE_BACKGROUND_ONE_LINE("simple_background_one_line", 160, 29),
 
 
-    SMALL_BUTTON_RED("icons10x10", 0, 0, 10, 10),
-    SMALL_BUTTON_GREEN("icons10x10", 10, 0, 10, 10),
-    SMALL_BUTTON_SELECTION("icons10x10", 20, 0, 10, 10),
-    SMALL_BUTTON_NO("icons10x10", 30, 0, 10, 10),
-    SMALL_BUTTON_YES("icons10x10", 40, 0, 10, 10),
+    SMALL_BUTTON_GREEN("icons10x10", 2, 50, 9, 13),
+    SMALL_BUTTON_SELECTION("icons10x10", 12, 50, 9, 13),
+    SMALL_BUTTON_NO("icons10x10", 22, 50, 9, 13),
+    SMALL_BUTTON_YES("icons10x10", 32, 50, 9, 13),
 
-    TAB_BUTTON_BACKGROUND("tab_button_background", 0, 0, 40, 12),
-    TAB_BUTTON_FRAME("tab_button_frame", 0, 0, 40, 1),
-    TAB_BAR("tab_bar", 0, 0, 164, 24),
+    SMALL_BUTTON_RED("icons10x10", 2, 64, 9, 13),
+    SMALL_BUTTON_GREEN_PRESSED("icons10x10", 2, 64, 9, 13),
+    SMALL_BUTTON_SELECTION_PRESSED("icons10x10", 12, 64, 9, 13),
+    SMALL_BUTTON_NO_PRESSED("icons10x10", 22, 64, 9, 13),
+    SMALL_BUTTON_YES_PRESSED("icons10x10", 32, 64, 9, 13),
+
+    // TAB_BUTTON_BACKGROUND("tab_button_background", 0, 0, 40, 12),
+    // TAB_BUTTON_FRAME("tab_button_frame", 0, 0, 40, 1),
+    TAB_BAR("tab_bar", 0, 0, 166, 30),
+
+    YES("icons10x10", 2, 2, 18, 18),
+    YES_DOWN("icons10x10", 2, 24, 18, 18),
+
+    REFRESH("icons10x10", 22, 2, 18, 18),
+    REFRESH_DOWN("icons10x10", 22, 24, 18, 18),
+
+    TOOL("icons10x10", 42, 2, 18, 18),
+    TOOL_DOWN("icons10x10", 42, 24, 18, 18),
     ;
 
     public static final int FONT_COLOR = 0x575F7A;

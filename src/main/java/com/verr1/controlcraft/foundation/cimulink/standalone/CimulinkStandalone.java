@@ -41,7 +41,7 @@ public class CimulinkStandalone {
         // Eval.testSubModule();
         // Eval.test();
         // save(Jet.create(), Path.of(DataPath), "attacker");
-        // save(WarThunderFlight.flight(), Path.of(DataPath), "yprFlight");
+        // save(Flights.flight6(), Path.of(DataPath), "yprFlight4");
         // save(View.create(), Path.of(DataPath), "view");
         // save(DigitalCircuits.decoder8(), Path.of(DataPath), "decoder8");
         // save(WarThunderFlight.Sel(), Path.of(DataPath), "viewManualSel");
@@ -55,8 +55,9 @@ public class CimulinkStandalone {
         // save(JetMissile.closeLoopXYZ().evaluate().buildContext(), Path.of(DataPath), "jetMissile");
         // save(JetMissile.computeYP().evaluate().buildContext(), Path.of(DataPath), "cyp");
 
-        save(Flights.flight4(), Path.of(DataPath), "yprFlight5");
+        save(CCRP.fireCon().evaluate().buildContext(), Path.of(DataPath), "fireMng");
 
+        // save(WarThunderFlight.lerp().evaluate().buildContext(), Path.of(DataPath), "testLoop");
         // System.out.println(Math.pow(1.001, -0.001));
         // AimPredict.testAim();
         // Missile.testYP();

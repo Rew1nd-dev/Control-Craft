@@ -2,13 +2,16 @@ package com.verr1.controlcraft.content.links.tweakerminal;
 
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
+import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.simibubi.create.foundation.utility.Iterate;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerServerRecorder;
+import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,6 +24,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 public class TweakerminalBlock extends DirectionalBlock implements IBE<TweakerminalBlockEntity> {
@@ -57,16 +62,33 @@ public class TweakerminalBlock extends DirectionalBlock implements IBE<Tweakermi
         return prefferedSide;
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public void displayScreen(BlockPos p){
+        ScreenOpener.open(CimulinkUIFactory.createTweakerminal(p));
+    }
+
 
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState state, Level worldIn, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand handIn,
                                           @NotNull BlockHitResult hit){
-        if(worldIn.isClientSide)return InteractionResult.PASS;
-        if(TweakControllerCompact.tweakControllerInHand(player)) {
+        if(
+                worldIn.isClientSide
+                && handIn == InteractionHand.MAIN_HAND
+                && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()
+                && !player.isShiftKeyDown()
+        ){
+            displayScreen(pos);
+            return InteractionResult.SUCCESS;
+        } else if(!worldIn.isClientSide && TweakControllerCompact.tweakControllerInHand(player)) {
             withBlockEntityDo(worldIn, pos, be -> be.setUserUUID(player.getUUID()));
+            CompoundTag tag = player.getItemInHand(InteractionHand.MAIN_HAND).getOrCreateTag();
+            tag.putLong("link_pos", pos.asLong());
             TweakControllerServerRecorder.link(player.getUUID(), WorldBlockPos.of(worldIn, pos));
+
         }
-        return InteractionResult.PASS;
+
+
+        return InteractionResult.SUCCESS;
     }
 
 

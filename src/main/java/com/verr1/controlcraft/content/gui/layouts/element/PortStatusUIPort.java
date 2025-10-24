@@ -27,7 +27,7 @@ import static com.verr1.controlcraft.content.gui.factory.Converter.alignLabel;
 public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
     private final int max_size = 28;
     private final int max_page_size = 14;
-    private final IconSelectionScrollInput pager = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION);
+    private final IconSelectionScrollInput pager = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED);
     private int currentSize = 0;
     private int currentPage = 0;
     private final List<NameEnableWidget> widgets =

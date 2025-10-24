@@ -37,6 +37,24 @@ public class Evaluator {
         return inputs.computeIfAbsent(name, k -> new InputVal(k, this));
     }
 
+    public Val newPositiveTrigger(Val val, String prefix){
+        String inName = prefix + "_i_" + val.portName();
+        String outName = prefix + "_o_" + val.portName();
+        Val lastVal = newVal(inName);
+        asOut(outName, val.mul(1));
+        asLoop(outName, inName);
+        return val.and(lastVal.not());
+    }
+
+    public Val newNegativeTrigger(Val val, String prefix){
+        String inName = prefix + "_i_" + val.portName();
+        String outName = prefix + "_o_" + val.portName();
+        Val lastVal = newVal(inName);
+        asOut(outName, val.mul(1));
+        asLoop(outName, inName);
+        return val.not().and(lastVal);
+    }
+
     public Vector3Val newVector3(String name){
         return new Vector3Val(
                 newVal(name + "_x"),
@@ -147,9 +165,9 @@ public class Evaluator {
             if(regs.containsKey(name)){
                 Shifter reg = allRegs.get(name);
                 constructor.connect(outComponentPortName, reg.__in(0));
+            }else{
+                constructor.defineOutput(name, outComponentPortName);
             }
-            constructor.defineOutput(name, outComponentPortName);
-
         });
         transits.forEach(valTransit -> {
             valTransit.ins().forEach((thisPortName, outputPort) -> {
@@ -344,6 +362,10 @@ public class Evaluator {
 
     public Val clamp(Val x, Val min, Val max){
         return min(max, max(min, x));
+    }
+
+    public Val clamp(Val x, Val max){
+        return min(max, max(max.neg(), x));
     }
 
     public Val lerp(Val start, Val end, Val rate){

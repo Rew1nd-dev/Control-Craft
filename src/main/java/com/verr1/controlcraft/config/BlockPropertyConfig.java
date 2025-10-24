@@ -106,6 +106,12 @@ public class BlockPropertyConfig
             )
             .define("Always Render Cimulink Wire", false);
 
+    private static final ForgeConfigSpec.BooleanValue ALWAYS_REQUEST_PORT_INFO = BUILDER
+            .comment(
+                    "  Always Request Cimulink Port Information, May Cause Network Burden, But Important for Debugging"
+            )
+            .define("Always Request Cimulink Port Information", false);
+
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
@@ -137,6 +143,8 @@ public class BlockPropertyConfig
 
     public static boolean _PHYSICS_THREAD_CIMULINK;
 
+    public static boolean _ALWAYS_REQUEST_PORT_INFO;
+
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
@@ -153,5 +161,6 @@ public class BlockPropertyConfig
         _ALWAYS_ADD_CAMERA_CHUNK = ALWAYS_ADD_CAMERA_CHUNK.get();
         _ALWAYS_RENDER_WIRE = ALWAYS_RENDER_WIRE.get();
         _PHYSICS_THREAD_CIMULINK = PHYSICS_THREAD_CIMULINK.get();
+        _ALWAYS_REQUEST_PORT_INFO = ALWAYS_REQUEST_PORT_INFO.get();
     }
 }

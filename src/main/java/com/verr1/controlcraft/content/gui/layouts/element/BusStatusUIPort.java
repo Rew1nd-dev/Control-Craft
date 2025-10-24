@@ -31,16 +31,16 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
     private final FormattedLabel availNameView = new FormattedLabel(10, 10, Component.literal(""));
     private final FormattedLabel availPortView = new FormattedLabel(10, 10, Component.literal(""));
 
-    private final IconSelectionScrollInput availNames = new IconSelectionScrollInput(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION);
-    private final IconSelectionScrollInput availPorts = new IconSelectionScrollInput(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION);
+    private final IconSelectionScrollInput availNames = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED);
+    private final IconSelectionScrollInput availPorts = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED);
 
 
     private final FormattedLabel usedNamePortView = new FormattedLabel(10, 10, Component.literal(""));
 
-    private final IconSelectionScrollInput usedNamePort = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION);
+    private final IconSelectionScrollInput usedNamePort = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION,ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED);
 
-    private final SmallIconButton add = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::addToUsed);
-    private final SmallIconButton ret = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_NO).withCallback(this::removeUsed);
+    private final SmallIconButton add = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_YES, ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED).withCallback(this::addToUsed);
+    private final SmallIconButton ret = new SmallIconButton(ControlCraftGuiTextures.SMALL_BUTTON_NO, ControlCraftGuiTextures.SMALL_BUTTON_NO_PRESSED).withCallback(this::removeUsed);
 
     final List<String> currentIn = new ArrayList<>();
     final List<String> currentOut = new ArrayList<>();

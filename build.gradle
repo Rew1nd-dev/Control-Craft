@@ -54,7 +54,7 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             args '-mixin.config=mixins.controlcraft.json'
-            // jvmArgs '-Dnet.minecraftforge.gradle.check.certs=false'
+            jvmArgs '-Dnet.minecraftforge.gradle.check.certs=false'
             // Recommended logging level for the console
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
@@ -70,7 +70,7 @@ minecraft {
         client {
 
             workingDirectory project.file('run')
-            //jvmArg "-XX:+AllowEnhancedClassRedefinition"
+            jvmArg "-XX:+AllowEnhancedClassRedefinition"
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', "${mod_id}"
@@ -191,11 +191,13 @@ dependencies {
     implementation "thedarkcolour:kotlinforforge:$forge_kotlin_version"
 
     implementation fg.deobf("libs:tau:2.0.1")
-    implementation fg.deobf("libs:valkyrien_space_war:0.6.13")
+    compileOnly fg.deobf("libs:valkyrien_space_war:0.6.13")
     implementation fg.deobf("libs:cbcmodernwarfare:0.0.6c")
     implementation fg.deobf("libs:createbigcannons:5.8.3")
     implementation fg.deobf("libs:trackwork:1.1.1")
-    compileOnly fg.deobf("libs:shaolib:1.2.0")
+    implementation fg.deobf("libs:vmod:1.3.0")
+    implementation fg.deobf("libs:we-7.2.15:forge")
+    implementation fg.deobf("libs:shaolib:1.4.3")
     implementation fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
 
     // minecraftLibrary("org.jgrapht:jgrapht-core:1.5.2")

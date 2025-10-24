@@ -40,13 +40,17 @@ public class OscilloscopeScreen extends AbstractSimiScreen {
 
     private final SizedScreenElement scopeBackground = ControlCraftGuiTextures.SIMPLE_BACKGROUND_QUARTER;
 
-    private final SmallIconButton autoFit = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::fit); // Converter.convert(UIContents.PLACE_HOLDER, Converter::titleStyle).toUILabel();
+    private final SmallIconButton autoFit = new SmallIconButton(
+            0, 0,
+            ControlCraftGuiTextures.SMALL_BUTTON_YES,
+            ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED
+            ).withCallback(this::fit); // Converter.convert(UIContents.PLACE_HOLDER, Converter::titleStyle).toUILabel();
 
 
 
     public OscilloscopeScreen(BlockPos boundPos) {
-        addChannelButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::addChannel);
-        removeChannelButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES).withCallback(this::removeChannel);
+        addChannelButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES, ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED).withCallback(this::addChannel);
+        removeChannelButton = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_YES, ControlCraftGuiTextures.SMALL_BUTTON_YES_PRESSED).withCallback(this::removeChannel);
         this.boundPos = boundPos;
         this.plotWidget = new MultiPlotWidget(Minecraft.getInstance().font, 0, 0, 180, 75, new MultiPlotWidget.ChannelDataSupplier() {
             @Override

@@ -216,8 +216,8 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
 
     private final IconSelectionScrollInput blockSelector = (IconSelectionScrollInput)
             new IconSelectionScrollInput(
-                    0, 0, 10, 10,
-                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION
+                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION,
+                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED
             ).calling(this::setBlock);
 
 
@@ -329,8 +329,8 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
     }
 
     private void renderFrequencySlot(GuiGraphics graphics){
-        int x = leftPos + 8;
-        int y = topPos + 8;
+        int x = leftPos + 12;
+        int y = topPos + 4;
 
         for(int row = 0; row < block.size(); row++){
             for(int column = 0; column < 2; column++){

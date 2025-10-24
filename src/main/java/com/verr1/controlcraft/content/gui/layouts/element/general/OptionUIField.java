@@ -35,14 +35,14 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
 
     public OptionUIField(BlockPos boundPos, NetworkKey key, Class<T> clazz, LabelProvider titleText) {
         super(boundPos, key, clazz, tryGetDefault(clazz));
-        options = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, clazz);
+        options = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, clazz);
         title = titleText.toDescriptiveLabel();
         lateInit();
     }
 
     public OptionUIField(BlockPos boundPos, NetworkKey key, Class<T> clazz, T[] scope, LabelProvider titleText) {
         super(boundPos, key, clazz, tryGetDefault(clazz));
-        options = new DescriptiveScrollInput<>(0, 0, 10, 10, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, clazz);
+        options = new DescriptiveScrollInput<>(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED, clazz);
         options.withValues(scope);
         title = titleText.toDescriptiveLabel();
         lateInit();

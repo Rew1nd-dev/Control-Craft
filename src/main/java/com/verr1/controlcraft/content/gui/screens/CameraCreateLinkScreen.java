@@ -19,7 +19,7 @@ public class CameraCreateLinkScreen extends AbstractSimiScreen {
 
     private final BlockPos pos;
     private final SizedScreenElement background = ControlCraftGuiTextures.SIMPLE_BACKGROUND_ONE_LINE;
-    private final IconButton dump = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_NO)
+    private final IconButton dump = new SmallIconButton(0, 0, ControlCraftGuiTextures.SMALL_BUTTON_NO, ControlCraftGuiTextures.SMALL_BUTTON_NO_PRESSED)
             .withToolTips(MiscDescription.DUMP.specific()).withCallback(this::dump);
     private final EditBox name = new EditBox(
             Minecraft.getInstance().font, 0, 0, 120, 10, Component.literal("Camera Link Name")

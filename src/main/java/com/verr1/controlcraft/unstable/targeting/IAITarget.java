@@ -1,7 +1,11 @@
 package com.verr1.controlcraft.unstable.targeting;
 
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixinducks.IEntityDuck;
 import com.verr1.controlcraft.unstable.AIServer;
+import com.verr1.controlcraft.utils.VSGetterUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -16,6 +20,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import java.util.Optional;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public interface IAITarget {
 
@@ -63,29 +68,40 @@ public interface IAITarget {
         };
     }
 
-//    static IAITarget ofShip(long id, ServerLevel level){
-//        return new IAITarget() {
-//
-//            private Optional<Ship> ship(){
-//                return Optional.ofNullable(VSGameUtilsKt.getAllShips(level).getById(id));
-//            }
-//
-//            @Override
-//            public Vector3dc position() {
-//                return ship().map(s -> s.getTransform().getPositionInWorld()).orElse(null);
-//            }
-//
-//            @Override
-//            public @NotNull Vector3dc velocity() {
-//                return ship().map(Ship::getVelocity).orElse(new Vector3d());
-//            }
-//
-//            @Override
-//            public boolean isRemoved() {
-//                return VSGameUtilsKt.getAllShips(level).getById(id) == null;
-//            }
-//        };
-//    }
+    static IAITarget ofShipLocation(Vector3dc blockPositionShip, ServerLevel level){
+        return new IAITarget() {
+            final BlockPos blockPos = BlockPos.containing(toMinecraft(blockPositionShip));
+
+            ServerShip ship(){
+                return AIServer.MANAGER.getShipAt(WorldBlockPos.of(level, blockPos)).orElse(null);
+            }
+
+
+            @Override
+            public @Nullable Vector3dc position() {
+                ServerShip ship = ship();
+                if(ship == null)return blockPositionShip;
+                return ship.getShipToWorld().transformPosition(blockPositionShip, new Vector3d());
+            }
+
+            @Override
+            public @NotNull Vector3dc velocity() {
+                return _velocity(blockPositionShip, level);
+            }
+        };
+    }
+
+    @NotNull
+    static Vector3dc _velocity(Vector3dc blockPositionShip, ServerLevel level){
+        BlockPos blockPos = BlockPos.containing(toMinecraft(blockPositionShip));
+        ServerShip ship = AIServer.MANAGER.getShipAt(WorldBlockPos.of(level, blockPos)).orElse(null);;
+        if(ship == null)return new Vector3d();
+        Vector3dc sv_wc = ship.getVelocity();
+        Vector3dc sw_wc = ship.getOmega();
+        Vector3dc r_sc = new Vector3d(blockPositionShip).sub(ship.getTransform().getPositionInShip());
+        Vector3dc r_wc = ship.getShipToWorld().transformDirection(r_sc, new Vector3d());
+        return new Vector3d(sv_wc).add(new Vector3d(sw_wc).cross(r_wc));
+    }
 
     static IAITarget ofEntity(Entity entity){
         return new IAITarget() {

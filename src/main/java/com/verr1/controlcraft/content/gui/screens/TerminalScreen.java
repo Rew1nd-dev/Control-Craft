@@ -152,7 +152,7 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
             lineLayout.addChild(maxField, 0, 4);
             lineLayout.addChild(toggleReverse, 0, 5);
             lineLayout.addChild(toggleField, 0, 6);
-            lineLayout.columnSpacing(6);
+            lineLayout.columnSpacing(5);
             return lineLayout;
         }
     }
@@ -222,8 +222,8 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
 
     private final IconSelectionScrollInput blockSelector = (IconSelectionScrollInput)
             new IconSelectionScrollInput(
-                    0, 0, 10, 10,
-                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION
+                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION,
+                    ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED
             ).calling(this::setBlock);
 
 
@@ -291,8 +291,8 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
 
         layout.addChild(block.createLayout(), 0, 0);
         layout.addChild(blockSelector, 1, 0);
-        layout.setX(leftPos + 8 + 40);
-        layout.setY(topPos + 8 + 4);
+        layout.setX(leftPos + 12 + 40);
+        layout.setY(topPos + 4 + 4);
 
         layout.visitWidgets(this::addRenderableWidget);
         layout.arrangeElements();
@@ -335,8 +335,8 @@ public class TerminalScreen extends AbstractSimiContainerScreen<TerminalMenu> {
     }
 
     private void renderFrequencySlot(GuiGraphics graphics){
-        int x = leftPos + 8;
-        int y = topPos + 8;
+        int x = leftPos + 12;
+        int y = topPos + 4;
 
         for(int row = 0; row < block.size(); row++){
             for(int column = 0; column < 2; column++){

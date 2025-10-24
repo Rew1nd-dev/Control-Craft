@@ -23,8 +23,13 @@ public class MultiIO extends Combinational {
     }
 
     @Override
+    protected void updateOutput(List<Double> outputValues) {
+
+    }
+
+    @Override
     protected List<Double> transform(List<Double> inputs) {
         // nothing, cc act as transform()
-        return List.of();
+        return ArrayUtils.ListOf(n(), 0.0); // return zeroes and avoid updateOutput throw an IllegalArgumentException
     }
 }
