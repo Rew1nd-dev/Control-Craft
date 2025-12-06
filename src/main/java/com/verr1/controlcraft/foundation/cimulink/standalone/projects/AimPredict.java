@@ -18,32 +18,25 @@ public class AimPredict {
 
     public static Evaluator aim(){
         Evaluator eval = new Evaluator();
-
         Vector3Val pt = eval.newVector3("ptx", "pty", "ptz"); // target position relative to base position, in world coordinate
         Vector3Val vt = eval.newVector3("vtx", "vty", "vtz"); // target velocity in world coordinate
         Val bv = eval.newVal("bv"); // bullet speed
-
         Val zero = eval.newVal(0);
         Val inf = eval.newVal(1e7);
-
         Val vt_mag_2 = vt.lengthSquare();
         Val a = vt_mag_2.sub(bv.mul(bv));
         Val b = vt.dot(pt).mul(2);
         Val c = pt.lengthSquare();
-
         Val discriminant = b.mul(b).sub(a.mul(c).mul(4));
         Val invalid = discriminant.lessThan(zero);
         Val safeDiscriminant = eval.max(discriminant, zero);
-
         Val sqrtDisc = eval.sqrt(safeDiscriminant);
         Val t1 = b.neg().add(sqrtDisc).div(a.mul(2));
         Val t2 = b.neg().sub(sqrtDisc).div(a.mul(2));
-
         Val t1_gt_0  = t1.greaterThan(zero);
         Val t2_le_0  = t2.lessThan(zero);
         Val t2_gt_0  = t2.greaterThan(zero);
         Val t1_le_t2 = t1.lessThan(t2);
-
         Val t_hit_0 = eval.orElse(
                 t1_gt_0.and(t2_le_0.or(t1_le_t2)),
                 t1,
@@ -53,7 +46,6 @@ public class AimPredict {
                         inf
                 )
         );
-
         Val t_hit_1 = eval.orElse(
                 discriminant.lessThan(zero),
                 zero,
@@ -63,9 +55,7 @@ public class AimPredict {
                         t_hit_0
                 )
         );
-
         Vector3Val p_aim = pt.add(vt.scale(t_hit_1));
-
         eval.asOut("ax", p_aim.x()).asOut("ay", p_aim.y()).asOut("az", p_aim.z());
 
         return eval;

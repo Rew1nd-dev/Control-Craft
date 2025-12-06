@@ -22,7 +22,7 @@ public class ShaoLibCompact {
         if(!ModList.get().isLoaded("shaolib"))return;
         try {
             Class<?> clazz = Class.forName("com.verr1.controlcraft.content.compact.shaolib.impl.ShaoLibProxyImpl");
-            // getter = (IShaoLibProxy) clazz.getDeclaredConstructor().newInstance();
+            getter = (IShaoLibProxy) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             ControlCraft.LOGGER.error("Failed to initialize ShaoLib Compact", e);
         }

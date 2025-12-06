@@ -51,7 +51,7 @@ public class CoeffUIPort extends ListUIPort<StringDouble, Coefficients>{
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         AtomicInteger line = new AtomicInteger(0);
         layoutToFill.addChild(title(UIContents.FMA_COEFFICIENT).toDescriptiveLabel(), line.getAndIncrement(), 0);
 

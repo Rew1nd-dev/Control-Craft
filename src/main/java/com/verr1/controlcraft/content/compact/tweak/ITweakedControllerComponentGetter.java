@@ -13,7 +13,6 @@ public interface ITweakedControllerComponentGetter {
 
     BlockState lecternBlock();
 
-
     boolean tweakControllerInHand(Player player);
 
 }

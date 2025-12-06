@@ -49,8 +49,7 @@ public class CompactFlapBlock extends BearingBlock implements
 
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn,
-                                 BlockHitResult hit){
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit){
         if(     worldIn.isClientSide
                 && handIn == InteractionHand.MAIN_HAND
                 && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()

@@ -193,7 +193,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
     public void tickServer() {
         syncAttachedJet();
         syncAttachedInducer();
-        syncForNear(true, FIELD);
+        // syncForNear(true, FIELD);
     }
 
 
@@ -215,7 +215,10 @@ public class JetBlockEntity extends OnShipBlockEntity implements
         buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
-                        t -> receiver().deserialize(t)
+                        t -> {
+                            receiver().deserialize(t);
+                            queueUpdate(FIELD);
+                        }
                 ))
                 .withClient(
                         new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class)

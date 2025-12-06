@@ -97,6 +97,11 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
 
     }
 
+    @Override
+    public String receiverName() {
+        return "output_link";
+    }
+
     public int getOutputSignal(){
         return lastOutputSignal;
     }

@@ -9,8 +9,6 @@ import com.verr1.controlcraft.unstable.blocks.AiBoundFakePlayer;
 import com.verr1.controlcraft.unstable.data.AIPersistentData;
 import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
 import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
-import com.verr1.controlcraft.unstable.data.v1.AIPersistentDataV1;
-import com.verr1.controlcraft.unstable.management.v1.AIPoolV1;
 import com.verr1.controlcraft.unstable.util.LazyTicker;
 import com.verr1.controlcraft.unstable.valkyrienskies.attachments.AIBlockNetwork;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
@@ -30,13 +28,13 @@ import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.joml.primitives.AABBi;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
 import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -50,19 +48,13 @@ public class AIPool extends SavedData {
     );
 
     public static final String DATA_NAME = ControlCraft.MODID + "_ai_pool";
-
     public static Vector3d SIMPLE_YARD_POSITION = new Vector3d(0, 128, 0);
-
     public static Vector3d SIMPLE_CREATE_POSITION = new Vector3d(0, 96, 0);
-
-
     private final Map<Long, AIPersistentData> persistent = new HashMap<>();
 
 
     private final AIYardAllocator allocator = new AIYardAllocator.Simple(this::yard);
-
     private final Map<Long, Pair<Long, Vector3dc>> availableAIAllocatePointer = new HashMap<>();
-
     private final Set<Long> availableAI = new HashSet<>();
 
 
@@ -132,7 +124,6 @@ public class AIPool extends SavedData {
         return Objects.requireNonNull(VSGameUtilsKt.getShipObjectWorld(server()));
     }
 
-
     public @NotNull List<ServerShip> getAllShips(){
         return vsWorld().getAllShips().stream().toList();
     }
@@ -175,7 +166,6 @@ public class AIPool extends SavedData {
     private void remove(long i){
         persistent.remove(i);
         availableAI.remove(i);
-
         if(availableAIAllocatePointer.containsKey(i)){
             allocator.free(availableAIAllocatePointer.get(i).getFirst());
             availableAIAllocatePointer.remove(i);
@@ -231,18 +221,18 @@ public class AIPool extends SavedData {
         return availableAI.contains(id);
     }
 
-    public void repairAI(long id, @NotNull SchematicKey overrideKey){
+    public RepairResult repairAI(long id, @NotNull SchematicKey overrideKey){
         AIPersistentData data = persistent.get(id);
         if(data == null){
             logAbsentId(id);
             MinecraftUtils.broadcastMessage(Component.literal("Ship with id: " + id + " is not recorded as AI!"));
-            return;
+            return RepairResult.SHIP_AI_NOT_RECORDED;
         }
         AISchematic schematic = AIServer.SCHEMATICS_MANAGER.getLoaded(overrideKey);
         if(schematic == null){
             logAbsentSchematic(overrideKey);
             MinecraftUtils.broadcastMessage(Component.literal("AI with type: " + overrideKey + " has no schematic loaded!"));
-            return;
+            return RepairResult.SCHEMATIC_NOT_LOADED;
         }
         BlockPos center = data.center;
 
@@ -250,9 +240,10 @@ public class AIPool extends SavedData {
 
         if(level == null){
             ControlCraft.LOGGER.error("Tried to repair AI with id {}, but no level found for the ship.", id);
-            return;
+            return RepairResult.CANNOT_ACCESS_LEVEL;
         }
         schematic.repairAt(center, level);
+        return RepairResult.SUCCESS;
     }
 
     public void restoreAI(long id){
@@ -267,7 +258,6 @@ public class AIPool extends SavedData {
         return getShipOf(s).map(AIBlockNetwork::getOrCreate);
     }
 
-
     public void discard(long id){
         if(!isAI(id))return;
         ServerShip ship = getShipOf(id).orElse(null);
@@ -280,7 +270,7 @@ public class AIPool extends SavedData {
             allocator.free(availableAIAllocatePointer.get(id).getFirst());
         }
 
-        Long spacePointer = allocator.allocate(ship.getShipAABB());
+        Long spacePointer = allocator.allocate(Optional.ofNullable(ship.getShipAABB()).orElse(new AABBi()));
         Vector3dc yardPosition = allocator.position(spacePointer);
         availableAIAllocatePointer.put(ship.getId(), new Pair<>(spacePointer, yardPosition));
         availableAI.add(ship.getId());
@@ -295,10 +285,10 @@ public class AIPool extends SavedData {
     }
 
     public @NotNull AISpawnResult spawn(long id, SchematicKey overrideKey ,Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
-        if(!isAI(id))return AISpawnResult.FAILED;
-        if(!availableAI.contains(id))return AISpawnResult.FAILED;
         ServerShip ship = getShipOf(id).orElse(null);
-        if(ship == null)return AISpawnResult.FAILED;
+        if(ship == null)return AISpawnResult.DELETED;
+        if(!isAI(id))return AISpawnResult.NOT_AN_AI;
+        if(!availableAI.contains(id))return AISpawnResult.NOT_AVAILABLE;
 
         Long spacePointer = availableAIAllocatePointer.get(id).getFirst();
         allocator.free(spacePointer);
@@ -308,7 +298,13 @@ public class AIPool extends SavedData {
 
 
         networkOf(ship).onPreRepair();
-        repairAI(id, overrideKey);
+        RepairResult result = repairAI(id, overrideKey);
+
+        if(result != RepairResult.SUCCESS){
+            ControlCraft.LOGGER.error("Failed to repair AI ship with id {} during spawning. Abort spawn.", id);
+            return new AISpawnResult(-1, AISpawnResult.Status.CAN_NOT_REPAIR, result);
+        }
+
         networkOf(ship).onPostRepair();
 
         Runnable task = () -> {
@@ -323,7 +319,7 @@ public class AIPool extends SavedData {
     }
 
     public @NotNull AISpawnResult spawn(SchematicKey type, Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
-        AtomicReference<AISpawnResult> ref = new AtomicReference<>(AISpawnResult.FAILED);
+        AtomicReference<AISpawnResult> ref = new AtomicReference<>(AISpawnResult.USE_UP);
 
         availableAI.stream().findAny().ifPresent(
                 id -> ref.set(spawn(id, type, position, rotation, velocity, omega))

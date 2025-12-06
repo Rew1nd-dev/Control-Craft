@@ -16,8 +16,6 @@ import java.util.function.Function;
 
 public class BasicUIField<T> extends TypedUIPort<T> implements TitleLabelProvider {
 
-
-
     protected final FormattedLabel title;
     protected final EditBox field;
 
@@ -41,7 +39,7 @@ public class BasicUIField<T> extends TypedUIPort<T> implements TitleLabelProvide
     }
 
     @Override
-    protected void initLayout(GridLayout gridLayout){
+    public void initLayout(GridLayout gridLayout){
         gridLayout.addChild(title, 0, 0);
         gridLayout.addChild(field, 0, 1);
         gridLayout.columnSpacing(4);
@@ -57,12 +55,12 @@ public class BasicUIField<T> extends TypedUIPort<T> implements TitleLabelProvide
     }
 
     @Override
-    protected T readGUI() {
+    public T readGUI() {
         return parseOut.apply(field.getValue());
     }
 
     @Override
-    protected void writeGUI(@Nullable T value) {
+    public void writeGUI(@Nullable T value) {
         field.setValue(parseIn.apply(value));
     }
 

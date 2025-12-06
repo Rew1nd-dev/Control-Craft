@@ -39,6 +39,8 @@ public class ClientCameraManager {
 
     private static Vec3 latestCameraWorldPos = null;
 
+    private static boolean lastBobViewOption = false;
+
 
     public static @Nullable CameraBlockEntity getLinkedCamera(){
         return Optional
@@ -49,6 +51,7 @@ public class ClientCameraManager {
                                                     .ofNullable(level.getBlockEntity(pos))))
                 .filter(CameraBlockEntity.class::isInstance)
                 .map(CameraBlockEntity.class::cast)
+                .filter(be -> !be.isRemoved())
                 .orElse(null);
     }
 
@@ -79,6 +82,7 @@ public class ClientCameraManager {
             player.setXRot((float) c.getPitch());
             player.setYRot((float) c.getYaw());
         });
+        lastBobViewOption = Minecraft.getInstance().options.bobView().get();
         Minecraft.getInstance().options.bobView().set(false);
     }
 
@@ -113,7 +117,7 @@ public class ClientCameraManager {
         disconnectServerCamera();
         LinkCameraPos = null;
         QueryPos = null;
-        Minecraft.getInstance().options.bobView().set(true);
+        Minecraft.getInstance().options.bobView().set(lastBobViewOption);
         Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
         Minecraft.getInstance().levelRenderer.allChanged();
         CameraClientChunkCacheExtension.clear();

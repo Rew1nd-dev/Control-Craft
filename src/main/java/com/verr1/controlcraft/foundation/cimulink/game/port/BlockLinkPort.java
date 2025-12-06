@@ -70,6 +70,7 @@ public abstract class BlockLinkPort {
     // make it concurrent
     public static Optional<BlockLinkPort> get(@NotNull WorldBlockPos pos) {
         Optional<BlockLinkPort> cachedValue = CACHE.getIfPresent(pos);
+        // Optional can be null too
         if (cachedValue != null) {
             return cachedValue;
         }
@@ -111,7 +112,6 @@ public abstract class BlockLinkPort {
     private NamedComponent realTimeComponent;
 
     private boolean initialized = false;
-
 
     private static boolean onMainThread(){
         return ControlCraftServer.onMainThread();
@@ -166,6 +166,16 @@ public abstract class BlockLinkPort {
             return;
             // throw new IllegalStateException("BlockLinkPort Pos has already been set!");
         }
+    }
+
+    protected void schedulePortRefresh(){
+        ControlCraftServer.SERVER_EXECUTOR.executeIfAbsent(
+                pos(),
+                () -> ofBlockEntity(pos()).ifPresent(cbe -> {
+                    cbe.sendPortConnectUpdate();
+                    cbe.setChanged();
+                })
+        );
     }
 
     public String name(){
@@ -448,12 +458,15 @@ public abstract class BlockLinkPort {
     }
 
     public void onInputDisconnection(String inputPortName){
+        schedulePortRefresh();
         try{
             input(inputPortName, 0);
         }catch (Exception ignored){}
     }
 
-    public void onOutputDisconnection(String outputPortName){}
+    public void onOutputDisconnection(String outputPortName){
+        schedulePortRefresh();
+    }
 
     protected void deleteInput(String name){
         ControlCraft.LOGGER.debug("deleting input: {} at: {}", name, pos());
@@ -583,16 +596,6 @@ public abstract class BlockLinkPort {
                 return true;
             }
 
-            /*
-            if(!ofBlockEntity(bp.pos())
-                    .map(CimulinkBlockEntity::initialized)
-                    .orElseThrow(() -> new RuntimeException("How Can This Be be null? at: " + bp.pos()))
-            ){
-                ControlCraft.LOGGER.info("be at: {} haven't been initialized when checking input: {} <-: {}", bp.pos(), inputName, bp);
-                return false;
-            }
-            * */
-
             boolean test = !blp.forwardLinks()
                     .getOrDefault(bp.portName(), EMPTY)
                     .contains(new BlockPort(pos(), inputName));
@@ -628,8 +631,9 @@ public abstract class BlockLinkPort {
 
     public @NotNull WorldBlockPos pos(){
         if(worldPosition == null){
-            ControlCraft.LOGGER.warn("calling pos() before pos is set!");
-            return WorldBlockPos.NULL;
+            // ControlCraft.LOGGER.warn("calling pos() before pos is set!");
+            // DebugUtils.printStackTrace();
+            return WorldBlockPos.of(ControlCraftServer.OVERWORLD, BlockPos.ZERO);
         }
         return worldPosition;
     }
@@ -658,26 +662,28 @@ public abstract class BlockLinkPort {
         if(blp == null)return;
 
         blp.connectBy(pos(), outputPort, inputName);
+
+        schedulePortRefresh();
         forwardLinks.computeIfAbsent(outputPort, $ -> new HashSet<>()).add(new BlockPort(pos, inputName));
     }
 
     public final void connectBy(WorldBlockPos pos, String outputPort, String inputName) throws IllegalArgumentException{
         ArrayUtils.AssertPresence(inputsNames(), inputName); // should be a valid inputName
         ArrayUtils.AssertAbsence(backwardLinks.keySet(), inputName); // should not been connected
+
+        schedulePortRefresh();
         backwardLinks.put(inputName, new BlockPort(pos, outputPort));
     }
-
-
 
 
     public abstract NamedComponent create();
 
     public final void recreate(){
+        String oldName = name();
         realTimeComponent = create();
+        setName(oldName);
         ControlCraft.LOGGER.debug("calling recreate() at: {}", pos());
         removeInvalid();
-        // inputsNames().forEach(this::disconnectInput);
-        // outputsNames().forEach(this::disconnectOutput);
     }
 
     public void onInputChange(String... changedInput) {

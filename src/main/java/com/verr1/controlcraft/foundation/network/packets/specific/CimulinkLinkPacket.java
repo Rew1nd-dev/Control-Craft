@@ -53,11 +53,6 @@ public class CimulinkLinkPacket extends SimplePacketBase {
 
                 BlockLinkPort.of(outputPort.pos()).ifPresent(
                         blp -> {
-                            /*
-                            * if(outputPort.pos().pos().getCenter().distanceToSqr(inputPort.pos().pos().getCenter()) > 1e4){
-                                throw new IllegalArgumentException("Ports Are Too Faraway From Each Other");
-                            }
-                            * */
                             blp.connectTo(
                                     outputPort.portName(),
                                     inputPort.pos(),
@@ -66,13 +61,14 @@ public class CimulinkLinkPacket extends SimplePacketBase {
                         }
 
                 );
-                BlockEntityGetter.INSTANCE
-                        .getBlockEntityAt(outputPort.pos(), CimulinkBlockEntity.class)
-                        .ifPresent(BlockEntity::setChanged);
-
-                BlockEntityGetter.INSTANCE
-                        .getBlockEntityAt(inputPort.pos(), CimulinkBlockEntity.class)
-                        .ifPresent(BlockEntity::setChanged);
+//                BlockEntityGetter.INSTANCE
+//                        .getBlockEntityAt(outputPort.pos(), CimulinkBlockEntity.class)
+//                        .ifPresent(BlockEntity::setChanged);
+//
+//                BlockEntityGetter.INSTANCE
+//                        .getBlockEntityAt(inputPort.pos(), CimulinkBlockEntity.class)
+//                        .ifPresent(BlockEntity::setChanged);
+//                They will be set changed during connection internally
 
             }catch (IllegalArgumentException e){
                 if(context.getSender() == null)return;

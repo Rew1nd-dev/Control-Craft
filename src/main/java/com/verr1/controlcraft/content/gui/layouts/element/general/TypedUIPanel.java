@@ -11,11 +11,12 @@ public abstract class TypedUIPanel <T> extends NetworkUIPort<T> {
 
     private final BlockPos boundPos;
     private final NetworkKey key;
+    private final T defaultValue;
 
     public TypedUIPanel(BlockPos boundPos, NetworkKey key, Class<T> dataType, T defaultValue) {
-        super($ -> {}, () -> defaultValue);
         this.boundPos = boundPos;
         this.key = key;
+        this.defaultValue = defaultValue;
     }
 
 
@@ -29,10 +30,20 @@ public abstract class TypedUIPanel <T> extends NetworkUIPort<T> {
     }
 
     @Override
-    protected abstract T readGUI();
+    protected void consume(T data) {
+
+    }
 
     @Override
-    protected final void writeGUI(T value) {
+    protected T provide() {
+        return defaultValue;
+    }
+
+    @Override
+    public abstract T readGUI();
+
+    @Override
+    public final void writeGUI(T value) {
         // does nothing
     }
 }

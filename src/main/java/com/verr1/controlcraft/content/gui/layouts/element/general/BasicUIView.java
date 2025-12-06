@@ -36,7 +36,7 @@ public class BasicUIView <T> extends TypedUIPort<T>  implements TitleLabelProvid
 
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0);
         layoutToFill.addChild(view, 0, 1);
         layoutToFill.columnSpacing(4);
@@ -48,12 +48,12 @@ public class BasicUIView <T> extends TypedUIPort<T>  implements TitleLabelProvid
     }
 
     @Override
-    protected T readGUI() {
+    public T readGUI() {
         return null; // parseOut.apply(view.text);
     }
 
     @Override
-    protected void writeGUI(T value) {
+    public void writeGUI(T value) {
         view.setText(parseIn.apply(value));
     }
 

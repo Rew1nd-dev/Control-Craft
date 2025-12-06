@@ -185,4 +185,36 @@ public class CCRP {
         return eval;
     }
 
+    public static Evaluator cannon8(){
+        Evaluator eval = new Evaluator();
+
+        Val fire = eval.newVal("fire");
+        Val fireTrigger = eval.newPositiveTrigger(fire, "_@");
+        Val lastCycle = eval.newVal("last_cycle");
+        Val cycleInc = lastCycle.add(fireTrigger);
+        Val cycle = eval.orElse(cycleInc.greaterThan(7), eval.newVal(0), cycleInc);
+        eval.asOut("cycle", cycle);
+        eval.asLoop("cycle", "last_cycle");
+
+        Val[] fireEdges = new Val[8];
+        for(int i = 0; i < 8; i++){
+            fireEdges[i] = eval.newPositiveTrigger(cycle.equal(eval.newVal(i)), "_@" + i);
+        }
+
+        for(int i = 0; i < 8; i++){
+            eval.asOut("cannon_" + i, fireEdges[i]);
+        }
+
+
+        Val pitchInDeg = eval.newVal("pitch_c_deg");
+        Val pitchTarRad = eval.newVal("pitch_t_rad");
+        Val gain_pitch = eval.newVal("gain_pitch");
+
+        Val pitchErr = pitchTarRad.sub(pitchInDeg.mul(Math.PI / 180));
+        Val pitchCon = pitchErr.mul(gain_pitch);
+        eval.asOut("pitch_con", pitchCon);
+
+        return eval;
+    }
+
 }

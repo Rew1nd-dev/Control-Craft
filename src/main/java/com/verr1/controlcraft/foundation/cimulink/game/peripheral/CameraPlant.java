@@ -40,6 +40,12 @@ public class CameraPlant extends MutablePlant{
                         () -> {if(cast(self).toggle(v))cast(self).clipNewServerPlayer();}
                     )
                 )
+                .in("set_pitch",
+                    (self, v) -> cbe.setPitch(v)
+                )
+                .in("set_yaw",
+                        (self, v) -> cbe.setYaw(v)
+                )
                 .out("latest_x",  self -> cast(self).cachedPosition().x())
                 .out("latest_y",  self -> cast(self).cachedPosition().y())
                 .out("latest_z",  self -> cast(self).cachedPosition().z())

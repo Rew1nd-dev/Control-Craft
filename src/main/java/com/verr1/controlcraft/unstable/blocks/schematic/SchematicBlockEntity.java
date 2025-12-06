@@ -7,7 +7,7 @@ import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.blocks.AIBaseBlockEntity;
 import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
 import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
-import com.verr1.controlcraft.unstable.management.v1.AIPoolV1;
+import com.verr1.controlcraft.unstable.management.AIPool;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -25,7 +25,7 @@ public class SchematicBlockEntity extends AIBaseBlockEntity {
 
 
     private String namespace = "default";
-    private String name = AIPoolV1.randomSequence(5);
+    private String name = AIPool.randomSequence(5);
 
     public SchematicBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

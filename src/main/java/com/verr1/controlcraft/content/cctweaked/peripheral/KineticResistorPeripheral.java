@@ -27,7 +27,7 @@ public class KineticResistorPeripheral extends AbstractAttachedPeripheral<Kineti
         return getTarget().ratio();
     }
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final void setRatio(double ratio){
         getTarget().setRatio(ratio);
     }

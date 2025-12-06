@@ -30,7 +30,7 @@ public class CompactFlapPeripheral extends AbstractAttachedPeripheral<CompactFla
 
     @LuaFunction
     public final void setAngle(double angle){
-        getTarget().setAttackAngle(angle);
+        getTarget().setAngle(angle);
     }
 
 }

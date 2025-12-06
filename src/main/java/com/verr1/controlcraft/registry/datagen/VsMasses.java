@@ -39,6 +39,7 @@ import com.verr1.controlcraft.content.links.scope.OscilloscopeBlock;
 import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
+import com.verr1.controlcraft.content.links.tweakerminal.TweakerminalBlock;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlock;
 import com.verr1.controlcraft.unstable.blocks.autocannon.AiAutoCannonBlock;
@@ -94,6 +95,7 @@ public enum VsMasses {
     SCOPE(OscilloscopeBlock.ID, 10),
     CC_BRIDGE(CCBridgeBlock.ID, 1),
     BUS(BusBlock.ID, 1),
+    TWEAKERMINAL(TweakerminalBlock.ID, 5),
 
 
     AI_CRUISER(CruiserBlock.ID, 5),

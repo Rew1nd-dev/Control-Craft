@@ -81,6 +81,7 @@ import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
+import org.valkyrienskies.physics_api.PoseVel;
 
 import java.lang.Math;
 import java.util.ArrayList;
@@ -275,6 +276,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setRayType(CameraClipType rayType) {
         this.rayType = rayType;
+        queueUpdate(RAY_TYPE);
     }
 
     public CameraClipType shipType() {
@@ -283,6 +285,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setShipType(CameraClipType shipType) {
         this.shipType = shipType;
+        queueUpdate(SHIP_TYPE);
     }
 
     public CameraClipType entityType() {
@@ -291,6 +294,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setEntityType(CameraClipType entityType) {
         this.entityType = entityType;
+        queueUpdate(ENTITY_TYPE);
     }
 
     public void clipNewServerPlayer(){
@@ -317,6 +321,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setActiveDistanceSensor(boolean activeDistanceSensor) {
         isActiveDistanceSensor = activeDistanceSensor;
+        queueUpdate(IS_ACTIVE_SENSOR);
     }
 
     public void setConeAngle(double coneAngle) {
@@ -333,6 +338,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setViewType(CameraViewType viewType){
         this.viewType = viewType;
+        queueUpdate(TR);
     }
 
     @Override
@@ -373,12 +379,11 @@ public class CameraBlockEntity extends OnShipBlockEntity
         return p.distance(q);
     }
 
-    @Override
-    public void onChunkUnloaded() {
-        super.onChunkUnloaded();
-        if(level.isClientSide){
+    // sometimes there is duplicate tick on client side, avoid that
+    // db_outlineConeAABB();
+    public void validateClientInstance(){
+        if(level == null || level.getBlockEntity(getBlockPos()) != this){
             setRemoved();
-            ControlCraft.LOGGER.info("Unloading Camera: {}", getBlockPos());
         }
     }
 
@@ -390,6 +395,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
         if(!isActiveDistanceSensor)return;
         if(level == null || level.isClientSide)return;
         // if(!fields.get(0).directionOptional.test(side))return 0;
+
+        PoseVel pv;
 
         double d = getClipDistance();
 
@@ -410,10 +417,12 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public void setPitch(double pitch) {
         this.pitch = pitch;
+        queueUpdate(PITCH);
     }
 
     public void setYaw(double yaw) {
         this.yaw = yaw;
+        queueUpdate(YAW);
     }
 
     public void setPitchYaw(double pitch, double yaw){
@@ -610,13 +619,14 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public @Nullable ShipHitResult clipShip(){
         ClipContext context = clipContext();
+        long selfId = getShipOrGroundID();
         return ClipUtils.clipShip(
                 context.getFrom(),
                 context.getTo(),
                 coneAABB(),
                 3,
                 level,
-                s -> !Optional.ofNullable(getShipOn()).map(Ship::getId).orElse(0L).equals(s.getId())
+                s -> s.getId() != selfId
         );
     }
 
@@ -919,7 +929,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void lazyTickServer() {
         super.lazyTickServer();
         isBeingUsed = ServerCameraManager.getUser(getWorldBlockPos()) != null;
-        syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD, TR, THIRD_PERSON);
+        // syncForNear(true, RAY_TYPE, SHIP_TYPE, ENTITY_TYPE , IS_ACTIVE_SENSOR, FIELD, TR, THIRD_PERSON);
     }
 
 
@@ -928,8 +938,8 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public void tickClient() {
         super.tickClient();
         if(isRemoved())return;
-        // sometimes there is duplicate tick on client side, avoid that
-        // db_outlineConeAABB();
+        validateClientInstance();
+
         if(
                 rayType() == CameraClipType.RAY_ALWAYS
                         ||
@@ -1202,7 +1212,10 @@ public class CameraBlockEntity extends OnShipBlockEntity
         buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
-                        t -> receiver().deserialize(t)
+                        t -> {
+                            receiver().deserialize(t);
+                            queueUpdate(FIELD);
+                        }
                 ))
                 .withClient(
                         new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class)
@@ -1223,6 +1236,9 @@ public class CameraBlockEntity extends OnShipBlockEntity
                 ),
                 new DirectReceiver.InitContext(SlotType.IS_SENSOR, Couple.create(0.0, 1.0))
         );
+
+        lazyTickRate = 60;
+
     }
 
 

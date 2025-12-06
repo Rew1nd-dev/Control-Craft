@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPort<T> implements TitleLabelProvider {
 
@@ -108,7 +106,7 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
 
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0);
         layoutToFill.addChild(value, 0, 1);
         layoutToFill.addChild(options, 0, 2);
@@ -116,12 +114,12 @@ public class OptionUIField<T extends Enum<?> & Descriptive<?>> extends TypedUIPo
     }
 
     @Override
-    protected T readGUI() {
+    public T readGUI() {
         return valueOfOption();
     }
 
     @Override
-    protected void writeGUI(T value) {
+    public void writeGUI(T value) {
         options.setToValue(value);
     }
 

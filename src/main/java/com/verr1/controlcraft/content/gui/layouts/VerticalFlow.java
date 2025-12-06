@@ -28,26 +28,22 @@ import static com.verr1.controlcraft.ControlCraftClient.CLIENT_EXECUTOR;
 
 
 public class VerticalFlow implements SwitchableTab {
-    private final GridLayout verticalLayout = new GridLayout();
-    private final List<NetworkKey> map;
-    private final List<? extends NetworkUIPort<?>> entries; // this is meant to preserve the input order
-    private final BlockPos boundBlockEntityPos;
+    protected final GridLayout verticalLayout = new GridLayout();
+    protected final List<NetworkKey> map;
+    protected final List<? extends NetworkUIPort<?>> entries; // this is meant to preserve the input order
+    protected final BlockPos boundBlockEntityPos;
+    protected final List<SwitchableTabListener> listeners;
 
-    // private final Runnable preDoLayout;
-    private final List<SwitchableTabListener> listeners;
+    protected Component title;
 
-    private Component title;
-
-    VerticalFlow(
+    protected VerticalFlow(
             BlockPos boundPos,
             List<NetworkKey> keys,
             List<? extends NetworkUIPort<?>> entries,
-            // Runnable preDoLayout,
             List<SwitchableTabListener> listeners
     ){
         this.boundBlockEntityPos = boundPos;
         this.entries = entries;
-        // this.preDoLayout = preDoLayout;
         this.map = keys;
         this.listeners = listeners;
     }
@@ -129,7 +125,7 @@ public class VerticalFlow implements SwitchableTab {
         }
     }
 
-    public void  traverseAllChildWidget(BiConsumer<WidgetContext, LayoutElement> consumer){
+    public void traverseAllChildWidget(BiConsumer<WidgetContext, LayoutElement> consumer){
         traverse(verticalLayout, consumer, new Context());
     }
 

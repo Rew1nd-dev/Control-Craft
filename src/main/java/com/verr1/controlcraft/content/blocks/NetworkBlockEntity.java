@@ -3,8 +3,10 @@ package com.verr1.controlcraft.content.blocks;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.api.delegate.IRemoteDevice;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
+import com.verr1.controlcraft.foundation.network.executors.AsyncLazySynchronizer;
 import com.verr1.controlcraft.foundation.network.remote.RemotePanel;
 import com.verr1.controlcraft.foundation.network.handler.NetworkHandler;
+import com.verr1.controlcraft.unstable.util.LazyTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +20,9 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
     private final RemotePanel panel = new RemotePanel();
 
     private final NetworkHandler handler = new NetworkHandler(this);
+    private final AsyncLazySynchronizer lazySynchronizer = new AsyncLazySynchronizer(this);
+    private final LazyTicker lazyLazySynchronizer = new LazyTicker(20 * 5, this::syncOnce);
+
 
     public NetworkBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -27,6 +32,20 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
         return handler.buildRegistry(key);
     }
 
+
+    protected void queueUpdate(NetworkKey... keys){
+        lazySynchronizer.queueUpdate(keys);
+    }
+
+    protected void syncOnce(){
+        handler.getSyncKeys().forEach(lazySynchronizer::queueUpdate);
+    }
+
+    @Override
+    public void initializeServer() {
+        super.initializeServer();
+        handler.onInit();
+    }
 
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
@@ -41,6 +60,14 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
         handler.onWrite(compound, clientPacket);
         writeExtra(compound);
     }
+
+    @Override
+    public void tickServer() {
+        super.tickServer();
+        lazySynchronizer.tick();
+        lazyLazySynchronizer.tick();
+    }
+
 
 
     // For VMod Compact

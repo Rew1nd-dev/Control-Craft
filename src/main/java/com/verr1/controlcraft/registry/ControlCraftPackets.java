@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.GenericClientPacket;
 import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.*;
+import com.verr1.controlcraft.foundation.network.packets.specific.tweak.TweakControllerFullAxisPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +41,7 @@ public enum ControlCraftPackets {
     CIMULINK_LINK(CimulinkLinkPacket.class, CimulinkLinkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIMULINK_COMPILE(CimulinkCompilePacket.class, CimulinkCompilePacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIRCUIT_SETTINGS(CircuitSettingsPacket.class, CircuitSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    TWEAK_FULL_PRECISION(TweakControllerFullAxisPacket.class, TweakControllerFullAxisPacket::new, NetworkDirection.PLAY_TO_SERVER)
     ;
 
 

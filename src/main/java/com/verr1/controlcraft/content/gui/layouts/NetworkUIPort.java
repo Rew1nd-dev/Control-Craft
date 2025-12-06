@@ -10,15 +10,16 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class NetworkUIPort<T> implements TabListener {
-    private final Consumer<T> write;
-    private final Supplier<T> read;
+//    private final Consumer<T> write;
+//    private final Supplier<T> read;
     private final GridLayout layout = new GridLayout();
     protected boolean isActivated = false;
 
-    public NetworkUIPort(Consumer<T> write, Supplier<T> read){
-        this.write = write;
-        this.read = read;
-    }
+    public NetworkUIPort(){}
+
+    protected abstract void consume(T data);
+
+    protected abstract T provide();
 
     public void setParent(VerticalFlow parent){
         this.parent = parent;
@@ -39,7 +40,7 @@ public abstract class NetworkUIPort<T> implements TabListener {
     }
 
     public void readToLayout(){
-        writeGUI(read.get());
+        writeGUI(provide());
     }
 
     public void onActivatedTab(){
@@ -66,13 +67,13 @@ public abstract class NetworkUIPort<T> implements TabListener {
     public final void writeFromLayout(){
         T value = readGUI();
         if(value == null)return;
-        write.accept(value);
+        consume(value);
     }
 
 
-    protected abstract void initLayout(GridLayout layoutToFill);
-    protected abstract T readGUI();
-    protected abstract void writeGUI(T value);
+    public abstract void initLayout(GridLayout layoutToFill);
+    public abstract T readGUI();
+    public abstract void writeGUI(T value);
 
 
 }

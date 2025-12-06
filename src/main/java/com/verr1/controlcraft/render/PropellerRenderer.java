@@ -20,7 +20,7 @@ public class PropellerRenderer extends SafeBlockEntityRenderer<PropellerBlockEnt
 
     @Override
     protected void renderSafe(PropellerBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
-        float angle = be.angle.getValue(partialTicks);
+        float angle = be.angle().getValue(partialTicks);
         BlockState state = be.getBlockState();
         boolean spinal_only = state.getValue(PropellerBlock.HAS_BLADES);
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());

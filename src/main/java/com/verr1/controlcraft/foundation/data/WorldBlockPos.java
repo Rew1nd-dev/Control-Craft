@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public record WorldBlockPos(String dimensionID, BlockPos pos){
 
-    public static final WorldBlockPos NULL = new WorldBlockPos("null", BlockPos.ZERO);
+    public static final WorldBlockPos NULL = new WorldBlockPos("minecraft:overworld", BlockPos.ZERO);
 
     public static WorldBlockPos of(Level level, BlockPos pos){
         String d = VSGameUtilsKt.getDimensionId(level);

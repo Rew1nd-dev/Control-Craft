@@ -148,7 +148,7 @@ public class VSchematicCompactCenter {
 
         BlockPos offset = BlockPos.of(compact.getLong("offset"));
         cbe.linkPort().modifyWithOffset(offset);
-
+        cbe.setChanged();
     }
 
     public static BlockPos centerPosOf(int x, int z){

@@ -37,10 +37,14 @@ public class TweakerminalBlockEntity extends OnShipBlockEntity implements IPlant
     }
 
     public void update(){
+        TweakControllerServerRecorder.PlayerInput input = TweakControllerServerRecorder.RECORDED_INPUTS.getOrDefault(userUUID, TweakControllerServerRecorder.PlayerInput.EMPTY);
+        updateWith(input);
+    }
+
+    public void updateWith(TweakControllerServerRecorder.PlayerInput input){
         // make something to commit
         cachedAxis.clear();
         cachedButtons.clear();
-        TweakControllerServerRecorder.PlayerInput input = TweakControllerServerRecorder.RECORDED_INPUTS.getOrDefault(userUUID, TweakControllerServerRecorder.PlayerInput.EMPTY);
         cachedAxis.addAll(input.asAxisList());
         for (int i = 0; i < 15; i++){
             cachedButtons.add(input.buttons[i]);
@@ -55,7 +59,7 @@ public class TweakerminalBlockEntity extends OnShipBlockEntity implements IPlant
 
     public double getAxis(int axisIndex){
         if(userUUID == null || axisIndex < 0 || axisIndex >= cachedAxis.size())return 0;
-        return cachedAxis.get(axisIndex) / 15f;
+        return cachedAxis.get(axisIndex);
     }
 
     public boolean getButton(int buttonIndex){

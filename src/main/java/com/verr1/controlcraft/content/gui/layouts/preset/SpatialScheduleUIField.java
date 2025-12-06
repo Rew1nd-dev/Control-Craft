@@ -59,7 +59,7 @@ public class SpatialScheduleUIField extends TypedUIPort<CompoundTag> implements
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0, 1, 5);
 
         layoutToFill.addChild(qTitle, 1, 0, 1, 5);
@@ -85,7 +85,7 @@ public class SpatialScheduleUIField extends TypedUIPort<CompoundTag> implements
     }
 
     @Override
-    protected CompoundTag readGUI() {
+    public CompoundTag readGUI() {
         PPID(new PID(
                 ParseUtils.tryParseDouble(ppField.getValue()),
                 ParseUtils.tryParseDouble(piField.getValue()),
@@ -102,7 +102,7 @@ public class SpatialScheduleUIField extends TypedUIPort<CompoundTag> implements
     }
 
     @Override
-    protected void writeGUI(CompoundTag value) {
+    public void writeGUI(CompoundTag value) {
         ISerializableSchedule.super.deserialize(value);
         qpField.setValue("" + QPID().p());
         qiField.setValue("" + QPID().i());

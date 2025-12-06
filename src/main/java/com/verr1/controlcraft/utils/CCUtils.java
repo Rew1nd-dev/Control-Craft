@@ -135,6 +135,7 @@ public class CCUtils {
     // shipHitResult
     public static Map<String, Object> parse(ShipHitResult hitResult){
         return Map.of(
+                "id", hitResult.ship().getId(),
                 "hit", dumpVec3(ValkyrienSkies.set(new Vector3d(), hitResult.hitLocation())),
                 "position", dumpVec3(hitResult.ship().getTransform().getPositionInWorld()),
                 "velocity", dumpVec3(hitResult.ship().getVelocity()),
@@ -155,6 +156,7 @@ public class CCUtils {
         Ship ship = VSGameUtilsKt.getShipObjectManagingPos(level, pos);
         if(ship == null)return Map.of();
         return Map.of(
+                "id", ship.getId(),
                 "slug", ship.getSlug() == null ? "null" : ship.getSlug(),
                 "position", dumpVec3(ship.getTransform().getPositionInWorld()),
                 "velocity", dumpVec3(ship.getVelocity()),

@@ -47,15 +47,26 @@ public class BusBlockEntity extends CimulinkBlockEntity<BusLinkPort> implements 
         linkPort().updateCache();
     }
 
-    @Override
-    public String receiverName() {
-        return name;
-    }
+//    @Override
+//    public String receiverName() {
+//        return name;
+//    }
+//
+//    @Override
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
+
+//    @Override
+//    public void setDeviceName(String name) {
+//        linkPort().setName(name);
+//    }
+//
+//    @Override
+//    public String deviceName() {
+//        return linkPort().name();
+//    }
 
     protected Optional<CimulinkBus> bus(){
         return Optional.ofNullable(getLoadedServerShip())

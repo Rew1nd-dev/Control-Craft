@@ -58,13 +58,13 @@ public class UnitUIPanel extends TypedUIPanel<Double> implements TitleLabelProvi
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0);
         layoutToFill.addChild(unitButton, 0, 1);
     }
 
     @Override
-    protected Double readGUI() {
+    public Double readGUI() {
         return 0.0;
     }
 

@@ -254,7 +254,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     public void lazyTickServer() {
         super.lazyTickServer();
         validateJoint();
-        syncForNear(true, FIELD, CONTROLLER);
+        // syncForNear(true, FIELD, CONTROLLER);
     }
 
     public void lockCheck(){
@@ -338,7 +338,10 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
-                        t -> receiver().deserialize(t)
+                        t -> {
+                            receiver().deserialize(t);
+                            queueUpdate(FIELD);
+                        }
                 ))
                 .withClient(
                         new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class)
@@ -354,7 +357,10 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         buildRegistry(CONTROLLER)
                 .withBasic(CompoundTagPort.of(
                         () -> getController().serialize(),
-                        tag -> getController().deserialize(tag)
+                        tag -> {
+                            getController().deserialize(tag);
+                            queueUpdate(CONTROLLER);
+                        }
                 ))
                 .withClient(
                         new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class)

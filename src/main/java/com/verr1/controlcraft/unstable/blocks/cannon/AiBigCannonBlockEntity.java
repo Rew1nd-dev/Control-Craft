@@ -1,16 +1,12 @@
 package com.verr1.controlcraft.unstable.blocks.cannon;
 
+import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.unstable.blocks.AiCannonBaseBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import rbasamoyai.createbigcannons.index.CBCEntityTypes;
-import rbasamoyai.createbigcannons.index.CBCItems;
-import rbasamoyai.createbigcannons.munitions.big_cannon.he_shell.HEShellProjectile;
-
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.ARROW;
 
 public class AiBigCannonBlockEntity extends AiCannonBaseBlockEntity {
@@ -33,16 +29,10 @@ public class AiBigCannonBlockEntity extends AiCannonBaseBlockEntity {
     @Override
     public Projectile getProjectile() {
         if(level == null)return null;
-        if(useArrow()){
-            Arrow ap = new Arrow(level, 0, 0, 0);
-            ap.setNoGravity(true);
-            return ap;
-        }else{
-            HEShellProjectile ap = new HEShellProjectile(CBCEntityTypes.HE_SHELL.get(), level);
-            ap.setFuze(CBCItems.IMPACT_FUZE.asStack());
-            ap.setNoGravity(true);
-
-            return ap;
+        Projectile ap = CreateBigCannonsCompact.createHEShell(level);
+        if(useArrow() || ap == null){
+            ap = new Arrow(level, 0, 0, 0);
         }
+        return ap;
     }
 }

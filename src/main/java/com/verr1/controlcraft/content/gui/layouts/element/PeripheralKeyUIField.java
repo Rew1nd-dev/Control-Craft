@@ -49,7 +49,7 @@ public class PeripheralKeyUIField extends TypedUIPort<PeripheralNetwork.Peripher
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(protocolLabel, 0, 0);
         layoutToFill.addChild(protocolField, 0, 1);
         layoutToFill.addChild(nameLabel, 1, 0);
@@ -59,14 +59,14 @@ public class PeripheralKeyUIField extends TypedUIPort<PeripheralNetwork.Peripher
     }
 
     @Override
-    protected PeripheralNetwork.PeripheralKey readGUI() {
+    public PeripheralNetwork.PeripheralKey readGUI() {
         String name = nameField.getValue();
         long protocol = ParseUtils.tryParseLong(protocolField.getValue());
         return new PeripheralNetwork.PeripheralKey(protocol, name);
     }
 
     @Override
-    protected void writeGUI(PeripheralNetwork.PeripheralKey value) {
+    public void writeGUI(PeripheralNetwork.PeripheralKey value) {
         nameField.setValue(value.name());
         protocolField.setValue("" + value.protocol());
     }

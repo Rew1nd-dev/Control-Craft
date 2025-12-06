@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.verr1.controlcraft.content.gui.layouts.TabSwitch;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+import com.verr1.controlcraft.content.gui.layouts.api.SwitchableTab;
 import com.verr1.controlcraft.content.gui.widgets.PressableIconButton;
 import com.verr1.controlcraft.content.gui.widgets.TabIconButton;
 import com.verr1.controlcraft.content.gui.layouts.api.SizedScreenElement;
@@ -40,7 +41,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
             this.pos = pos;
         }
 
-        public builder withTab(String name, VerticalFlow tab){
+        public builder withTab(String name, SwitchableTab tab){
             IconButton button = new TabIconButton(0, 0,
                     ControlCraftGuiTextures.TOOL,
                     ControlCraftGuiTextures.TOOL_DOWN,
@@ -52,7 +53,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
             return this;
         }
 
-        public builder withTab(Descriptive<?> name, VerticalFlow tab){
+        public builder withTab(Descriptive<?> name, SwitchableTab tab){
             Descriptive<?> converted = name.convertTo(
                     s -> s,
                     s -> s.withItalic(true).withBold(true).withColor(ChatFormatting.GOLD),
@@ -99,7 +100,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
     }
 
 
-    public record TabWithButton(VerticalFlow tab, IconButton button){ }
+    public record TabWithButton(SwitchableTab tab, IconButton button){ }
 
     List<Runnable> tickTasks;
     ItemStack renderedStack;
@@ -107,7 +108,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
     TabSwitch tabManager;
     SizedScreenElement background;
     SizedScreenElement tabBar = ControlCraftGuiTextures.TAB_BAR;
-    BlockPos pos;
+    // BlockPos pos;
     GridLayout buttonLayout = new GridLayout();
     PressableIconButton applyButton = new PressableIconButton(0, 0, ControlCraftGuiTextures.YES, ControlCraftGuiTextures.YES_DOWN).withCallback(this::apply);
     PressableIconButton refreshButton = new PressableIconButton(0, 0, ControlCraftGuiTextures.REFRESH, ControlCraftGuiTextures.REFRESH_DOWN).withCallback(this::refresh);
@@ -121,7 +122,7 @@ public class GenericSettingScreen extends AbstractSimiScreen {
             List<Runnable> tasks
     ){
 
-        this.pos = pos;
+        // this.pos = pos;
         this.tabs = tabs;
         this.tickTasks = tasks;
         this.tabManager = tabManager;

@@ -104,7 +104,7 @@ public class GroupOptionUIField<G extends Enum<?> & EnumGroup<V> & Descriptive<?
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(groupTitle, 0, 0);
         layoutToFill.addChild(group, 0, 1);
         layoutToFill.addChild(groups, 0, 2);
@@ -115,7 +115,7 @@ public class GroupOptionUIField<G extends Enum<?> & EnumGroup<V> & Descriptive<?
     }
 
     @Override
-    protected V readGUI() {
+    public V readGUI() {
         return values.valueOfOption();
     }
 
@@ -133,7 +133,7 @@ public class GroupOptionUIField<G extends Enum<?> & EnumGroup<V> & Descriptive<?
     }
 
     @Override
-    protected void writeGUI(V value) {
+    public void writeGUI(V value) {
         groups.setToValue(value.group());
         values.setToValue(value);
     }

@@ -28,7 +28,7 @@ public class BooleanUIField extends TypedUIPort<Boolean> implements TitleLabelPr
     }
 
     @Override
-    protected void initLayout(GridLayout gridLayout){
+    public void initLayout(GridLayout gridLayout){
         gridLayout.addChild(title, 0, 0);
         gridLayout.addChild(field, 0, 1);
         gridLayout.rowSpacing(4);
@@ -45,12 +45,12 @@ public class BooleanUIField extends TypedUIPort<Boolean> implements TitleLabelPr
     }
 
     @Override
-    protected Boolean readGUI() {
+    public Boolean readGUI() {
         return inverted ^ field.selected();
     }
 
     @Override
-    protected void writeGUI(Boolean value) {
+    public void writeGUI(Boolean value) {
         field.setSelected(inverted ^ value);
     }
 

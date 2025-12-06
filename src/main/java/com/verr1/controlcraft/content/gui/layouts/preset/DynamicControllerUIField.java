@@ -50,7 +50,7 @@ public class DynamicControllerUIField extends TypedUIPort<CompoundTag> implement
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0, 1, 5);
         layoutToFill.addChild(pLabel, 1, 0);
         layoutToFill.addChild(pField, 1, 1);
@@ -62,7 +62,7 @@ public class DynamicControllerUIField extends TypedUIPort<CompoundTag> implement
     }
 
     @Override
-    protected CompoundTag readGUI() {
+    public CompoundTag readGUI() {
         PID(new PID(
                 ParseUtils.tryParseDouble(pField.getValue()),
                 ParseUtils.tryParseDouble(iField.getValue()),
@@ -72,7 +72,7 @@ public class DynamicControllerUIField extends TypedUIPort<CompoundTag> implement
     }
 
     @Override
-    protected void writeGUI(CompoundTag value) {
+    public void writeGUI(CompoundTag value) {
         ISerializableDynamicController.super.deserialize(value);
         pField.setValue("" + PID().p());
         iField.setValue("" + PID().i());

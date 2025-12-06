@@ -30,10 +30,10 @@ public class QMul extends Combinational {
 
         // Quaternion multiplication
         Quaterniond res =
-                        new Quaterniond(qw0, qx0, qy0, qz0)
+                        new Quaterniond(qx0, qy0, qz0, qw0)
                 .mul(
-                        new Quaterniond(qw1, qx1, qy1, qz1)
-                ).normalize();
+                        new Quaterniond(qx1, qy1, qz1, qw1)
+                );
 
         return List.of(res.x(), res.y(), res.z(), res.w());
     }

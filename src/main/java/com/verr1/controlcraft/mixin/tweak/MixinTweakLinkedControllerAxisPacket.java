@@ -10,25 +10,27 @@ import com.verr1.controlcraft.content.compact.tweak.TweakControllerServerRecorde
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.*;
 
+@Pseudo
 @Mixin(TweakedLinkedControllerAxisPacket.class)
 public class MixinTweakLinkedControllerAxisPacket {
 
 
-    @WrapOperation(
-            method = "handleItem",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/getitemfromblock/create_tweaked_controllers/controller/TweakedLinkedControllerServerHandler;ReceiveAxis(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Ljava/util/ArrayList;Ljava/util/ArrayList;)V"),
-            remap = false
-    )
-    void saveToRecorder(LevelAccessor entryA, BlockPos iterator, UUID entryB, ArrayList<Couple<RedstoneLinkNetworkHandler.Frequency>> i, ArrayList<Byte> world, Operation<Void> original){
-        original.call(entryA, iterator, entryB, i, world);
-        TweakControllerServerRecorder.receiveAxis(entryB, world);
-    }
+//    @WrapOperation(
+//            method = "handleItem",
+//            at = @At(
+//                    value = "INVOKE",
+//                    target = "Lcom/getitemfromblock/create_tweaked_controllers/controller/TweakedLinkedControllerServerHandler;ReceiveAxis(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Ljava/util/ArrayList;Ljava/util/ArrayList;)V"),
+//            remap = false
+//    )
+//    void saveToRecorder(LevelAccessor entryA, BlockPos iterator, UUID entryB, ArrayList<Couple<RedstoneLinkNetworkHandler.Frequency>> i, ArrayList<Byte> world, Operation<Void> original){
+//        original.call(entryA, iterator, entryB, i, world);
+//        TweakControllerServerRecorder.receiveAxis(entryB, world.stream().map(Byte::doubleValue).toList());
+//    }
 
 /*
 @Shadow(remap = false)

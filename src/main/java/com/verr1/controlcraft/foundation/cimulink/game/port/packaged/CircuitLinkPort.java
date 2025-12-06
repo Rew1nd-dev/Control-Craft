@@ -152,6 +152,14 @@ public class CircuitLinkPort extends BlockLinkPort implements ICompilable<Circui
         }
     }
 
+    public void setToAllOpen(){
+        var statusIn = viewInputs();
+        var statusOut = viewOutputs();
+        var openedIn = statusIn.stream().map(s -> new CircuitPortStatus(s.portName(), s.value(), s.isInput(), true)).toList();
+        var openedOut = statusOut.stream().map(s -> new CircuitPortStatus(s.portName(), s.value(), s.isInput(), true)).toList();
+        setStatus(new Pair<>(openedIn, openedOut));
+    }
+
     private void setValuesOnly(List<CircuitPortStatus> inputStatus){
         try{
             inputStatus.forEach(cps -> {

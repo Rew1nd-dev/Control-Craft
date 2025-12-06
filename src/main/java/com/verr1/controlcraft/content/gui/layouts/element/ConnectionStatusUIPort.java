@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.gui.layouts.element;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
-import com.verr1.controlcraft.content.gui.widgets.IconSelectionScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.ListSelectionScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.SmallIconButton;
 import com.verr1.controlcraft.content.links.connector.EasyConnectorBlockEntity;
@@ -124,7 +123,7 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         int line = 0;
         GridLayout operationLayout = new GridLayout();
         operationLayout.addChild(addLabel, line, 0);
@@ -153,12 +152,12 @@ public class ConnectionStatusUIPort extends TypedUIPort<EasyConnectorBlockEntity
     }
 
     @Override
-    protected EasyConnectorBlockEntity.Status readGUI() {
+    public EasyConnectorBlockEntity.Status readGUI() {
         return EasyConnectorBlockEntity.Status.EMPTY;
     }
 
     @Override
-    protected void writeGUI(EasyConnectorBlockEntity.Status value) {
+    public void writeGUI(EasyConnectorBlockEntity.Status value) {
         List<String> allNames = value.allCimulinks().stream().map(EasyConnectorBlockEntity.LinkStatus::name).distinct().toList();
         List<String> allPortName = value.allCimulinks().stream().flatMap(c -> ArrayUtils.flatten(c.inputNames(), c.outputNames()).stream()).distinct().toList();
 

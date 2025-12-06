@@ -4,6 +4,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.ModList;
@@ -31,6 +32,11 @@ public class CreateBigCannonsCompact {
     public static @Nullable APAutocannonAccess createAutocannonAp(Level level){
         if(getter == null)return null;
         return getter.createAutocannonAp(level);
+    }
+
+    public static @Nullable Projectile createHEShell(Level level){
+        if(getter == null)return null;
+        return getter.createHEShell(level);
     }
 
     public static void createExplosion(Level level, double x, double y, double z, double radius, boolean fire, Level.ExplosionInteraction interaction){

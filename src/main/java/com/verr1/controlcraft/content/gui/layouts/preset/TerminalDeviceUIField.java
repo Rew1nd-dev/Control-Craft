@@ -155,7 +155,7 @@ public class TerminalDeviceUIField extends TypedUIPort<CompoundTag> {
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         int i = 0;
 
         GridLayout fieldSelectLayout = new GridLayout();
@@ -179,12 +179,12 @@ public class TerminalDeviceUIField extends TypedUIPort<CompoundTag> {
     }
 
     @Override
-    protected CompoundTag readGUI() {
+    public CompoundTag readGUI() {
         return guiView.serialize();
     }
 
     @Override
-    protected void writeGUI(CompoundTag value) {
+    public void writeGUI(CompoundTag value) {
         guiView.deserializeClientView(value);
         read();
     }

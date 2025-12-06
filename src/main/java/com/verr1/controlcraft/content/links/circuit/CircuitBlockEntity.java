@@ -111,7 +111,9 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         var savedStatus = linkPort().viewStatus();
         linkPort().load(nbt);
         linkPort().setStatus(savedStatus);
+        linkPort().setToAllOpen();
         updateIOName();
+        setChanged();
     }
 
     public boolean useDecimalNetwork() {

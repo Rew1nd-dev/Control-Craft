@@ -100,7 +100,7 @@ public class SensorUIPort extends MultipleTypedUIPort{
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0);
         layoutToFill.addChild(typeTitle, 1, 0);
         layoutToFill.addChild(value, 1, 1);
@@ -111,7 +111,7 @@ public class SensorUIPort extends MultipleTypedUIPort{
     }
 
     @Override
-    protected List<Object> readGUI() {
+    public List<Object> readGUI() {
         return List.of(valueOfOption(), localCheckbox.selected());
     }
 }

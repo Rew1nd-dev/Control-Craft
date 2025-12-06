@@ -1,13 +1,10 @@
 package com.verr1.controlcraft.content.gui.layouts.element;
 
 import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
-import com.verr1.controlcraft.content.gui.screens.CircuitWirelessScreen;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.gui.widgets.IconSelectionScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
 import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
-import com.verr1.controlcraft.content.links.circuit.IoData;
-import com.verr1.controlcraft.content.links.circuit.IoSettings;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
@@ -53,7 +50,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
 
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
 
         blockLayout = block.createLayout();
         // Add BlockUI and block selector to layout
@@ -83,7 +80,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     }
 
     @Override
-    protected CompoundTag readGUI() {
+    public CompoundTag readGUI() {
         writeCurrent();
 
         List<CircuitPortStatus> input = data
@@ -110,7 +107,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     }
 
     @Override
-    protected void writeGUI(CompoundTag value) {
+    public void writeGUI(CompoundTag value) {
 
         var inputStatus = CircuitBlockEntity.PAIR_SER.deserialize(value);
 

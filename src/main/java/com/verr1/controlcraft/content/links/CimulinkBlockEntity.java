@@ -6,6 +6,7 @@ import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
+import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -29,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -76,23 +78,23 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     }
 
     @Override
+    public void setLevel(@NotNull Level level) {
+        super.setLevel(level);
+        linkPort.setWorldBlockPos(WorldBlockPos.of(level, getBlockPos()));
+    }
+
+    @Override
     public final void initializeServer() {
         super.initializeServer();
 
         initializeEarly();
-
-        if(level != null){
-            linkPort.setWorldBlockPos(WorldBlockPos.of(level, getBlockPos()));
-        }else{
-            ControlCraft.LOGGER.warn("link port has not been set pos! at: {} because level is null", getBlockPos().toShortString());
-        }
 
         lateInitLinkPort.load(); // restore connections
         lateInitVModCompact.load(); // load with vmod compact (offset all links)
         linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
         initializeExtra();
         isInitialized = true;
-        syncForAllPlayers(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
+        syncForNear(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
         ControlCraft.LOGGER.debug("be at {} finish initialization", getBlockPos().toShortString());
     }
 
@@ -119,17 +121,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
                         () -> linkPort().serialize(),
                         lateInitLinkPort::load
                 ))
-                .register();
-        // this will be done in link ports serializations
-        buildRegistry(SharedKeys.COMPONENT_NAME)
-                .withBasic(SerializePort.of(
-                        this::receiverName,
-                        this::setName,
-                        SerializeUtils.STRING
-                ))
-                .runtimeOnly()
-                .withClient(ClientBuffer.STRING.get())
-                .dispatchToSync()
                 .register();
 
         registerPartial(
@@ -158,13 +149,13 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         return getBlockPos().getCenter().add(faceDir.scale(-0.2));
     }
 
-    public void setName(String name){
-        linkPort().setName(name);
-    }
-
-    public String receiverName(){
-        return linkPort().name();
-    }
+//    public void setName(String name){
+//        linkPort().setName(name);
+//    }
+//
+//    public String receiverName(){
+//        return linkPort().name();
+//    }
 
     private<R> void registerPartial(
             NetworkKey key,
@@ -232,12 +223,30 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     }
 
 
+    public void setDeviceName(String name){
+        linkPort().setName(name);
+    }
+
+    public String deviceName(){
+        return linkPort().name();
+    }
+
     @Override
     public void tickServer() {
         super.tickServer();
         if(BlockPropertyConfig._ALWAYS_REQUEST_PORT_INFO){
-            syncForNear(true, SharedKeys.VALUE_STATUS, SharedKeys.CONNECTION_STATUS);
+            sendPortValueUpdate();
         }
+    }
+
+    public void sendPortValueUpdate(){
+        if(level == null || level.isClientSide)return;
+        syncForNear(false, SharedKeys.VALUE_STATUS);
+    }
+
+    public void sendPortConnectUpdate(){
+        if(level == null || level.isClientSide)return;
+        syncForNear(false, SharedKeys.CONNECTION_STATUS);
     }
 
     @Override

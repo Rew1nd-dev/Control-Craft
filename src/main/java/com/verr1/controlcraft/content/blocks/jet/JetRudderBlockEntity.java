@@ -29,6 +29,7 @@ import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.impl.shadow.H;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class JetRudderBlockEntity extends OnShipBlockEntity implements
@@ -67,14 +68,17 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
 
     public void setTargetHorizontalAngle(float targetHorizontalAngle) {
         this.targetHorizontalAngle = (float) VSMathUtils.clamp(targetHorizontalAngle, Math.toRadians(90));
+        queueUpdate(HORIZONTAL);
     }
 
     public void setTargetVerticalAngle(float targetVerticalAngle) {
         this.targetVerticalAngle = (float) VSMathUtils.clamp(targetVerticalAngle, Math.toRadians(90));
+        queueUpdate(VERTICAL);
     }
 
     public void setTargetThrust(float targetThrust) {
         this.targetThrust = targetThrust;
+        queueUpdate(THRUST);
     }
 
     public Direction getFiexdDirection() {
@@ -131,6 +135,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         targetHorizontalAngle = (float) VSMathUtils.clamp(horizontal, Math.toRadians(90));
         targetVerticalAngle = (float) VSMathUtils.clamp(vertical, Math.toRadians(90));
         targetThrust = (float)thrust;
+        queueUpdate(THRUST, VERTICAL, HORIZONTAL);
     }
 
 
@@ -176,7 +181,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     @Override
     public void tickServer() {
         super.tickServer();
-        syncForNear(true, THRUST, HORIZONTAL, VERTICAL);
+        // syncForNear(true, THRUST, HORIZONTAL, VERTICAL);
         // syncClient();
     }
 

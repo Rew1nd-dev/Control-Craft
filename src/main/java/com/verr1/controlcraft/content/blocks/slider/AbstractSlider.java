@@ -20,6 +20,7 @@ import com.verr1.controlcraft.foundation.vsapi.ShipAssembler;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.BlockPos;
@@ -38,6 +39,7 @@ import org.valkyrienskies.core.apigame.constraints.VSSlideConstraint;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 
+import java.lang.Math;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +59,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
 
     private Vector3d selfOffset = new Vector3d();
 
-
+    private double latestDistance = 0;
 
     private Vector3d compOffset = new Vector3d();
 
@@ -102,10 +104,17 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
     @Override
     public void tickServer() {
         super.tickServer();
-        syncForNear(true, ANIMATED_DISTANCE);
+        decideAnimationUpdate();
         // syncClient();
     }
 
+
+    public void decideAnimationUpdate(){
+        double d = getSlideDistance();
+        if(Math.abs(latestDistance - d) < 1e-3)return;
+        latestDistance = d;
+        queueUpdate(ANIMATED_DISTANCE);
+    }
 
 
     public Vector3dc getSelfOffset() {

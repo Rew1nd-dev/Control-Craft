@@ -12,7 +12,6 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.bus.BusPort;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
 import com.verr1.controlcraft.utils.MinecraftUtils;
-import kotlin.Pair;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -56,7 +55,7 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         int line = 0;
         layoutToFill.addChild(available, line, 0, 1, 5);
         line++;
@@ -79,7 +78,7 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
     }
 
     @Override
-    protected BusLinkPort.Status readGUI() {
+    public BusLinkPort.Status readGUI() {
         return new BusLinkPort.Status(Map.of(), Map.of(), currentIn, currentOut);
     }
 
@@ -193,7 +192,7 @@ public class BusStatusUIPort extends TypedUIPort<BusLinkPort.Status> {
     }
 
     @Override
-    protected void writeGUI(BusLinkPort.Status value) {
+    public void writeGUI(BusLinkPort.Status value) {
         clear();
         availableIn.putAll(value.availableIn());
         availableOut.putAll(value.availableOut());

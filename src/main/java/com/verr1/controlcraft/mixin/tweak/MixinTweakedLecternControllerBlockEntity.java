@@ -4,10 +4,12 @@ package com.verr1.controlcraft.mixin.tweak;
 import com.getitemfromblock.create_tweaked_controllers.block.TweakedLecternControllerBlockEntity;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@Pseudo
 @Mixin(TweakedLecternControllerBlockEntity.class)
 public class MixinTweakedLecternControllerBlockEntity {
 

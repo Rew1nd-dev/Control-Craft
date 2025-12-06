@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 public class CimulinkStandalone {
-    static String DataPath = System.getProperty("user.dir") + "\\src\\main\\resources\\data\\vscontrolcraft\\cimulinks\\";;
+    static String DataPath = System.getProperty("user.dir") + "\\src\\main\\resources\\data\\vscontrolcraft\\cimulinks\\";; //".cimulinks";//
 
     public static void save(CircuitNbt nbt, Path folder, String saveName) {
         CompoundTag tag = new CompoundTag();
@@ -55,7 +55,7 @@ public class CimulinkStandalone {
         // save(JetMissile.closeLoopXYZ().evaluate().buildContext(), Path.of(DataPath), "jetMissile");
         // save(JetMissile.computeYP().evaluate().buildContext(), Path.of(DataPath), "cyp");
 
-        save(CCRP.fireCon().evaluate().buildContext(), Path.of(DataPath), "fireMng");
+        save(CCRP.cannon8().evaluate().buildContext(), Path.of(DataPath), "cannon8");
 
         // save(WarThunderFlight.lerp().evaluate().buildContext(), Path.of(DataPath), "testLoop");
         // System.out.println(Math.pow(1.001, -0.001));

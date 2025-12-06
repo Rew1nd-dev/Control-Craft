@@ -10,6 +10,7 @@ import com.verr1.controlcraft.mixinducks.ICannonDuck;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +23,7 @@ import rbasamoyai.createbigcannons.index.CBCItems;
 import rbasamoyai.createbigcannons.munitions.ShellExplosion;
 import rbasamoyai.createbigcannons.munitions.autocannon.ap_round.APAutocannonProjectile;
 import rbasamoyai.createbigcannons.munitions.autocannon.flak.FlakAutocannonProjectile;
+import rbasamoyai.createbigcannons.munitions.big_cannon.he_shell.HEShellProjectile;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonProjectile;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -67,6 +69,13 @@ public class CBCCompactAccessImpl implements ICBCCompactAccess {
         he.setNoGravity(true);
         he.setFuze(CBCItems.IMPACT_FUZE.asStack());
         return new APAutocannonAccessImpl(he);
+    }
+
+    @Override
+    public Projectile createHEShell(Level level) {
+        HEShellProjectile ap = new HEShellProjectile(CBCEntityTypes.HE_SHELL.get(), level);
+        ap.setFuze(CBCItems.IMPACT_FUZE.asStack());
+        return ap;
     }
 
     @Override

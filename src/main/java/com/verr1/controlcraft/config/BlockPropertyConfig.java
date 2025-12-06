@@ -104,13 +104,13 @@ public class BlockPropertyConfig
             .comment(
                     "  Always Render Cimulink Wire, Turn Off If You Think It's Ugly"
             )
-            .define("Always Render Cimulink Wire", false);
+            .define("Always Render Cimulink Wire", true);
 
     private static final ForgeConfigSpec.BooleanValue ALWAYS_REQUEST_PORT_INFO = BUILDER
             .comment(
                     "  Always Request Cimulink Port Information, May Cause Network Burden, But Important for Debugging"
             )
-            .define("Always Request Cimulink Port Information", false);
+            .define("Always Request Cimulink Port Information", true);
 
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();

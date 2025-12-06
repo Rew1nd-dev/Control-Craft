@@ -14,6 +14,7 @@ import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.unstable.AIServer;
+import com.verr1.controlcraft.utils.TimeCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -67,6 +68,7 @@ public class ControlCraftEvents {
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
             AIServer.MANAGER.tick();
             CimulinkBus.tickAll();
+            TimeCache.tick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();
         }

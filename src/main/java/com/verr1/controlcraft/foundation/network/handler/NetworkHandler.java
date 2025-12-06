@@ -72,6 +72,18 @@ public class NetworkHandler {
         }
     }
 
+    public List<NetworkKey> getSyncKeys(){
+        return simplex.keySet().stream().toList();
+    }
+
+    public List<NetworkKey> getSaveLoadKeys(){
+        return saveLoads.keySet().stream().toList();
+    }
+
+    public List<NetworkKey> getDuplexKeys(){
+        return duplex.keySet().stream().toList();
+    }
+
     public boolean isAnyDirty(NetworkKey... key){
         AtomicBoolean isAllUpdated = new AtomicBoolean(true);
         Arrays.asList(key).forEach(
@@ -93,6 +105,7 @@ public class NetworkHandler {
     }
 
     public void syncForAllPlayers(boolean simplex, NetworkKey... key){
+        if(delegate.getLevel() == null || delegate.getLevel().isClientSide)return;
         dispatchChannel(PacketDistributor.ALL.noArg(), simplex, key);
     }
 
@@ -103,22 +116,20 @@ public class NetworkHandler {
     }
 
     public void receiveRequest(List<NetworkKey> requests, ServerPlayer sender){
-        // assume requests are only from duplex channels
         syncForPlayer(false, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class));
-        /*
-        ControlCraftServer.SERVER_EXECUTOR.executeLater(
-                () -> syncForPlayer(false, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class)),
-                25
-        ); // simulating lag for 1125 ms
-        * */
-
-        
     }
 
     public void syncForNear(boolean simplex, NetworkKey... key){
+        if(delegate.getLevel() == null || delegate.getLevel().isClientSide)return;
         BlockPos pos = delegate.getBlockPos();
         dispatchChannel(
-                PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, Objects.requireNonNull(delegate.getLevel()).dimension())),
+                PacketDistributor.NEAR.with(
+                        () -> new PacketDistributor.TargetPoint(
+                                pos.getX(), pos.getY(), pos.getZ(),
+                                64,
+                                Objects.requireNonNull(delegate.getLevel()).dimension()
+                        )
+                ),
                 simplex,
                 key
         );
@@ -166,12 +177,15 @@ public class NetworkHandler {
     }
 
     public void dispatchChannel(PacketDistributor.PacketTarget target, boolean isSimplex, NetworkKey... key){
-        if (isSimplex)syncSimplex(target, key);
-        else syncDuplex(target, key);
+        if (isSimplex){
+            syncSimplex(target, key);
+        } else{
+            syncDuplex(target, key);
+        }
     }
 
     public void syncSimplex(PacketDistributor.PacketTarget target, NetworkKey... key){
-        if(delegate.getLevel() == null)return;
+        if(delegate.getLevel() == null || key.length == 0)return;
         CompoundTag syncTag = new CompoundTag();
         Arrays.asList(key).forEach(
                 k -> Optional
@@ -185,7 +199,7 @@ public class NetworkHandler {
     }
 
     public void syncDuplex(PacketDistributor.PacketTarget target, NetworkKey... key){
-        if(delegate.getLevel() == null)return;
+        if(delegate.getLevel() == null || key.length == 0)return;
         CompoundTag portTag = new CompoundTag();
         Arrays.asList(key).forEach(
                 k -> Optional
@@ -215,7 +229,7 @@ public class NetworkHandler {
                 sidePort.dispatch(simplexTag.getCompound(k.getSerializedName()), delegate.getLevel().isClientSide);
             });
         }
-        if(delegate.getLevel().isClientSide)return;
+        if(delegate.getLevel() == null || delegate.getLevel().isClientSide)return;
         delegate.setChanged();
     }
 
@@ -232,6 +246,11 @@ public class NetworkHandler {
                 );
     }
 
+
+
+    public void onInit(){
+        syncForNear(true, simplex.keySet().toArray(new NetworkKey[0]));
+    }
 
     public void onRead(CompoundTag compound, boolean clientPacket) {
         // super.read(compound, clientPacket);
@@ -336,6 +355,7 @@ public class NetworkHandler {
 
 
     }
+
 
 
     private void registerAsymmetric(

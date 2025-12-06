@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 public class TweakerminalBlock extends DirectionalBlock implements IBE<TweakerminalBlockEntity> {
 
     public static final String ID = "tweakerminal";
+    public static final String K_POS = "link_pos";
 
     public TweakerminalBlock(Properties properties) {
         super(properties);
@@ -82,8 +83,8 @@ public class TweakerminalBlock extends DirectionalBlock implements IBE<Tweakermi
         } else if(!worldIn.isClientSide && TweakControllerCompact.tweakControllerInHand(player)) {
             withBlockEntityDo(worldIn, pos, be -> be.setUserUUID(player.getUUID()));
             CompoundTag tag = player.getItemInHand(InteractionHand.MAIN_HAND).getOrCreateTag();
-            tag.putLong("link_pos", pos.asLong());
-            TweakControllerServerRecorder.link(player.getUUID(), WorldBlockPos.of(worldIn, pos));
+            tag.putLong(K_POS, pos.asLong());
+            // TweakControllerServerRecorder.link(player.getUUID(), WorldBlockPos.of(worldIn, pos));
 
         }
 

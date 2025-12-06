@@ -3,25 +3,34 @@ package com.verr1.controlcraft.content.gui.layouts.element;
 import com.verr1.controlcraft.content.gui.layouts.NetworkUIPort;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
-import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.core.BlockPos;
+import org.mozilla.javascript.ast.Block;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static com.verr1.controlcraft.content.gui.factory.GenericUIFactory.boundBlockEntity;
 
 public abstract class MultipleTypedUIPort extends NetworkUIPort<List<Object>> {
 
     public final List<KeyWithType> kwt;
+    private final BlockPos boundPos;
 
     public MultipleTypedUIPort(
             BlockPos boundPos,
             List<KeyWithType> kTypes
     ) {
-        super(obJs -> handleWrite(boundPos, kTypes, obJs), () -> handleRead(boundPos, kTypes));
         kwt = kTypes;
+        this.boundPos = boundPos;
+    }
+
+    @Override
+    protected void consume(List<Object> data) {
+        handleWrite(boundPos, kwt, data);
+    }
+
+    @Override
+    protected List<Object> provide() {
+        return handleRead(boundPos, kwt);
     }
 
     public static void handleWrite(BlockPos boundPos, List<KeyWithType> kTypes, List<Object> inputs){
@@ -54,7 +63,7 @@ public abstract class MultipleTypedUIPort extends NetworkUIPort<List<Object>> {
     }
 
     @Override
-    protected final void writeGUI(List<Object> value) {
+    public final void writeGUI(List<Object> value) {
         writeGUIWithType(
                 value.stream().map(v -> new ValueWithType(v, v == null ? Object.class : v.getClass())).toList()
         );

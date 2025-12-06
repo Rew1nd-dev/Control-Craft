@@ -35,7 +35,7 @@ public class Vector3dUIField extends TypedUIPort<Vector3d> implements TitleLabel
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0);
         layoutToFill.addChild(xLabel, 0, 1);
         layoutToFill.addChild(xField, 0, 2);
@@ -47,7 +47,7 @@ public class Vector3dUIField extends TypedUIPort<Vector3d> implements TitleLabel
     }
 
     @Override
-    protected Vector3d readGUI() {
+    public Vector3d readGUI() {
         return new Vector3d(
                 ParseUtils.tryParseDouble(xField.getValue()),
                 ParseUtils.tryParseDouble(yField.getValue()),
@@ -56,7 +56,7 @@ public class Vector3dUIField extends TypedUIPort<Vector3d> implements TitleLabel
     }
 
     @Override
-    protected void writeGUI(Vector3d value) {
+    public void writeGUI(Vector3d value) {
         xField.setValue("" + value.x());
         yField.setValue("" + value.y());
         zField.setValue("" + value.z());

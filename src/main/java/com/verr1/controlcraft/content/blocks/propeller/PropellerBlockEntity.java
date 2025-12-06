@@ -39,17 +39,19 @@ public class PropellerBlockEntity extends OnShipBlockEntity implements
     public static NetworkKey TORQUE = NetworkKey.create("torque");
     public static NetworkKey SPEED = NetworkKey.create("speed");
 
-    public double ThrustRatio = 1000;
-    public double TorqueRatio = 1000;
+    private double ThrustRatio = 1000;
+    private double TorqueRatio = 1000;
 
     public double getRotationalSpeed() {
         return rotationalSpeed;
     }
 
-    public double rotationalSpeed = 5;
+    private double rotationalSpeed = 5;
 
-    public LerpedFloat angle;
-    public float targetAngle = 0;
+
+
+    private final LerpedFloat angle;
+    private float targetAngle = 0;
 
 
     public double getThrustRatio() {
@@ -64,8 +66,12 @@ public class PropellerBlockEntity extends OnShipBlockEntity implements
 
     public void setVisualRotationalSpeed(double speed){
         rotationalSpeed = speed;
+        queueUpdate(SPEED);
     }
 
+    public LerpedFloat angle() {
+        return angle;
+    }
 
     public void setThrustRatio(double thrustRatio) {
         ThrustRatio = thrustRatio;
@@ -96,7 +102,7 @@ public class PropellerBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public void lazyTickServer() {
-        syncForNear(true, SPEED);
+        // syncForNear(true, SPEED);
     }
 
     @OnlyIn(Dist.CLIENT)

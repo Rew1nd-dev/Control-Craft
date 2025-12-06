@@ -15,6 +15,7 @@ import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.foundation.vsapi.ShipAssembler;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.CONNECT_CONTEXT;
+import static com.verr1.controlcraft.content.blocks.SharedKeys.SELF_OFFSET;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
@@ -57,6 +59,8 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
     private final SynchronizedField<Double> cachedAngle = new SynchronizedField<>(0.0);
     private final SynchronizedField<Double> cachedVelocity = new SynchronizedField<>(0.0);
+
+    private double latestAngle = 0.0;
 
     public AbstractMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -131,6 +135,12 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
     public void setCachedServoAngle(double value){cachedAngle.write(value);}
 
     public void setCachedServoAngularVelocity(double value){cachedVelocity.write(value);}
+
+    public void decideAnimationUpdate(){
+        if(Math.abs(MathUtils.radianReset(latestAngle - cachedAngle.read())) < 1e-3)return;
+        latestAngle = cachedAngle.read();
+        queueUpdate(ANIMATED_ANGLE);
+    }
 
     public Vector3d getCompOffset() {
         return compOffset;
@@ -333,12 +343,14 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
     @Override
     public void tickServer() {
         super.tickServer();
-        syncForNear(true, ANIMATED_ANGLE, SharedKeys.SELF_OFFSET);
+        decideAnimationUpdate();
+        // syncForNear(true, ANIMATED_ANGLE, SharedKeys.SELF_OFFSET);
         // syncClientAnimation();
     }
 
     public void setSelfOffset(Vector3dc selfOffset) {
         this.selfOffset = new Vector3d(selfOffset);
+        queueUpdate(SELF_OFFSET);
         setChanged();
     }
 

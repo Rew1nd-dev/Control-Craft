@@ -50,11 +50,7 @@ public class AISchematic {
     );
 
     private static final Serializer<List<CompoundTag>> BE_TAGS = SerializeUtils.ofList(SerializeUtils.UNIT);
-
-
-
     private static final Serializer<Pair<Integer, Integer>> Y_BOUND = SerializeUtils.ofPair(SerializeUtils.INT);
-
 
 
     private final BlockPaletteHashMapV1 offsetPalette;

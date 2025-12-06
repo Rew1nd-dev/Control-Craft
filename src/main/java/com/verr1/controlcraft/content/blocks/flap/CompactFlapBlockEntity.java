@@ -109,8 +109,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
         buildRegistry(ANGLE)
                 .withBasic(SerializePort.of(
-                        () -> angle.read(),
-                        a -> angle.write(a),
+                        this::angle,
+                        this::setAngle,
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
@@ -164,7 +164,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         receiver().register(
                 new NumericField(
                         () -> angle.read(),
-                        a -> angle.write(a),
+                        a -> {
+                            angle.write(a);
+                            queueUpdate(ANGLE);
+                        },
                         "angle"
                 ),
                 new DirectReceiver.InitContext(SlotType.DEGREE, Couple.create(0.0, 1.0)),
@@ -231,6 +234,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     public void setOffset(double offset) {
         this.offset = offset;
+        queueUpdate(OFFSET);
     }
 
     public double getResistRatio() {
@@ -238,7 +242,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     public void setResistRatio(double resistRatio) {
-        this.resistRatio = resistRatio;
+        this.resistRatio = Math.abs(resistRatio);
     }
 
     public double getLiftRatio() {
@@ -246,7 +250,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     public void setLiftRatio(double liftRatio) {
-        this.liftRatio = liftRatio;
+        this.liftRatio = Math.abs(liftRatio);
     }
 
     public double getBias() {
@@ -261,7 +265,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public void tickServer() {
         super.tickServer();
         syncAttachInducer();
-        syncForNear(true, ANGLE, OFFSET);
+        // syncForNear(true, ANGLE, OFFSET);
     }
 
     @Override
@@ -294,7 +298,14 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
 
+    public double angle(){
+        return angle.read();
+    }
 
+    public void setAngle(double angle){
+        this.angle.write(angle);
+        queueUpdate(ANGLE);
+    }
 
     @Override
     public String receiverName() {

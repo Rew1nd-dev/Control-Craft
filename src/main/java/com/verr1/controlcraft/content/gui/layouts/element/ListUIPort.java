@@ -27,12 +27,12 @@ public abstract class ListUIPort<V, T> extends TypedUIPort<T> {
 
 
     @Override
-    protected final T readGUI() {
+    public final T readGUI() {
         return restorer.apply(readList());
     }
 
     @Override
-    protected final void writeGUI(T value) {
+    public final void writeGUI(T value) {
         writeList(extractor.apply(value));
     }
 

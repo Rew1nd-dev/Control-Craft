@@ -70,7 +70,7 @@ public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         AtomicInteger line = new AtomicInteger(0);
         GridLayout grid = new GridLayout();
         layoutToFill.addChild(label, 0, 0, 1, 1);

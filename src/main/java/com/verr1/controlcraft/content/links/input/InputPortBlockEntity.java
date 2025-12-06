@@ -102,6 +102,11 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
         return receiver;
     }
 
+    @Override
+    public String receiverName() {
+        return "input_link";
+    }
+
     private static class Cooldown{
         private int neighborInputCooldown = 0;
 

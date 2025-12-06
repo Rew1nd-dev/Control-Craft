@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class Executor {
 
     private final ConcurrentLinkedDeque<Executable> common = new ConcurrentLinkedDeque<>();
-    private final ConcurrentHashMap<String, Executable> named = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Object, Executable> named = new ConcurrentHashMap<>();
 
 
     public void tick(){
@@ -41,11 +41,11 @@ public class Executor {
         common.add(task);
     }
 
-    public void execute(String name, Executable task){
+    public void execute(Object name, Executable task){
         named.put(name, task);
     }
 
-    public void executeIfAbsent(String name, Executable task){
+    public void executeIfAbsent(Object name, Executable task){
         named.putIfAbsent(name, task);
     }
 
@@ -63,7 +63,7 @@ public class Executor {
     }
 
 
-    public void executeLater(String name, Runnable task, int tick){
+    public void executeLater(Object name, Runnable task, int tick){
         if(tick <= 0){
             ControlCraft.LOGGER.warn(
                     "task will probably be neglected because deferral tick is <= 0, " +
@@ -72,7 +72,7 @@ public class Executor {
         named.put(name, new DeferralExecutable(task, tick));
     }
 
-    public void executeLaterIfAbsent(String name, Runnable task, int tick){
+    public void executeLaterIfAbsent(Object name, Runnable task, int tick){
         if(tick <= 0){
             ControlCraft.LOGGER.warn(
                     "a task will probably be neglected because deferral tick is <= 0, " +
@@ -81,11 +81,11 @@ public class Executor {
         named.putIfAbsent(name, new DeferralExecutable(task, tick));
     }
 
-    public void execute(String name, Runnable task){
+    public void execute(Object name, Runnable task){
         executeLater(name, task, 1);
     }
 
-    public void executeIfAbsent(String name, Runnable task){
+    public void executeIfAbsent(Object name, Runnable task){
         executeLaterIfAbsent(name, task, 1);
     }
 
@@ -93,11 +93,11 @@ public class Executor {
         executeLater(task, 1);
     }
 
-    public void executeOnSchedule(String name, Runnable task, int interval, int cycles){
+    public void executeOnSchedule(Object name, Runnable task, int interval, int cycles){
         named.put(name, new IntervalExecutable(task, interval, cycles));
     }
 
-    public void executeOnScheduleIfAbsent(String name, Runnable task, int interval, int cycles){
+    public void executeOnScheduleIfAbsent(Object name, Runnable task, int interval, int cycles){
         named.putIfAbsent(name, new IntervalExecutable(task, interval, cycles));
     }
 

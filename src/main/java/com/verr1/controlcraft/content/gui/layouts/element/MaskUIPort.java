@@ -6,7 +6,6 @@ import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
 import com.verr1.controlcraft.content.links.logic.FlexibleGateBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.port.digital.FlexibleGateLinkPort;
-import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.StringBoolean;
 import com.verr1.controlcraft.foundation.data.links.StringBooleans;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
@@ -15,7 +14,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public class MaskUIPort extends ListUIPort<StringBoolean, StringBooleans>{
@@ -76,7 +74,7 @@ public class MaskUIPort extends ListUIPort<StringBoolean, StringBooleans>{
     }
 
     @Override
-    protected void initLayout(GridLayout layoutToFill) {
+    public void initLayout(GridLayout layoutToFill) {
         layoutToFill.addChild(title, 0, 0, 1, 1);
         for (int i = 0; i < lines.size(); i++) {
             MaskUI line = lines.get(i);
