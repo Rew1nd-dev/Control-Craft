@@ -655,7 +655,7 @@ public abstract class BlockLinkPort {
         return realTimeComponent;
     }
 
-    public void connectTo(String outputPort, WorldBlockPos pos, String inputName) throws IllegalArgumentException{
+    public final void connectTo(String outputPort, WorldBlockPos pos, String inputName) throws IllegalArgumentException{
         ArrayUtils.AssertPresence(outputsNames(), outputPort);
 
         BlockLinkPort blp = of(pos).orElse(null);
@@ -668,7 +668,7 @@ public abstract class BlockLinkPort {
     }
 
     public final void connectBy(WorldBlockPos pos, String outputPort, String inputName) throws IllegalArgumentException{
-        ArrayUtils.AssertPresence(inputsNames(), inputName); // should be a valid inputName
+        ArrayUtils.AssertPresence(inputsNamesExcludeSignals(), inputName); // should be a valid inputName
         ArrayUtils.AssertAbsence(backwardLinks.keySet(), inputName); // should not been connected
 
         schedulePortRefresh();

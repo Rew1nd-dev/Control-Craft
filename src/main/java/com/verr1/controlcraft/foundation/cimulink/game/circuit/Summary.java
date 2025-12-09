@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
 public record Summary(
         String registerName,
@@ -23,5 +24,8 @@ public record Summary(
         );
     }
 
-
+    @Override
+    public @NotNull String toString() {
+        return String.format("[type: %s |saved: {%s}]", registerName, componentTag);
+    }
 }

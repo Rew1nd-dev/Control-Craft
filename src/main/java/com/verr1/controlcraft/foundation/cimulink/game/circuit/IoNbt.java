@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
 public record IoNbt(boolean isInput, String ioName, String componentName, String portName) {
 
@@ -24,5 +25,9 @@ public record IoNbt(boolean isInput, String ioName, String componentName, String
         );
     }
 
-
+    @Override
+    public @NotNull String toString() {
+        String in_out = isInput ? "IN" : "OUT";
+        return String.format("[(Global %s.%s) -> (%s.%s)]", in_out, ioName, componentName, portName);
+    }
 }

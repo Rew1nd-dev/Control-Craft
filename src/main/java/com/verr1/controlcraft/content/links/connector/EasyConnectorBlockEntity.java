@@ -100,7 +100,7 @@ public class EasyConnectorBlockEntity extends OnShipBlockEntity {
             BlockLinkPort blp = BlockLinkPort.of(pos).orElse(null);
             if(blp == null)return null;
             return new  LinkStatus(
-                    List.copyOf(blp.inputsNames()),
+                    List.copyOf(blp.inputsNamesExcludeSignals()),
                     List.copyOf(blp.outputsNames()),
                     pos,
                     blp.name()

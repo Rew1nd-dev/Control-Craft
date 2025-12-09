@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.
 import com.verr1.controlcraft.foundation.cimulink.core.components.digital.gates.Gates;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.ad.Comparator;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.da.Multiplexer;
+import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.DirectCurrent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.vectors.*;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.Summary;
@@ -35,6 +36,15 @@ public class CimulinkFactory {
             ),
             Circuit.class,
             defaultID("circuit")
+    );
+
+    public static final Factory<Luacuit> LUACUIT = register(
+            SerializeUtils.of(
+                    Luacuit::serialize,
+                    Luacuit::deserialize
+            ),
+            Luacuit.class,
+            defaultID("luacuit")
     );
 
     public static final Factory<DirectCurrent> DC = register(

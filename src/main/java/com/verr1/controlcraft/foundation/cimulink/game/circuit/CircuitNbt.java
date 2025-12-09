@@ -107,5 +107,23 @@ public class CircuitNbt {
         return deserialize(SerializeUtils.decompress(tag.getByteArray("compressed")));
     }
 
-
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("CircuitNbt {\n");
+        sb.append("  Components:\n");
+        for (ComponentNbt component : componentSummaries) {
+            sb.append("    ").append(component).append("\n");
+        }
+        sb.append("  Connections:\n");
+        for (ConnectionNbt connection : connectionNbts) {
+            sb.append("    ").append(connection).append("\n");
+        }
+        sb.append("  IOs:\n");
+        for (IoNbt io : inOuts) {
+            sb.append("    ").append(io).append("\n");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
 }

@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
 public record ComponentNbt(String componentName, Summary componentTag) {
 
@@ -20,4 +21,8 @@ public record ComponentNbt(String componentName, Summary componentTag) {
         );
     }
 
+    @Override
+    public @NotNull String toString() {
+        return String.format("[name: %s |data: %s]", componentName, componentTag);
+    }
 }

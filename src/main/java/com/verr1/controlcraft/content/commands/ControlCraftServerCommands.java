@@ -31,6 +31,9 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.util.Arrays;
 import java.util.List;
@@ -82,6 +85,13 @@ public class ControlCraftServerCommands {
                 name
         ));
 
+        return 1;
+    }
+
+    private static int testLuaj(CommandContext<CommandSourceStack> context){
+        Globals globals = JsePlatform.standardGlobals();
+        LuaValue chunk = globals.load("print('Hello from Lua!')");
+        chunk.call();
         return 1;
     }
 
@@ -353,7 +363,15 @@ public class ControlCraftServerCommands {
                             .executes(ControlCraftServerCommands::toggleCimulinkDebugMode)
                         )
         );
+        dispatcher.register(
+                Commands.literal("luaj")
+                        .then(lt("test")
+                                .executes(
+                                        ControlCraftServerCommands::testLuaj
+                                )
+                        )
 
+        );
 
     }
 

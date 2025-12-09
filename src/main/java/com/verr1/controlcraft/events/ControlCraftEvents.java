@@ -31,6 +31,8 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.concurrent.Executors;
+
 @Mod.EventBusSubscriber
 public class ControlCraftEvents {
 
@@ -43,6 +45,7 @@ public class ControlCraftEvents {
         ConstraintCenter.onServerStaring(event.getServer());
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
+        ControlCraftServer.LUA_THREAD = Executors.newSingleThreadExecutor();
         ControlCraftAttachments.register();
 
         AIServer.init(event.getServer());

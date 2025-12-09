@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.circuit;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
 public record ConnectionNbt(
         String outputName,
@@ -29,4 +30,8 @@ public record ConnectionNbt(
         );
     }
 
+    @Override
+    public @NotNull String toString() {
+        return String.format("[(%s.%s) -> (%s.%s)]", outputName, outputPortName, inputName, inputPortName);
+    }
 }

@@ -88,9 +88,14 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         super.initializeServer();
 
         initializeEarly();
+        try{
+            lateInitLinkPort.load(); // restore connections
+            lateInitVModCompact.load(); // load with vmod compact (offset all links)
+        }catch (IllegalArgumentException e){
+            ControlCraft.LOGGER.error("error encountered when initializing CimulinkBlockEntity at {}", getBlockPos().toShortString());
+            ControlCraft.LOGGER.error("error message:{}", e.getMessage());
+        }
 
-        lateInitLinkPort.load(); // restore connections
-        lateInitVModCompact.load(); // load with vmod compact (offset all links)
         linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
         initializeExtra();
         isInitialized = true;

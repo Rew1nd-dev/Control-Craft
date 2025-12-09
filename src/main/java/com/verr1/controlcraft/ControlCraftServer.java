@@ -11,12 +11,15 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import java.util.concurrent.ExecutorService;
+
 public class ControlCraftServer {
     public static MinecraftServer INSTANCE;
     public static ServerLevel OVERWORLD;
     public static RedstoneLinkNetworkHandlerExtension DECIMAL_LINK_NETWORK_HANDLER = new RedstoneLinkNetworkHandlerExtension();
     public static PeripheralNetwork CC_NETWORK = new PeripheralNetwork();
     public static final Executor SERVER_EXECUTOR = new Executor();
+    public static ExecutorService LUA_THREAD;
 
     public static void ServerInit(){
         Configurator.setLevel("org.valkyrienskies.core.impl.networking", Level.ERROR);

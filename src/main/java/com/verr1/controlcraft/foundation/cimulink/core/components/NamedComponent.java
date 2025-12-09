@@ -154,8 +154,8 @@ public abstract class NamedComponent extends Component {
     }
 
     public double retrieveInput(String name) {
-        ArrayUtils.AssertPresence(outputs, name);
-        return super.retrieveInput(namedOutputs.get(name));
+        ArrayUtils.AssertPresence(inputs, name);
+        return super.retrieveInput(namedInputs.get(name));
     }
 
     public double peekInput(String name) {
