@@ -1,18 +1,17 @@
 package com.verr1.controlcraft.content.gui.factory;
 
 import com.verr1.controlcraft.content.blocks.SharedKeys;
-import com.verr1.controlcraft.content.gui.layouts.SwitchableTabListener;
 import com.verr1.controlcraft.content.gui.layouts.VerticalFlow;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
 import com.verr1.controlcraft.content.gui.layouts.api.LabelProvider;
 import com.verr1.controlcraft.content.gui.layouts.element.*;
 import com.verr1.controlcraft.content.gui.layouts.element.general.*;
 import com.verr1.controlcraft.content.gui.screens.GenericSettingScreen;
-import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.ff.FFBlockEntity;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlockEntity;
 import com.verr1.controlcraft.content.links.func.FunctionsBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
+import com.verr1.controlcraft.content.links.integration.WirelessIntegrationBlockEntity;
 import com.verr1.controlcraft.content.links.logic.FlexibleGateBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
 import com.verr1.controlcraft.content.links.output.OutputPortBlockEntity;
@@ -283,7 +282,7 @@ public class CimulinkUIFactory {
                 .build();
     }
 
-    public static GenericSettingScreen createCircuitScreen(BlockPos boundPos){
+    public static GenericSettingScreen createIntegratedScreen(BlockPos boundPos){
         StringUIField name = new StringUIField(
                 boundPos,
                 SharedKeys.COMPONENT_NAME,
@@ -292,7 +291,7 @@ public class CimulinkUIFactory {
 
         BooleanUIField decimal = new BooleanUIField(
                 boundPos,
-                CircuitBlockEntity.DECIMAL,
+                WirelessIntegrationBlockEntity.DECIMAL,
                 title(UIContents.USE_DECIMAL)
         );
 

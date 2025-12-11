@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.content.items;
 
-import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
+import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import net.minecraft.core.BlockPos;
@@ -49,7 +49,13 @@ public class CircuitCompilerItem extends Item {
 
                 BlockEntityGetter.getLevelBlockEntityAt(world, pos, CircuitBlockEntity.class)
                         .ifPresentOrElse(
-                                cbe -> cbe.loadCircuit(nbtHolder),
+                                cbe -> {
+                                    try {
+                                        cbe.loadCircuit(nbtHolder);
+                                    }catch (IllegalArgumentException e){
+                                        player.sendSystemMessage(Component.literal("Failed to load circuit: " + e.getMessage()));
+                                    }
+                                },
                                 () -> player.sendSystemMessage(Component.literal("Not a circuit block found at the selected position."))
                         );
 

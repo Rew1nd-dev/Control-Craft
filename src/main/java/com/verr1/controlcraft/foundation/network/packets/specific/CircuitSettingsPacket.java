@@ -2,8 +2,8 @@ package com.verr1.controlcraft.foundation.network.packets.specific;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import com.verr1.controlcraft.ControlCraftServer;
-import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
-import com.verr1.controlcraft.content.links.circuit.IoSettings;
+import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
+import com.verr1.controlcraft.content.links.integration.IoSettings;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;

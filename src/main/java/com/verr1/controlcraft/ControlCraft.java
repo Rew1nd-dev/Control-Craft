@@ -7,12 +7,14 @@ import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsC
 import com.verr1.controlcraft.content.compact.shaolib.ShaoLibCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.content.compact.vssw.VSSWCompact;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.LuaScriptLoader;
 import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.ponder.CimulinkPonderIndex;
 import com.verr1.controlcraft.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -43,14 +45,9 @@ public class ControlCraft
     public ControlCraft(){
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         REGISTRATE.registerEventListeners(modEventBus);
-        modEventBus.addListener(this::addCreative);
+
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
-
-        if(FMLEnvironment.dist == Dist.CLIENT){
-            modEventBus.addListener(this::clientSetup);
-        }
-        modEventBus.addListener(this::addCreative);
 
         ControlCraftCreativeTabs.register(modEventBus);
         // ControlCraftManuals.register(modEventBus);
@@ -94,21 +91,10 @@ public class ControlCraft
         IEventBus modEventBus = context.getModEventBus();
 
         REGISTRATE.registerEventListeners(modEventBus);
-        modEventBus.addListener(this::addCreative);
-        // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
-        if(FMLEnvironment.dist == Dist.CLIENT){
-            modEventBus.addListener(this::clientSetup);
-        }
-        // Register ourselves for server and other game events we are interested in
-
-
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
 
         ControlCraftCreativeTabs.register(modEventBus);
-        // ControlCraftManuals.register(modEventBus);
 
         ControlCraftBlocks.register();
         ControlCraftBlockEntities.register();
@@ -161,16 +147,9 @@ public class ControlCraft
 
     }
 
-    private void clientSetup(FMLClientSetupEvent event)
-    {
-
-
-    }
-
-
-    private void addCreative(BuildCreativeModeTabContentsEvent event)
-    {
-
+    @SubscribeEvent
+    public void onAddReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new LuaScriptLoader());
     }
 
 

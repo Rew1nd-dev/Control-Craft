@@ -5,6 +5,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import com.verr1.controlcraft.content.items.AweInWandItem;
 import com.verr1.controlcraft.content.items.CameraLinkItem;
 import com.verr1.controlcraft.content.items.CircuitCompilerItem;
+import com.verr1.controlcraft.content.items.LuaCompilerItem;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -35,6 +36,12 @@ public class ControlCraftItems {
             .model(AssetLookup.existingItemModel())
             .properties(p -> p.stacksTo(1))
             .lang("Circuit Compiler")
+            .register();
+
+    public static final ItemEntry<LuaCompilerItem> LUA_COMPILER = REGISTRATE.item("lua_compiler", LuaCompilerItem::new)
+            .model(AssetLookup.existingItemModel())
+            .properties(p -> p.stacksTo(1))
+            .lang("Lua Compiler")
             .register();
 
     public static void register(){

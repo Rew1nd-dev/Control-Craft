@@ -1,10 +1,13 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.UnpresentPortException;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
@@ -19,9 +22,13 @@ public class Luacuit extends NamedComponent{
 
     protected final Globals luaGlobals;
     protected final LuaValue loopFunction;
-    protected final LuacuitScript script;
 
+    protected IPhysWorldAccess worldAccess = IPhysWorldAccess.EMPTY;
+
+
+    protected final LuacuitScript script;
     protected boolean forbidden = false;
+    private boolean initialized = false;
 
     Luacuit(
             List<String> inputs,
@@ -36,6 +43,7 @@ public class Luacuit extends NamedComponent{
         this.script = script;
         luaGlobals.set("getInput", createBuiltInInput());
         luaGlobals.set("setOutput", createBuiltInOutput());
+        setWorldAccess(IPhysWorldAccess.EMPTY);
     }
 
     protected void outputToJava(String name, double value) throws LuaError {
@@ -44,7 +52,17 @@ public class Luacuit extends NamedComponent{
         }catch (IllegalArgumentException e){
             throw new UnpresentPortException(e.getMessage());
         }
+    }
 
+    public void setWorldAccess(@NotNull IPhysWorldAccess worldAccess){
+        this.worldAccess = worldAccess;
+        LUA_THREAD.submit(() -> {
+            luaGlobals.load(new PhysLib(this.worldAccess));
+        });
+    }
+
+    public void setForbidden(boolean forbidden) {
+        this.forbidden = forbidden;
     }
 
     protected double inputFromJava(String name) throws LuaError{
@@ -54,6 +72,10 @@ public class Luacuit extends NamedComponent{
             throw new UnpresentPortException(e.getMessage());
         }
 
+    }
+
+    public LuacuitScript script() {
+        return script;
     }
 
     public CompoundTag serialize(){
@@ -77,7 +99,7 @@ public class Luacuit extends NamedComponent{
                     String name = luaValue.checkjstring();
                     return LuaValue.valueOf(inputFromJava(name));
                 } else {
-                    throw new LuaError("getInput expects one string argument");
+                    throw new UnpresentPortException("getInput expects one string argument");
                 }
             }
         };
@@ -105,17 +127,14 @@ public class Luacuit extends NamedComponent{
 
     }
 
-    @Override
-    public void onPositiveEdge() throws LuaError, LuaOvertimeException {
-        if(forbidden)return;
-
+    protected void doTask(int tolerantMillis) throws LuaError, LuaOvertimeException {
         Future<Void> future = LUA_THREAD.submit(() -> {
             loopFunction.call();
             return null;
         });
 
         try {
-            future.get(16, TimeUnit.MILLISECONDS);  // 超时 16ms
+            future.get(tolerantMillis, TimeUnit.MILLISECONDS);  // 超时 160ms
         } catch (TimeoutException e) {
             future.cancel(true);
             boolean interrupted = CimulinkLua.interrupt(luaGlobals);
@@ -134,6 +153,13 @@ public class Luacuit extends NamedComponent{
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void onPositiveEdge() throws LuaError, LuaOvertimeException {
+        initialized = true;
+        if(forbidden)return;
+        doTask(3000);
     }
 
 

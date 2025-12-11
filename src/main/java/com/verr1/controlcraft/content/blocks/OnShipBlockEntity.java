@@ -4,6 +4,7 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;

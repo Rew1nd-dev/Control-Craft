@@ -168,6 +168,10 @@
     "mass": 1.0
   },
   {
+    "block": "vscontrolcraft:tweakerminal",
+    "mass": 5.0
+  },
+  {
     "block": "vscontrolcraft:ai_cruiser",
     "mass": 5.0
   },

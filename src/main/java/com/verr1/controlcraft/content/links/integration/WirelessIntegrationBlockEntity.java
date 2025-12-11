@@ -1,20 +1,17 @@
-package com.verr1.controlcraft.content.links.circuit;
+package com.verr1.controlcraft.content.links.integration;
 
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.Couple;
-import com.verr1.controlcraft.ControlCraft;
-import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
-import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.redstone.$IRedstoneLinkable;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.misc.CircuitWirelessMenu;
-import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
+import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.WrappedLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
-import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
+import com.verr1.controlcraft.foundation.data.links.IntegrationPortStatus;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
+import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.registry.ControlCraftMenuTypes;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
@@ -27,7 +24,6 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
@@ -44,17 +40,20 @@ import static com.verr1.controlcraft.ControlCraftServer.DECIMAL_LINK_NETWORK_HAN
 import static com.verr1.controlcraft.content.blocks.terminal.TerminalBlockEntity.EMPTY_FREQUENCY;
 import static java.lang.Math.min;
 
-public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> implements MenuProvider {
+public abstract class WirelessIntegrationBlockEntity<W extends NamedComponent, T extends WrappedLinkPort<W>> extends CimulinkBlockEntity<T>
+    implements MenuProvider, IWirelessLinkProvider
+{
 
-    public static Serializer<List<CircuitPortStatus>> CPS_SER =
+
+    public static Serializer<List<IntegrationPortStatus>> CPS_SER =
             SerializeUtils.ofList(
                     SerializeUtils.of(
-                            CircuitPortStatus::serialize,
-                            CircuitPortStatus::deserialize
+                            IntegrationPortStatus::serialize,
+                            IntegrationPortStatus::deserialize
                     )
             );
 
-    public static Serializer<Pair<List<CircuitPortStatus>, List<CircuitPortStatus>>> PAIR_SER =
+    public static Serializer<Pair<List<IntegrationPortStatus>, List<IntegrationPortStatus>>> PAIR_SER =
             SerializeUtils.ofPair(CPS_SER);
 
     public static final NetworkKey CIRCUIT = NetworkKey.create("circuit");
@@ -65,17 +64,14 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
     private static final int MAX_CHANNEL_SIZE = 24;
 
 
-    private final List<WirelessIO> io = new ArrayList<>(ArrayUtils.ListOf(MAX_CHANNEL_SIZE, WirelessIO::new));
+    private final List<WirelessIO> io = new ArrayList<>(ArrayUtils.ListOf(MAX_CHANNEL_SIZE, () -> new WirelessIO(this)));
 
     private int validSize = 0;
 
     private final WrappedChannel wrapper;
-
-
-
     private boolean useDecimalNetwork = false;
 
-    public CircuitBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+    protected WirelessIntegrationBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         wrapper = new WrappedChannel(pos);
 
@@ -97,23 +93,10 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         buildRegistry(CHANNEL).withBasic(CompoundTagPort.of(this::serializeIo, this::deserializeIo)).register();
     }
 
+
     public void openScreen(Player player){
         wrapper.overrideData(io.subList(0, validSize));
         NetworkHooks.openScreen((ServerPlayer) player, this, wrapper::write);
-    }
-
-    @Override
-    protected CircuitLinkPort create() {
-        return new CircuitLinkPort();
-    }
-
-    public void loadCircuit(CircuitNbt nbt){
-        var savedStatus = linkPort().viewStatus();
-        linkPort().load(nbt);
-        linkPort().setStatus(savedStatus);
-        linkPort().setToAllOpen();
-        updateIOName();
-        setChanged();
     }
 
     public boolean useDecimalNetwork() {
@@ -124,11 +107,11 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         this.useDecimalNetwork = useDecimalNetwork;
     }
 
-    private Circuit linkCircuit(){
-        return linkPort().circuit();
+    public W linkCircuit(){
+        return linkPort().component();
     }
 
-    private void updateIOName(){
+    protected void updateIOName(){
         AtomicInteger ioIndex = new AtomicInteger(0);
         linkCircuit().inputsExcludeSignals()
                 .forEach(s -> {
@@ -155,21 +138,21 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         validSize = ioIndex.get();
     }
 
-    private void removeFromNetwork(){
+    protected void removeFromNetwork(){
         io.forEach(e -> {  //  stream().filter(o -> !o.isRedundant)
             DECIMAL_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
             REDSTONE_LINK_NETWORK_HANDLER.removeFromNetwork(this.level, e);
         });
     }
 
-    private void addToNetwork(){
+    protected void addToNetwork(){
         io.stream().filter(o -> !o.isRedundant).forEach(e -> {
             DECIMAL_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
             REDSTONE_LINK_NETWORK_HANDLER.addToNetwork(this.level, e);
         });
     }
 
-    private CompoundTag serializeIo(){
+    protected CompoundTag serializeIo(){
         CompoundTag tag = new CompoundTag();
         for (int i = 0; i < MAX_CHANNEL_SIZE; i++) {
             WirelessIO wirelessIO = io.get(i);
@@ -178,7 +161,7 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         return tag;
     }
 
-    private void deserializeIo(CompoundTag tag){
+    protected void deserializeIo(CompoundTag tag){
         for (int i = 0; i < MAX_CHANNEL_SIZE; i++) {
             WirelessIO wirelessIO = io.get(i);
             wirelessIO.deserialize(tag.getCompound("io" + i));
@@ -279,147 +262,4 @@ public class CircuitBlockEntity extends CimulinkBlockEntity<CircuitLinkPort> imp
         }
     }
 
-    public class WirelessIO implements $IRedstoneLinkable {
-        public Couple<RedstoneLinkNetworkHandler.Frequency> key = EMPTY_FREQUENCY;
-
-
-        public int lastReceivedStrength = 0;
-        public double $lastReceivedStrength = 0.0;
-
-        public boolean isInput;
-        public String ioName = "";
-        public boolean isRedundant = true;
-
-        public boolean enabled;
-
-
-        public Couple<Double> minMax = Couple.create(0.0, 1.0);
-
-
-        @Override
-        public int getTransmittedStrength() {
-            if(!isInput && !isRedundant) {
-                try{
-                    double out = linkCircuit().output(ioName);
-                    return (int)out;
-                } catch (Exception e){
-                    ControlCraft.LOGGER.error("Error while getting transmitted strength for circuit: {}", e.getMessage());
-                }
-            }
-            return 0;
-        }
-
-        public void setAsInput(String name){
-            ioName = name;
-            isInput = true;
-            isRedundant = false;
-        }
-
-        public void setAsOutput(String name){
-            ioName = name;
-            isInput = false;
-            isRedundant = false;
-        }
-
-        public void setAsRedundant(){
-            isRedundant = true;
-            isInput = false;
-            ioName = "Redundant";
-        }
-
-        private double select(){
-            return useDecimalNetwork ? $lastReceivedStrength : lastReceivedStrength;
-        }
-
-        private void updateInput(){
-            double ratio = select();
-            double value = minMax.getFirst() + ratio * (minMax.getSecond() - minMax.getFirst());
-            try{
-                linkPort().circuit().input(ioName, value);
-            }catch (Exception e){
-                ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
-            }
-        }
-
-        @Override
-        public double $getTransmittedStrength() {
-            if(!isInput && !isRedundant && useDecimalNetwork) {
-                try{
-                    double out = linkCircuit().output(ioName);
-                    return out;
-                } catch (Exception e){
-                    ControlCraft.LOGGER.error("Error while getting transmitted decimal strength for circuit: {}", e.getMessage());
-                }
-            }
-            return Double.NEGATIVE_INFINITY;
-        }
-
-        @Override
-        public boolean isSource() {
-            return !isInput;
-        }
-
-        @Override
-        public void setReceivedStrength(int power) {
-            if(!isInput || useDecimalNetwork)return;
-
-            if (lastReceivedStrength == power)return;
-            lastReceivedStrength = power;
-
-            updateInput();
-        }
-
-        @Override
-        public void $setReceivedStrength(double decimal) {
-            if(!isInput || !useDecimalNetwork)return;
-
-            if (Math.abs(decimal - $lastReceivedStrength) < 1e-6)return;
-            $lastReceivedStrength = decimal;
-
-            updateInput();
-        }
-
-        public CompoundTag serialize(){
-            CompoundTag tag = new CompoundTag();
-            tag.put("key",  key.serializeEach(e -> e.getStack().serializeNBT()));
-            tag.putString("ioName", ioName);
-            tag.putBoolean("isInput", isInput);
-            tag.putBoolean("isRedundant", isRedundant);
-            tag.putBoolean("enabled", enabled);
-            tag.putDouble("min", minMax.getFirst());
-            tag.putDouble("max", minMax.getSecond());
-            return tag;
-        }
-
-        public void deserialize(CompoundTag tag){
-            key = Couple.deserializeEach(tag.getList("key", 10), e -> RedstoneLinkNetworkHandler.Frequency.of(ItemStack.of(e)));
-            ioName = tag.getString("ioName");
-            isInput = tag.getBoolean("isInput");
-            isRedundant = tag.getBoolean("isRedundant");
-            enabled = tag.getBoolean("enabled");
-            minMax = Couple.create(tag.getDouble("min"), tag.getDouble("max"));
-        }
-
-        @Override
-        public boolean isListening() {
-            return enabled;
-        }
-
-        @Override
-        public boolean isAlive() {
-            return !isRemoved();
-        }
-
-        @Override
-        public Couple<RedstoneLinkNetworkHandler.Frequency> getNetworkKey() {
-            return key;
-        }
-
-        @Override
-        public BlockPos getLocation() {
-            return getBlockPos();
-        }
-
-
-    }
 }

@@ -11,22 +11,29 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
+import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.SignalGenerator;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.EncloseLoopException;
+import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
+import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.LuacuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
-import com.verr1.controlcraft.utils.CompoundTagBuilder;
-import com.verr1.controlcraft.utils.DebugUtils;
-import com.verr1.controlcraft.utils.SerializeUtils;
-import com.verr1.controlcraft.utils.Serializer;
+import com.verr1.controlcraft.utils.*;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
+import net.shao.valkyrien_space_war.particle.explotion.ExplosionSmokeOptions;
 import org.jetbrains.annotations.NotNull;
+import org.luaj.vm2.LuaError;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +47,7 @@ public abstract class BlockLinkPort {
     public static boolean DEBUG_STEPPING_MODE = false;
 
     public static final Set<WorldBlockPos> ALL_BLP = ConcurrentHashMap.newKeySet();
+    public static final CimulinkProfiler PROFILER = new CimulinkProfiler();
 
     // For Physics Thread Non-Blocking BlockEntity Access
     private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> CACHE = CacheBuilder.newBuilder()
@@ -274,11 +282,47 @@ public abstract class BlockLinkPort {
         ));
     }
 
+    private static String getSuspectedLuaCode(BlockLinkPort raw){
+//        if(raw instanceof LuacuitLinkPort llp){
+//            Luacuit lc = llp.component();
+//            return lc.script().code();
+//        }
+        return "{code spam is disabled}";
+    }
+
+    private static void alarmPlayers(Vec3 position){
+        MinecraftUtils.spawnParticleAt(position, ParticleTypes.EXPLOSION);
+        MinecraftUtils.playSoundAt(position, SoundEvents.GENERIC_EXPLODE, 10f, 10f);
+    }
+
     public static void propagateTemporal(){
 
         // stage 2
         // Temporal samples their input and update output, while combinational stay unchanged
-        ALL_BLP.stream().map(BlockLinkPort::of).forEach(blp -> blp.ifPresent(BlockLinkPort::onPositiveEdge));
+        ALL_BLP.stream().map(BlockLinkPort::of).forEach(blpOpt -> blpOpt.ifPresent(blp -> {
+            try{
+                PROFILER.track(blp.pos());
+                blp.onPositiveEdge();
+                PROFILER.untrack();
+            }catch (LuaError le){
+                String sus = getSuspectedLuaCode(blp);
+                ControlCraft.LOGGER.error("Lua Execution Exception at {}: {}, sus code: {}",
+                        blp.pos(), le.getMessage(), sus
+                );
+                blp.removeAllLinks();
+                alarmPlayers(Vec3.atCenterOf(blp.pos().pos()));
+            }catch (LuaOvertimeException loe){
+                String sus = getSuspectedLuaCode(blp);
+                ControlCraft.LOGGER.error("Lua Execution Overtime at {}: {}, sus code: {}",
+                        blp.pos(), loe.getMessage(), sus
+                );
+                blp.removeAllLinks();
+                alarmPlayers(Vec3.atCenterOf(blp.pos().pos()));
+            }catch (RuntimeException re){
+                ControlCraft.LOGGER.error("Unexpected Exception during temporal propagation at {}: {}", blp.pos(), re.getMessage());
+                blp.removeAllLinks();
+            }
+        }));
 
         // stage 3
         // Temporal output can be considered as a kind of input in a loop-less directional graph

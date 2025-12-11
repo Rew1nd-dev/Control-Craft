@@ -44,7 +44,7 @@ public class ControlCraftBlocks {
         REGISTRATE.setCreativeTab(ControlCraftCreativeTabs.MAIN);
     }
 
-    public static final int EXPLOSIVE_RESISTANCE = 10;
+    public static final int EXPLOSIVE_RESISTANCE = 64;
 
     public static final BlockEntry<ChunkLoaderBlock> CHUNK_LOADER = REGISTRATE
             .block(ChunkLoaderBlock.ID, ChunkLoaderBlock::new)

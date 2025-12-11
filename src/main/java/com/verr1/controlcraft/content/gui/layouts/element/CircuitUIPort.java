@@ -4,9 +4,10 @@ import com.verr1.controlcraft.content.gui.layouts.element.general.TypedUIPort;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.gui.widgets.IconSelectionScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
-import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
+import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
+import com.verr1.controlcraft.content.links.integration.WirelessIntegrationBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
-import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
+import com.verr1.controlcraft.foundation.data.links.IntegrationPortStatus;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.ParseUtils;
@@ -32,7 +33,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
 
 
     private final List<MutableBlock> data = new ArrayList<>();
-    private final List<CircuitPortStatus> immutableData = new ArrayList<>();
+    private final List<IntegrationPortStatus> immutableData = new ArrayList<>();
     private final BlockUI block = new BlockUI(Minecraft.getInstance().font);
     private int currentIndex = 0;
     private final IconSelectionScrollInput blockSelector = (IconSelectionScrollInput)
@@ -44,7 +45,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     private GridLayout blockLayout = new GridLayout();
 
     public CircuitUIPort(BlockPos boundPos) {
-        super(boundPos, CircuitBlockEntity.CIRCUIT, CompoundTag.class, new CompoundTag());
+        super(boundPos, WirelessIntegrationBlockEntity.CIRCUIT, CompoundTag.class, new CompoundTag());
     }
 
 
@@ -83,12 +84,12 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     public CompoundTag readGUI() {
         writeCurrent();
 
-        List<CircuitPortStatus> input = data
+        List<IntegrationPortStatus> input = data
                 .stream().flatMap(d -> d.lines.stream().filter(l -> l.isInput))
                 .map(MutableLine::immutable)
                 .toList();
 
-        List<CircuitPortStatus> output = data
+        List<IntegrationPortStatus> output = data
                 .stream().flatMap(d -> d.lines.stream().filter(l -> !l.isInput))
                 .map(MutableLine::immutable)
                 .toList();
@@ -96,7 +97,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
         return CircuitBlockEntity.PAIR_SER.serialize(new Pair<>(input, output));
     }
 
-    static List<CircuitPortStatus> sort(List<CircuitPortStatus> statuses) {
+    static List<IntegrationPortStatus> sort(List<IntegrationPortStatus> statuses) {
         return statuses.stream()
                 .sorted((a, b) -> {
                     int cmp = a.portName().compareTo(b.portName());
@@ -111,7 +112,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
 
         var inputStatus = CircuitBlockEntity.PAIR_SER.deserialize(value);
 
-        List<CircuitPortStatus> newData = ArrayUtils.flatten(sort(inputStatus.getFirst()), sort(inputStatus.getSecond()));
+        List<IntegrationPortStatus> newData = ArrayUtils.flatten(sort(inputStatus.getFirst()), sort(inputStatus.getSecond()));
 
         immutableData.clear();
         immutableData.addAll(newData);
@@ -125,7 +126,7 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
             data.add(new MutableBlock(immutableData.subList(start, end)));
         }
 
-        int labelMaxLen = MinecraftUtils.maxTitleLength(immutableData.stream().map(CircuitPortStatus::portName).toList());
+        int labelMaxLen = MinecraftUtils.maxTitleLength(immutableData.stream().map(IntegrationPortStatus::portName).toList());
 
         // Initialize BlockUI
 
@@ -177,15 +178,15 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
         final String name;
 
 
-        MutableLine(CircuitPortStatus immutableData) {
+        MutableLine(IntegrationPortStatus immutableData) {
             value = immutableData.value();
             enabled = immutableData.enabled();
             isInput = immutableData.isInput();
             name = immutableData.portName();
         }
 
-        public CircuitPortStatus immutable(){
-            return new CircuitPortStatus(name, value, isInput, enabled);
+        public IntegrationPortStatus immutable(){
+            return new IntegrationPortStatus(name, value, isInput, enabled);
         }
 
     }
@@ -193,8 +194,8 @@ public class CircuitUIPort extends TypedUIPort<CompoundTag> {
     static class MutableBlock{
         List<MutableLine> lines = new ArrayList<>();
 
-        public MutableBlock(List<CircuitPortStatus> blockData) {
-            for(CircuitPortStatus line : blockData){
+        public MutableBlock(List<IntegrationPortStatus> blockData) {
+            for(IntegrationPortStatus line : blockData){
                 lines.add(new MutableLine(line));
             }
         }

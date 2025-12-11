@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.content.links.circuit;
+package com.verr1.controlcraft.content.links.integration;
 
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
@@ -21,7 +21,7 @@ public class WrappedChannel {
     public final List<IoData> ioDatas = new ArrayList<>();
     private final CompoundTag inventoryTag = new CompoundTag();
 
-    public void overrideData(List<CircuitBlockEntity.WirelessIO> ios){
+    public void overrideData(List<WirelessIO> ios){
         ioDatas.clear();
         ios.forEach(io -> {
             ioDatas.add(new IoData(

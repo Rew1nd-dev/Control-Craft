@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.content.links.circuit;
+package com.verr1.controlcraft.content.links.integration;
 
 import net.minecraft.nbt.CompoundTag;
 

@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.content.links.circuit;
+package com.verr1.controlcraft.content.links.integration;
 
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
@@ -16,17 +16,18 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
-public class CircuitBlock extends CimulinkBlock<CircuitBlockEntity> {
-    public static final String ID = "circuit";
+public class LuaBlock extends CimulinkBlock<LuaBlockEntity> {
 
-    public CircuitBlock(Properties p) {
+    public static final String ID = "luacuit";
+
+    public LuaBlock(Properties p) {
         super(p);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void displayScreen(BlockPos p) {
-        ScreenOpener.open(CimulinkUIFactory.createCircuitScreen(p));
+        ScreenOpener.open(CimulinkUIFactory.createIntegratedScreen(p));
     }
 
     @Override
@@ -52,12 +53,13 @@ public class CircuitBlock extends CimulinkBlock<CircuitBlockEntity> {
     }
 
     @Override
-    public Class<CircuitBlockEntity> getBlockEntityClass() {
-        return CircuitBlockEntity.class;
+    public Class<LuaBlockEntity> getBlockEntityClass() {
+        return LuaBlockEntity.class;
     }
 
     @Override
-    public BlockEntityType<? extends CircuitBlockEntity> getBlockEntityType() {
-        return CimulinkBlockEntities.CIRCUIT_BLOCKENTITY.get();
+    public BlockEntityType<? extends LuaBlockEntity> getBlockEntityType() {
+        return CimulinkBlockEntities.LUA_BLOCKENTITY.get();
     }
+
 }

@@ -7,13 +7,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -27,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.shao.valkyrien_space_war.particle.explotion.ExplosionSmokeOptions;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -210,6 +220,88 @@ public class MinecraftUtils {
             return;
         };
         server.getPlayerList().getPlayers().forEach(p -> p.sendSystemMessage(message));
+    }
+
+    public static void spawnParticleAt(Vec3 position, ParticleOptions opt){
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if(server == null){
+            return;
+        };
+        server.getAllLevels().forEach(lvl -> {
+            lvl.sendParticles(opt, position.x, position.y, position.z, 1, 0.0, 0.0, 0.0, 0.0);
+        });
+    }
+
+    public static void playSoundAt(Vec3 position, SoundEvent soundEvent, float volume, float pitch){
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if(server == null){
+            return;
+        };
+        server.getAllLevels().forEach(lvl -> {
+            lvl.playSound(null, position.x, position.y, position.z, soundEvent, SoundSource.PLAYERS, volume, pitch);
+        });
+    }
+
+    public static void broadcastMessageAsBook(List<Component> lines){
+        ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
+
+        CompoundTag tag = new CompoundTag();
+
+        // 设置书的标题和作者
+        tag.putString("title", "自定义书籍");
+        tag.putString("author", "你的名字");
+
+        // 创建页面列表
+        ListTag pages = new ListTag();
+
+        int maxLinesPerPage = 14;
+
+        for (var i = 0; i < lines.size(); i += maxLinesPerPage) {
+            int end = Math.min(i + maxLinesPerPage, lines.size());
+            List<Component> pageLines = lines.subList(i, end);
+            StringBuilder pageContent = new StringBuilder();
+            for (Component line : pageLines) {
+                pageContent.append(line.getString()).append("\n");
+            }
+            // 移除最后一个换行符
+            if (!pageContent.isEmpty()) {
+                pageContent.setLength(pageContent.length() - 1);
+            }
+            String pageJson = "{\"text\":\"" + pageContent.toString().replace("\"", "\\\"") + "\"}";
+            pages.add(StringTag.valueOf(pageJson));
+        }
+
+
+        // 添加页面内容（使用 JSON 文本格式）
+//        String page1 = "{\"text\":\"这是第一页内容。\\n换行示例。\"}";
+//        String page2 = "{\"text\":\"第二页内容。\\n\\n支持多行文本。\"}";
+//        String page3 = "{\"text\":\"第三页\\n特殊格式：\",\"extra\":[{\"text\":\"粗体\",\"bold\":true},{\"text\":\" 斜体\",\"italic\":true},{\"text\":\" 颜色\",\"color\":\"red\"}]}";
+//
+//        pages.add(StringTag.valueOf(page1));
+//        pages.add(StringTag.valueOf(page2));
+//        pages.add(StringTag.valueOf(page3));
+
+        // 将页面添加到 NBT
+        tag.put("pages", pages);
+
+        // 标记为已解析（对于已写好的书）
+        tag.putBoolean("resolved", true);
+
+        // 将 NBT 应用到书本
+        book.setTag(tag);
+
+    }
+
+    public static void giveItemToAll(ItemStack stack){
+        getAllPlayers().forEach(p -> p.drop(stack.copy(), false));
+    }
+
+    public static List<ServerPlayer> getAllPlayers(){
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if(server == null){
+            return List.of();
+        };
+        return server.getPlayerList().getPlayers();
     }
 
     public static void broadcastMessage(String message){

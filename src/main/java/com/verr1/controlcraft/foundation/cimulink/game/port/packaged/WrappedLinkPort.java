@@ -2,13 +2,11 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.packaged;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ICompilable;
-import com.verr1.controlcraft.foundation.data.links.CircuitPortStatus;
+import com.verr1.controlcraft.foundation.data.links.IntegrationPortStatus;
 import kotlin.Pair;
 
 import java.util.ArrayList;
@@ -25,12 +23,6 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
     protected WrappedLinkPort(W initial) {
         super(PlantProxy.of(initial, List.of(), List.of()));
         cached = initial;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public W component() {
-        return (W)(proxy().plant());
     }
 
 
@@ -51,13 +43,13 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
         return component().inputsExcludeSignals();
     }
 
-    public List<CircuitPortStatus> viewInputs(){
+    public List<IntegrationPortStatus> viewInputs(){
         List<String> allInputNames = inputNamesValid();
         List<Double> inputValues = allInputNames.stream().map(n -> component().peekInput(n)).toList();
 
         Set<String> enabled = enabledInput();
 
-        return allInputNames.stream().map(n -> new CircuitPortStatus(
+        return allInputNames.stream().map(n -> new IntegrationPortStatus(
                 n,
                 inputValues.get(allInputNames.indexOf(n)),
                 true,
@@ -65,13 +57,13 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
         )).toList();
     }
 
-    public List<CircuitPortStatus> viewOutputs(){
+    public List<IntegrationPortStatus> viewOutputs(){
         List<String> allOutputNames = component().outputs();
         List<Double> outputValues = allOutputNames.stream().map(n -> component().peekOutput(n)).toList();
 
         Set<String> enabled = enabledOutput();
 
-        return allOutputNames.stream().map(n -> new CircuitPortStatus(
+        return allOutputNames.stream().map(n -> new IntegrationPortStatus(
                 n,
                 outputValues.get(allOutputNames.indexOf(n)),
                 false,
@@ -79,7 +71,7 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
         )).toList();
     }
 
-    public Pair<List<CircuitPortStatus>, List<CircuitPortStatus>> viewStatus(){
+    public Pair<List<IntegrationPortStatus>, List<IntegrationPortStatus>> viewStatus(){
         return new Pair<>(
                 viewInputs(),
                 viewOutputs()
@@ -94,24 +86,24 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
         return new HashSet<>(proxy().outputs());
     }
 
-    public void setStatus(Pair<List<CircuitPortStatus>, List<CircuitPortStatus>> statues){
-        List<CircuitPortStatus> inputStatus = statues.getFirst();
-        List<CircuitPortStatus> outputStatus = statues.getSecond();
+    public void setStatus(Pair<List<IntegrationPortStatus>, List<IntegrationPortStatus>> statues){
+        List<IntegrationPortStatus> inputStatus = statues.getFirst();
+        List<IntegrationPortStatus> outputStatus = statues.getSecond();
 
         Set<String> currentEnabledInput = enabledInput();
         Set<String> currentEnabledOutput = enabledOutput();
 
         Set<String> newEnabledInput = inputStatus.stream()
-                .filter(CircuitPortStatus::enabled)
-                .map(CircuitPortStatus::portName)
+                .filter(IntegrationPortStatus::enabled)
+                .map(IntegrationPortStatus::portName)
 
                 .filter(n -> component().hasInput(n))
 
                 .collect(HashSet::new, HashSet::add, HashSet::addAll);
 
         Set<String> newEnabledOutput = outputStatus.stream()
-                .filter(CircuitPortStatus::enabled)
-                .map(CircuitPortStatus::portName)
+                .filter(IntegrationPortStatus::enabled)
+                .map(IntegrationPortStatus::portName)
 
                 .filter(n -> component().hasOutput(n))
 
@@ -133,12 +125,12 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
     public void setToAllOpen(){
         var statusIn = viewInputs();
         var statusOut = viewOutputs();
-        var openedIn = statusIn.stream().map(s -> new CircuitPortStatus(s.portName(), s.value(), s.isInput(), true)).toList();
-        var openedOut = statusOut.stream().map(s -> new CircuitPortStatus(s.portName(), s.value(), s.isInput(), true)).toList();
+        var openedIn = statusIn.stream().map(s -> new IntegrationPortStatus(s.portName(), s.value(), s.isInput(), true)).toList();
+        var openedOut = statusOut.stream().map(s -> new IntegrationPortStatus(s.portName(), s.value(), s.isInput(), true)).toList();
         setStatus(new Pair<>(openedIn, openedOut));
     }
 
-    private void setValuesOnly(List<CircuitPortStatus> inputStatus){
+    protected void setValuesOnly(List<IntegrationPortStatus> inputStatus){
         try{
             inputStatus.forEach(cps -> {
                 component().input(cps.portName(), cps.value());
@@ -146,7 +138,7 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
             component().onInputChange(
                     inputStatus
                             .stream()
-                            .map(CircuitPortStatus::portName)
+                            .map(IntegrationPortStatus::portName)
                             .toArray(String[]::new)
             );
         }catch (IllegalArgumentException e){

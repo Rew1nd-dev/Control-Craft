@@ -4,16 +4,16 @@ import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
-import com.verr1.controlcraft.content.blocks.loader.ChunkLoaderBlock;
 import com.verr1.controlcraft.content.links.bus.BusBlock;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
-import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
+import com.verr1.controlcraft.content.links.integration.CircuitBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.connector.EasyConnectorBlock;
 import com.verr1.controlcraft.content.links.ff.FFBlock;
 import com.verr1.controlcraft.content.links.fma.LinearAdderBlock;
 import com.verr1.controlcraft.content.links.func.FunctionsBlock;
 import com.verr1.controlcraft.content.links.input.InputPortBlock;
+import com.verr1.controlcraft.content.links.integration.LuaBlock;
 import com.verr1.controlcraft.content.links.logic.FlexibleGateBlock;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
 import com.verr1.controlcraft.content.links.mux2.Mux2Block;
@@ -187,6 +187,20 @@ public class CimulinkBlocks {
 
             .transform(customItemModel())
             .lang("Uncompiled Circuit")
+            .register();
+
+    public static final BlockEntry<LuaBlock> LUA = REGISTRATE
+            .block(LuaBlock.ID, LuaBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(TagGen.axeOrPickaxe())
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+
+            .transform(customItemModel())
+            .lang("Uncompiled Luacuit")
             .register();
 
     public static final BlockEntry<DirectCurrentBlock> DC = REGISTRATE

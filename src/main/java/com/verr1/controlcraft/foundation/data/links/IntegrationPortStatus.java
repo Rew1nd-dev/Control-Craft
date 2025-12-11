@@ -2,7 +2,7 @@ package com.verr1.controlcraft.foundation.data.links;
 
 import net.minecraft.nbt.CompoundTag;
 
-public record CircuitPortStatus(String portName, double value, boolean isInput, boolean enabled) {
+public record IntegrationPortStatus(String portName, double value, boolean isInput, boolean enabled) {
 
     // generate serialize and deserialize
 
@@ -15,8 +15,8 @@ public record CircuitPortStatus(String portName, double value, boolean isInput, 
         return tag;
     }
 
-    public static CircuitPortStatus deserialize(CompoundTag tag) {
-        return new CircuitPortStatus(
+    public static IntegrationPortStatus deserialize(CompoundTag tag) {
+        return new IntegrationPortStatus(
                 tag.getString("portName"),
                 tag.getDouble("value"),
                 tag.getBoolean("isInput"),

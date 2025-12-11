@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.items.CircuitCompilerItem;
+import com.verr1.controlcraft.content.items.LuaCompilerItem;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
@@ -262,6 +263,51 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int dumpProfiler(CommandContext<CommandSourceStack> context){
+        return 1;
+    }
+
+    public static int startProfiler(CommandContext<CommandSourceStack> context){
+        return 1;
+    }
+
+    public static int stopProfiler(CommandContext<CommandSourceStack> context){
+        return 1;
+    }
+
+    public static int loadLuaCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        String saveName = context.getArgument("saveName", String.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set save a circuit!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        ItemStack stack = player.isCreative() ? ControlCraftItems.LUA_COMPILER.asStack() : player.getItemInHand(InteractionHand.MAIN_HAND);
+        if(!stack.is(ControlCraftItems.LUA_COMPILER.get())){
+            source.sendFailure(Component.literal("No compiler found in your main hand"));
+            return 0;
+        }
+        try{
+            LuaCompilerItem.load(saveName, stack);
+        }catch (Exception e){
+            source.sendFailure(Component.literal("Failed to load lua: " + e.getMessage()));
+            ControlCraft.LOGGER.error("Failed to load lua: " + e.getMessage(), e);
+            return 0;
+        }
+
+        if(player.isCreative()){
+            player.drop(stack, false);
+        } else{
+            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+        }
+
+
+
+        source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
+        return 1;
+    }
+
     public static int stepCimulinkCommand(CommandContext<CommandSourceStack> context){
         try{
             BlockLinkPort.preMainTick();
@@ -361,6 +407,9 @@ public class ControlCraftServerCommands {
                             .executes(ControlCraftServerCommands::stepCimulinkCommand)
                         ).then(lt("toggle-debug-mode")
                             .executes(ControlCraftServerCommands::toggleCimulinkDebugMode)
+                        ).then(lt("load-lua")
+                                .then(arg("saveName", StringArgumentType.string())
+                                        .executes(ControlCraftServerCommands::loadLuaCommand))
                         )
         );
         dispatcher.register(

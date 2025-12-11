@@ -5,8 +5,8 @@ import com.verr1.controlcraft.content.links.bus.BusBlock;
 import com.verr1.controlcraft.content.links.bus.BusBlockEntity;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlock;
 import com.verr1.controlcraft.content.links.ccbridge.CCBridgeBlockEntity;
-import com.verr1.controlcraft.content.links.circuit.CircuitBlock;
-import com.verr1.controlcraft.content.links.circuit.CircuitBlockEntity;
+import com.verr1.controlcraft.content.links.integration.CircuitBlock;
+import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlock;
 import com.verr1.controlcraft.content.links.comparator.ComparatorBlockEntity;
 import com.verr1.controlcraft.content.links.connector.EasyConnectorBlock;
@@ -19,6 +19,8 @@ import com.verr1.controlcraft.content.links.func.FunctionsBlock;
 import com.verr1.controlcraft.content.links.func.FunctionsBlockEntity;
 import com.verr1.controlcraft.content.links.input.InputPortBlock;
 import com.verr1.controlcraft.content.links.input.InputPortBlockEntity;
+import com.verr1.controlcraft.content.links.integration.LuaBlock;
+import com.verr1.controlcraft.content.links.integration.LuaBlockEntity;
 import com.verr1.controlcraft.content.links.logic.FlexibleGateBlock;
 import com.verr1.controlcraft.content.links.logic.FlexibleGateBlockEntity;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlock;
@@ -109,6 +111,12 @@ public class CimulinkBlockEntities {
     public static final BlockEntityEntry<CircuitBlockEntity> CIRCUIT_BLOCKENTITY = REGISTRATE
             .blockEntity(CircuitBlock.ID, CircuitBlockEntity::new)
             .validBlock(CimulinkBlocks.CIRCUIT)
+            .renderer(() -> CimulinkSocketRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<LuaBlockEntity> LUA_BLOCKENTITY = REGISTRATE
+            .blockEntity(LuaBlock.ID, LuaBlockEntity::new)
+            .validBlock(CimulinkBlocks.LUA)
             .renderer(() -> CimulinkSocketRenderer::new)
             .register();
 

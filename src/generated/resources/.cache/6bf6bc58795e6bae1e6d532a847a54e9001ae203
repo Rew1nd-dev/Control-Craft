@@ -1,4 +1,4 @@
-// 1.20.1	2025-10-12T21:21:11.7688508	Registrate Provider for vscontrolcraft [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-10T11:24:45.8123245	Registrate Provider for vscontrolcraft [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 b368dafc2de91561e8a67dbee8f7c44666cf2161 assets/vscontrolcraft/blockstates/ai_autocannon.json
 6f2681a5b3eef937b61eb24a459b8da9366a9d02 assets/vscontrolcraft/blockstates/ai_big_cannon.json
 9e1e30435467632506e4dd2ce2f7bafa0555a942 assets/vscontrolcraft/blockstates/ai_cruiser.json
@@ -34,6 +34,7 @@ a09dcaeb2dcf25b8a163d74f5d19479c1313a5f5 assets/vscontrolcraft/blockstates/joint
 a0e782a1d79c706931fd67b627d892d0cbc1e551 assets/vscontrolcraft/blockstates/link_proxy.json
 a2096d204b408825e75d0ed16e4658f658938092 assets/vscontrolcraft/blockstates/link_sensor.json
 1d0c5d55d947c0027ab762ec22647e2a6292abe3 assets/vscontrolcraft/blockstates/logic_gates.json
+0452e040743eb043f3e0fd2b8be1581293e6fd60 assets/vscontrolcraft/blockstates/luacuit.json
 a657e8e037033a8248ad189ea7cc373e37809db7 assets/vscontrolcraft/blockstates/mux.json
 e5f3ac07b523850d1cd05420e1fa6bffaaa2ed52 assets/vscontrolcraft/blockstates/output_link.json
 b9325e39663180adc0654798382d35fa64e8e96f assets/vscontrolcraft/blockstates/pivot.json
@@ -52,8 +53,8 @@ b850cd7eb72711c5abfd2c4e5263bbaa996b8f8e assets/vscontrolcraft/blockstates/termi
 7f6e4e9d5a3ce7151a929eb7a1f8d47edf506d07 assets/vscontrolcraft/blockstates/transmitter.json
 07151f33b461ff0cf59403b3c3bd5237e67ff793 assets/vscontrolcraft/blockstates/tweakerminal.json
 2a6f2c9efcc11cfdf2ab3b9866ce7f4ce2695e3e assets/vscontrolcraft/blockstates/wing_controller.json
-bb0b942ab18a5ab0966027e1204ed0bea3ef60b2 assets/vscontrolcraft/lang/en_ud.json
-38d9fcb7f6dc49d24205d06fc2a0ec5c24e99050 assets/vscontrolcraft/lang/en_us.json
+66699c862c39dcd5fee1c5535c4935a940748bb2 assets/vscontrolcraft/lang/en_ud.json
+b03dd33db5a7d58dee49b80c15cfba6289f7322c assets/vscontrolcraft/lang/en_us.json
 26dda2456a049fb119bf636323f817844d758988 assets/vscontrolcraft/models/item/ai_autocannon.json
 bc790ab92336e754477bd72efd2107baa0b5bac9 assets/vscontrolcraft/models/item/ai_big_cannon.json
 919e917f1801901d2e845f6674ce21333b959154 assets/vscontrolcraft/models/item/ai_cruiser.json
@@ -89,6 +90,7 @@ ef9ff1bd47aa0367565aa1c5efb78868d012ca22 assets/vscontrolcraft/models/item/jet_r
 9659dca7c2407362b22f6bdd1bb4a558c8a46a14 assets/vscontrolcraft/models/item/link_proxy.json
 fcbba1de34c0bc4e16a1559b5a997033aa5d1f3e assets/vscontrolcraft/models/item/link_sensor.json
 c9dcb5282a27040249f49e430eff767e5d1be6e5 assets/vscontrolcraft/models/item/logic_gates.json
+d5fc5951a35cdb5c5d0bd2d88b13716084478b1e assets/vscontrolcraft/models/item/luacuit.json
 4ca78b235cda85b4e8f8dd7fe9d1894123081194 assets/vscontrolcraft/models/item/mux.json
 9da84bf9871ec73cdda56b49e7d2c5591838993f assets/vscontrolcraft/models/item/output_link.json
 5fad314bbae524675e0c945797f69ff1f281329b assets/vscontrolcraft/models/item/pivot.json
@@ -107,8 +109,8 @@ e3462ad270c350965aaa167c4985ce47d7e1477e assets/vscontrolcraft/models/item/termi
 fa5847169992c31801e97df3dc24287b5b60b24a assets/vscontrolcraft/models/item/transmitter.json
 a1bb9f9888b657b1d0d07a033d0116ac9cf22009 assets/vscontrolcraft/models/item/tweakerminal.json
 b8f0dbc051856f6b6a0f56e994b95da7db991080 assets/vscontrolcraft/models/item/wing_controller.json
-d30b1a41baf8e1f611070dd1731aa2038c594821 data/minecraft/tags/blocks/mineable/axe.json
-f758c81c4c1260902026d8990e3fe70d5d2591c3 data/minecraft/tags/blocks/mineable/pickaxe.json
+97dbc71ced699bd292cd1421d567336a5ca45920 data/minecraft/tags/blocks/mineable/axe.json
+d87a8df1375488889253743d1b64c97eb9350ffe data/minecraft/tags/blocks/mineable/pickaxe.json
 b8fda6735d2b1598559b91644d21e618c8aa0aef data/vscontrolcraft/loot_tables/blocks/ai_cruiser.json
 613dfa732bf7c3339583ab3aa45310464cdc799d data/vscontrolcraft/loot_tables/blocks/ai_direct_deployer.json
 d30b4c1bd8f73b820c3c48b3d31fa17c78d712d3 data/vscontrolcraft/loot_tables/blocks/ai_jet.json
@@ -140,6 +142,7 @@ f54eaa608ee3f67f72ffa52ce50704ddc9d79e1d data/vscontrolcraft/loot_tables/blocks/
 fad410841c7e7668272b3c5e97ba68bb647fa310 data/vscontrolcraft/loot_tables/blocks/link_proxy.json
 fc5750bd15f7f42588fa28906f87035a925fc8ad data/vscontrolcraft/loot_tables/blocks/link_sensor.json
 d40047bdcf92fc0da531f2ff2288e5b4e0a1659c data/vscontrolcraft/loot_tables/blocks/logic_gates.json
+407f68ec0dc0420c8cd388a0af18a0e03a469e38 data/vscontrolcraft/loot_tables/blocks/luacuit.json
 752bc935425e377e31cb44550b7651e50ef1529f data/vscontrolcraft/loot_tables/blocks/mux.json
 6a0104191d7a58d7f7f3d73f36340e9f0c9235ae data/vscontrolcraft/loot_tables/blocks/output_link.json
 8d8fc4b3cf09931b115d77a5c4b051c626b20f54 data/vscontrolcraft/loot_tables/blocks/pivot.json

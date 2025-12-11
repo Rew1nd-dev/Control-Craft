@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.lua;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.DebugLib;
 
@@ -12,10 +13,10 @@ public class WatcherLib extends DebugLib {
 
         if(interrupted){
             interrupted = false;
-            throw new RuntimeException("Execution interrupted");
+            throw new LuaError("Execution interrupted");
         }
 
-        super.onInstruction(i, varargs, i1);
+
     }
 
     public void interrupt(){
