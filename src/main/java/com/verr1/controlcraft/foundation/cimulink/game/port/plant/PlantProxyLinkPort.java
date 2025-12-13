@@ -49,6 +49,15 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         this.plant = plant == null ? EMPTY : plant;
         enabledInput.clear();
         enabledOutput.clear();
+
+        int n = this.plant.n();
+        for(int i = 0; i < Math.min(n, 8); i++){
+            enabledInput.add(i);
+        }
+        int m = this.plant.m();
+        for(int i = 0; i < Math.min(m, 8); i++){
+            enabledOutput.add(i);
+        }
         recreate();
     }
 
@@ -184,7 +193,9 @@ public class PlantProxyLinkPort extends BlockLinkPort {
     public void deserialize(CompoundTag tag) {
         be.updateAttachedPlant(); // set plant
         ControlCraft.LOGGER.debug("Deserializing PlantProxyLinkPort");
-        setAll(PROXY_PORT.deserialize(tag.getCompound("status"))); // set status
+        if(tag.contains("status")){
+            setAll(PROXY_PORT.deserialize(tag.getCompound("status")));
+        }// set status
         ControlCraft.LOGGER.debug("Deserializing status");
         super.deserialize(tag.getCompound("blp")); // restore links
         ControlCraft.LOGGER.debug("Deserializing links");
