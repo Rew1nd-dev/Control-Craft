@@ -36,7 +36,6 @@ import org.joml.Vector3dc;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.*;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.AWARENESS;
 import static com.verr1.controlcraft.unstable.blocks.monitor.MonitorBlockEntity.*;

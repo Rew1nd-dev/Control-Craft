@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.links.logic;
 
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
@@ -9,6 +8,7 @@ import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.FFTypes;
 import com.verr1.controlcraft.foundation.cimulink.game.port.types.GateTypes;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;

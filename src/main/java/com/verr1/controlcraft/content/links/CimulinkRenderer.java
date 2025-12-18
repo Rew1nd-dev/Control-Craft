@@ -12,8 +12,9 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.*;
 import com.verr1.controlcraft.foundation.data.render.CimulinkWireEntry;
 import com.verr1.controlcraft.foundation.managers.render.CimulinkRenderCenter;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MinecraftUtils;
+import net.createmod.catnip.outliner.Outline;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -26,13 +27,14 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
 public class CimulinkRenderer implements IRenderer{
 
@@ -431,9 +433,9 @@ public class CimulinkRenderer implements IRenderer{
                         -(float)(socketRenderOffset) * 16
                 ).fromSide(cbe.getDirection()); //
 
-        CreateClient.OUTLINER
-                .showValueBox(cbe.getBlockPos(), box.transform(transform))
-                .highlightFace(result.getDirection());
+//        Outliner.getInstance()
+//                .showValueBox(cbe.getBlockPos(), box.transform(transform))
+//                .highlightFace(result.getDirection());
 
 
 

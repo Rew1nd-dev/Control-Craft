@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.links.output;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.OutputLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -17,6 +16,7 @@ import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -75,6 +75,11 @@ public class OutputPortBlockEntity extends CimulinkBlockEntity<OutputLinkPort> i
 
     }
 
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
+    }
 
     public void updateOutputSignal(){
         if(level == null || level.isClientSide)return;

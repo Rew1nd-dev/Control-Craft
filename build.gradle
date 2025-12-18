@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-        id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 
     id "org.jetbrains.kotlin.jvm" version "2.1.0"
 
@@ -119,18 +119,23 @@ repositories {
     maven { url = 'https://maven.minecraftforge.net' }
     maven { url = "https://modmaven.dev/" } // Create, Flywheel
     maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
-    maven {url = "https://cursemaven.com"}
-    maven{url = "https://repo.essential.gg/repository/maven-public"}
-    maven {url = 'https://thedarkcolour.github.io/KotlinForForge/'}
-    maven {url = 'https://maven.valkyrienskies.org/'}
+    maven { url = "https://cursemaven.com"}
+    maven { url = "https://repo.essential.gg/repository/maven-public"}
+    maven { url = 'https://thedarkcolour.github.io/KotlinForForge/'}
+    maven { url = 'https://maven.valkyrienskies.org/'}
     maven { url = 'https://maven.fabricmc.net/' }
-    maven {url = "https://api.modrinth.com/maven"}
+    maven { url = "https://api.modrinth.com/maven"}
     // Add KFF Maven repository
     maven { url = "https://maven.saps.dev/minecraft" }
     maven { url = "https://maven.bawnorton.com/releases" }
-    maven {url = "https://maven.realrobotix.me/master/"}
-    maven {url 'https://maven.blamejared.com' }
-    maven {url = "https://maven.squiddev.cc"}
+    maven { url = "https://maven.realrobotix.me/master/"}
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = "https://maven.squiddev.cc"}
+
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
+    maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+
     flatDir {dirs 'libs'}
 
     gradlePluginPortal()
@@ -138,8 +143,8 @@ repositories {
 }
 
 mixin {
-    add sourceSets.main, "mixins.controlcraft.refmap.json"
-    config 'mixins.controlcraft.json'
+     add sourceSets.main, "mixins.controlcraft.refmap.json"
+     config 'mixins.controlcraft.json'
 }
 
 
@@ -152,29 +157,35 @@ configurations {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    implementation fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-    // compileOnly("maven.modrinth:embeddium:${embeddium_version}")
+
 
     implementation fg.deobf("libs:architectury-forge:9.2.14")
 
-    // implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_mod_version}")
-    compileOnly("org.valkyrienskies.core:api:${vs_core_version}")
-    compileOnly("org.valkyrienskies.core:api-game:${vs_core_version}")
-    compileOnly("org.valkyrienskies.core:util:${vs_core_version}")
-    compileOnly("org.valkyrienskies.core:impl:${vs_core_version}")
+    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
+    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
+    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
-    // runtimeOnly("libs:valkyrienskies-1201:2.1.3")
-
-    // implementation fg.deobf("libs:valkyrienskies-1201:2.5.0")
-    // implementation fg.deobf("org.valkyrienskies.core:api:${vs2_core_version}")
-
-    // implementation fg.deobf("libs:embeddium-1201:0.3.31")
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}") { transitive = false
+        exclude group: 'org.valkyrienskies.core', module: ''
+        exclude group: "com.simibubi.create"
+        exclude group: "io.github.fabricators_of_create"
+        exclude group: "dev.engine-room"
+        exclude group: "dev.engine_room"
+    }
+    implementation("org.valkyrienskies.core:api:${vscore_version}") { transitive = false
+        exclude group: 'org.joml', module: ''
+    }
+    implementation("org.valkyrienskies.core:util:${vscore_version}") { transitive = false
+        exclude group: 'org.joml', module: ''
+    }
+    implementation("org.valkyrienskies.core:internal:${vscore_version}") { transitive = false
+        exclude group: 'org.joml', module: ''
+    }
 
     implementation fg.deobf("libs:spark-1.10.53:forge")
 
@@ -183,19 +194,23 @@ dependencies {
 
     implementation fg.deobf("libs:tau:2.0.1")
     compileOnly fg.deobf("libs:valkyrien_space_war:0.6.13")
-    implementation fg.deobf("libs:cbcmodernwarfare:0.0.6c")
-    implementation fg.deobf("libs:createbigcannons:5.8.3")
-    implementation fg.deobf("libs:trackwork:1.1.1")
-    implementation fg.deobf("libs:vmod:1.3.0")
+    compileOnly fg.deobf("libs:cbcmodernwarfare:0.0.6c")
+    compileOnly fg.deobf("libs:createbigcannons:5.10.0")
+    compileOnly fg.deobf("libs:trackwork:1.1.1")
+    compileOnly fg.deobf("libs:shaolib:1.4.3")
+    compileOnly fg.deobf("libs:vmod:1.8.0")
+    implementation fg.deobf("libs:tweakcontroller-1.2.5:forge")
     implementation fg.deobf("libs:we-7.2.15:forge")
-    implementation fg.deobf("libs:shaolib:1.4.3")
-    implementation fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
+    implementation fg.deobf("libs:fcs-8.0.2:forge")
+    implementation fg.deobf("libs:cct-1.116.2:forge")
+    compileOnly fg.deobf("libs:shaolib:1.4.3")
+    compileOnly fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
 
     minecraftLibrary(jarJar("libs:luaj:3.0.2"){
         jarJar.ranged(it, "[0.0.2,)")
     })
 
-    implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:1.2")){
+    implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:1.3")){
         jarJar.ranged(it, "[0.0,)")
     }
 
@@ -210,7 +225,7 @@ dependencies {
 
     // cc:t dependencies
     // implementation fg.deobf("curse.maven:cc-tweaked-282001:5379173")
-    implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:1.113.0")
+    // implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:1.113.0")
 
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
@@ -227,7 +242,7 @@ dependencies {
     //  implementation fg.deobf(jarJar("libs:markdown_manual-forge:1.2.5")){
     //      jarJar.ranged(it, "[0.0.0,)")
     //  }
-    implementation fg.deobf("curse.maven:create-tweaked-controllers-898849:5206625")
+    // compileOnly fg.deobf("curse.maven:create-tweaked-controllers-898849:5206625")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

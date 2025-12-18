@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.links.input;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.game.port.inout.InputLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -16,6 +15,7 @@ import com.verr1.controlcraft.foundation.type.descriptive.GroupPolicy;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -83,6 +83,12 @@ public class InputPortBlockEntity extends CimulinkBlockEntity<InputLinkPort> imp
         }
         dsg.setPolicy(GroupPolicy.SUM);
 
+    }
+
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
     }
 
     @Override

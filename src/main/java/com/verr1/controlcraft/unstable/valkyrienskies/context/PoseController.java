@@ -1,10 +1,10 @@
 package com.verr1.controlcraft.unstable.valkyrienskies.context;
 
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.PhysShip;
 
 public class PoseController {
 
@@ -23,7 +23,7 @@ public class PoseController {
 
     private double ts = 1d / 60;
 
-    public void overridePhysics(PhysShipWrapper ship){
+    public void overridePhysics(PhysShip ship){
         mass = ship.getMass();
         inertia = ship.getMomentOfInertia().m00();
 

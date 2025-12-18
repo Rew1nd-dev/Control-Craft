@@ -1,7 +1,8 @@
 package com.verr1.controlcraft.foundation.managers;
 
 import com.simibubi.create.CreateClient;
-import com.simibubi.create.foundation.outliner.Outline;
+import net.createmod.catnip.outliner.Outline;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -79,18 +80,18 @@ public class ClientOutliner {
         BlockState state = world.getBlockState(selection);
         VoxelShape shape = state.getShape(world, selection);
         AABB boundingBox = shape.isEmpty() ? new AABB(BlockPos.ZERO) : shape.bounds();
-        return CreateClient.OUTLINER.showAABB(slot, boundingBox.move(selection))
+        return Outliner.getInstance().showAABB(slot, boundingBox.move(selection))
                 .colored(color)
                 .lineWidth(1 / 16f);
     }
 
     public static Outline.OutlineParams drawOutline(Entity e){
-        return CreateClient.OUTLINER.showAABB(e.getUUID(), e.getBoundingBox(), 1);
+        return Outliner.getInstance().showAABB(e.getUUID(), e.getBoundingBox(), 1);
     }
 
 
     public static Outline.OutlineParams drawOutline(@NotNull AABB aabb, int color, String slot, double scale, double width) {
-        return CreateClient.OUTLINER.showAABB(slot, aabb)
+        return Outliner.getInstance().showAABB(slot, aabb)
                 .colored(color)
                 .lineWidth((float) (width * (float)scale * 2f));
     }
@@ -103,16 +104,16 @@ public class ClientOutliner {
 
 
         FaceVec3 faceVec3 = getFaceVec3(new Vec3(selection.getX(), selection.getY(), selection.getZ()), face);
-        CreateClient.OUTLINER.showLine(slot + "selection_l1", faceVec3.f1, faceVec3.f2)
+        Outliner.getInstance().showLine(slot + "selection_l1", faceVec3.f1, faceVec3.f2)
                 .colored(color)
                 .lineWidth(1 / 16f);
-        CreateClient.OUTLINER.showLine(slot + "selection_l2", faceVec3.f2, faceVec3.f3)
+        Outliner.getInstance().showLine(slot + "selection_l2", faceVec3.f2, faceVec3.f3)
                 .colored(color)
                 .lineWidth(1 / 16f);
-        CreateClient.OUTLINER.showLine(slot + "selection_l3", faceVec3.f3, faceVec3.f4)
+        Outliner.getInstance().showLine(slot + "selection_l3", faceVec3.f3, faceVec3.f4)
                 .colored(color)
                 .lineWidth(1 / 16f);
-        CreateClient.OUTLINER.showLine(slot + "selection_l4", faceVec3.f4, faceVec3.f1)
+        Outliner.getInstance().showLine(slot + "selection_l4", faceVec3.f4, faceVec3.f1)
                 .colored(color)
                 .lineWidth(1 / 16f);
     }
@@ -125,16 +126,16 @@ public class ClientOutliner {
 
 
         FaceVec3 faceVec3 = getFaceVec3(center, face, scale * 0.35);
-        CreateClient.OUTLINER.showLine(slot + "selection_l1", faceVec3.f1, faceVec3.f2)
+        Outliner.getInstance().showLine(slot + "selection_l1", faceVec3.f1, faceVec3.f2)
                 .colored(color)
                 .lineWidth(1 / 16f * (float)scale * 2f);
-        CreateClient.OUTLINER.showLine(slot + "selection_l2", faceVec3.f2, faceVec3.f3)
+        Outliner.getInstance().showLine(slot + "selection_l2", faceVec3.f2, faceVec3.f3)
                 .colored(color)
                 .lineWidth(1 / 16f * (float)scale * 2f);
-        CreateClient.OUTLINER.showLine(slot + "selection_l3", faceVec3.f3, faceVec3.f4)
+        Outliner.getInstance().showLine(slot + "selection_l3", faceVec3.f3, faceVec3.f4)
                 .colored(color)
                 .lineWidth(1 / 16f * (float)scale * 2f);
-        CreateClient.OUTLINER.showLine(slot + "selection_l4", faceVec3.f4, faceVec3.f1)
+        Outliner.getInstance().showLine(slot + "selection_l4", faceVec3.f4, faceVec3.f1)
                 .colored(color)
                 .lineWidth(1 / 16f * (float)scale * 2f);
     }

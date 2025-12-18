@@ -1,13 +1,13 @@
 package com.verr1.controlcraft.foundation.data.control;
 
-import com.verr1.controlcraft.foundation.vsapi.PhysPose;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.bodies.properties.BodyPose;
 
-public record ImmutablePhysPose(Vector3dc pos, Quaterniondc rot) implements PhysPose {
+public record ImmutablePhysPose(Vector3dc pos, Quaterniondc rot) implements BodyPose {
 
     public static ImmutablePhysPose EMPTY = new ImmutablePhysPose(new Vector3d(), new Quaterniond());
 
@@ -16,14 +16,12 @@ public record ImmutablePhysPose(Vector3dc pos, Quaterniondc rot) implements Phys
     }
 
     @NotNull
-    @Override
-    public Vector3dc getPos() {
+    public Vector3dc getPosition() {
         return pos;
     }
 
     @NotNull
-    @Override
-    public Quaterniondc getRot() {
+    public Quaterniondc getRotation() {
         return rot;
     }
 }

@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 @Pseudo
 @Mixin(TweakedLecternControllerBlockEntity.class)

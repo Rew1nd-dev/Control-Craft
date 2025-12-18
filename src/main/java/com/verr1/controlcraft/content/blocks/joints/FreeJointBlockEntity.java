@@ -9,10 +9,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaterniond;
 import org.joml.Vector3dc;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.core.internal.joints.VSSphericalJoint;
 
 public class FreeJointBlockEntity extends AbstractJointBlockEntity{
     public FreeJointBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -33,28 +35,28 @@ public class FreeJointBlockEntity extends AbstractJointBlockEntity{
         FreeJointBlockEntity otherHinge = BlockEntityGetter.getLevelBlockEntityAt(level, pos, FreeJointBlockEntity.class).orElse(null);
         if(otherHinge == null)return;
 
-        Vector3dc selfContact = getJointConnectorPosJOML();
-        Vector3dc otherContact = otherHinge.getJointConnectorPosJOML();
+
 
         long selfID = getShipOrGroundID();
         long otherID = otherHinge.getShipOrGroundID();
 
+        Vector3dc selfContact = getJointConnectorPosJOML();
+        Vector3dc otherContact = otherHinge.getJointConnectorPosJOML();
 
-
-        VSAttachmentConstraint attachment = new VSAttachmentConstraint(
-                selfID,
-                otherID,
-                1.0E-20,
-                selfContact,
-                otherContact,
-                1.0E20,
-                0.0
+        VSSphericalJoint joint = new VSSphericalJoint(
+                selfID == -1L ? null: selfID,
+                new VSJointPose(selfContact, new Quaterniond()),
+                otherID == -1L ? null: otherID,
+                new VSJointPose(otherContact, new Quaterniond()),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                1e-20,
+                null
         );
 
-        recreateConstraints(attachment);
+        recreateConstraints(joint);
     }
 
-    public void recreateConstraints(@NotNull VSConstraint... joint){
+    public void recreateConstraints(@NotNull VSJoint... joint){
         if(level == null || level.isClientSide)return;
         if(joint.length == 0){
             ControlCraft.LOGGER.error("invalid constraint data for free joint");

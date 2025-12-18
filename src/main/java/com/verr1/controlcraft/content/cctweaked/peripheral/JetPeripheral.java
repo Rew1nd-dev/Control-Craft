@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.cctweaked.peripheral;
 import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class JetPeripheral extends AbstractAttachedPeripheral<JetBlockEntity> {
@@ -12,8 +13,8 @@ public class JetPeripheral extends AbstractAttachedPeripheral<JetBlockEntity> {
     }
 
     @Override
-    public String getType() {
-        return "attacker";
+    public @NotNull String getType() {
+        return "jet";
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.content.links;
 
-import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
+import com.simibubi.create.api.equipment.goggles.IHaveHoveringInformation;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
@@ -186,7 +186,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     @OnlyIn(Dist.CLIENT)
     private void requestConnectionStatusOnFocus(){
         if(beingLookedAt()){
-            handler().request(SharedKeys.CONNECTION_STATUS);
+            handler().request(false, SharedKeys.CONNECTION_STATUS);
         }
     }
 
@@ -199,7 +199,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     @OnlyIn(Dist.CLIENT)
     private void requestValueStatusOnFocus(){
         if(beingLookedAt()){
-            handler().request(SharedKeys.VALUE_STATUS);
+            handler().request(false, SharedKeys.VALUE_STATUS);
         }
     }
 

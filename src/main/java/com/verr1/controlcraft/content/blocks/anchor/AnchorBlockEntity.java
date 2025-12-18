@@ -116,6 +116,7 @@ public class AnchorBlockEntity extends OnShipBlockEntity
 
     @Override
     public void tickServer() {
+        super.tickServer();
         syncAttachInducer();
     }
 

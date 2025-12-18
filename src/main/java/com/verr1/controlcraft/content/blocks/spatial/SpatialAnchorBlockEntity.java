@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.blocks.spatial;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.gui.layouts.api.IScheduleProvider;
@@ -21,13 +20,13 @@ import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSGetterUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -46,6 +45,7 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.List;
 import java.util.Optional;
@@ -242,7 +242,7 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
 
         Vector3dc dir = ValkyrienSkies.set(new Vector3d(), c_align.getNormal()).mul(anchorOffset);
         Vector3dc cFace_sc = ValkyrienSkies.set(new Vector3d(), c_pos).add(dir);
-        Vector3dc cCenter_sc = ship.getInertiaData().getCenterOfMassInShip();
+        Vector3dc cCenter_sc = ship.getInertiaData().getCenterOfMass();
         Vector3dc relative_r_sc = new Vector3d(cFace_sc).sub(cCenter_sc, new Vector3d());
 
         Vector3dc relative_r_wc = q_target.transform(relative_r_sc, new Vector3d());
@@ -291,6 +291,12 @@ public class SpatialAnchorBlockEntity extends OnShipBlockEntity implements
                 protocol,
                 new SpatialSchedule()
         );
+    }
+
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
     }
 
     @Override

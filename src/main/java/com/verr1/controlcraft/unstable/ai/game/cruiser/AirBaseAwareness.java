@@ -20,7 +20,8 @@ import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
+
 
 public class AirBaseAwareness {
 

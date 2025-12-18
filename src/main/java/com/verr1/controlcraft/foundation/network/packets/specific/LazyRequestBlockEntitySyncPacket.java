@@ -15,15 +15,18 @@ import java.util.List;
 
 public class LazyRequestBlockEntitySyncPacket extends SimplePacketBase {
     private final BlockPos pos;
+    private final boolean useField;
     private final ArrayList<NetworkKey> requests = new ArrayList<>();
 
-    public LazyRequestBlockEntitySyncPacket(BlockPos pos, List<NetworkKey> requests) {
+    public LazyRequestBlockEntitySyncPacket(BlockPos pos, boolean useField, List<NetworkKey> requests) {
         this.pos = pos;
+        this.useField = useField;
         this.requests.addAll(requests);
     }
 
     public LazyRequestBlockEntitySyncPacket(FriendlyByteBuf buf){
         pos = buf.readBlockPos();
+        useField = buf.readBoolean();
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
             requests.add(NetworkKey.create(buf.readUtf()));
@@ -33,6 +36,7 @@ public class LazyRequestBlockEntitySyncPacket extends SimplePacketBase {
     @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(pos);
+        buffer.writeBoolean(useField);
         buffer.writeInt(requests.size());
         for (NetworkKey request : requests) {
             buffer.writeUtf(request.getSerializedName());

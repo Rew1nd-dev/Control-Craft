@@ -19,7 +19,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ControlCraftClientCommands {

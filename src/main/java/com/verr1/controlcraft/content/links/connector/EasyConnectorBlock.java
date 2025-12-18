@@ -1,10 +1,10 @@
 package com.verr1.controlcraft.content.links.connector;
 
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import com.verr1.controlcraft.registry.CimulinkBlocks;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;

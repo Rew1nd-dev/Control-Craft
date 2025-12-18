@@ -1,24 +1,19 @@
 package com.verr1.controlcraft.content.blocks.motor;
 
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
 import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.SynchronizedField;
+import com.verr1.controlcraft.foundation.data.constraint.AngleLimit;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.api.operatable.IBruteConnectable;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
-import com.verr1.controlcraft.foundation.vsapi.ShipAssembler;
-import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
-import com.verr1.controlcraft.utils.MathUtils;
-import com.verr1.controlcraft.utils.MinecraftUtils;
-import com.verr1.controlcraft.utils.SerializeUtils;
-import com.verr1.controlcraft.utils.VSMathUtils;
+import com.verr1.controlcraft.utils.*;
+import net.createmod.catnip.animation.LerpedFloat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -28,11 +23,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSHingeOrientationConstraint;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.core.internal.joints.VSRevoluteJoint;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
 import java.lang.Math;
 import java.util.List;
@@ -40,14 +38,16 @@ import java.util.Optional;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.CONNECT_CONTEXT;
 import static com.verr1.controlcraft.content.blocks.SharedKeys.SELF_OFFSET;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 public abstract class AbstractMotor extends ShipConnectorBlockEntity implements IBruteConnectable
 {
     public static final NetworkKey ANIMATED_ANGLE = NetworkKey.create("animated_angle");
 
     // public static final NetworkKey CONNECT_CONTEXT = NetworkKey.create("connect_context");
+    public static final NetworkKey ANGLE_LIMIT = NetworkKey.create("angle_limit");
+    public static final Serializer<AngleLimit> SER = SerializeUtils.of(AngleLimit::serialize, AngleLimit::deserialize);
 
 
     protected float clientAngle = 0;
@@ -60,27 +60,38 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
     private final SynchronizedField<Double> cachedAngle = new SynchronizedField<>(0.0);
     private final SynchronizedField<Double> cachedVelocity = new SynchronizedField<>(0.0);
 
+    private AngleLimit angleLimit = AngleLimit.FREE;
+
     private double latestAngle = 0.0;
 
     public AbstractMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        buildRegistry(ANIMATED_ANGLE).withBasic(SerializePort.of(this::getServoAngle, this::setClientAngle, SerializeUtils.DOUBLE)).dispatchToSync().runtimeOnly().register();
-        buildRegistry(SharedKeys.SELF_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getSelfOffset()), this::setSelfOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).dispatchToSync().register();
-        buildRegistry(SharedKeys.COMP_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getCompOffset()), this::setCompOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).register();
+        buildRegistry(ANIMATED_ANGLE).withBasic(SerializePort.of(this::getServoAngle, this::setClientAngle, SerializeUtils.DOUBLE)).dispatchToSync().runtimeOnly().constantSync().register();
+        buildRegistry(SharedKeys.SELF_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getSelfOffset()), this::setSelfOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).dispatchToSync().constantSync().register();
+        buildRegistry(SharedKeys.COMP_OFFSET).withBasic(SerializePort.of(() -> new Vector3d(getCompOffset()), this::setCompOffset, SerializeUtils.VECTOR3D)).withClient(ClientBuffer.VECTOR3D.get()).constantSync().register();
         buildRegistry(CONNECT_CONTEXT).withBasic(SerializePort.of(() -> context, ctx -> context = ctx, SerializeUtils.CONNECT_CONTEXT)).register();
 
+        buildRegistry(ANGLE_LIMIT)
+                .withBasic(
+                        SerializePort.of(
+                                this::getAngleLimit,
+                                this::setAngleLimit,
+                                SER
+                        )
+                ).withClient(new ClientBuffer<>(
+                        SER,
+                        AngleLimit.class
+                )).register();
 
         panel().registerUnit(SharedKeys.ASSEMBLE, this::assemble);
         panel().registerUnit(SharedKeys.DISASSEMBLE, this::destroyConstraints);
 
         registerConstraintKey("revolute");
-        registerConstraintKey("attach_1");
-        registerConstraintKey("attach_2");
     }
 
     public void validateJoint(){
-        if(getConstraint("attach_1") == null || getConstraint("attach_2") == null || getConstraint("revolute") == null){
-            destroyConstraints();
+        if(retrieveJoint("revolute") == null){
+            // destroyConstraints();
         }
     }
 
@@ -152,29 +163,29 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
     public void assemble(){
         if(level == null || level.isClientSide)return;
-        // var self = Optional.ofNullable(getShipOn());
-        // if(self == null)return;
+
         ServerLevel serverLevel = (ServerLevel) level;
         List<BlockPos> collected = List.of(getAssembleBlockPos());
-        ServerShip comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected.get(0), true, 1, true);
-        if(comp == null)return;
+        Ship comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1, true);
 
         Vector3dc comp_at_sc = toJOML(getAssembleBlockPos().getCenter());
         Vector3dc comp_at_wc = getShipOn() != null ?
                 getShipOn().getShipToWorld().transformPosition(comp_at_sc, new Vector3d()) :
                 new Vector3d(comp_at_sc);
-        ((ShipDataCommon)comp).setTransform(
+        /*
+        * ((ShipDataCommon)comp).setTransform(
             new ShipTransformImpl(
                 comp_at_wc,
                 comp.getInertiaData().getCenterOfMassInShip(),
                 getSelfShipQuaternion(),
                 new Vector3d(1, 1, 1)
         ));
+        * */
 
         long compId = comp.getId();
         long selfId = getShipOrGroundID();
-        Vector3dc p_self = getRotationCenterPosJOML();
-        Vector3dc p_comp = comp.getTransform().getPositionInShip().add(new Vector3d(0.5, 0.5, 0.5).add(compOffset), new Vector3d());  // new Vector3d();
+        Vector3dc p_self = selfId == -1L ? getRotationCenterPosJOML().add(new Vector3d(0.5, 0.5, 0.5)) : getRotationCenterPosJOML();
+        Vector3dc p_comp = comp.getTransform().getPositionInShip().add(new Vector3d(0.0, 0.0, 0.0).add(compOffset), new Vector3d());  // new Vector3d();
         // Vector3dc selfOffset = self.map(s -> s.getTransform().getPositionInShip()).orElse(); //.sub(p_self, new Vector3d())
         Quaterniondc q_self = VSMathUtils.getQuaternionToEast_(getServoDirection());
         Quaterniondc q_comp = VSMathUtils.getQuaternionToEast_(getServoDirection());
@@ -182,98 +193,65 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
         Vector3d direction = getServoDirectionJOML();
 
-        VSHingeOrientationConstraint hingeConstraint = new VSHingeOrientationConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                q_self,
-                q_comp,
-                1.0E20
-        );
 
-        VSAttachmentConstraint attachment_1 = new VSAttachmentConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                new Vector3d(p_self).fma(0, direction),
-                new Vector3d(p_comp).fma(0, direction),
-                1.0E20,
-                0.0
-        );
 
-        VSAttachmentConstraint attachment_2 = new VSAttachmentConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                new Vector3d(p_self).fma(-2, direction),
-                new Vector3d(p_comp).fma(-2, direction),
-                1.0E20,
-                0.0
-        );
-        /*
         VSRevoluteJoint joint = new VSRevoluteJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(p_self, q_self),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(p_comp, q_comp),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
-                null, null, null, null, null
+                1e-20,
+                getAngleLimit().toPhysX(getDirection()),
+                null, null, null, null
         );
-        * */
 
 
-        recreateRevoluteConstraints(hingeConstraint, attachment_1, attachment_2);
+
+        recreateRevoluteConstraints(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(getServoDirection().getOpposite());
         setBlockConnectContext(BlockPos.containing(toMinecraft(p_comp)));
         setStartingAngleOfCompanionShip();
         setChanged();
+        jointWatcher.reset();
+    }
+
+    public AngleLimit getAngleLimit() {
+        return angleLimit;
+    }
+
+    public void setAngleLimit(AngleLimit angleLimit) {
+        this.angleLimit = angleLimit;
     }
 
     public void invalidateConnectContext(){
         context = ConnectContext.EMPTY;
     }
 
-    public void updateConnectContext(){
-        Optional
-            .ofNullable(getConstraint("revolute")).ifPresentOrElse(
-                rvl -> Optional.ofNullable(getConstraint("attach_1")).ifPresentOrElse(
-                att -> {
-                    VSHingeOrientationConstraint revolute = (VSHingeOrientationConstraint) rvl;
-                    VSAttachmentConstraint attach = (VSAttachmentConstraint) att;
-                    Vector3dc p_0 = attach.getLocalPos0();
-                    Vector3dc p_1 = attach.getLocalPos1();
-                    Quaterniondc q_0 = revolute.getLocalRot0();
-                    Quaterniondc q_1 = revolute.getLocalRot1();
-                    context = new ConnectContext(
-                        new VSJointPose(p_0, q_0),
-                        new VSJointPose(p_1, q_1),
-                        false
-                    );
-                },
-                        this::invalidateConnectContext
-                ),
-                        this::invalidateConnectContext
-                );
+    public void updateConnectContext(VSJoint revolute){
+        context = new ConnectContext(
+                revolute.getPose0(),
+                revolute.getPose1(),
+                false
+        );
     }
 
-    public void recreateRevoluteConstraints(VSConstraint... joint){
-        if(joint.length < 3){
+
+
+    public void recreateRevoluteConstraints(VSJoint... joint){
+        if(joint.length < 1){
             ControlCraft.LOGGER.error("Failed to recreate revolute constraints: invalid joint data");
             return;
         }
         overrideConstraint("revolute", joint[0]);
-        overrideConstraint("attach_1", joint[1]);
-        overrideConstraint("attach_2", joint[2]);
-        updateConnectContext();
+        updateConnectContext(joint[0]);
     }
 
     @Override
     public void destroyConstraints() {
         clearCompanionShipInfo();
         removeConstraint("revolute");
-        removeConstraint("attach_1");
-        removeConstraint("attach_2");
     }
 
     @Override
@@ -290,53 +268,26 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         Vector3dc p_comp = ValkyrienSkies.set(new Vector3d(), bp_comp.getCenter()).add(compOffset);
         Vector3d dir_self = getServoDirectionJOML();
         Vector3d dir_comp = ValkyrienSkies.set(new Vector3d(), direction_comp.getNormal());
-        /*
+
         VSRevoluteJoint joint = new VSRevoluteJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(p_self, q_self),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(p_comp, q_comp),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
-                null, null, null, null, null
-        );
-        * */
-
-
-        VSHingeOrientationConstraint hingeConstraint = new VSHingeOrientationConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                q_self,
-                q_comp,
-                1.0E20
+                1e-20,
+                getAngleLimit().toPhysX(getDirection()),
+                null, null, null, null
         );
 
-        VSAttachmentConstraint attachment_1 = new VSAttachmentConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                new Vector3d(p_self).fma(0, dir_self),
-                new Vector3d(p_comp).fma(0, dir_comp),
-                1.0E20,
-                0.0
-        );
 
-        VSAttachmentConstraint attachment_2 = new VSAttachmentConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                new Vector3d(p_self).fma(-2, dir_self),
-                new Vector3d(p_comp).fma(2, dir_comp),
-                1.0E20,
-                0.0
-        );
-
-        recreateRevoluteConstraints(hingeConstraint, attachment_1, attachment_2);
+        recreateRevoluteConstraints(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(direction_comp);
         setBlockConnectContext(bp_comp);
         setStartingAngleOfCompanionShip();
         setChanged();
+        jointWatcher.reset();
 
     }
 

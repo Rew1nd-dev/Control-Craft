@@ -3,7 +3,6 @@ package com.verr1.controlcraft.unstable.management;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ShipAssembler;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.blocks.AiBoundFakePlayer;
 import com.verr1.controlcraft.unstable.data.AIPersistentData;
@@ -29,16 +28,19 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.primitives.AABBi;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
 import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
+import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 public class AIPool extends SavedData {
 
@@ -120,16 +122,16 @@ public class AIPool extends SavedData {
         return Optional.ofNullable(VSGameUtilsKt.getLevelFromDimensionId(server(), dimensionOf(id)));
     }
 
-    private ServerShipWorldCore vsWorld(){
-        return Objects.requireNonNull(VSGameUtilsKt.getShipObjectWorld(server()));
+    private VsiServerShipWorld vsWorld(){
+        return Objects.requireNonNull((VsiServerShipWorld)ValkyrienSkies.getShipWorld(server()));
     }
 
-    public @NotNull List<ServerShip> getAllShips(){
-        return vsWorld().getAllShips().stream().toList();
+    public @NotNull List<LoadedServerShip> getAllShips(){
+        return vsWorld().getLoadedShips().stream().toList();
     }
 
-    public Optional<ServerShip> getShipOf(long id){
-        return Optional.ofNullable(vsWorld().getAllShips().getById(id));
+    public Optional<LoadedServerShip> getShipOf(long id){
+        return Optional.ofNullable(vsWorld().getLoadedShips().getById(id));
     }
 
     public AIBlockNetwork getNetworkOf(long id){
@@ -203,13 +205,13 @@ public class AIPool extends SavedData {
 
     public void unMarkAI(long id){
         getShipOf(id).ifPresentOrElse(s -> {
-            s.saveAttachment(AIBlockNetwork.class, null);
+            s.removeAttachment(AIBlockNetwork.class);
             s.setSlug("unmarked_ai_" + randomSequence(5));
         }, () -> logAbsentId(id));
     }
 
     public boolean isAI(long id){
-        Optional<ServerShip> opt = getShipOf(id);
+        Optional<LoadedServerShip> opt = getShipOf(id);
         return opt.filter(ship -> ship.getAttachment(AIBlockNetwork.class) != null).isPresent();
     }
 
@@ -250,7 +252,7 @@ public class AIPool extends SavedData {
         repairAI(id, persistent.get(id).storageSchematic);
     }
 
-    private AIBlockNetwork networkOf(ServerShip s){
+    private AIBlockNetwork networkOf(LoadedServerShip s){
         return AIBlockNetwork.getOrCreate(s);
     }
 
@@ -260,7 +262,7 @@ public class AIPool extends SavedData {
 
     public void discard(long id){
         if(!isAI(id))return;
-        ServerShip ship = getShipOf(id).orElse(null);
+        LoadedServerShip ship = getShipOf(id).orElse(null);
         if(ship == null)return;
         ship.setStatic(true);
 
@@ -285,7 +287,7 @@ public class AIPool extends SavedData {
     }
 
     public @NotNull AISpawnResult spawn(long id, SchematicKey overrideKey ,Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
-        ServerShip ship = getShipOf(id).orElse(null);
+        LoadedServerShip ship = getShipOf(id).orElse(null);
         if(ship == null)return AISpawnResult.DELETED;
         if(!isAI(id))return AISpawnResult.NOT_AN_AI;
         if(!availableAI.contains(id))return AISpawnResult.NOT_AVAILABLE;
@@ -308,7 +310,7 @@ public class AIPool extends SavedData {
         networkOf(ship).onPostRepair();
 
         Runnable task = () -> {
-            vsWorld().teleportShip(ship, withPose(position, rotation, velocity, omega, ship.getChunkClaimDimension()));
+            vsWorld().teleportShip(ship, withPose(position, rotation, velocity, omega, ship.getChunkClaimDimension(), ship.getTransform().getPositionInShip()));
             networkOf(ship).onSpawn();
         };
 
@@ -339,7 +341,7 @@ public class AIPool extends SavedData {
             return;
         }
         ServerShip newAIShip = create1Block(level);
-        Vector3dc createdShipCenter = newAIShip.getInertiaData().getCenterOfMassInShip();
+        Vector3dc createdShipCenter = newAIShip.getInertiaData().getCenterOfMass();
         BlockPos center = BlockPos.containing(toMinecraft(createdShipCenter));
         long id = newAIShip.getId();
 
@@ -355,9 +357,8 @@ public class AIPool extends SavedData {
     public static ServerShip create1Block(ServerLevel level){
         BlockPos createdWorldCenter = BlockPos.containing(toMinecraft(SIMPLE_CREATE_POSITION));
         level.setBlock(createdWorldCenter, Blocks.STONE.defaultBlockState(), 3);
-        ServerShip newShip = ShipAssembler.INSTANCE.assembleToShip(level, createdWorldCenter, true, 1, true);
 
-        return newShip;
+        return ShipAssembler.INSTANCE.assembleToShip(level, List.of(createdWorldCenter), true, 1, true);
     }
 
     public static ShipTeleportDataImpl withPosition(Vector3dc newPosition, String newDim){
@@ -367,7 +368,8 @@ public class AIPool extends SavedData {
                 new Vector3d(),
                 new Vector3d(),
                 newDim,
-                1.0
+                1.0,
+                new Vector3d()
         );
     }
 
@@ -404,8 +406,9 @@ public class AIPool extends SavedData {
     }
 
 
-    public static ShipTeleportDataImpl withPose(Vector3dc newPosition, Quaterniondc newRotation, String newDim){
-        return withPose(newPosition, newRotation, new Vector3d(), new Vector3d(), newDim);
+    public static ShipTeleportDataImpl withPose(Vector3dc newPosition, Quaterniondc newRotation, String newDim,
+                                                Vector3dc oldShipPosition){
+        return withPose(newPosition, newRotation, new Vector3d(), new Vector3d(), newDim, oldShipPosition);
     }
 
     public static ShipTeleportDataImpl withPose(
@@ -413,9 +416,10 @@ public class AIPool extends SavedData {
             Quaterniondc newRotation,
             Vector3dc vel,
             Vector3dc omg,
-            String newDim
+            String newDim,
+            Vector3dc oldShipPosition
     ){
-        return new ShipTeleportDataImpl(newPosition, newRotation, vel, omg, newDim, 1.0);
+        return new ShipTeleportDataImpl(newPosition, newRotation, vel, omg, newDim, 1.0, oldShipPosition);
     }
 
     public void setYardPosition(double x, double y, double z){

@@ -1,9 +1,7 @@
 package com.verr1.controlcraft.content.blocks.propeller;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
@@ -16,6 +14,8 @@ import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.lang.Lang;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -116,7 +116,7 @@ public class PropellerBlockEntity extends OnShipBlockEntity implements
 
         buildRegistry(THRUST).withBasic(SerializePort.of(this::getThrustRatio, this::setThrustRatio, SerializeUtils.DOUBLE)).withClient(ClientBuffer.DOUBLE.get()).register();
         buildRegistry(TORQUE).withBasic(SerializePort.of(this::getTorqueRatio, this::setTorqueRatio, SerializeUtils.DOUBLE)).withClient(ClientBuffer.DOUBLE.get()).register();
-        buildRegistry(SPEED).withBasic(SerializePort.of(this::getRotationalSpeed, this::setVisualRotationalSpeed, SerializeUtils.DOUBLE)).withClient(ClientBuffer.DOUBLE.get()).dispatchToSync().register();
+        buildRegistry(SPEED).withBasic(SerializePort.of(this::getRotationalSpeed, this::setVisualRotationalSpeed, SerializeUtils.DOUBLE)).withClient(ClientBuffer.DOUBLE.get()).dispatchToSync().constantSync().register();
         /*
         registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getThrustRatio, this::setThrustRatio, SerializeUtils.DOUBLE, THRUST), Side.SHARED);
         registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getTorqueRatio, this::setTorqueRatio, SerializeUtils.DOUBLE, TORQUE), Side.SHARED);
@@ -137,18 +137,21 @@ public class PropellerBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        Lang.text("Propeller Statistic")
+        Lang.builder(ControlCraft.MODID).text("Propeller Statistic")
                 .style(GRAY)
                 .forGoggles(tooltip);
 
         float omega = (float)rotationalSpeed;
 
-        Lang.number(omega)
+        Lang.builder(ControlCraft.MODID).text("" + omega)
                 .text("/s")
                 .style(ChatFormatting.AQUA)
                 .space()
-                .add(Lang.text("current omega")
-                        .style(ChatFormatting.DARK_GRAY))
+                .add(
+                        Lang.builder(ControlCraft.MODID)
+                        .text("current omega")
+                        .style(ChatFormatting.DARK_GRAY)
+                )
                 .forGoggles(tooltip, 1);
         return true;
     }

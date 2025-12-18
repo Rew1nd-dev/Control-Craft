@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.unstable.blocks.explosive;
 
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.foundation.api.common.ISignalHandler;

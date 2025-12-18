@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import javax.annotation.Nullable;
@@ -22,7 +23,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
 
     protected Set<Long> aliveShips = new HashSet<>();
 
-    public static Optional<ServerShip> get(Long id){
+    public static Optional<LoadedServerShip> get(Long id){
         return pool().getShipOf(id);
     }
 
@@ -48,7 +49,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
 
     protected abstract void onDiscard(@NotNull ServerShip ship, @Nullable AIBlockNetwork network);
 
-    protected Stream<ServerShip> streamAlive(){
+    protected Stream<LoadedServerShip> streamAlive(){
         return aliveShips.stream()
                 .map(pool()::getShipOf)
                 .map(opt -> opt.orElse(null))
@@ -107,7 +108,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
         tickDeploy();
     }
 
-    protected List<ServerShip> getAlive(Predicate<ServerShip> predicate){
+    protected List<LoadedServerShip> getAlive(Predicate<LoadedServerShip> predicate){
         return streamAlive().filter(predicate).toList();
     }
 

@@ -1,13 +1,24 @@
 package com.verr1.controlcraft.registry;
 
 import com.verr1.controlcraft.content.valkyrienskies.attachments.*;
+import com.verr1.controlcraft.unstable.valkyrienskies.attachments.AIBlockNetwork;
+import com.verr1.controlcraft.unstable.valkyrienskies.attachments.ConstantCruiseNavigator;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.core.impl.hooks.VSEvents;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+
+import java.util.Arrays;
 
 public enum ControlCraftAttachments {
 
     OBSERVER(Observer.class),
     QUEUE_FORCE_INDUCER(QueueForceInducer.class),
+    CIMULINK_BUS(CimulinkBus.class),
+    CIMULINK_PORTS(CimulinkPorts.class),
+
+    AI_BLOCK_NETWORK(AIBlockNetwork.class),
+    NAVIGATOR(ConstantCruiseNavigator.class),
 
     ANCHOR(AnchorForceInducer.class),
     DYNAMIC_MOTOR(DynamicMotorForceInducer.class),
@@ -31,7 +42,7 @@ public enum ControlCraftAttachments {
     }
 
     private final Class<?> clazz;
-    <T extends ShipForcesInducer> ControlCraftAttachments (Class<T> clazz) {
+    <T> ControlCraftAttachments (Class<T> clazz) {
         this.clazz = clazz;
     }
 
@@ -81,6 +92,15 @@ public enum ControlCraftAttachments {
             );
 
         * */
+        Arrays
+                .stream(ControlCraftAttachments.values())
+                .forEach(
+                        type -> ValkyrienSkies.api().registerAttachment(
+                                ValkyrienSkies.api().newAttachmentRegistrationBuilder(type.clazz)
+                                        .useTransientSerializer()
+                                        .build()
+                        )
+                );
 
         isRegistered = true;
     }

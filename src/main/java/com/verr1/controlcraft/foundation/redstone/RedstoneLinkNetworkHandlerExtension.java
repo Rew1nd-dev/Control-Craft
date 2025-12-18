@@ -3,8 +3,8 @@ package com.verr1.controlcraft.foundation.redstone;
 import com.simibubi.create.Create;
 
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
-import com.simibubi.create.foundation.utility.Couple;
-import com.simibubi.create.foundation.utility.WorldHelper;
+import net.createmod.catnip.data.Couple;
+import net.createmod.catnip.levelWrappers.WorldHelper;
 import net.minecraft.world.level.LevelAccessor;
 
 import java.util.*;

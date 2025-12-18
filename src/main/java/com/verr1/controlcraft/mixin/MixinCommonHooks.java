@@ -2,7 +2,6 @@ package com.verr1.controlcraft.mixin;
 
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.ControlCraftServer;
-import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
 import dan200.computercraft.shared.CommonHooks;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,8 +33,6 @@ abstract class MixinCommonHooks {
         if(!BlockPropertyConfig._CC_OVERCLOCKING){
             return;
         }
-        ComputerCraftDelegation.setServer(server);
-        ControlCraftServer.SERVER_EXECUTOR.executeLater(ComputerCraftDelegation::delegateThreadStart, 10);
     }
 
     @Inject(method = "onServerStopped", at = @At("HEAD"), remap = false)
@@ -43,7 +40,6 @@ abstract class MixinCommonHooks {
         if(!BlockPropertyConfig._CC_OVERCLOCKING){
             return;
         }
-        ComputerCraftDelegation.delegateThreadKill();
     }
 
 }

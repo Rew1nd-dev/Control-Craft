@@ -1,13 +1,10 @@
 package com.verr1.controlcraft.unstable.targeting;
 
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixinducks.IEntityDuck;
 import com.verr1.controlcraft.unstable.AIServer;
-import com.verr1.controlcraft.utils.VSGetterUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,12 +12,10 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import java.util.Optional;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public interface IAITarget {
 

@@ -1,16 +1,14 @@
 package com.verr1.controlcraft.content.blocks;
 
-import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.api.operatable.IConstraintHolder;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConstraintKey;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
-import net.minecraft.client.multiplayer.ClientLevel;
+import com.verr1.controlcraft.utils.Watcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,7 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
 {
     private long companionShipID;
     private Direction companionShipDirection = Direction.UP;
-
+    protected final Watcher jointWatcher = new Watcher(this::destroyConstraints, this::validateJoints, 3);
 
 
     private BlockPos blockConnectContext = BlockPos.ZERO;
@@ -63,34 +62,49 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
     }
 
     public void registerConstraintKey(String id){
-        registeredConstraintKeys.put(id, new ConstraintKey(getBlockPos(), getDimensionID(), id));
+        // registeredConstraintKeys.put(id, new ConstraintKey(getBlockPos(), getDimensionID(), id));
     }
 
-    public @Nullable ConstraintKey getConstraintKey(String id){
-        return registeredConstraintKeys.get(id);
+    public @Nullable ConstraintKey getConstraintKey(String id, boolean runtimeOnly){
+        return new ConstraintKey(getBlockPos(), getDimensionID(), id, runtimeOnly);
     }
 
-    public void overrideConstraint(String id, VSConstraint newConstraint){
-        Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(key -> ConstraintCenter.createOrReplaceNewConstrain(key, newConstraint));
+    public void overrideConstraint(String id, VSJoint newConstraint){
+        Optional.ofNullable(getConstraintKey(id, false))
+                .ifPresent(key -> JointHandler.requestOverrideJoint(key, newConstraint));
     }
 
-    public void updateConstraint(String id, VSConstraint newConstraint){
-        Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(key -> ConstraintCenter.updateOrCreateConstraint(key, newConstraint));
+    public void overrideRuntimeConstraint(String id, VSJoint newConstraint){
+        Optional.ofNullable(getConstraintKey(id, true))
+                .ifPresent(key -> JointHandler.requestOverrideJoint(key, newConstraint));
     }
 
     public void removeConstraint(String id){
-        Optional.ofNullable(getConstraintKey(id))
-                .ifPresent(ConstraintCenter::removeConstraintIfPresent);
+        Optional.ofNullable(getConstraintKey(id, false))
+                .ifPresent(JointHandler::requestRemoveJoint);
     }
 
-    public @Nullable VSConstraint getConstraint(String id){
-        return Optional.ofNullable(getConstraintKey(id))
-                .map(ConstraintCenter::get)
+    public @Nullable VSJoint retrieveJoint(String id){
+        return Optional.ofNullable(getConstraintKey(id, false))
+                .map(JointHandler::retrieveJoint)
                 .orElse(null);
     }
 
+    protected boolean validateJoints(){
+        return true;
+    };
+
+    public @Nullable Integer retrieveVsId(String id){
+        return Optional.ofNullable(getConstraintKey(id, false))
+                .map(JointHandler::retrieveJointId)
+                .orElse(null);
+    }
+
+    @Override
+    public void lazyTickServer() {
+        super.lazyTickServer();
+        jointWatcher.check();
+    }
 
     public void setCompanionShipID(long companionShipID) {
         this.companionShipID = companionShipID;
@@ -112,11 +126,13 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
     }
 
     public @Nullable ClientShip getCompanionClientShip(){
-        if(!(level instanceof ClientLevel lvl))return null;
+        if(level == null || !(level.isClientSide))return null;
 
         return Optional
-                .ofNullable(ValkyrienSkies.getShipWorld(lvl))
+                .ofNullable(ValkyrienSkies.getShipWorld(level))
                 .map(shipWorld -> shipWorld.getLoadedShips().getById(companionShipID))
+                .filter(ClientShip.class::isInstance)
+                .map(ClientShip.class::cast)
                 .orElse(null);
     }
 

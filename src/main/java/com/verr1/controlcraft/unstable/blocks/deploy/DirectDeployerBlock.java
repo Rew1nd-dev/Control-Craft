@@ -1,10 +1,10 @@
 package com.verr1.controlcraft.unstable.blocks.deploy;
 
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.foundation.api.common.ISignalHandler;
 import com.verr1.controlcraft.registry.AIBlockEntities;
 import com.verr1.controlcraft.unstable.ai.ui.AIUIFactory;
 import com.verr1.controlcraft.unstable.blocks.AIBaseBlock;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

@@ -15,9 +15,8 @@ import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.registry.ControlCraftItems;
 import net.minecraft.commands.CommandSourceStack;
@@ -35,11 +34,10 @@ import net.minecraftforge.fml.common.Mod;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ControlCraftServerCommands {
@@ -53,27 +51,31 @@ public class ControlCraftServerCommands {
     }
 
     private static void clearAllAttachments(){
-        ControlCraftServer
-                .INSTANCE
-                .getAllLevels()
-                .forEach(
-                    lvl -> ValkyrienSkies
-                            .getShipWorld(lvl)
-                            .getAllShips()
-                            .forEach(
-                                s -> Arrays
-                                        .stream(ControlCraftAttachments.values())
-                                        .map(ControlCraftAttachments::getClazz)
-                                        .filter(c -> s.getAttachment(c) != null)
-                                        .forEach(
-                                                c -> s.saveAttachment(c, null)
-                                        )
-                            )
-                );
+//        ControlCraftServer
+//                .INSTANCE
+//                .getAllLevels()
+//                .forEach(
+//                    lvl -> ValkyrienSkies.getShipWorld(lvl)
+//                            .getAllShips()
+//                            .forEach(
+//                                s -> Arrays
+//                                        .stream(ControlCraftAttachments.values())
+//                                        .map(ControlCraftAttachments::getClazz)
+//                                        .filter(c -> s.getAttachment(c) != null)
+//                                        .forEach(
+//                                                c -> s.saveAttachment(c, null)
+//                                        )
+//                            )
+//                );
     }
 
     private static int saveAllConstraintsCommand(CommandContext<CommandSourceStack> $){
-        ConstraintCenter.saveAll();
+        JointHandler.saveAll();
+        return 1;
+    }
+
+    private static int removeInvalidConstraintsCommand(CommandContext<CommandSourceStack> $){
+        JointHandler.removeInvalidJoints();
         return 1;
     }
 
@@ -371,6 +373,10 @@ public class ControlCraftServerCommands {
                 ).then(
                         lt("save-all-constraints").executes(
                                 ControlCraftServerCommands::saveAllConstraintsCommand
+                        )
+                ).then(
+                        lt("remove-invalid-cache").executes(
+                                ControlCraftServerCommands::removeInvalidConstraintsCommand
                         )
                 )
         );

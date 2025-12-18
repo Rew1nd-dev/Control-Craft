@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.gui.screens;
 
-import com.simibubi.create.foundation.gui.AbstractSimiScreen;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
@@ -13,6 +12,7 @@ import com.verr1.controlcraft.content.gui.widgets.SmallIconButton;
 import com.verr1.controlcraft.content.links.scope.OscilloscopeBlockEntity;
 import com.verr1.controlcraft.foundation.type.descriptive.UIContents;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
+import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;

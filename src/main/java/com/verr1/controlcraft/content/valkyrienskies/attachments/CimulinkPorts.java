@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
+import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.HashSet;
@@ -18,17 +19,17 @@ import java.util.Set;
         setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CimulinkPorts {
+public final class CimulinkPorts {
 
 
-    public static CimulinkPorts getOrCreate(ServerShip ship){
-        //return ship.getOrPutAttachment(AnchorForceInducer.class, AnchorForceInducer::new);
-        var obj = ship.getAttachment(CimulinkPorts.class);
-        if(obj == null){
-            obj = new CimulinkPorts();
-            ship.saveAttachment(CimulinkPorts.class, obj);
-        }
-        return obj;
+    public static CimulinkPorts getOrCreate(AttachmentHolder ship){
+        return ship.getOrPutAttachment(CimulinkPorts.class, CimulinkPorts::new);
+//        var obj = ship.getAttachment(CimulinkPorts.class);
+//        if(obj == null){
+//            obj = new CimulinkPorts();
+//            ship.saveAttachment(CimulinkPorts.class, obj);
+//        }
+//        return obj;
     }
 
 

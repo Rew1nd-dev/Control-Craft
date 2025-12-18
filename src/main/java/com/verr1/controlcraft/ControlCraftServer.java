@@ -22,9 +22,9 @@ public class ControlCraftServer {
     public static ExecutorService LUA_THREAD;
 
     public static void ServerInit(){
-        Configurator.setLevel("org.valkyrienskies.core.impl.networking", Level.ERROR);
-        Configurator.setLevel("org.valkyrienskies.core.networking", Level.ERROR);
-        Configurator.setLevel("org.valkyrienskies.physics.networking", Level.ERROR);
+//        Configurator.setLevel("org.valkyrienskies.core.impl.networking", Level.ERROR);
+//        Configurator.setLevel("org.valkyrienskies.core.networking", Level.ERROR);
+//        Configurator.setLevel("org.valkyrienskies.physics.networking", Level.ERROR);
     }
 
     public static boolean onMainThread(){

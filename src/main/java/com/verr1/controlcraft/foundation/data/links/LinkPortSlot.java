@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.foundation.data.links;
 
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.utility.VecHelper;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 

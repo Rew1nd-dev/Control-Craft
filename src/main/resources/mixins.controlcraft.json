@@ -1,14 +1,12 @@
 {
   "required": false,
+  "package": "com.verr1.controlcraft.mixin",
   "refmap": "mixins.controlcraft.refmap.json",
   "mixins": [
-    "MixinAt",
     "MixinCommonHooks",
     "MixinContraption",
     "MixinCustomPayloadPacket",
     "MixinEntity",
-    "accessor.ShipObjectServerWorldAccessor",
-    "ai.MixinShipObjectServerWorld",
     "camera.MixinChunkMap",
     "camera.MixinChunkMap$TrackedEntity",
     "camera.MixinServerPlayer",
@@ -21,7 +19,6 @@
     "tweak.MixinTweakLinkedControllerAxisPacket",
     "tweak.MixinTweakLinkedControllerButtonPacket"
   ],
-  "package": "com.verr1.controlcraft.mixin",
   "injectors": {
     "defaultRequire": 1
   },

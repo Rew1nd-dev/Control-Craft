@@ -1,11 +1,7 @@
 package com.verr1.controlcraft.unstable.data.schematic;
 
 import com.verr1.controlcraft.ControlCraft;
-import com.verr1.controlcraft.ControlCraftServer;
-import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
-import com.verr1.controlcraft.registry.AIBlocks;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.ai.api.IReplaceBlock;
 import com.verr1.controlcraft.unstable.util.SchematicSerializeUtil;
@@ -30,13 +26,13 @@ import org.joml.primitives.AABBi;
 import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter.centerPosOf;
-import static com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter.centerVecOf;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+
 
 public class AISchematic {
     private static final Serializer<BlockPaletteHashMapV1> PALETTE = SerializeUtils.of(

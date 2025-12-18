@@ -5,20 +5,22 @@ import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.data.control.ImmutablePhysPose;
 import com.verr1.controlcraft.foundation.data.logical.*;
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.physics_api.PoseVel;
 
 import java.lang.Math;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
 /*
 *   This is what makes Control Craft to be Control Craft :)
@@ -27,7 +29,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 public class InducerControls {
 
-    public static void anchorTickControls(LogicalAnchor anchor, @NotNull PhysShipWrapper physShip) {
+    public static void anchorTickControls(LogicalAnchor anchor, @NotNull PhysShip physShip) {
 
         Vector3dc p_sc = ValkyrienSkies.set(new Vector3d(), anchor.pos().pos().getCenter());
         Vector3dc s_sc = physShip.getTransform().getPositionInShip();
@@ -57,9 +59,9 @@ public class InducerControls {
         Vector3dc accel_d = new Vector3d(q_d.x(), q_d.y(), q_d.z()).mul(-2 / ts).mul(anchor.rotDamp());
         Vector3dc tRotationalResistance = new Vector3d(accel_d).mul(inertia);
 
-        physShip.applyInvariantForceToPos(fExtraGravity, r_sc_gravity);
-        physShip.applyInvariantForceToPos(fAirResistance, r_sc_resistance);
-        physShip.applyInvariantTorque(tRotationalResistance);
+        physShip.applyWorldForceToBodyPos(fExtraGravity, r_sc_gravity);
+        physShip.applyWorldForceToBodyPos(fAirResistance, r_sc_resistance);
+        physShip.applyWorldTorque(tRotationalResistance);
 
 
 
@@ -69,12 +71,12 @@ public class InducerControls {
         return scaleVector.get(scaleVector.minComponent());
     }
 
-    public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @NotNull  PhysShipWrapper motorShip, @NotNull PhysShipWrapper compShip) {
+    public static void dynamicMotorTickControls(LogicalDynamicMotor motor, @Nullable PhysShip motorShip, @NotNull PhysShip compShip) {
         if(!motor.free())return;
-
+        if(motorShip == null)return;
 
         double angle = VSMathUtils.get_yc2xc(motorShip, compShip, motor.motorDir(), motor.compDir());
-        double speed = VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getOmega(), compShip.getOmega(), motor.motorDir(), motor.compDir());
+        double speed = VSMathUtils.get_dyc2xc(motorShip, compShip, motorShip.getAngularVelocity(), compShip.getAngularVelocity(), motor.motorDir(), motor.compDir());
 
         motor.speedCallBack().accept(speed);
         motor.angleCallBack().accept(angle);
@@ -101,14 +103,16 @@ public class InducerControls {
 
         motor.controller().overrideError(metric);
 
-        compShip.applyInvariantTorque(controlTorque_wc);
-        if(motor.eliminateGravity())compShip.applyInvariantForce(new Vector3d(0, compShip.getMass() * 10, 0));
-        if(motor.shouldCounter())   motorShip.applyInvariantTorque(controlTorque_wc.mul(-1, new Vector3d()));
+        compShip.applyWorldTorque(controlTorque_wc);
+        if(motor.eliminateGravity())compShip.applyWorldForceToBodyPos(new Vector3d(0, compShip.getMass() * 10, 0), new Vector3d());
+        if(motor.shouldCounter())   motorShip.applyWorldTorque(controlTorque_wc.mul(-1, new Vector3d()));
     }
 
 
-    public static void sliderTickControls(LogicalSlider slider, @NotNull PhysShipWrapper selfShip, @NotNull PhysShipWrapper compShip){
+    public static void sliderTickControls(LogicalSlider slider, @Nullable PhysShip selfShip, @NotNull PhysShip compShip){
         if(!slider.free())return;
+        if(selfShip == null)return;
+
         Vector3dc own_local_pos = slider.selfContact();
         Vector3dc cmp_local_pos = slider.compContact();
 
@@ -155,23 +159,23 @@ public class InducerControls {
         Vector3dc own_r = new Vector3d(own_local_pos).sub(selfShip.getTransform().getPositionInShip());
         Vector3dc cmp_r = new Vector3d(cmp_local_pos).sub(compShip.getTransform().getPositionInShip());
 
-        compShip.applyInvariantForceToPos(controlForce_wc.mul( 1, new Vector3d()), cmp_r);
+        compShip.applyWorldForceToBodyPos(controlForce_wc.mul( 1, new Vector3d()), cmp_r);
         if(!slider.shouldCounter())return;
-        selfShip.applyInvariantForceToPos(controlForce_wc.mul(-1, new Vector3d()), own_r);
+        selfShip.applyWorldForceToBodyPos(controlForce_wc.mul(-1, new Vector3d()), own_r);
 
     }
 
-    public static void spatialTickControls(LogicalSpatial spatial, @NotNull PhysShipWrapper physShip){
+    public static void spatialTickControls(LogicalSpatial spatial, @NotNull PhysShip physShip){
         if(!spatial.shouldDrive())return;
         spatial.schedule().overridePhysics(physShip);
         Vector3dc controlTorque = spatial.schedule().calcControlTorque();
         Vector3dc controlForce  = spatial.schedule().calcControlForce();
 
-        physShip.applyInvariantForce(controlForce);
-        physShip.applyInvariantTorque(controlTorque);
+        physShip.applyWorldForceToBodyPos(controlForce, new Vector3d());
+        physShip.applyWorldTorque(controlTorque);
     }
 
-    public static void jetTickControls(LogicalJet jet, @NotNull PhysShipWrapper physShip) {
+    public static void jetTickControls(LogicalJet jet, @NotNull PhysShip physShip) {
         Vector3dc dir = jet.direction();
         double thrust = MathUtils.clamp(jet.thrust(), BlockPropertyConfig._JET_MAX_THRUST);
         if(!BlockPropertyConfig._CAN_JET_THRUST_BACK)thrust = MathUtils.relu(thrust);
@@ -184,10 +188,10 @@ public class InducerControls {
         Vector3dc jet_sc = ValkyrienSkies.set(new Vector3d(), jet.pos().pos().getCenter());
         Vector3dc relativeRadius_sc = jet_sc.sub(ship_sc, new Vector3d());
 
-        physShip.applyInvariantForceToPos(force_wc, relativeRadius_sc);
+        physShip.applyWorldForceToBodyPos(force_wc, relativeRadius_sc);
     }
 
-    public static void propellerTickControls(LogicalPropeller propeller, @NotNull PhysShipWrapper physShip) {
+    public static void propellerTickControls(LogicalPropeller propeller, @NotNull PhysShip physShip) {
         if(!propeller.canDrive())return;
         Vector3dc p_sc = ValkyrienSkies.set(new Vector3d(), propeller.pos().pos().getCenter());
         Vector3dc s_sc = physShip.getTransform().getPositionInShip();
@@ -203,12 +207,12 @@ public class InducerControls {
         Vector3dc thrust_wc = physShip.getTransform().getShipToWorld().transformDirection(thrust, new Vector3d());
 
 
-        physShip.applyInvariantForceToPos(thrust_wc, r_sc);
-        physShip.applyInvariantTorque(torque_wc);
+        physShip.applyWorldForceToBodyPos(thrust_wc, r_sc);
+        physShip.applyWorldTorque(torque_wc);
     }
 
 
-    public static ImmutablePhysPose kinematicMotorTickControls(LogicalKinematicMotor motor, Ship motorShip, ServerShip compShip){
+    public static ImmutablePhysPose kinematicMotorTickControls(LogicalKinematicMotor motor, Ship motorShip, LoadedServerShip compShip){
         Quaterniondc q_m = motorShip.getTransform().getShipToWorldRotation();
         Quaterniondc q_m_c = motor.context().self().getRot();
         Quaterniondc q_c_c = motor.context().comp().getRot();
@@ -232,7 +236,7 @@ public class InducerControls {
         Vector3dc p_c_contact_s = motor.context().comp().getPos();
         Vector3dc r_c_contact_s = p_c_contact_s.sub(compShip
                                                     .getInertiaData()
-                                                    .getCenterOfMassInShip()
+                                                    .getCenterOfMass()
                                                     .add(new Vector3d(0.5, 0.5, 0.5),
                                                             new Vector3d()),
                                                     new Vector3d());  //comp_sp.positionInShip()
@@ -250,7 +254,7 @@ public class InducerControls {
 
     }
 
-    public static void kinematicMotorTickControls(LogicalKinematicMotor motor, PhysShipWrapper motorShip, PhysShipWrapper compShip){
+    public static void kinematicMotorTickControls(LogicalKinematicMotor motor, PhysShip motorShip, PhysShip compShip){
         Quaterniondc q_m = motorShip.getTransform().getShipToWorldRotation();
         Quaterniondc q_m_c = motor.context().self().getRot();
         Quaterniondc q_c_c = motor.context().comp().getRot();
@@ -282,17 +286,18 @@ public class InducerControls {
         }else{
             motor.controller().updateTargetAngular(1d / 60);
         }
-        compShip.implOptional().ifPresent(impl ->
-        {
-            impl.setEnableKinematicVelocity(true);
-            impl.setStatic(true);
-            impl.setPoseVel(new PoseVel(p_t, q_t, new Vector3d(), new Vector3d()));
-        });
+
+//        compShip.implOptional().ifPresent(impl ->
+//        {
+//            impl.setEnableKinematicVelocity(true);
+//            impl.setStatic(true);
+//            impl.setPoseVel(new PoseVel(p_t, q_t, new Vector3d(), new Vector3d()));
+//        });
 
     }
 
 
-    public static void flapTickControls(LogicalFlap flap, PhysShipWrapper ship){
+    public static void flapTickControls(LogicalFlap flap, PhysShip ship){
         double lift = flap.lift();
         double drag = flap.drag();
 
@@ -328,8 +333,8 @@ public class InducerControls {
         Vector3dc combine_wc = lift_wc.add(drag_wc, new Vector3d());
         Vector3dc torque_wc  = r_wc.cross(combine_wc, new Vector3d());
 
-        ship.applyInvariantForce(combine_wc);
-        ship.applyInvariantTorque(torque_wc);
+        ship.applyWorldForceToBodyPos(combine_wc, new Vector3d());
+        ship.applyWorldTorque(torque_wc);
     }
 
 }

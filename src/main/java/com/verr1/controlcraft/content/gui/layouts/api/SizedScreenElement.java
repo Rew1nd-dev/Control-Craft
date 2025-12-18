@@ -1,7 +1,8 @@
 package com.verr1.controlcraft.content.gui.layouts.api;
 
-import com.simibubi.create.foundation.gui.element.ScreenElement;
+import net.createmod.catnip.gui.element.ScreenElement;
 import net.minecraft.client.gui.GuiGraphics;
+import org.jetbrains.annotations.NotNull;
 
 public interface SizedScreenElement extends ScreenElement {
 
@@ -18,7 +19,7 @@ public interface SizedScreenElement extends ScreenElement {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int i, int i1) {
+            public void render(@NotNull GuiGraphics guiGraphics, int i, int i1) {
                 element.render(guiGraphics, i, i1);
             }
         };
@@ -37,7 +38,7 @@ public interface SizedScreenElement extends ScreenElement {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int i, int i1) {
+            public void render(@NotNull GuiGraphics guiGraphics, int i, int i1) {
                 element.render(guiGraphics, i, i1);
             }
         };

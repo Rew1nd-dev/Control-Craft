@@ -1,8 +1,8 @@
 package com.verr1.controlcraft.foundation.data.constraint;
 
-import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
 
 public record ConnectContext(VSJointPose self, VSJointPose comp, boolean isDirty) {
 

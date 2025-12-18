@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.gui.factory;
 
-import com.jozufozu.flywheel.util.Color;
 import com.simibubi.create.foundation.gui.widget.Label;
 import com.verr1.controlcraft.content.gui.layouts.api.ComponentLike;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
@@ -181,7 +180,7 @@ public class Converter {
     }
 
     public static Style optionStyle(Style s){
-        return s.withBold(false).withItalic(true).withUnderlined(true).withColor(Color.SPRING_GREEN.getRGB());
+        return s.withBold(false).withItalic(true).withUnderlined(true).withColor(Color.GREEN.getRGB());
     }
 
     public static Style minMaxStyle(Style s){

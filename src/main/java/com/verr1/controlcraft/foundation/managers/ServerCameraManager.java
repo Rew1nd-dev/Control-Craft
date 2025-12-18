@@ -5,8 +5,6 @@ import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
-import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
@@ -16,14 +14,12 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
-import org.valkyrienskies.core.apigame.world.IPlayer;
-import org.valkyrienskies.core.apigame.world.PlayerState;
+import org.valkyrienskies.core.internal.world.VsiPlayer;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class ServerCameraManager {
     private static final HashMap<UUID, WorldBlockPos> player2Camera = new HashMap<>();
@@ -87,7 +83,7 @@ public class ServerCameraManager {
                 .orElse(RANDOM_UUID);
     }
 
-    public static Set<IPlayer> getAllWatchers(){
+    public static Set<VsiPlayer> getAllWatchers(){
         return player2Camera.values().stream()
                 .map(p -> BlockEntityGetter.INSTANCE.getBlockEntityAt(p, CameraBlockEntity.class).orElse(null))
                 .filter(Objects::nonNull)

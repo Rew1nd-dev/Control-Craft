@@ -1078,7 +1078,7 @@ public class GenericUIFactory {
 
     public static Runnable createSyncTasks(BlockPos boundPos, NetworkKey... keys){
         return () -> boundBlockEntity(boundPos, INetworkHandle.class).ifPresent(
-                be -> be.handler().request(keys)
+                be -> be.handler().request(false, keys)
         );
     }
 

@@ -52,7 +52,6 @@ import org.valkyrienskies.core.api.ships.ServerShip;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class MonitorBlockEntity extends AIBaseBlockEntity
 {

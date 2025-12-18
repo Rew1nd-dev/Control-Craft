@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.foundation.data.terminal;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
+import net.createmod.catnip.data.Couple;
 
 public record TerminalRowData(
         boolean enabled,

@@ -34,6 +34,7 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
 
 
     protected void queueUpdate(NetworkKey... keys){
+        if(isClientSide())return;
         lazySynchronizer.queueUpdate(keys);
     }
 

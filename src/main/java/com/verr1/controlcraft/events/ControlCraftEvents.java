@@ -2,21 +2,20 @@ package com.verr1.controlcraft.events;
 
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
-import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
+import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftAsyncDelegation;
 import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
-import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
+import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.utils.TimeCache;
 import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -30,6 +29,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import org.valkyrienskies.core.api.events.PhysTickEvent;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.concurrent.Executors;
 
@@ -42,7 +43,7 @@ public class ControlCraftEvents {
 
         // AttachmentRegistry.register();
         BlockEntityGetter.create(event.getServer());
-        ConstraintCenter.onServerStaring(event.getServer());
+        JointHandler.onServerStaring(event.getServer());
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftServer.LUA_THREAD = Executors.newSingleThreadExecutor();
@@ -57,6 +58,7 @@ public class ControlCraftEvents {
     public static void onServerStarted(ServerStartedEvent event) {
         AIServer.MANAGER.onServerStarted();
         BlockLinkPort.RUN_AT_PHYSICS_THREAD = BlockPropertyConfig._PHYSICS_THREAD_CIMULINK;
+        ValkyrienSkies.api().getPhysTickEvent().on(ControlCraftEvents::onPhysicsTickStart);
     }
 
     @SubscribeEvent
@@ -117,17 +119,18 @@ public class ControlCraftEvents {
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
-        ConstraintCenter.onServerStopping(event.getServer());
+        JointHandler.onServerStopping(event.getServer());
         BlockLinkPort.onClose();
     }
 
-    public static void onPhysicsTickStart(){
-        ComputerCraftDelegation.lockDelegateThread();
-        BlockLinkPort.prePhysicsTick();
+    public static void onPhysicsTickStart(PhysTickEvent event){
+        JointHandler.dispatchEvent(event);
+
+        if(event.getWorld().getDimension().equals(ValkyrienSkies.getDimensionId(ControlCraftServer.OVERWORLD))){
+            ComputerCraftAsyncDelegation.onPhysTick();
+            BlockLinkPort.prePhysicsTick();
+        }
     }
 
-    public static void onPhysicsTickEnd(){
-        ComputerCraftDelegation.freeDelegateThread();
-    }
 
 }

@@ -62,7 +62,7 @@ public class VerticalFlow implements SwitchableTab {
         boundBlockEntity().ifPresentOrElse(
                 be -> {
                     NetworkKey[] keys = map.toArray(NetworkKey[]::new);
-                    be.handler().request(keys);
+                    be.handler().request(false, keys);
                     be.handler().setDirty(keys);
                     AtomicInteger row = new AtomicInteger();
                     entries.forEach(port -> {

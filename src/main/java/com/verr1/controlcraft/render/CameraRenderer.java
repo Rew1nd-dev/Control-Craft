@@ -3,11 +3,12 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import kotlin.Pair;
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -15,7 +16,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3dc;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
     public CameraRenderer(BlockEntityRendererProvider.Context context) {
@@ -39,8 +39,8 @@ public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
 
         BlockState state = be.getBlockState();
         VertexConsumer solid = bufferSource.getBuffer(RenderType.translucent());
-        SuperByteBuffer lensBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.CAMERA_LENS, state);
-        SuperByteBuffer yawBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.CAMERA_YAW, state);
+        SuperByteBuffer lensBuffer = CachedBuffers.partialFacing(ControlCraftPartialModels.CAMERA_LENS, state);
+        SuperByteBuffer yawBuffer = CachedBuffers.partialFacing(ControlCraftPartialModels.CAMERA_YAW, state);
 
         Direction horizontal = be.getDirection();
 
@@ -56,13 +56,13 @@ public class CameraRenderer extends SafeBlockEntityRenderer<CameraBlockEntity> {
 
 
         yawBuffer
-                .rotateCentered(horizontal, hv.getFirst().floatValue())
+                .rotateCentered(hv.getFirst().floatValue(), horizontal)
                 .light(light)
                 .renderInto(ms, solid);
 
         lensBuffer
-                .rotateCentered(horizontal, hv.getFirst().floatValue())
-                .rotateCentered(vertical, hv.getSecond().floatValue())
+                .rotateCentered(hv.getFirst().floatValue(), horizontal)
+                .rotateCentered(hv.getSecond().floatValue(), vertical)
                 .light(light)
                 .renderInto(ms, solid);
     }

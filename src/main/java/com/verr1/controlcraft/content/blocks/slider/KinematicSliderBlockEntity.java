@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.blocks.slider;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.KSliderKineticPeripheral;
 import com.verr1.controlcraft.content.gui.layouts.api.IKinematicUIDevice;
@@ -15,16 +14,16 @@ import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
 import com.verr1.controlcraft.foundation.data.control.KinematicController;
-import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.*;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -34,10 +33,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.internal.joints.VSFixedJoint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.lang.Math;
-import java.util.List;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
 
@@ -154,6 +156,12 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
     }
 
     @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
+    }
+
+    @Override
     public @NotNull Direction getSlideDirection() {
         return getDirection();
     }
@@ -177,33 +185,26 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
         long compId = compShip.getId();
 
         Vector3dc sliDir = ValkyrienSkies.set(new Vector3d(), getSlideDirection().getNormal());
-        /*
+
         VSJoint joint = new VSFixedJoint(
-                selfId,
+                selfId == -1L ? null : selfId,
                 new VSJointPose(context.self().getPos(), context.self().getRot()),
-                compId,
+                compId == -1L ? null : compId,
                 new VSJointPose(context.comp().getPos().fma(
                         -MathUtils.clamp(
                                 controller.getTarget(),
                                 0.0,
                                 MAX_SLIDE_DISTANCE
-                        ), slideDirJoml, new Vector3d()),
+                        ),
+                        sliDir,
+                        new Vector3d()
+                ),
                         context.comp().getRot()
                 ),
-                new VSJointMaxForceTorque(1e20f, 1e20f)
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                1e-20
         );
-        overrideConstraint("control", joint);
-        * */
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                context.self().getPos().fma(getController().getTarget(), sliDir, new Vector3d()),
-                context.comp().getPos(), // This is the opposite with the case of assemble()
-                1.0E20,
-                0.0
-        );
-        overrideConstraint("control", fixed);
+        overrideRuntimeConstraint("control", joint);
         targetOfLastAppliedConstraint = controller.getTarget();
     }
 

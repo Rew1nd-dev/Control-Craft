@@ -9,17 +9,19 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.apigame.world.IPlayer;
-import org.valkyrienskies.core.apigame.world.PlayerState;
+import org.valkyrienskies.core.internal.world.VsiPlayer;
+import org.valkyrienskies.core.internal.world.VsiPlayerState;
 import org.valkyrienskies.mod.common.util.MinecraftPlayer;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
-public class CameraBoundFakePlayer extends FakePlayer implements IPlayer {
+
+public class CameraBoundFakePlayer extends FakePlayer implements VsiPlayer {
 
     private boolean isValid = false;
     private final int live = 30;
@@ -95,8 +97,8 @@ public class CameraBoundFakePlayer extends FakePlayer implements IPlayer {
 
     @NotNull
     @Override
-    public PlayerState getPlayerState() {
-        return new PlayerState(
+    public VsiPlayerState getPlayerState() {
+        return new VsiPlayerState(
                 owner.getCameraPosition(),
                 owner.readSelf().velocity(),
                 owner.getDimensionID(),
@@ -120,4 +122,8 @@ public class CameraBoundFakePlayer extends FakePlayer implements IPlayer {
         return new MinecraftPlayer(this);
     }
 
+    @Override
+    public @NotNull Set<Long> getForceWatchingShips() {
+        return Set.of(owner.getShipOrGroundID());
+    }
 }

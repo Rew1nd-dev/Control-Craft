@@ -2,11 +2,11 @@ package com.verr1.controlcraft.foundation.network.packets.specific;
 
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.terminal.TerminalRowSetting;
 import com.verr1.controlcraft.content.blocks.terminal.TerminalBlockEntity;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,9 +1,9 @@
 package com.verr1.controlcraft.unstable.blocks.attacker;
 
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.registry.AIBlockEntities;
 import com.verr1.controlcraft.unstable.ai.ui.AIUIFactory;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

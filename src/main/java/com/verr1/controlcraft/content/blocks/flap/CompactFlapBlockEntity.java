@@ -7,9 +7,6 @@ import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.content.contraptions.bearing.BearingContraption;
 import com.simibubi.create.content.contraptions.bearing.IBearingBlockEntity;
-import com.simibubi.create.foundation.utility.Color;
-import com.simibubi.create.foundation.utility.Couple;
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
@@ -32,6 +29,9 @@ import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.data.Couple;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -48,8 +48,8 @@ import org.joml.Vector3dc;
 
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         IReceiver, IBearingBlockEntity, IPlant
@@ -114,7 +114,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
-                .dispatchToSync()
+                .dispatchToSync().constantSync()
                 .register();
 
         buildRegistry(OFFSET)
@@ -124,7 +124,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
-                .dispatchToSync()
+                .dispatchToSync().constantSync()
                 .register();
 
         buildRegistry(LIFT)

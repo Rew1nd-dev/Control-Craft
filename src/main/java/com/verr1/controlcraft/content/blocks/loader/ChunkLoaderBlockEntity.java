@@ -50,6 +50,7 @@ public class ChunkLoaderBlockEntity extends OnShipBlockEntity {
 
     @Override
     public void tickServer() {
+        super.tickServer();
         tickClaimedChunks();
         tickClaimNew();
     }

@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.blocks.motor;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.DMotorKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.DynamicMotorForceInducer;
@@ -28,6 +27,7 @@ import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -41,7 +41,9 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.internal.joints.VSFixedJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
 
 import javax.annotation.Nullable;
 import java.lang.Math;
@@ -169,27 +171,26 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         Vector3dc v_own = q_self.transform(new Vector3d(0, 1, 0));
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
-        /*
-        * VSFixedJoint joint = new VSFixedJoint(
-                getShipID(),
+        VSFixedJoint joint = new VSFixedJoint(
+                getShipOrGroundIDNullable(),
                 new VSJointPose(context.self().getPos(), q_self),
                 getCompanionShipID(),
                 new VSJointPose(context.comp().getPos(), q_comp),
-                new VSJointMaxForceTorque(1e20f, 1e20f)
-        );
-        * */
-
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
-                getShipOrGroundID(),
-                getCompanionShipID(),
-                1.0E-20,
-                context.self().getPos().add(v_own, new Vector3d()),
-                context.comp().getPos().add(v_cmp, new Vector3d()),
-                1.0E20,
-                0.0
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                1e-20
         );
 
-        overrideConstraint("fix", fixed);
+//        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
+//                getShipOrGroundID(),
+//                getCompanionShipID(),
+//                1.0E-20,
+//                context.self().getPos().add(v_own, new Vector3d()),
+//                context.comp().getPos().add(v_cmp, new Vector3d()),
+//                1.0E20,
+//                0.0
+//        );
+
+        overrideConstraint("fix", joint);
         isLocked = true;
         setChanged();
     }
@@ -436,8 +437,16 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
 
     }
 
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
+    }
 
-
+    @Override
+    protected boolean validateJoints() {
+        return retrieveJoint("revolute") != null;
+    }
 
     @Override
     public void setStartingAngleOfCompanionShip(){

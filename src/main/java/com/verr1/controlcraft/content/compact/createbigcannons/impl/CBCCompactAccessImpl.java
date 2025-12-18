@@ -80,7 +80,7 @@ public class CBCCompactAccessImpl implements ICBCCompactAccess {
 
     @Override
     public Explosion createExplosion(Level level, double x, double y, double z, double radius, boolean fire, Level.ExplosionInteraction interaction) {
-        ShellExplosion impact =new ShellExplosion(
+        ShellExplosion impact = new ShellExplosion(
                 level,
                 null,
                 null,

@@ -2,6 +2,7 @@ package com.verr1.controlcraft.content.gui.wand;
 
 import com.simibubi.create.AllKeys;
 import com.verr1.controlcraft.content.blocks.joints.AbstractJointBlockEntity;
+import com.verr1.controlcraft.content.blocks.joints.RevoluteJointBlockEntity;
 import com.verr1.controlcraft.content.blocks.motor.*;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
 import com.verr1.controlcraft.content.blocks.slider.KinematicSliderBlockEntity;
@@ -16,6 +17,7 @@ import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
@@ -29,7 +31,8 @@ import org.joml.Vector3dc;
 import java.awt.*;
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
+
 
 @OnlyIn(Dist.CLIENT)
 public class WandGUI implements IGuiOverlay {
@@ -58,7 +61,7 @@ public class WandGUI implements IGuiOverlay {
     public void onKeyInput(int key, boolean pressed) {
         if (!isClientWandInHand())
             return;
-        if (key != AllKeys.TOOL_MENU.getBoundCode())
+        if (key != 342) // temp fix
             return;
 
         if (pressed && !selectionScreen.focused)
@@ -139,8 +142,19 @@ public class WandGUI implements IGuiOverlay {
         if(shouldSetModeByLooking)setModeByLooking();
         WandModesType.modeOf(currentType).onTick();
         renderOffset();
+        renderJointFace();
     }
 
+
+    public void renderJointFace() {
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return;
+        if(!WandGUI.isWrenchInHand())return;
+        if(MinecraftUtils.lookingAt() instanceof RevoluteJointBlockEntity rvl){
+            ClientOutliner.drawOutline(rvl.getBlockPos(), rvl.getJointDirection(), net.createmod.catnip.theme.Color.RED.getRGB(), "rvl_joint_dir");
+        }
+
+    }
 
 
     public void select(WandSelection selection){

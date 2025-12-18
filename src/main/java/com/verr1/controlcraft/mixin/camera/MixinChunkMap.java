@@ -34,9 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.utils.MinecraftUtils._isChunkInRange;
 import static net.minecraft.server.level.ChunkMap.isChunkInRange;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 @Mixin(ChunkMap.class)
 public abstract class MixinChunkMap {

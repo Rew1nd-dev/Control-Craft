@@ -91,7 +91,7 @@ public abstract class MixinCamera implements ICameraDuck {
         ShipTransform renderTransform = Optional
                 .ofNullable(shipMountedTo)
                 .map(ClientShip::getRenderTransform)
-                .orElse(new ShipTransformImpl(new Vector3d(), new Vector3d(), new Quaterniond(), new Vector3d(1, 1, 1)));
+                .orElse(ShipTransformImpl.Companion.createEmpty());
 
         Vector3dc playerBasePos =
                 renderTransform.getShipToWorld().transformPosition(inShipPlayerPosition, new Vector3d());
@@ -115,7 +115,7 @@ public abstract class MixinCamera implements ICameraDuck {
 
             if(thirdPerson && shipMountedTo != null){
 
-                final AABBi boundingBox = Optional.ofNullable((AABBi)shipMountedTo.getShipVoxelAABB()).orElse(new AABBi());
+                final AABBi boundingBox = Optional.ofNullable((AABBi)shipMountedTo.getShipAABB()).orElse(new AABBi());
 
                 double dist = ((boundingBox.lengthX() + boundingBox.lengthY() + boundingBox.lengthZ()) / 3.0) * 1.5;
 

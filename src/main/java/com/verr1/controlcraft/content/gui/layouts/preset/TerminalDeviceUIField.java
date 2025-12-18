@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.gui.layouts.preset;
 
 import com.simibubi.create.foundation.gui.widget.Label;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
@@ -12,6 +11,7 @@ import com.verr1.controlcraft.foundation.redstone.*;
 import com.verr1.controlcraft.foundation.type.descriptive.*;
 import com.verr1.controlcraft.registry.ControlCraftGuiTextures;
 import com.verr1.controlcraft.utils.ParseUtils;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.layouts.GridLayout;

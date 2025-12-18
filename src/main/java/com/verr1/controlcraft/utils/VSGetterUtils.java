@@ -2,7 +2,6 @@ package com.verr1.controlcraft.utils;
 
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,7 +16,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import javax.annotation.Nullable;
@@ -91,11 +90,5 @@ public class VSGetterUtils {
 
     }
 
-    public static @Nullable ServerShipWorldCore getServerShipWorldCore(){
-        return Optional
-                .ofNullable(ValkyrienSkies.getShipWorld(ControlCraftServer.INSTANCE))
-                .filter(ServerShipWorldCore.class::isInstance)
-                .map(ServerShipWorldCore.class::cast).orElse(null);
-    }
 
 }

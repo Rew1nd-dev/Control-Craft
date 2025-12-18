@@ -92,12 +92,7 @@ abstract class MixinGameRenderer {
         // player.sendSystemMessage(Component.literal("stage_5"));
         // Apply the ship render transform to [matrixStack]
         ShipTransform renderTransform = Optional.ofNullable(cameraClientShip).map(ClientShip::getRenderTransform).orElse(
-                new ShipTransformImpl(
-                        new Vector3d(),
-                        new Vector3d(),
-                        new Quaterniond(),
-                        new Vector3d(1, 1, 1)
-                )
+                ShipTransformImpl.Companion.createEmpty()
         );
         // player.sendSystemMessage(Component.literal("stage_6"));
 

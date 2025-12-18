@@ -4,7 +4,6 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.motor.AbstractMotor;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
@@ -14,12 +13,12 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
-import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
 
 import java.util.Map;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
+
 
 public class VSchematicCompactCenter {
 

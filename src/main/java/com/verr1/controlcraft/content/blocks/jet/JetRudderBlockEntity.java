@@ -1,25 +1,22 @@
 package com.verr1.controlcraft.content.blocks.jet;
 
-import com.simibubi.create.foundation.utility.Couple;
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
-import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.type.Side;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.LazyField;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
+import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,7 +26,7 @@ import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.impl.shadow.H;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class JetRudderBlockEntity extends OnShipBlockEntity implements
@@ -46,39 +43,41 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     private Vector3dc thisTickDirection = new Vector3d();
 
 
-    public float targetHorizontalAngle = 0;
+
     public LerpedFloat animatedVerticalAngle = LerpedFloat.angular();
-    public float targetVerticalAngle = 0;
-    public float targetThrust = 0;
+
+    public LazyField<Float> targetHorizontalAngle = new LazyField<>(0.0f, LazyField.FLOAT_COMP.apply(1e-3));
+    public LazyField<Float> targetVerticalAngle = new LazyField<>(0.0f, LazyField.FLOAT_COMP.apply(1e-3));
+    public LazyField<Float> targetThrust = new LazyField<>(0.0f, LazyField.FLOAT_COMP.apply(1e-3));
 
     private Direction vertical = Direction.UP;
     private Direction horizontal = Direction.NORTH;
 
     public float getTargetThrust() {
-        return targetThrust;
+        return targetThrust.get();
     }
 
     public float getTargetVerticalAngle() {
-        return targetVerticalAngle;
+        return targetVerticalAngle.get();
     }
 
     public float getTargetHorizontalAngle() {
-        return targetHorizontalAngle;
+        return targetHorizontalAngle.get();
     }
 
     public void setTargetHorizontalAngle(float targetHorizontalAngle) {
-        this.targetHorizontalAngle = (float) VSMathUtils.clamp(targetHorizontalAngle, Math.toRadians(90));
-        queueUpdate(HORIZONTAL);
+        this.targetHorizontalAngle.set((float) VSMathUtils.clamp(targetHorizontalAngle, Math.toRadians(90)));
+        if(this.targetHorizontalAngle.pollDirty())queueUpdate(HORIZONTAL);
     }
 
     public void setTargetVerticalAngle(float targetVerticalAngle) {
-        this.targetVerticalAngle = (float) VSMathUtils.clamp(targetVerticalAngle, Math.toRadians(90));
-        queueUpdate(VERTICAL);
+        this.targetVerticalAngle.set((float) VSMathUtils.clamp(targetVerticalAngle, Math.toRadians(90)));
+        if(this.targetVerticalAngle.pollDirty())queueUpdate(VERTICAL);
     }
 
     public void setTargetThrust(float targetThrust) {
-        this.targetThrust = targetThrust;
-        queueUpdate(THRUST);
+        this.targetThrust.set(targetThrust);
+        if(this.targetThrust.pollDirty())queueUpdate(THRUST);
     }
 
     public Direction getFiexdDirection() {
@@ -126,16 +125,15 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         registerFieldReadWriter(SerializeUtils.ReadWriter.of(this::getTargetVerticalAngle, this::setTargetVerticalAngle, SerializeUtils.FLOAT, VERTICAL), Side.RUNTIME_SHARED);
 
         * */
-        buildRegistry(THRUST).withBasic(SerializePort.of(this::getTargetThrust, this::setTargetThrust, SerializeUtils.FLOAT)).dispatchToSync().runtimeOnly().register();
-        buildRegistry(HORIZONTAL).withBasic(SerializePort.of(this::getTargetHorizontalAngle, this::setTargetHorizontalAngle, SerializeUtils.FLOAT)).dispatchToSync().runtimeOnly().register();
-        buildRegistry(VERTICAL).withBasic(SerializePort.of(this::getTargetVerticalAngle, this::setTargetVerticalAngle, SerializeUtils.FLOAT)).dispatchToSync().runtimeOnly().register();
+        buildRegistry(THRUST).withBasic(SerializePort.of(this::getTargetThrust, this::setTargetThrust, SerializeUtils.FLOAT)).dispatchToSync().runtimeOnly().constantSync().register();
+        buildRegistry(HORIZONTAL).withBasic(SerializePort.of(this::getTargetHorizontalAngle, this::setTargetHorizontalAngle, SerializeUtils.FLOAT)).dispatchToSync().runtimeOnly().constantSync().register();
+        buildRegistry(VERTICAL).withBasic(SerializePort.of(this::getTargetVerticalAngle, this::setTargetVerticalAngle, SerializeUtils.FLOAT)).dispatchToSync().runtimeOnly().constantSync().register();
     }
 
     public void setAnimatedAngles(double horizontal, double vertical, double thrust){
-        targetHorizontalAngle = (float) VSMathUtils.clamp(horizontal, Math.toRadians(90));
-        targetVerticalAngle = (float) VSMathUtils.clamp(vertical, Math.toRadians(90));
-        targetThrust = (float)thrust;
-        queueUpdate(THRUST, VERTICAL, HORIZONTAL);
+        setTargetThrust((float) thrust);
+        setTargetHorizontalAngle((float) horizontal);
+        setTargetVerticalAngle((float) vertical);
     }
 
 
@@ -209,7 +207,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         Vector3d dir = getRenderThrustDir().mul(-1);
 
         Vector3d p_wc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter()).fma(0.2, getDirectionJOML());
-        Vector3d v_wc = dir.mul(MathUtils.clamp1(targetThrust * 1e-3) * 3, new Vector3d());
+        Vector3d v_wc = dir.mul(MathUtils.clamp1(targetThrust.get() * 1e-3) * 3, new Vector3d());
 
         if(v_wc.lengthSquared() < 1e-2)return;
 
@@ -253,44 +251,20 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
         Vector3dc basis_v = getVerticalJOML();
         Vector3dc basis_t = getDirectionJOML().mul(-1);  // make it the opposite (set to bounded attacker direction)
 
-        float h = targetHorizontalAngle;
-        float v = targetVerticalAngle;
+        float h = targetHorizontalAngle.get();
+        float v = targetVerticalAngle.get();
 
         return JetBlockEntity.getThrustDir(h, v, basis_h, basis_v, basis_t);
     }
 
-
-    public void syncClient() {
-        if(!level.isClientSide){
-            var p = new BlockBoundClientPacket.builder(getBlockPos(), RegisteredPacketType.SYNC_0)
-                    .withDouble(targetHorizontalAngle)
-                    .withDouble(targetVerticalAngle)
-                    .withDouble(targetThrust)
-                    .build();
-
-
-            ControlCraftPackets.getChannel().send(PacketDistributor.ALL.noArg(), p);
-        }
-    }
-
     @OnlyIn(Dist.CLIENT)
     private void tickAnimation(){
-        animatedHorizontalAngle.chase(targetHorizontalAngle , 0.1, LerpedFloat.Chaser.EXP);
-        animatedVerticalAngle.chase(targetVerticalAngle , 0.1, LerpedFloat.Chaser.EXP);
+        animatedHorizontalAngle.chase(targetHorizontalAngle.get() , 0.1, LerpedFloat.Chaser.EXP);
+        animatedVerticalAngle.chase(targetVerticalAngle.get() , 0.1, LerpedFloat.Chaser.EXP);
         animatedHorizontalAngle.tickChaser();
         animatedVerticalAngle.tickChaser();
     }
 
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void handleClient(NetworkEvent.Context context, BlockBoundClientPacket packet) {
-        /*if(packet.getType() == RegisteredPacketType.SYNC_0){
-            double h = packet.getDoubles().get(0);
-            double v = packet.getDoubles().get(1);
-            double t = packet.getDoubles().get(2);
-            setAnimatedAngles(h, v, t);
-        }*/
-    }
 
 }

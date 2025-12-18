@@ -4,38 +4,35 @@ import com.verr1.controlcraft.content.valkyrienskies.attachments.ExpirableForceI
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.logical.LogicalAnchor;
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.LogicalDirectionTarget;
 import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControls;
-import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.world.PhysLevel;
+
+import java.util.function.Function;
 
 
-public class ConstantCruiseNavigator extends ExpirableForceInducer<LogicalDirectionTarget> {
+public final class ConstantCruiseNavigator extends ExpirableForceInducer<LogicalDirectionTarget> {
     private static final LogicalAnchor NO_GRAVITY = new LogicalAnchor(0, -10, 0, WorldBlockPos.NULL, false, false, false);
 
-    public static ConstantCruiseNavigator getOrCreate(ServerShip ship){
-        //return ship.getOrPutAttachment(AnchorForceInducer.class, AnchorForceInducer::new);
-        var obj = ship.getAttachment(ConstantCruiseNavigator.class);
-        if(obj == null){
-            obj = new ConstantCruiseNavigator();
-            ship.saveAttachment(ConstantCruiseNavigator.class, obj);
-        }
-        return obj;
+    public static ConstantCruiseNavigator getOrCreate(AttachmentHolder ship){
+        return ship.getOrPutAttachment(ConstantCruiseNavigator.class, ConstantCruiseNavigator::new);
     }
 
 
     @Override
     protected void consume(
             @NotNull PhysShip physShip,
-            @NotNull Function1<? super Long, ? extends PhysShip> lookupPhysShip,
-            @NotNull LogicalDirectionTarget context
-    ) {
-        InducerControls.anchorTickControls(NO_GRAVITY, PhysShipWrapper.of(physShip));
+            @NotNull Function<Long, @Nullable PhysShip> lookupPhysShip,
+            @NotNull LogicalDirectionTarget context,
+            PhysLevel world) {
+        InducerControls.anchorTickControls(NO_GRAVITY, physShip);
         AIControls.rotateControl(
-                PhysShipWrapper.of(physShip),
+                physShip,
                 context
         );
     }

@@ -10,6 +10,7 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.util.LazyTicker;
 import org.jetbrains.annotations.NotNull;
+import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
         setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CimulinkBus implements IBusContext {
+public final class CimulinkBus implements IBusContext {
     @JsonIgnore
     private final Map<String, Set<WorldBlockPos>> addresses = new ConcurrentHashMap<>();
     @JsonIgnore
@@ -115,14 +116,14 @@ public class CimulinkBus implements IBusContext {
     }
 
 
-    public static CimulinkBus getOrCreate(ServerShip ship){
-        //return ship.getOrPutAttachment(AnchorForceInducer.class, AnchorForceInducer::new);
-        var obj = ship.getAttachment(CimulinkBus.class);
-        if(obj == null){
-            obj = new CimulinkBus();
-            ship.saveAttachment(CimulinkBus.class, obj);
-        }
-        return obj;
+    public static CimulinkBus getOrCreate(AttachmentHolder ship){
+        return ship.getOrPutAttachment(CimulinkBus.class, CimulinkBus::new);
+//        var obj = ship.getAttachment(CimulinkBus.class);
+//        if(obj == null){
+//            obj = new CimulinkBus();
+//            ship.saveAttachment(CimulinkBus.class, obj);
+//        }
+//        return obj;
     }
 
     public static void tickAll(){

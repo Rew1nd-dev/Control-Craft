@@ -2,9 +2,9 @@ package com.verr1.controlcraft.content.gui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
-import com.simibubi.create.foundation.gui.element.ScreenElement;
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.verr1.controlcraft.utils.LatchBoolean;
+import net.createmod.catnip.gui.element.ScreenElement;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class PressableIconButton extends IconButton {

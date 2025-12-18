@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.gui.screens;
 
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
-import com.simibubi.create.foundation.utility.Components;
 import com.verr1.controlcraft.content.gui.widgets.FormattedLabel;
 import com.verr1.controlcraft.content.gui.widgets.IconSelectionScrollInput;
 import com.verr1.controlcraft.content.gui.widgets.SmallCheckbox;
@@ -90,9 +89,9 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
 
             name = UIContents.NAME.toUILabel(); // will be modified
             minTitle = UIContents.MIN.toDescriptiveLabel();
-            minField = new EditBox(font, 0, 0, input_len_x, len_y, Components.literal(""));
+            minField = new EditBox(font, 0, 0, input_len_x, len_y, Component.literal(""));
             maxTitle = UIContents.MAX.toDescriptiveLabel();
-            maxField = new EditBox(font, 0, 0, input_len_x, len_y, Components.literal(""));
+            maxField = new EditBox(font, 0, 0, input_len_x, len_y, Component.literal(""));
             toggleField = new SmallCheckbox(0, 0, 10, 10, MiscDescription.TURN_ON.specific().get(0), false);
 
             minField.setFilter(ParseUtils::tryParseDoubleFilter);
@@ -240,7 +239,7 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
 
         blockSelector.forOptions(
                 IntStream.range(0, pages)
-                        .mapToObj(i -> Components.literal("Page " + (i + 1)))
+                        .mapToObj(i -> Component.literal("Page " + (i + 1)))
                         .toList()
         );
 
@@ -255,9 +254,9 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
         setWindowSize(
                 Math.max(
                         background.width,
-                        PLAYER_INVENTORY.width
+                        PLAYER_INVENTORY.getWidth()
                 ),
-                background.height + 4 + PLAYER_INVENTORY.height
+                background.height + 4 + PLAYER_INVENTORY.getHeight()
         );
         super.init();
 
@@ -315,7 +314,7 @@ public class CircuitWirelessScreen extends AbstractSimiContainerScreen<CircuitWi
 
     @Override
     protected void renderBg(@NotNull GuiGraphics graphics, float p_97788_, int p_97789_, int p_97790_) {
-        int invX = getLeftOfCentered(PLAYER_INVENTORY.width);
+        int invX = getLeftOfCentered(PLAYER_INVENTORY.getWidth());
         int invY = topPos + background.height + 4;
         renderPlayerInventory(graphics, invX, invY);
 

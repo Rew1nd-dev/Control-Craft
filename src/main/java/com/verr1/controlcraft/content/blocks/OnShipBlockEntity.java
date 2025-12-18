@@ -4,13 +4,11 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
-import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -31,8 +29,7 @@ import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
-import org.valkyrienskies.core.impl.game.ships.DummyShipWorldServer;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -139,7 +136,7 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
     public @Nullable LoadedServerShip getLoadedServerShip(){
         if(level == null || level.isClientSide)return null;
         return Optional
-                .of(ValkyrienSkies.getShipWorld(level.getServer()))
+                .ofNullable(ValkyrienSkies.getShipWorld(level.getServer()))
                 .map((shipWorld -> shipWorld.getLoadedShips().getById(getShipOrGroundID()))).orElse(null);
     }
 
@@ -147,7 +144,7 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
     public @Nullable ClientShip getClientShip(){
         if(level == null || !level.isClientSide)return null;
         return Optional
-                .of(ValkyrienSkies.getShipWorld(Minecraft.getInstance()))
+                .ofNullable(ValkyrienSkies.getShipWorld(Minecraft.getInstance()))
                 .map(shipWorld -> shipWorld.getLoadedShips().getById(getShipOrGroundID())).orElse(null);
     }
 
@@ -199,15 +196,7 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
 
 
     public long getGroundBodyID(){
-        return Optional
-                .ofNullable(level)
-                .filter(ServerLevel.class::isInstance)
-                .map(ServerLevel.class::cast)
-                .map(ValkyrienSkies::getShipWorld)
-                .filter(sw -> !(sw instanceof DummyShipWorldServer))
-                .map(ServerShipWorldCore::getDimensionToGroundBodyIdImmutable)
-                .map(m -> m.get(getDimensionID()))
-                .orElse(-1L);
+        return Optional.ofNullable(getShipOn()).map(Ship::getId).orElse(-1L);
     }
 
     public long getShipOrGroundID(){
@@ -219,5 +208,8 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
     }
 
 
+    public @Nullable Long getShipOrGroundIDNullable(){
+        return Optional.of(getShipOrGroundID()).filter(id -> id != -1L).orElse(null);
+    }
 
 }

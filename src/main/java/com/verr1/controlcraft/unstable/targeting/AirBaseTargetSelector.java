@@ -8,6 +8,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 
@@ -35,7 +36,7 @@ public class AirBaseTargetSelector {
         this.self = self;
     }
 
-    protected Optional<ServerShip> getShipOf(long id){
+    protected Optional<LoadedServerShip> getShipOf(long id){
         return AIServer.MANAGER.getShipOf(id);
     }
 

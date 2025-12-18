@@ -18,7 +18,6 @@ import org.joml.Vector3dc;
 
 import java.awt.*;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlockEntity.CURRENT_CRUISE;
 
 public class PathAlongAction extends Action implements Interruptible {

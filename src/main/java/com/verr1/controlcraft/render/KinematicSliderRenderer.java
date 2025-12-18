@@ -3,11 +3,12 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlockEntity;
 import com.verr1.controlcraft.content.blocks.slider.KinematicSliderBlockEntity;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
 import com.verr1.controlcraft.utils.VSMathUtils;
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -25,7 +26,7 @@ public class KinematicSliderRenderer extends SafeBlockEntityRenderer<KinematicSl
         float distance = (float) VSMathUtils.clamp(be.getAnimatedTargetDistance(partialTicks), 32) ;
         BlockState state = be.getBlockState();
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());
-        SuperByteBuffer buffer_top = CachedBufferer.partialFacing(ControlCraftPartialModels.CONSTRAINT_SLIDER_TOP, state);
+        SuperByteBuffer buffer_top = CachedBuffers.partialFacing(ControlCraftPartialModels.CONSTRAINT_SLIDER_TOP, state);
 
 
         buffer_top.translate(new Vector3f(be.getDirectionJOML().get(new Vector3f()).mul(distance)))

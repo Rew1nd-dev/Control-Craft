@@ -1,14 +1,13 @@
 package com.verr1.controlcraft.content.links.scope;
 
 import com.simibubi.create.content.kinetics.base.IRotate;
-import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.utility.Iterate;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.gui.screens.OscilloscopeScreen;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
 import com.verr1.controlcraft.registry.ControlCraftShapes;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;

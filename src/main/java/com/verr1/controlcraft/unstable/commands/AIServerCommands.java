@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Quaterniond;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
 
 @Mod.EventBusSubscriber(modid = ControlCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)

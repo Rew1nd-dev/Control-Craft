@@ -1,9 +1,9 @@
 package com.verr1.controlcraft.content.links.signal;
 
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.CimulinkBlock;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;

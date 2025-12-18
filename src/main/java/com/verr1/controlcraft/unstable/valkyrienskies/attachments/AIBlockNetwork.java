@@ -11,6 +11,7 @@ import com.verr1.controlcraft.unstable.blocks.AiBoundFakePlayer;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
+import org.valkyrienskies.core.api.attachment.AttachmentHolder;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -27,7 +28,7 @@ import java.util.function.Supplier;
         setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AIBlockNetwork implements IAIListener{
+public final class AIBlockNetwork implements IAIListener{
     @JsonIgnore
     private final HashMap<WorldBlockPos, IAIListener> aiEventListeners = new HashMap<>();
     @JsonIgnore
@@ -85,16 +86,11 @@ public class AIBlockNetwork implements IAIListener{
                 .forEach(operation);
     }
 
-    public static AIBlockNetwork getOrCreate(ServerShip ship){
-        var obj = ship.getAttachment(AIBlockNetwork.class);
-        if(obj == null){
-            obj = new AIBlockNetwork();
-            ship.saveAttachment(AIBlockNetwork.class, obj);
-        }
-        return obj;
+    public static AIBlockNetwork getOrCreate(AttachmentHolder ship){
+        return ship.getOrPutAttachment(AIBlockNetwork.class, AIBlockNetwork::new);
     }
 
-    public static @Nullable AIBlockNetwork get(ServerShip ship){
+    public static @Nullable AIBlockNetwork get(AttachmentHolder ship){
         return ship.getAttachment(AIBlockNetwork.class);
     }
 

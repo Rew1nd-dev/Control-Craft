@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.blocks.kinetic.resistor;
 
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
-import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.cctweaked.peripheral.KineticResistorPeripheral;
@@ -23,6 +22,7 @@ import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -32,6 +32,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.valkyrienskies.core.impl.shadow.FI;
 
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
@@ -69,7 +70,10 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
                 .buildRegistry(FIELD)
                 .withBasic(CompoundTagPort.of(
                         () -> receiver().serialize(),
-                        t -> receiver().deserialize(t)
+                        t -> {
+                            receiver().deserialize(t);
+                            handler.syncForNear(true, FIELD);
+                        }
                 ))
                 .withClient(
                         new ClientBuffer<>(SerializeUtils.UNIT, CompoundTag.class)
@@ -110,6 +114,13 @@ public class KineticResistorBlockEntity extends SplitShaftBlockEntity implements
 
     }
 
+    @Override
+    public void initialize() {
+        super.initialize();
+        if(level != null && level.isClientSide){
+            handler().request(true, FIELD);
+        }
+    }
 
     @Override
     public void lazyTick() {

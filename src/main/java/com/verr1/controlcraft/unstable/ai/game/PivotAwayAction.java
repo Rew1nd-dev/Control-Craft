@@ -13,7 +13,6 @@ import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.EVADE_TARGET_ANGLE;
 import static com.verr1.controlcraft.unstable.ai.game.attacker.PathAlongAction.unsafeRenderPosition;
 

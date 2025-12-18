@@ -3,11 +3,11 @@ package com.verr1.controlcraft.registry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllCreativeModeTabs;
 import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.verr1.controlcraft.ControlCraft;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -22,7 +22,7 @@ public class ControlCraftCreativeTabs {
 
     public static final RegistryObject<CreativeModeTab> MAIN = REGISTER.register("main",
             () -> CreativeModeTab.builder()
-                    .title(Components.translatable("itemGroup."+ ControlCraft.MODID +".main"))
+                    .title(Component.translatable("itemGroup."+ ControlCraft.MODID +".main"))
                     .withTabsBefore(AllCreativeModeTabs.BASE_CREATIVE_TAB.getKey())
                     .icon(ControlCraftBlocks.CONSTRAINT_SERVO_MOTOR_BLOCK::asStack)
                     .displayItems((params, output) -> {
@@ -41,7 +41,7 @@ public class ControlCraftCreativeTabs {
 
     public static final RegistryObject<CreativeModeTab> CIMULINK = REGISTER.register("circuits",
             () -> CreativeModeTab.builder()
-                    .title(Components.translatable("itemGroup."+ ControlCraft.MODID +".cimulink"))
+                    .title(Component.translatable("itemGroup."+ ControlCraft.MODID +".cimulink"))
                     .withTabsBefore(AllCreativeModeTabs.BASE_CREATIVE_TAB.getKey())
                     .icon(CimulinkBlocks.LOGIC_GATE::asStack)
                     .displayItems((params, output) -> {
@@ -60,7 +60,7 @@ public class ControlCraftCreativeTabs {
 
     public static final RegistryObject<CreativeModeTab> AI = REGISTER.register("ai",
             () -> CreativeModeTab.builder()
-                    .title(Components.translatable("itemGroup."+ ControlCraft.MODID +".ai"))
+                    .title(Component.translatable("itemGroup."+ ControlCraft.MODID +".ai"))
                     .withTabsBefore(AllCreativeModeTabs.BASE_CREATIVE_TAB.getKey())
                     .icon(AllBlocks.DISPLAY_LINK::asStack)
                     .displayItems((params, output) -> {

@@ -1,16 +1,16 @@
 package com.verr1.controlcraft.unstable.valkyrienskies.controls;
 
-import com.verr1.controlcraft.foundation.vsapi.PhysShipWrapper;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.LogicalDirectionTarget;
 import com.verr1.controlcraft.utils.MathUtils;
 import org.joml.*;
+import org.valkyrienskies.core.api.ships.PhysShip;
 
 import static com.verr1.controlcraft.utils.MathUtils.safeNormalize;
 
 public class AIControls {
 
 
-    public static void rotateControl(PhysShipWrapper ship, LogicalDirectionTarget target){
+    public static void rotateControl(PhysShip ship, LogicalDirectionTarget target){
 
         double mass = ship.getMass();
         double turnRate = target.controller().inducedResistance();
@@ -35,8 +35,8 @@ public class AIControls {
         target.poseController().overridePhysics(ship);
         target.controller().overridePhysics(ship.getVelocity(), ship.getTransform().getShipToWorldRotation());
 
-        ship.applyInvariantForce(MathUtils.nonNan(f));
-        ship.applyInvariantTorque(MathUtils.nonNan(t));
+        ship.applyWorldForceToBodyPos(MathUtils.nonNan(f), new Vector3d());
+        ship.applyWorldTorque(MathUtils.nonNan(t));
     }
 
     private static Vector3dc tooSmallOrElse(Vector3dc v, Vector3dc o){

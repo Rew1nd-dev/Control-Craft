@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.content.gui.widgets;
 
-import com.simibubi.create.foundation.gui.widget.AbstractSimiWidget;
+import net.createmod.catnip.gui.widget.AbstractSimiWidget;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

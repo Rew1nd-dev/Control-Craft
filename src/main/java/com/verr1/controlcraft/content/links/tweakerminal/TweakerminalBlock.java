@@ -2,13 +2,13 @@ package com.verr1.controlcraft.content.links.tweakerminal;
 
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.utility.Iterate;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.content.compact.tweak.TweakControllerServerRecorder;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.registry.CimulinkBlockEntities;
+import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

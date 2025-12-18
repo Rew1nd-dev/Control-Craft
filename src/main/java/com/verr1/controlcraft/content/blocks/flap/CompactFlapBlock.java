@@ -2,11 +2,11 @@ package com.verr1.controlcraft.content.blocks.flap;
 
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import com.verr1.controlcraft.content.gui.factory.GenericUIFactory;
 import com.verr1.controlcraft.foundation.api.common.ISignalAcceptor;
 import com.verr1.controlcraft.registry.ControlCraftBlockEntities;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;

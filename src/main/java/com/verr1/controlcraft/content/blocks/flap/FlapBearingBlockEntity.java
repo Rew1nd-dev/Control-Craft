@@ -1,15 +1,13 @@
 package com.verr1.controlcraft.content.blocks.flap;
 
 import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.content.contraptions.bearing.BearingContraption;
 import com.simibubi.create.content.contraptions.bearing.IBearingBlockEntity;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Couple;
-import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
@@ -35,6 +33,8 @@ import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -147,6 +147,12 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
         if (physicalWing != null){
             sendData();
         }
+    }
+
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
     }
 
     @Override
@@ -332,7 +338,7 @@ public class FlapBearingBlockEntity extends OnShipBlockEntity implements
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
-                .dispatchToSync()
+                .dispatchToSync().constantSync()
                 //.runtimeOnly()
                 .register();
 

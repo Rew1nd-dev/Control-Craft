@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.foundation.executor.executables;
 
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.BlockPos;
@@ -12,6 +11,7 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
@@ -45,7 +45,7 @@ public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
     }
 
     public Vector3dc getXFacePos(){
-        ServerShip xShip = VSGameUtilsKt.getShipObjectManagingPos(level, xPos);
+        ServerShip xShip = VSGameUtilsKt.getLoadedShipManagingPos(level, xPos);
         if(xShip == null)return ValkyrienSkies.set(new Vector3d(), xPos.relative(xAlign).getCenter());
         Vector3dc xFace_sc = ValkyrienSkies.set(new Vector3d(), xPos.relative(xAlign).getCenter());
         Vector3dc xFace_wc = xShip.getTransform().getShipToWorld().transformPosition(xFace_sc, new Vector3d());
@@ -53,7 +53,7 @@ public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
     }
 
     public Quaterniondc getXBaseQuaternion(){
-        ServerShip xShip = VSGameUtilsKt.getShipObjectManagingPos(level, xPos);
+        ServerShip xShip = VSGameUtilsKt.getLoadedShipManagingPos(level, xPos);
         if(xShip == null)return new Quaterniond();
         Quaterniondc xBaseQuaternion = xShip.getTransform().getShipToWorldRotation();
         return xBaseQuaternion;

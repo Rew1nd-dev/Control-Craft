@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.blocks.jet;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.JetForceInducer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -20,11 +19,11 @@ import com.verr1.controlcraft.foundation.data.logical.LogicalJet;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -39,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.List;
 import java.util.Optional;
@@ -191,6 +191,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public void tickServer() {
+        super.tickServer();
         syncAttachedJet();
         syncAttachedInducer();
         // syncForNear(true, FIELD);
@@ -204,7 +205,11 @@ public class JetBlockEntity extends OnShipBlockEntity implements
     }
 
 
-
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
+    }
 
 
 

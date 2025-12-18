@@ -44,8 +44,6 @@ import java.awt.*;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.*;
 
 public class AiAttackerBlockEntity extends AiPlaneBase implements

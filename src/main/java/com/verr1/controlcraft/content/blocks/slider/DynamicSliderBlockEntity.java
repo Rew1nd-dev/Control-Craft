@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.blocks.slider;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.utility.Couple;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.create.DSliderKineticPeripheral;
@@ -31,11 +30,11 @@ import com.verr1.controlcraft.foundation.type.descriptive.CheatMode;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.descriptive.LockMode;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -49,7 +48,9 @@ import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.lang.Math;
 import java.util.List;
@@ -201,20 +202,25 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         long compId = compShip.getId();
 
 
-        Vector3dc sliDir = ValkyrienSkies.set(new Vector3d(), getSlideDirection().getNormal());
+
+        float d = (float) getSlideDistance();
 
 
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
-                selfId,
-                compId,
-                1.0E-20,
-                context.self().getPos().fma(getSlideDistance(), sliDir, new Vector3d()),
-                context.comp().getPos(), // This is the opposite with the case of assemble()
-                1.0E20,
-                0.0
+        VSDistanceJoint joint = new VSDistanceJoint(
+                selfId == -1 ? null : selfId,
+                context.self(),
+                compId == -1 ? null : compId,
+                context.comp(),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                1e-20,
+                d - 1e-4f,
+                d + 1e-4f,
+                1e-20f,
+                null,
+                null
         );
 
-        overrideConstraint("fix", fixed);
+        overrideConstraint("fix", joint);
 
         isLocked = true;
         setChanged();
@@ -375,6 +381,23 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
 
         lazyTickRate = 20;
 
+    }
+
+    @Override
+    public void lazyTickServer() {
+        super.lazyTickServer();
+        validateJoint();
+    }
+
+    @Override
+    protected boolean validateJoints() {
+        return retrieveJoint("revolute") != null;
+    }
+
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlockEntity;
 import com.verr1.controlcraft.content.cctweaked.peripheral.SpinalyzerPeripheral;
+import com.verr1.controlcraft.content.compact.createbigcannons.CreateBigCannonsCompact;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
@@ -15,7 +16,6 @@ import com.verr1.controlcraft.unstable.ai.core.BehaviorTree;
 import com.verr1.controlcraft.unstable.ai.core.Blackboard;
 import com.verr1.controlcraft.unstable.ai.game.SharedAIKeys;
 import com.verr1.controlcraft.unstable.ai.game.cruiser.AirBaseAwareness;
-import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
 import com.verr1.controlcraft.unstable.valkyrienskies.attachments.ConstantCruiseNavigator;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.CruiseController;
 import com.verr1.controlcraft.unstable.valkyrienskies.context.LogicalDirectionTarget;
@@ -31,10 +31,6 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import rbasamoyai.createbigcannons.CreateBigCannons;
-import rbasamoyai.createbigcannons.munitions.ImpactExplosion;
-import rbasamoyai.createbigcannons.munitions.ShellExplosion;
-import rbasamoyai.createbigcannons.munitions.autocannon.flak.FlakExplosion;
 
 import java.util.Optional;
 
@@ -219,16 +215,21 @@ public abstract class AiPlaneBase extends AIBaseBlockEntity implements
     public void explode(){
         if(level == null)return;
         Vector3dc p = getPosition();
-        ShellExplosion impact2 = new ShellExplosion(
-                level,
-                null,
-                null,
-                p.x(), p.y(), p.z(),
-                3,
-                false,
-                Level.ExplosionInteraction.NONE
+//        ShellExplosion impact2 = new ShellExplosion(
+//                level,
+//                null,
+//                null,
+//                p.x(), p.y(), p.z(),
+//                3,
+//                false,
+//                Level.ExplosionInteraction.NONE
+//        );
+//        CreateBigCannons.handleCustomExplosion(level, impact2);
+
+        CreateBigCannonsCompact.createExplosion(
+                level, p.x(), p.y(), p.z(), 16, false, Level.ExplosionInteraction.NONE
         );
-        CreateBigCannons.handleCustomExplosion(level, impact2);
+
         // level.explode(null, p.x(), p.y(), p.z(), 4, Level.ExplosionInteraction.NONE);
     }
 

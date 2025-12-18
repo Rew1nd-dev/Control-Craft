@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.blocks.motor;
 
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.content.create.KMotorKineticPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.controls.InducerControls;
 import com.verr1.controlcraft.content.valkyrienskies.transform.KinematicMotorTransformProvider;
@@ -24,11 +23,11 @@ import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.foundation.type.descriptive.TargetMode;
-import com.verr1.controlcraft.foundation.vsapi.PhysPose;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -41,7 +40,11 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.api.ships.properties.PhysPose;
+import org.valkyrienskies.core.internal.joints.VSFixedJoint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
 
 import java.lang.Math;
 import java.util.Optional;
@@ -172,6 +175,11 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         );
     }
 
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, FIELD);
+    }
 
     private void tickTarget(){
         if(mode == TargetMode.VELOCITY){
@@ -182,9 +190,11 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     }
 
     private void tickConstraint(){
+        if(noCompanionShip())return;
         tickTarget();
         if(Math.abs(targetOfLastAppliedConstraint - controller.getTarget()) < Math.pow(10, compliance) + 1e-6)return;
         if(level == null || level.isClientSide)return;
+        queueUpdate(ANIMATED_ANGLE);
         long compID = Optional.ofNullable(getCompanionServerShip()).map(Ship::getId).orElse(-1L);
         if(compID == -1)return;
         Quaterniondc q_self = new
@@ -205,16 +215,15 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
 
-        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
-                getShipOrGroundID(),
-                getCompanionShipID(),
-                1.0E-20,
-                context.self().getPos().add(v_own, new Vector3d()),
-                context.comp().getPos().add(v_cmp, new Vector3d()),
-                1.0E20,
-                0.0
+        VSJoint joint = new VSFixedJoint(
+                getShipOrGroundIDNullable(),
+                new VSJointPose(context.self().getPos(), q_self),
+                compID,
+                new VSJointPose(context.comp().getPos(), q_comp),
+                new VSJointMaxForceTorque(1e20f, 1e20f),
+                1e-20
         );
-        overrideConstraint("control", fixed);
+        overrideRuntimeConstraint("control", joint);
         targetOfLastAppliedConstraint = controller.getTarget();
     }
 
@@ -261,15 +270,16 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     }
 
     public @Nullable PhysPose tickPose(){
-        LoadedServerShip compShip = getCompanionServerShip();
-        LogicalKinematicMotor motor = getLogicalMotor();
-        Ship selfShip = getShipOn();
-        if(compShip == null || motor == null)return null;
-        return InducerControls.kinematicMotorTickControls(
-                motor,
-                Optional.ofNullable(selfShip).orElse(new GroundBodyShip()),
-                compShip
-        );
+//        LoadedServerShip compShip = getCompanionServerShip();
+//        LogicalKinematicMotor motor = getLogicalMotor();
+//        Ship selfShip = getShipOn();
+//        if(compShip == null || motor == null)return null;
+//        return InducerControls.kinematicMotorTickControls(
+//                motor,
+//                Optional.ofNullable(selfShip).orElse(new GroundBodyShip()),
+//                compShip
+//        );
+        return null;
     }
 
     @Override
@@ -312,11 +322,12 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     }
 
     public void syncAttachTransformProviderServer(){
-        if(level != null && level.isClientSide)return;
-        Optional
-                .ofNullable(getCompanionServerShip())
-                .map(KinematicMotorTransformProvider::replaceOrCreate)
-                .ifPresent(prov -> Optional.ofNullable(tickPose()).ifPresent(prov::set));
+//        if(level != null && level.isClientSide)return;
+//        Optional
+//                .ofNullable(getCompanionServerShip())
+//                .map(KinematicMotorTransformProvider::replaceOrCreate)
+//                .ifPresent(prov -> Optional.ofNullable(tickPose())
+//                        .ifPresent(prov::set));
     }
 
 

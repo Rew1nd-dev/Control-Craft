@@ -8,10 +8,13 @@ import org.joml.primitives.AABBd;
 import org.joml.primitives.AABBdc;
 import org.joml.primitives.AABBi;
 import org.joml.primitives.AABBic;
+import org.valkyrienskies.core.api.bodies.properties.BodyKinematics;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
 import org.valkyrienskies.core.api.ships.properties.IShipActiveChunksSet;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
+import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsBuilderImpl;
+import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 
 public class GroundBodyShip implements Ship {
@@ -53,10 +56,6 @@ public class GroundBodyShip implements Ship {
         throw new UnsupportedOperationException("GroundBodyShip does not have chunk claim dimension, How is this method called ??");
     }
 
-    @Override
-    public void setChunkClaimDimension(@NotNull String s) {
-        throw new UnsupportedOperationException("GroundBodyShip does not have chunk claim dimension, How is this method called ??");
-    }
 
     @NotNull
     @Override
@@ -86,5 +85,10 @@ public class GroundBodyShip implements Ship {
     @Override
     public IShipActiveChunksSet getActiveChunksSet() {
         throw new UnsupportedOperationException("GroundBodyShip does not have active chunk set, How is this method called ??");
+    }
+
+    @Override
+    public @NotNull BodyKinematics getKinematics() {
+        return new BodyKinematicsBuilderImpl().build();
     }
 }

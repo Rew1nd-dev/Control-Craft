@@ -3,7 +3,6 @@ package com.verr1.controlcraft.mixin.camera;
 
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
-import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -16,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.Optional;
 

@@ -32,6 +32,8 @@ public class NetworkHandler {
     private final HashMap<NetworkKey, SymmetricPort> saveLoads = new HashMap<>();
 
 
+    private final Set<NetworkKey> constantSyncKeys = new HashSet<>();
+
     private final SmartBlockEntity delegate;
 
     public NetworkHandler(SmartBlockEntity delegate) {
@@ -73,7 +75,7 @@ public class NetworkHandler {
     }
 
     public List<NetworkKey> getSyncKeys(){
-        return simplex.keySet().stream().toList();
+        return constantSyncKeys.stream().toList(); //simplex.keySet().stream().toList();
     }
 
     public List<NetworkKey> getSaveLoadKeys(){
@@ -100,18 +102,18 @@ public class NetworkHandler {
 
 
 
-    public void syncForPlayer(boolean simplex, ServerPlayer player, NetworkKey... key){
-        dispatchChannel(PacketDistributor.PLAYER.with(() -> player), simplex, key);
+    public void syncForPlayer(boolean useField, ServerPlayer player, NetworkKey... key){
+        dispatchChannel(PacketDistributor.PLAYER.with(() -> player), useField, key);
     }
 
-    public void syncForAllPlayers(boolean simplex, NetworkKey... key){
+    public void syncForAllPlayers(boolean useField, NetworkKey... key){
         if(delegate.getLevel() == null || delegate.getLevel().isClientSide)return;
-        dispatchChannel(PacketDistributor.ALL.noArg(), simplex, key);
+        dispatchChannel(PacketDistributor.ALL.noArg(), useField, key);
     }
 
-    public void request(NetworkKey... requests){
+    public void request(boolean useField, NetworkKey... requests){
         if(delegate.getLevel() == null || !delegate.getLevel().isClientSide)return;
-        var p = new LazyRequestBlockEntitySyncPacket(delegate.getBlockPos(), List.of(requests));
+        var p = new LazyRequestBlockEntitySyncPacket(delegate.getBlockPos(), useField, List.of(requests));
         ControlCraftPackets.getChannel().sendToServer(p);
     }
 
@@ -119,7 +121,7 @@ public class NetworkHandler {
         syncForPlayer(false, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class));
     }
 
-    public void syncForNear(boolean simplex, NetworkKey... key){
+    public void syncForNear(boolean useField, NetworkKey... key){
         if(delegate.getLevel() == null || delegate.getLevel().isClientSide)return;
         BlockPos pos = delegate.getBlockPos();
         dispatchChannel(
@@ -130,7 +132,7 @@ public class NetworkHandler {
                                 Objects.requireNonNull(delegate.getLevel()).dimension()
                         )
                 ),
-                simplex,
+                useField,
                 key
         );
     }
@@ -380,6 +382,10 @@ public class NetworkHandler {
         simplex.put(key, new SymmetricPort(server));
     }
 
+    private void asConstant(NetworkKey key){
+        constantSyncKeys.add(key);
+    }
+
     public class Registry {
         Slot<CompoundTag> server = Slot.createEmpty(CompoundTag.class);
         ClientBuffer<?> client = null;
@@ -387,6 +393,7 @@ public class NetworkHandler {
         boolean asSaveLoad = true;
         boolean dispatchToBuffer = false;
         boolean dispatchToSync = false;
+        boolean isConstantSync = false;
 
         public Registry(NetworkKey key){
             this.key = key;
@@ -408,6 +415,11 @@ public class NetworkHandler {
             return this;
         }
 
+        public Registry constantSync(){
+            isConstantSync = true;
+            return this;
+        }
+
         public Registry runtimeOnly(){
             asSaveLoad = false;
             return this;
@@ -421,6 +433,7 @@ public class NetworkHandler {
             if(asSaveLoad)registerSaveLoads(key, server);
             if(dispatchToSync)registerSync(key, server);
             if(dispatchToBuffer)registerAsymmetric(key, server, client);
+            if(isConstantSync && dispatchToSync)asConstant(key);
         }
 
 

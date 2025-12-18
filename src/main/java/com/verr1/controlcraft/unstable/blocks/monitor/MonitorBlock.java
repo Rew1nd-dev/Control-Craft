@@ -1,10 +1,10 @@
 package com.verr1.controlcraft.unstable.blocks.monitor;
 
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.registry.AIBlockEntities;
 import com.verr1.controlcraft.unstable.ai.ui.AIUIFactory;
 import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlockEntity;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

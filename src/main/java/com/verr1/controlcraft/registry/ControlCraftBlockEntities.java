@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.registry;
 
-import com.simibubi.create.content.kinetics.base.ShaftInstance;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
+import com.simibubi.create.content.kinetics.base.ShaftVisual;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlockEntity;
@@ -57,15 +57,16 @@ public class ControlCraftBlockEntities {
             .validBlock(ControlCraftBlocks.ANCHOR_BLOCK)
             .register();
 
-    public static final BlockEntityEntry<DynamicRevoluteMotorBlockEntity> SERVO_MOTOR_BLOCKENTITY = REGISTRATE
-            .blockEntity(DynamicRevoluteMotorBlock.ID, DynamicRevoluteMotorBlockEntity::new)
-            .validBlock(ControlCraftBlocks.SERVO_MOTOR_BLOCK)
-            .renderer(()-> DynamicRevoluteMotorRenderer::new)
-            .register();
 
     public static final BlockEntityEntry<DynamicJointMotorBlockEntity> JOINT_MOTOR_BLOCKENTITY = REGISTRATE
             .blockEntity(DynamicJointMotorBlock.ID, DynamicJointMotorBlockEntity::new)
             .validBlock(ControlCraftBlocks.JOINT_MOTOR_BLOCK)
+            .register();
+
+    public static final BlockEntityEntry<DynamicRevoluteMotorBlockEntity> SERVO_MOTOR_BLOCKENTITY = REGISTRATE
+            .blockEntity(DynamicRevoluteMotorBlock.ID, DynamicRevoluteMotorBlockEntity::new)
+            .validBlock(ControlCraftBlocks.SERVO_MOTOR_BLOCK)
+            .renderer(()-> DynamicRevoluteMotorRenderer::new)
             .register();
 
     public static final BlockEntityEntry<DynamicSliderBlockEntity> SLIDER_CONTROLLER_BLOCKENTITY = REGISTRATE
@@ -169,14 +170,14 @@ public class ControlCraftBlockEntities {
 
     public static final BlockEntityEntry<KineticProxyBlockEntity> KINETIC_PROXY_BLOCKENTITY = REGISTRATE
             .blockEntity(KineticProxyBlock.ID, KineticProxyBlockEntity::new)
-            .instance(() -> ShaftInstance::new, false)
+            .visual(() -> ShaftVisual::new)
             .validBlock(ControlCraftBlocks.KINETIC_PROXY_BLOCK)
             .renderer(() -> ShaftRenderer::new)
             .register();
 
     public static final BlockEntityEntry<KineticResistorBlockEntity> KINETIC_RESISTOR_BLOCKENTITY = REGISTRATE
             .blockEntity(KineticResistorBlock.ID, KineticResistorBlockEntity::new)
-            .instance(() -> ShaftInstance::new, false)
+            .visual(() -> ShaftVisual::new)
             .validBlock(ControlCraftBlocks.KINETIC_RESISTOR_BLOCK)
             .renderer(() -> ShaftRenderer::new)
             .register();

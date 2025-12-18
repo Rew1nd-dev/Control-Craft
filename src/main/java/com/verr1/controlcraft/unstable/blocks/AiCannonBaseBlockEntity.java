@@ -16,8 +16,8 @@ import org.joml.Vector3dc;
 
 import java.util.Objects;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 import static com.verr1.controlcraft.unstable.ai.game.SharedAIKeys.ARROW;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 public abstract class AiCannonBaseBlockEntity extends AiUtilBlockEntity implements IAirCannon, IPlant {
 

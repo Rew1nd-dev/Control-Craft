@@ -23,7 +23,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+
 
 public class AIBaseBlockEntity extends OnShipBlockEntity implements
         IAIListener

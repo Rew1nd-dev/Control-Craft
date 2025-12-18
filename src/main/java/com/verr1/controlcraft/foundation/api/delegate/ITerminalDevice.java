@@ -1,12 +1,11 @@
 package com.verr1.controlcraft.foundation.api.delegate;
 
-import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Couple;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.field.ExposedFieldWrapper;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotDirection;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
 import com.verr1.controlcraft.utils.MinecraftUtils;
+import net.createmod.catnip.data.Couple;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -75,7 +74,7 @@ public interface ITerminalDevice{
     default boolean TerminalDeviceToolTip(List<Component> tooltip, boolean isPlayerSneaking) {
         Direction dir = MinecraftUtils.lookingAtFaceDirection();
         if(dir == null)return true;
-        tooltip.add(Components.literal("    Face " + dir + " Bounded:"));
+        tooltip.add(Component.literal("    Face " + dir + " Bounded:"));
         fields().forEach(f -> {
             if(!f.directionOptional.test(dir))return;
             String info = f.type.asComponent().getString();

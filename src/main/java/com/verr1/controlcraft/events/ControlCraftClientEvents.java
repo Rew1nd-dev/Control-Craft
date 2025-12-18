@@ -3,11 +3,12 @@ package com.verr1.controlcraft.events;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
 import com.verr1.controlcraft.unstable.pathing.DebugTester;
+import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.render.DefaultSuperRenderTypeBuffer;
+import net.createmod.catnip.render.SuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -57,7 +58,7 @@ public class ControlCraftClientEvents {
 
         PoseStack ms = event.getPoseStack();
         ms.pushPose();
-        SuperRenderTypeBuffer buffer = SuperRenderTypeBuffer.getInstance();
+        SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
         float partialTicks = AnimationTickHolder.getPartialTicks();
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
                 .getPosition();
