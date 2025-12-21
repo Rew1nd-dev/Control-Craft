@@ -7,37 +7,34 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.compact.vmod.version.VSchematicCompactCimulinkV1;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
-import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.sources.SignalGenerator;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.EncloseLoopException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
-import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.LuacuitLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.BlockPort;
 import com.verr1.controlcraft.utils.*;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.shao.valkyrien_space_war.particle.explotion.ExplosionSmokeOptions;
 import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.LuaError;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // for connection recording, forming a graph
@@ -53,6 +50,7 @@ public abstract class BlockLinkPort {
     private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> CACHE = CacheBuilder.newBuilder()
             .maximumSize(1024)
             .refreshAfterWrite(2, TimeUnit.SECONDS)
+            .expireAfterAccess(4, TimeUnit.SECONDS)
             .build(
                     new CacheLoader<>() {
                         @Override
@@ -230,9 +228,10 @@ public abstract class BlockLinkPort {
 
                     }catch (IllegalArgumentException e){
                         ControlCraft.LOGGER.error("Error during propagation when trying propagate to:{}, exception: {}", nextBlp, e);
+                        nextBlp.removeAllLinks();
                     }catch (EncloseLoopException e){
                         ControlCraft.LOGGER.error("Enclosed loop detected: ", e);
-                        BlockEntityGetter.playerAround(blp.pos(), 5).forEach(s ->
+                        BlockEntityGetter.playerAround(blp.pos(), 25).forEach(s ->
                                 s.sendSystemMessage(Component.literal("Enclosed Loop Detected, A loop must contain at least one temporal circuit (shifter, ff etc)")));
                         blp.removeAllLinks();
                     }
@@ -760,12 +759,34 @@ public abstract class BlockLinkPort {
         return FORWARD.serialize(forwardLinks);
     }
 
+    public List<VSchematicCompactCimulinkV1.CenterAndId> collectVModCompact(){
+        List<VSchematicCompactCimulinkV1.CenterAndId> result = new ArrayList<>();
+        forwardLinks.values().stream().flatMap(Collection::stream)
+                .forEach(bp -> result.add(VSchematicCompactCimulinkV1.CenterAndId.of(bp)));
+        backwardLinks.values().forEach(
+                bp -> result.add(VSchematicCompactCimulinkV1.CenterAndId.of(bp))
+        );
+        return result;
+    }
+
     public void modifyWithOffset(BlockPos offset){
-        ControlCraft.LOGGER.debug("modifying with offset: {}", offset.toShortString());
+//        ControlCraft.LOGGER.debug("modifying with offset: {}", offset.toShortString());
+//        Map<String, BlockPort> backwardLinksNew = new HashMap<>();
+//        Map<String, Set<BlockPort>> forwardLinksNew = new HashMap<>();
+//        backwardLinks.forEach((k, v) -> backwardLinksNew.put(k, v.offset(offset)));
+//        forwardLinks.forEach((k, vs) -> forwardLinksNew.put(k, vs.stream().map(v -> v.offset(offset)).collect(Collectors.toSet())));
+//        backwardLinks.clear();
+//        forwardLinks.clear();
+//        backwardLinks.putAll(backwardLinksNew);
+//        forwardLinks.putAll(forwardLinksNew);
+        modifyWithOffset($ -> offset);
+    }
+
+    public void modifyWithOffset(Function<BlockPos, BlockPos> offsetComputer){
         Map<String, BlockPort> backwardLinksNew = new HashMap<>();
         Map<String, Set<BlockPort>> forwardLinksNew = new HashMap<>();
-        backwardLinks.forEach((k, v) -> backwardLinksNew.put(k, v.offset(offset)));
-        forwardLinks.forEach((k, vs) -> forwardLinksNew.put(k, vs.stream().map(v -> v.offset(offset)).collect(Collectors.toSet())));
+        backwardLinks.forEach((k, v) -> backwardLinksNew.put(k, v.offset(offsetComputer)));
+        forwardLinks.forEach((k, vs) -> forwardLinksNew.put(k, vs.stream().map(v -> v.offset(offsetComputer)).collect(Collectors.toSet())));
         backwardLinks.clear();
         forwardLinks.clear();
         backwardLinks.putAll(backwardLinksNew);

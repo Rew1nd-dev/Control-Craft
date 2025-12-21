@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.compact.vmod;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.motor.AbstractMotor;
-import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
@@ -18,7 +17,6 @@ import org.valkyrienskies.core.api.ships.Ship;
 import java.util.Map;
 
 import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
-
 
 public class VSchematicCompactCenter {
 
@@ -96,68 +94,19 @@ public class VSchematicCompactCenter {
 
     }
 
-    public static @Nullable CompoundTag PreWriteCimulinkVModCompact(CimulinkBlockEntity<?> cbe){
-        CompoundTag linkOriginal = new CompoundTag();
-        CompoundTag compact = new CompoundTag();
-        cbe.writeCompact(linkOriginal);
-        Ship self = cbe.getShipOn();
-        if(self == null)return null;
-        compact.putLong("o_self_ID", self.getId());
 
-        linkOriginal.put("compact", compact);
-        return linkOriginal;
-    }
 
-    public static CompoundTag PreCimulinkReadVModCompact(
-            @NotNull ServerLevel serverLevel,
-            @NotNull Map<Long, Long> map,
-            @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> offsetMap,
-            @Nullable CompoundTag tagToModify
-    ){
 
-        ControlCraft.LOGGER.debug("PreCimulinkReadVModCompact"); //, tagToModify
-        ControlCraft.LOGGER.debug("lMap: {}", map);
 
-        if(tagToModify == null)return null;
-        CompoundTag compact = tagToModify.getCompound("compact");
-        long o_self_id = compact.getLong("o_self_ID");
-        if(!map.containsKey(o_self_id))return tagToModify;
-        long n_self_id = map.get(o_self_id);
 
-        ControlCraft.LOGGER.debug("link has new ship {}", n_self_id);
-
-        Vector3d oldCenter = offsetMap.get(o_self_id).getFirst();
-        Vector3d newCenter = offsetMap.get(o_self_id).getSecond();
-        compact.putLong("offset", BlockPos.containing(
-                        toMinecraft(
-                                newCenter.sub(oldCenter, new Vector3d()))
-                ).asLong()
-        );
-
-        ControlCraft.LOGGER.debug("PreCimulinkReadVModCompact Modified:"); //, tagToModify
-        return tagToModify;
-    }
-
-    public static void PostCimulinkReadVModCompact(CimulinkBlockEntity<?> cbe, CompoundTag modifiedTag){
-        CompoundTag compact = modifiedTag.getCompound("compact");
-
-        ControlCraft.LOGGER.debug("PostCimulinkReadVModCompact"); //, compact
-
-        if(!compact.contains("offset"))return;
-
-        BlockPos offset = BlockPos.of(compact.getLong("offset"));
-        cbe.linkPort().modifyWithOffset(offset);
-        cbe.setChanged();
-    }
-
-    public static BlockPos centerPosOf(int x, int z){
-        return new BlockPos(((x / 16 / 256 - 1) * 256 + 128) * 16, 0, ((z / 16 / 256) * 256 + 128) * 16);
-    }
 
     public static Vector3d centerVecOf(int x, int z){
         int cx = ((x / 16 / 256 - 1) * 256 + 128) * 16;
         int cz = ((z / 16 / 256) * 256 + 128) * 16;
         return new Vector3d(cx, 0, cz);
     }
+
+
+
 
 }

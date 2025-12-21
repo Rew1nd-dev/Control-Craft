@@ -26,11 +26,13 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
 
     @Override
     public void lazyTickServer() {
+        super.lazyTickServer();
         setWorldAccess();
     }
 
     public void loadCircuit(LuacuitScript nbt) throws IllegalArgumentException{
         var savedStatus = linkPort().viewStatus();
+        boolean shouldOpen = linkPort().isEmpty();
         try{
             linkPort().load(nbt);
         }catch (IllegalArgumentException e){
@@ -38,7 +40,7 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
             throw e;
         }
         linkPort().setStatus(savedStatus);
-        linkPort().setToAllOpen();
+        if(shouldOpen)linkPort().setToAllOpen();
         updateIOName();
         setChanged();
     }

@@ -41,6 +41,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSFixedJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
@@ -171,24 +172,25 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         Vector3dc v_own = q_self.transform(new Vector3d(0, 1, 0));
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
-        VSFixedJoint joint = new VSFixedJoint(
-                getShipOrGroundIDNullable(),
-                new VSJointPose(context.self().getPos(), q_self),
-                getCompanionShipID(),
-                new VSJointPose(context.comp().getPos(), q_comp),
-                new VSJointMaxForceTorque(1e20f, 1e20f),
-                1e-20
-        );
-
-//        VSAttachmentConstraint fixed = new VSAttachmentConstraint(
-//                getShipOrGroundID(),
+//        VSFixedJoint joint = new VSFixedJoint(
+//                getShipOrGroundIDNullable(),
+//                new VSJointPose(context.self().getPos(), q_self),
 //                getCompanionShipID(),
-//                1.0E-20,
-//                context.self().getPos().add(v_own, new Vector3d()),
-//                context.comp().getPos().add(v_cmp, new Vector3d()),
-//                1.0E20,
-//                0.0
+//                new VSJointPose(context.comp().getPos(), q_comp),
+//                new VSJointMaxForceTorque(1e20f, 1e20f),
+//                1e-20
 //        );
+
+        VSDistanceJoint joint = new VSDistanceJoint(
+                getShipOrGroundID(),
+                new VSJointPose(context.self().getPos().add(v_own, new Vector3d()), q_self),
+                getCompanionShipID(),
+                new VSJointPose(context.comp().getPos().add(v_cmp, new Vector3d()), q_comp),
+                new VSJointMaxForceTorque(1e10f, 1e10f),
+                1.0E-10,
+                0.0f, 0.0f,
+                null, null, null
+        );
 
         overrideConstraint("fix", joint);
         isLocked = true;

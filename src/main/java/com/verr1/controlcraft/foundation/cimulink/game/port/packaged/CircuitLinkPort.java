@@ -31,6 +31,10 @@ public class CircuitLinkPort extends WrappedLinkPort<Circuit> {
         recreate();
     }
 
+    public boolean isEmpty(){
+        return nbt == CircuitNbt.EMPTY_CONTEXT;
+    }
+
     private void buildCached(){
         try{
             cached = nbt.buildCircuit();

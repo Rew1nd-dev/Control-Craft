@@ -26,9 +26,10 @@ public class CircuitBlockEntity extends WirelessIntegrationBlockEntity<Circuit, 
 
     public void loadCircuit(CircuitNbt nbt) throws IllegalArgumentException{
         var savedStatus = linkPort().viewStatus();
+        boolean shouldOpen = linkPort().isEmpty();
         linkPort().load(nbt);
         linkPort().setStatus(savedStatus);
-        linkPort().setToAllOpen();
+        if(shouldOpen)linkPort().setToAllOpen();
         updateIOName();
         setChanged();
     }

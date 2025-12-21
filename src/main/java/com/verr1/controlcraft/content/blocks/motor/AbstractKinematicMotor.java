@@ -41,10 +41,7 @@ import org.joml.*;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.properties.PhysPose;
-import org.valkyrienskies.core.internal.joints.VSFixedJoint;
-import org.valkyrienskies.core.internal.joints.VSJoint;
-import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
-import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.core.internal.joints.*;
 
 import java.lang.Math;
 import java.util.Optional;
@@ -215,14 +212,26 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         Vector3dc v_cmp = q_comp.transform(new Vector3d(0, 1, 0));
 
 
-        VSJoint joint = new VSFixedJoint(
-                getShipOrGroundIDNullable(),
-                new VSJointPose(context.self().getPos(), q_self),
-                compID,
-                new VSJointPose(context.comp().getPos(), q_comp),
-                new VSJointMaxForceTorque(1e20f, 1e20f),
-                1e-20
+        VSJoint joint = new VSDistanceJoint(
+                getShipOrGroundID(),
+                new VSJointPose(context.self().getPos().add(v_own, new Vector3d()), q_self),
+                getCompanionShipID(),
+                new VSJointPose(context.comp().getPos().add(v_cmp, new Vector3d()), q_comp),
+                new VSJointMaxForceTorque(1e10f, 1e10f),
+                1.0E-10,
+                0.0f, 0.0f,
+                null, null, null
         );
+
+//        VSJoint joint = new VSFixedJoint(
+//                getShipOrGroundIDNullable(),
+//                new VSJointPose(context.self().getPos(), q_self),
+//                compID,
+//                new VSJointPose(context.comp().getPos(), q_comp),
+//                new VSJointMaxForceTorque(1e20f, 1e20f),
+//                1e-20
+//        );
+
         overrideRuntimeConstraint("control", joint);
         targetOfLastAppliedConstraint = controller.getTarget();
     }

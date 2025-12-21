@@ -60,6 +60,10 @@ public class LuacuitLinkPort extends WrappedLinkPort<Luacuit>{
         component().setWorldAccess(access);
     }
 
+    public boolean isEmpty(){
+        return script == LuacuitScript.EMPTY;
+    }
+
     @Override
     public CompoundTag serialize() {
         return CompoundTagBuilder.create()
