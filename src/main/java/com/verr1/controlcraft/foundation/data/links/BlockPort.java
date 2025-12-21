@@ -7,6 +7,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 public record BlockPort(@NotNull WorldBlockPos pos, String portName) {
     public static final BlockPort EMPTY = new BlockPort(WorldBlockPos.NULL, "");
 
@@ -18,12 +20,17 @@ public record BlockPort(@NotNull WorldBlockPos pos, String portName) {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "[" + portName + " | " + pos.pos().toShortString() + "]";
     }
 
     public BlockPort offset(BlockPos offsetPos){
         return new BlockPort(new WorldBlockPos(pos.dimensionID(), pos.pos().offset(offsetPos)), portName);
+    }
+
+    public BlockPort offset(Function<BlockPos, BlockPos> offsetComputer){
+        BlockPos oldBlockPos = pos.pos();
+        return new BlockPort(new WorldBlockPos(pos.dimensionID(), oldBlockPos.offset(offsetComputer.apply(oldBlockPos))), portName);
     }
 
     @Override

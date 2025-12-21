@@ -53,7 +53,7 @@ public class BusLinkPort extends BlockLinkPort {
 
     public void updateStatus(Status status){
         if(!status.availableIn.isEmpty() && !status.availableOut.isEmpty()){
-            ControlCraft.LOGGER.info("Why are you sending status with non-empty available back?");
+            // ControlCraft.LOGGER.info("Why are you sending status with non-empty available back?");
         }
         definedInputs.clear();
         definedOutputs.clear();

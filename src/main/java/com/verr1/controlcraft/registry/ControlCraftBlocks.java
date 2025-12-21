@@ -35,7 +35,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.material.MapColor;
 
-import static com.simibubi.create.AllMovementBehaviours.movementBehaviour;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -211,7 +210,7 @@ public class ControlCraftBlocks {
             .blockstate(
                     SpatialAnchorBlock.SpatialAnchorDataGenerator.generate()
             )
-            .onRegister(movementBehaviour(new SpatialMovementBehavior()))
+            // .onRegister(movementBehaviour(new SpatialMovementBehavior()))
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .item()
             .properties(p -> p.rarity(Rarity.EPIC))

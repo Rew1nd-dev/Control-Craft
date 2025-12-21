@@ -42,6 +42,10 @@ public class CircuitLinkPort extends WrappedLinkPort<Circuit> {
 
     }
 
+    public boolean isEmpty(){
+        return nbt == CircuitNbt.EMPTY_CONTEXT;
+    }
+
     @Override
     protected List<String> inputNamesValid() {
         return component().inputNamesValid();

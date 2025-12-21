@@ -116,21 +116,29 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 repositories {
-    maven { url = 'https://maven.minecraftforge.net' }
-    maven { url = "https://modmaven.dev/" } // Create, Flywheel
-    maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    maven {url = 'https://maven.minecraftforge.net' }
+    maven {url = 'https://maven.tterrag.com/'}
+
+    maven {url = "https://modmaven.dev/" } // Create, Flywheel
+    maven {url = "https://maven.ithundxr.dev/mirror" } // Registrate
     maven {url = "https://cursemaven.com"}
-    maven{url = "https://repo.essential.gg/repository/maven-public"}
+    maven {url = "https://repo.essential.gg/repository/maven-public"}
     maven {url = 'https://thedarkcolour.github.io/KotlinForForge/'}
     maven {url = 'https://maven.valkyrienskies.org/'}
-    maven { url = 'https://maven.fabricmc.net/' }
+    maven {url = 'https://maven.fabricmc.net/' }
     maven {url = "https://api.modrinth.com/maven"}
-    // Add KFF Maven repository
-    maven { url = "https://maven.saps.dev/minecraft" }
-    maven { url = "https://maven.bawnorton.com/releases" }
+
+    maven {url = "https://maven.saps.dev/minecraft" }
+    maven {url = "https://maven.bawnorton.com/releases" }
     maven {url = "https://maven.realrobotix.me/master/"}
-    maven {url 'https://maven.blamejared.com' }
+    maven {url = 'https://maven.blamejared.com' }
     maven {url = "https://maven.squiddev.cc"}
+
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
+    maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+
+
     flatDir {dirs 'libs'}
 
     gradlePluginPortal()
@@ -155,26 +163,45 @@ dependencies {
     implementation fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-    // compileOnly("maven.modrinth:embeddium:${embeddium_version}")
+//     compileOnly("maven.modrinth:embeddium:${embeddium_version}")
+
+//    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+//    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+//    compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
+//    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
+//    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 
     implementation fg.deobf("libs:architectury-forge:9.2.14")
 
-    // implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
+//    implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_mod_version}")
     compileOnly("org.valkyrienskies.core:api:${vs_core_version}")
     compileOnly("org.valkyrienskies.core:api-game:${vs_core_version}")
     compileOnly("org.valkyrienskies.core:util:${vs_core_version}")
     compileOnly("org.valkyrienskies.core:impl:${vs_core_version}")
 
+
+//    implementation("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}") { transitive = false
+//        exclude group: 'org.valkyrienskies.core', module: ''
+//        exclude group: "com.simibubi.create"
+//        exclude group: "io.github.fabricators_of_create"
+//        exclude group: "dev.engine-room"
+//        exclude group: "dev.engine_room"
+//    }
+//    implementation("org.valkyrienskies.core:api:${vscore_version}") { transitive = false
+//        exclude group: 'org.joml', module: ''
+//    }
+//    implementation("org.valkyrienskies.core:util:${vscore_version}") { transitive = false
+//        exclude group: 'org.joml', module: ''
+//    }
+//    implementation("org.valkyrienskies.core:internal:${vscore_version}") { transitive = false
+//        exclude group: 'org.joml', module: ''
+//    }
+
+
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
-    // runtimeOnly("libs:valkyrienskies-1201:2.1.3")
-
-    // implementation fg.deobf("libs:valkyrienskies-1201:2.5.0")
-    // implementation fg.deobf("org.valkyrienskies.core:api:${vs2_core_version}")
-
-    // implementation fg.deobf("libs:embeddium-1201:0.3.31")
 
     implementation fg.deobf("libs:spark-1.10.53:forge")
 

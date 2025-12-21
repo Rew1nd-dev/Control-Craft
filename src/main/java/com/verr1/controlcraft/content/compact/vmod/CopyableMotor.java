@@ -52,31 +52,4 @@ public interface CopyableMotor extends ICopyableBlock {
         return VSchematicCompactCenter.PreMotorReadVModCompact(serverLevel, map, map1, compoundTag);
     };
 
-
-
-    /*
-    * @Override
-    default void onPaste(
-            @NotNull ServerLevel serverLevel,
-            @NotNull BlockPos blockPos,
-            @NotNull BlockState blockState,
-            @NotNull Map<Long, Long> map,
-            @Nullable CompoundTag compoundTag,
-            @NotNull Function2<
-                    ? super Boolean,
-                    ? super Function1<? super CompoundTag, ? extends CompoundTag>,
-                    Unit> delayLoading,
-            @NotNull Function1<
-                    ? super Function1<
-                            ? super BlockEntity
-                            , Unit>
-                    , Unit> function1
-    ){
-        Function1<CompoundTag, CompoundTag> func = tag -> VSchematicCompactCenter.PreMotorReadVModCompact(serverLevel, map, tag);
-        delayLoading.invoke(true, func);
-    }
-
-    @Override
-    default void onPasteNoTag(@NotNull ServerLevel serverLevel, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @NotNull Map<Long, Long> map){};
-    * */
 }

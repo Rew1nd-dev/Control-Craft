@@ -56,6 +56,10 @@ public class LuacuitLinkPort extends WrappedLinkPort<Luacuit>{
         }
     }
 
+    public boolean isEmpty(){
+        return script == LuacuitScript.EMPTY;
+    }
+
     public void setWorldAccess(IPhysWorldAccess access){
         component().setWorldAccess(access);
     }

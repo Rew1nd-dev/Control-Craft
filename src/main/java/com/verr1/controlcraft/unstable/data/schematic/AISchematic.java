@@ -34,8 +34,6 @@ import org.valkyrienskies.core.api.ships.Ship;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter.centerPosOf;
-import static com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter.centerVecOf;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 public class AISchematic {

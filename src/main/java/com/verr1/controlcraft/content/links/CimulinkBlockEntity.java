@@ -5,8 +5,8 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
-import com.verr1.controlcraft.content.compact.vmod.VSchematicCompactCenter;
-import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
+import com.verr1.controlcraft.content.compact.vmod.version.CimulinkSerializations;
+import com.verr1.controlcraft.content.compact.vmod.version.VSchematicCompactCimulinkV1;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.ILinkableBlock;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
@@ -14,7 +14,6 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.data.links.*;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
-import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.MinecraftUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.ChatFormatting;
@@ -64,11 +63,13 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     private final DeferralInitializer lateInitVModCompact = new DeferralInitializer() {
         @Override
         void deferralLoad(CompoundTag tag) {
-            VSchematicCompactCenter.PostCimulinkReadVModCompact(CimulinkBlockEntity.this, tag);
+            CimulinkSerializations.INSTANCE.finalize(CimulinkBlockEntity.this, tag);
         }
     };
 
-    protected void initializeEarly(){}
+    protected void initializeEarly(){
+
+    }
 
     @Override
     protected void readExtra(CompoundTag compound) {
@@ -93,7 +94,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
             ControlCraft.LOGGER.error("error encountered when initializing CimulinkBlockEntity at {}", getBlockPos().toShortString());
             ControlCraft.LOGGER.error("error message:{}", e.getMessage());
         }
-
+        linkPort.setInitialized();
         linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
         initializeExtra();
         isInitialized = true;
@@ -146,6 +147,9 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     }
 
 
+    public List<VSchematicCompactCimulinkV1.CenterAndId> collectVModCompact(){
+        return linkPort().collectVModCompact();
+    }
 
     public Vec3 getFaceCenter(){
         Vec3 faceDir = toVec3(getDirection().getNormal());
