@@ -27,15 +27,21 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.LuaError;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
+import static org.valkyrienskies.mod.api.ValkyrienSkies.toMinecraft;
 
 // for connection recording, forming a graph
 public abstract class BlockLinkPort {
@@ -294,6 +300,15 @@ public abstract class BlockLinkPort {
         MinecraftUtils.playSoundAt(position, SoundEvents.GENERIC_EXPLODE, 10f, 10f);
     }
 
+    private static void tellNearby(Level level, Vec3 position, String message){
+        Vec3 actualPosition = position;
+        Ship s = VSGameUtilsKt.getShipManagingPos(level, position);
+        if(s != null){
+            actualPosition = toMinecraft(s.getShipToWorld().transformPosition(toJOML(position)));
+        }
+        MinecraftUtils.broadcastMessage(message, actualPosition, 32);
+    }
+
     public static void propagateTemporal(){
 
         // stage 2
@@ -304,19 +319,25 @@ public abstract class BlockLinkPort {
                 blp.onPositiveEdge();
                 PROFILER.untrack();
             }catch (LuaError le){
+                Level world = blp.pos().level(ControlCraftServer.INSTANCE);
+                Vec3 position = Vec3.atCenterOf(blp.pos().pos());
                 String sus = getSuspectedLuaCode(blp);
                 ControlCraft.LOGGER.error("Lua Execution Exception at {}: {}, sus code: {}",
                         blp.pos(), le.getMessage(), sus
                 );
                 blp.removeAllLinks();
-                alarmPlayers(Vec3.atCenterOf(blp.pos().pos()));
+                tellNearby(world, position, le.getMessage());
+                alarmPlayers(position);
             }catch (LuaOvertimeException loe){
+                Level world = blp.pos().level(ControlCraftServer.INSTANCE);
+                Vec3 position = Vec3.atCenterOf(blp.pos().pos());
                 String sus = getSuspectedLuaCode(blp);
                 ControlCraft.LOGGER.error("Lua Execution Overtime at {}: {}, sus code: {}",
                         blp.pos(), loe.getMessage(), sus
                 );
                 blp.removeAllLinks();
-                alarmPlayers(Vec3.atCenterOf(blp.pos().pos()));
+                tellNearby(world, position, loe.getMessage());
+                alarmPlayers(position);
             }catch (RuntimeException re){
                 ControlCraft.LOGGER.error("Unexpected Exception during temporal propagation at {}: {}", blp.pos(), re.getMessage());
                 blp.removeAllLinks();

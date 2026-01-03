@@ -193,8 +193,8 @@ public class JointHandler {
     private void removeJoint(VsiPhysLevel world, ConstraintKey key){
         if(cache.containsKey(key)){
             ConstraintWithID exist = cache.get(key);
-            // world.removeJoint(exist.ID());
-            adapter(key.dimension()).removeJoint(exist.ID());
+            world.removeJoint(exist.ID());
+            // adapter(key.dimension()).removeJoint(exist.ID());
             cache.remove(key);
         }
     }

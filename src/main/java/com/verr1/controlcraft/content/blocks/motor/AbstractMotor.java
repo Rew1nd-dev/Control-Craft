@@ -207,7 +207,7 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         );
 
 
-
+        destroyConstraints();
         recreateRevoluteConstraints(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(getServoDirection().getOpposite());
@@ -281,6 +281,7 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
         );
 
 
+        destroyConstraints();
         recreateRevoluteConstraints(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(direction_comp);

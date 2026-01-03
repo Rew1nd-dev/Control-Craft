@@ -16,7 +16,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
 
-    private boolean force_connect = false;
+    private boolean force_connect = true;
 
     private final BlockPos xPos;
     private final BlockPos yPos;
@@ -71,7 +71,7 @@ public class FaceAlignmentSchedule extends ShipQPNavigationSchedule {
         if(yShip == null)return new Vector3d(0, 0, 0);
         Vector3dc dir = ValkyrienSkies.set(new Vector3d(), yAlign.getNormal()).mul(0.2);
         Vector3dc yFace_sc = ValkyrienSkies.set(new Vector3d(), yPos).add(dir);
-        Vector3dc yCenter_sc = yShip.getInertiaData().getCenterOfMassInShip();
+        Vector3dc yCenter_sc = yShip.getInertiaData().getCenterOfMass();
         Vector3dc relative_r_sc = new Vector3d(yFace_sc).sub(yCenter_sc, new Vector3d());
 
         Quaterniondc targetQuaternion = getYTargetQuaternion();

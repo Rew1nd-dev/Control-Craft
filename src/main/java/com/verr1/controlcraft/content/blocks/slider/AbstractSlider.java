@@ -98,7 +98,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
 
     @Override
     protected boolean validateJoints() {
-        return retrieveJoint("slide") != null;
+        return true;//retrieveJoint("slide") != null;
     }
 
     public void decideAnimationUpdate(){
@@ -184,8 +184,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
 
 
 
-
-
+        destroyConstraints();
         recreateConstrains(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(align_comp);
@@ -299,7 +298,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
 
 
 
-
+        destroyConstraints();
         recreateConstrains(joint);
         setCompanionShipID(compId);
         setCompanionShipDirection(getDirection().getOpposite());

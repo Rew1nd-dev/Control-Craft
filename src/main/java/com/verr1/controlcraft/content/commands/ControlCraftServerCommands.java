@@ -17,8 +17,10 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLink
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.managers.JointHandler;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
+import com.verr1.controlcraft.foundation.network.packets.specific.CodeUploadRequestPacket;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.registry.ControlCraftItems;
+import com.verr1.controlcraft.registry.ControlCraftPackets;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -36,6 +38,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -246,7 +249,11 @@ public class ControlCraftServerCommands {
             return 0;
         }
         try{
-            CircuitCompilerItem.load(saveName, stack);
+            CircuitCompilerItem.load(player.getName().getString(), saveName, stack);
+        }catch (IOException ioe){
+            var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.CIRCUIT);
+            ControlCraftPackets.sendToPlayer(p, player);
+            source.sendFailure(Component.literal("circuit is missing, requesting upload..."));
         }catch (Exception e){
             source.sendFailure(Component.literal("Failed to load circuit: " + e.getMessage()));
             ControlCraft.LOGGER.error("Failed to load circuit: " + e.getMessage(), e);
@@ -291,7 +298,11 @@ public class ControlCraftServerCommands {
             return 0;
         }
         try{
-            LuaCompilerItem.load(saveName, stack);
+            LuaCompilerItem.load(player.getName().getString(), saveName, stack);
+        }catch (IOException ioe){
+            var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.LUACUIT);
+            ControlCraftPackets.sendToPlayer(p, player);
+            source.sendFailure(Component.literal("lua is missing, requesting upload..."));
         }catch (Exception e){
             source.sendFailure(Component.literal("Failed to load lua: " + e.getMessage()));
             ControlCraft.LOGGER.error("Failed to load lua: " + e.getMessage(), e);

@@ -188,19 +188,12 @@ public class KinematicSliderBlockEntity extends AbstractSlider implements
 
         VSJoint joint = new VSFixedJoint(
                 selfId == -1L ? null : selfId,
-                new VSJointPose(context.self().getPos(), context.self().getRot()),
+                new VSJointPose(
+                    context.self().getPos().fma(MathUtils.clamp(controller.getTarget(), 0.0, MAX_SLIDE_DISTANCE), sliDir, new Vector3d()),
+                    context.self().getRot()
+                ),
                 compId == -1L ? null : compId,
-                new VSJointPose(context.comp().getPos().fma(
-                        -MathUtils.clamp(
-                                controller.getTarget(),
-                                0.0,
-                                MAX_SLIDE_DISTANCE
-                        ),
-                        sliDir,
-                        new Vector3d()
-                ),
-                        context.comp().getRot()
-                ),
+                new VSJointPose(context.comp().getPos(), context.comp().getRot()),
                 new VSJointMaxForceTorque(1e20f, 1e20f),
                 1e-20
         );

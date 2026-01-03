@@ -29,4 +29,9 @@ public class AISpawnResult {
         CAN_NOT_REPAIR
 
     }
+
+    @Override
+    public String toString() {
+        return status.name();
+    }
 }

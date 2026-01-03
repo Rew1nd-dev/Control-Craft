@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.items;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.integration.LuaBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
@@ -20,9 +21,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.luaj.vm2.LuaError;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 
 import static com.verr1.controlcraft.content.items.CircuitCompilerItem.CIMULINKS;
 
@@ -70,7 +69,23 @@ public class LuaCompilerItem extends Item {
     }
 
 
-    public static void load(String saveName, ItemStack stack){
+    public static void load(String loader, String saveName, ItemStack stack) throws IOException{
+        Path file = LUALINKS.resolve(saveName + ".lua").toAbsolutePath();
+
+        if(!Files.exists(file)){
+            file = LUALINKS.resolve(loader).resolve(saveName + ".lua").toAbsolutePath();
+        }
+
+        try{
+            String code = loadLua(file.toString());
+            LuacuitScript ls = LuacuitScript.fromCode(code);
+            stack.getOrCreateTag().put("luaNbt", ls.serialize());
+        } catch (LuaOvertimeException | LuaError e){
+            throw new IllegalArgumentException("Failed to compile Lua script: " + e.getMessage());
+        }
+    }
+
+    public static CompoundTag loadTag(String saveName){
         Path file = LUALINKS.resolve(saveName + ".lua").toAbsolutePath();
 
         try{
@@ -78,12 +93,45 @@ public class LuaCompilerItem extends Item {
 
             LuacuitScript ls = LuacuitScript.fromCode(code);
 
-            stack.getOrCreateTag().put("luaNbt", ls.serialize());
+            return ls.serialize();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (LuaOvertimeException | LuaError e){
             throw new IllegalArgumentException("Failed to compile Lua script: " + e.getMessage());
+        }
+    }
+
+    // Implement saveTag: ensure parent directories exist, write UTF-8 to a temp file then move atomically to target
+    public static void saveTag(CompoundTag tag, String uploaded, String uploader){
+        Path file = LUALINKS.resolve(uploader).resolve(uploaded + ".lua").toAbsolutePath();
+
+        LuacuitScript ls = LuacuitScript.deserialize(tag);
+        String code = ls.code();
+
+        try {
+            Path parent = file.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }else{
+                ControlCraft.LOGGER.error("Fail to get parent when try to save uploaded lua");
+                return;
+            }
+
+            // Create a temp file in the same directory to allow atomic move on the same filesystem
+            Path tmp = Files.createTempFile(parent, uploaded + "-", ".lua.tmp");
+
+            // Write the code as UTF-8
+            Files.writeString(tmp, code);
+
+            // Try atomic move, fallback if not supported
+            try {
+                Files.move(tmp, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -95,8 +143,6 @@ public class LuaCompilerItem extends Item {
                 content.append(line).append("\n");
             }
             return content.toString();
-        } catch (IOException e) {
-            throw e;
         }
     }
 

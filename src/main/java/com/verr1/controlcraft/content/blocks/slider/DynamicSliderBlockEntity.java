@@ -390,11 +390,6 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
     }
 
     @Override
-    protected boolean validateJoints() {
-        return retrieveJoint("revolute") != null;
-    }
-
-    @Override
     public void initializeClient() {
         super.initializeClient();
         handler().request(true, FIELD);

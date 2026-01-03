@@ -239,7 +239,7 @@ public class AISchematic {
 
 
                         BlockPos realPos = offsetPos.offset(center);
-
+                        blockPlacer.destroyBlock(realPos, false, null);
                         if(!original.isAir()){
                             ControlCraft.LOGGER.debug("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
                         }
