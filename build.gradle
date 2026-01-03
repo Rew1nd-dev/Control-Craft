@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-        id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 
     id "org.jetbrains.kotlin.jvm" version "2.1.0"
 
@@ -115,7 +115,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 
-repositories {
+repositories
+        {
     maven {url = 'https://maven.minecraftforge.net' }
     maven {url = 'https://maven.tterrag.com/'}
 
@@ -138,7 +139,7 @@ repositories {
     maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
 
-
+    maven { url = "https://maven.firstdark.dev/snapshots"} // ldllib
     flatDir {dirs 'libs'}
 
     gradlePluginPortal()
@@ -157,46 +158,24 @@ configurations {
     implementation.extendsFrom(shadowInclude)  // 开发环境可见
     // shadowInclude.extendsFrom()
 }
+
+
+
 dependencies {
+
+
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     implementation fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-//     compileOnly("maven.modrinth:embeddium:${embeddium_version}")
-
-//    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
-//    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
-//    compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
-//    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
-//    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
-
     implementation fg.deobf("libs:architectury-forge:9.2.14")
 
-//    implementation fg.deobf("org.valkyrienskies.core:api:${vs_core_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_mod_version}")
     compileOnly("org.valkyrienskies.core:api:${vs_core_version}")
     compileOnly("org.valkyrienskies.core:api-game:${vs_core_version}")
     compileOnly("org.valkyrienskies.core:util:${vs_core_version}")
     compileOnly("org.valkyrienskies.core:impl:${vs_core_version}")
-
-
-//    implementation("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}") { transitive = false
-//        exclude group: 'org.valkyrienskies.core', module: ''
-//        exclude group: "com.simibubi.create"
-//        exclude group: "io.github.fabricators_of_create"
-//        exclude group: "dev.engine-room"
-//        exclude group: "dev.engine_room"
-//    }
-//    implementation("org.valkyrienskies.core:api:${vscore_version}") { transitive = false
-//        exclude group: 'org.joml', module: ''
-//    }
-//    implementation("org.valkyrienskies.core:util:${vscore_version}") { transitive = false
-//        exclude group: 'org.joml', module: ''
-//    }
-//    implementation("org.valkyrienskies.core:internal:${vscore_version}") { transitive = false
-//        exclude group: 'org.joml', module: ''
-//    }
 
 
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
@@ -217,17 +196,18 @@ dependencies {
     implementation fg.deobf("libs:we-7.2.15:forge")
     implementation fg.deobf("libs:shaolib:1.4.3")
     implementation fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
-
+    implementation fg.deobf("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:1.0.47") { transitive = false }
+    // Fuck JarInJar
     minecraftLibrary(jarJar("libs:luaj:3.0.2"){
         jarJar.ranged(it, "[0.0.2,)")
     })
 
+//    implementation ("libs:luaj:3.0.2")
+//    shadowInclude("libs:luaj:3.0.2")
+
     implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:1.2")){
         jarJar.ranged(it, "[0.0,)")
     }
-
-    // implementation fg.deobf("libs:valkyrien-ship-schematics-forge:1.0")
-    // implementation fg.deobf("libs:VMod-Forge-1.20.1:1.0.0")
 
     implementation fg.deobf("com.rbasamoyai:ritchiesprojectilelib:${rpl_version}+mc.${minecraft_version}-forge-build." + rpl_build){ transitive = false }
 
@@ -239,22 +219,23 @@ dependencies {
     // implementation fg.deobf("curse.maven:cc-tweaked-282001:5379173")
     implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:1.113.0")
 
+    implementation fg.deobf("maven.modrinth:sodium:mc1.20.1-0.5.11")
+
+
+
+    implementation fg.deobf("curse.maven:create-tweaked-controllers-898849:5206625")
+
+
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {
         jarJar.ranged(it, "[0.4.1,)")
     }
-    implementation fg.deobf("maven.modrinth:sodium:mc1.20.1-0.5.11")
-
     compileOnly(annotationProcessor("com.bawnorton.mixinsquared:mixinsquared-common:0.2.0-beta.6"))
     implementation(jarJar("com.bawnorton.mixinsquared:mixinsquared-forge:0.2.0-beta.6")) {
         jarJar.ranged(it, "[0.2.0-beta.6,)")
     }
 
-    //  implementation fg.deobf(jarJar("libs:markdown_manual-forge:1.2.5")){
-    //      jarJar.ranged(it, "[0.0.0,)")
-    //  }
-    implementation fg.deobf("curse.maven:create-tweaked-controllers-898849:5206625")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
@@ -263,8 +244,11 @@ shadowJar {
     mergeServiceFiles()
     configurations = [project.configurations.shadowInclude]
     archiveClassifier.set('')
-    relocate("gg.essential.elementa", "com.verr1.elementa")
-    relocate("gg.essential.universal", "com.verr1.universal")
+    relocate("org.luaj", "com.verr1.luaj")
+    exclude('lua.class')
+    exclude('luaj.class')
+    exclude('luajc.class')
+    exclude('luajc$*.class')
 }
 jar.enabled = false
 tasks.named("jar") { dependsOn(shadowJar) }

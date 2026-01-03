@@ -245,6 +245,8 @@ public class AISchematic {
                         if(!original.isAir()){
                             ControlCraft.LOGGER.debug("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
                         }
+
+                        blockPlacer.destroyBlock(realPos, false, null);
                         if(original.getBlock() instanceof IReplaceBlock){
                             blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 3); // destroy and replace, in order to clear be
                         }

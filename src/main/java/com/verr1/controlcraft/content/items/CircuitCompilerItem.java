@@ -79,19 +79,39 @@ public class CircuitCompilerItem extends Item {
         }
     }
 
-    public static void load(String saveName, ItemStack stack){
+    public static void load(String loader, String saveName, ItemStack stack) throws IOException{
+        Path file = CIMULINKS.resolve(saveName + ".nbt").toAbsolutePath();
+        if(!Files.exists(file)){
+            file = CIMULINKS.resolve(loader).resolve(saveName + ".nbt").toAbsolutePath();
+        }
+        InputStream in = Files.newInputStream(file, StandardOpenOption.CREATE);
+        CompoundTag tag = NbtIo.readCompressed(in);
+        stack.setTag(tag);
+    }
+
+    public static CompoundTag loadTag(String saveName){
         Path file = CIMULINKS.resolve(saveName + ".nbt").toAbsolutePath();
 
         try(InputStream in = Files.newInputStream(file, StandardOpenOption.CREATE)){
-            CompoundTag tag = NbtIo.readCompressed(in);
-            stack.setTag(tag);
+            return NbtIo.readCompressed(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
+    public static void saveTag(CompoundTag uploaded, String saveName, String uploader){
+        Path file = CIMULINKS.resolve(uploader).resolve(saveName + ".nbt").toAbsolutePath();
+
+        try{
+            Files.createDirectories(CIMULINKS);
+            try(OutputStream out = Files.newOutputStream(file, StandardOpenOption.CREATE)){
+                NbtIo.writeCompressed(uploaded, out);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 /*
 *

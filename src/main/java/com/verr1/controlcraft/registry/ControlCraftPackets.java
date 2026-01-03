@@ -30,6 +30,7 @@ public enum ControlCraftPackets {
     EXPOSED_FIELD_SYNC_CLIENT(ExposedFieldSyncClientPacket.class, ExposedFieldSyncClientPacket::new, NetworkDirection.PLAY_TO_CLIENT),
     SYNC_BLOCKENTITY_CLIENT(SyncBlockEntityClientPacket.class, SyncBlockEntityClientPacket::new, NetworkDirection.PLAY_TO_CLIENT),
     RECEIVE_LATEST_WORLD_POS(ReceiveLatestWorldPosPacket.class, ReceiveLatestWorldPosPacket::new, NetworkDirection.PLAY_TO_CLIENT),
+    CODE_UPLOAD_REQUEST(CodeUploadRequestPacket.class, CodeUploadRequestPacket::new, NetworkDirection.PLAY_TO_CLIENT),
 
     GENERIC_SERVER(GenericServerPacket.class, GenericServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
     BLOCK_BOUND_SERVER(BlockBoundServerPacket.class, BlockBoundServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
@@ -41,7 +42,8 @@ public enum ControlCraftPackets {
     CIMULINK_LINK(CimulinkLinkPacket.class, CimulinkLinkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIMULINK_COMPILE(CimulinkCompilePacket.class, CimulinkCompilePacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIRCUIT_SETTINGS(CircuitSettingsPacket.class, CircuitSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),
-    TWEAK_FULL_PRECISION(TweakControllerFullAxisPacket.class, TweakControllerFullAxisPacket::new, NetworkDirection.PLAY_TO_SERVER)
+    TWEAK_FULL_PRECISION(TweakControllerFullAxisPacket.class, TweakControllerFullAxisPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    CODE_UPLOAD(CodeUploadPacket.class, CodeUploadPacket::new, NetworkDirection.PLAY_TO_SERVER)
     ;
 
 
@@ -56,7 +58,7 @@ public enum ControlCraftPackets {
 
     public static void registerPackets() {
         channel = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(ControlCraft.MODID, ControlCraft.MODID+"_channel")).networkProtocolVersion(() -> {
+                .named(new ResourceLocation(ControlCraft.MODID, ControlCraft.MODID +"_channel")).networkProtocolVersion(() -> {
                     return NETWORK_VERSION;
                 })
                 .clientAcceptedVersions(NETWORK_VERSION::equals).serverAcceptedVersions(NETWORK_VERSION::equals).simpleChannel();

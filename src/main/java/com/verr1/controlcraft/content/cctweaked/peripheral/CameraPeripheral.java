@@ -128,7 +128,7 @@ public class CameraPeripheral extends AbstractAttachedPeripheral<CameraBlockEnti
     }
 
 
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final double getClipDistance(){
         return getTarget().getClipDistance();
     }

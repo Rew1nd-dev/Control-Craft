@@ -21,6 +21,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
@@ -77,6 +78,12 @@ public class MinecraftUtils {
             // 方块有遮挡，返回综合光照
             return level.getRawBrightness(pos, 0);
         }
+    }
+
+    public static void sendClientMessage(String mst){
+        Player p = Minecraft.getInstance().player;
+        if(p == null)return;
+        p.sendSystemMessage(Component.literal(mst));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -222,6 +229,17 @@ public class MinecraftUtils {
         server.getPlayerList().getPlayers().forEach(p -> p.sendSystemMessage(message));
     }
 
+    public static void broadcastMessage(Component message, Vec3 position, double radius){
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if(server == null){
+            return;
+        };
+        server.getPlayerList().getPlayers()
+                .stream()
+                .filter(p -> p.position().distanceTo(position) < radius)
+                .forEach(p -> p.sendSystemMessage(message));
+    }
+
     public static void spawnParticleAt(Vec3 position, ParticleOptions opt){
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if(server == null){
@@ -306,6 +324,10 @@ public class MinecraftUtils {
 
     public static void broadcastMessage(String message){
         broadcastMessage(Component.literal(message));
+    }
+
+    public static void broadcastMessage(String message, Vec3 position, double radius){
+        broadcastMessage(Component.literal(message), position, radius);
     }
 
 }
