@@ -5,17 +5,20 @@ import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeExc
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
+import kotlin.Pair;
 import net.minecraft.nbt.CompoundTag;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-public record LuacuitScript(String code, List<String> definedInputs, List<String> definedOutputs) {
+public record LuacuitScript(String code, List<String> definedInputs, List<Double> defaultInputs, List<String> definedOutputs) {
+    public static final Serializer<List<Double>> DOUBLE_LIST_SER = SerializeUtils.ofList(SerializeUtils.DOUBLE);
     public static final Serializer<List<String>> STRING_LIST_SER = SerializeUtils.ofList(SerializeUtils.STRING);
     public static final String EMPTY_CODE =
             """
@@ -29,12 +32,13 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
             end
             
             """;
-    public static final LuacuitScript EMPTY = new LuacuitScript(EMPTY_CODE, List.of(), List.of());
+    public static final LuacuitScript EMPTY = new LuacuitScript(EMPTY_CODE, List.of(), List.of(), List.of());
 
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()
                 .withString("code", code)
                 .withCompound("inputs", STRING_LIST_SER.serialize(definedInputs))
+                .withCompound("default", DOUBLE_LIST_SER.serialize(defaultInputs))
                 .withCompound("outputs", STRING_LIST_SER.serialize(definedOutputs))
                 .build();
     }
@@ -43,6 +47,7 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
         return new LuacuitScript(
                 tag.getString("code"),
                 STRING_LIST_SER.deserialize(tag.getCompound("inputs")),
+                DOUBLE_LIST_SER.deserialize(tag.getCompound("default")),
                 STRING_LIST_SER.deserialize(tag.getCompound("outputs"))
         );
     }
@@ -51,13 +56,17 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
         LuacuitScript temporary;
         Globals defineGlobal = CimulinkLua.createStandardGlobals();
 
-        List<String> collectedInputs = new ArrayList<>();
+        List<String> definedInputs = new ArrayList<>();
+        List<Double> defaultInputs = new ArrayList<>();
         List<String> collectedOutputs = new ArrayList<>();
 
-        defineGlobal.set("defineInput", new OneArgFunction() {
+        defineGlobal.set("defineInput", new TwoArgFunction() {
             @Override
-            public LuaValue call(LuaValue arg) {
-                collectedInputs.add(arg.checkjstring());
+            public LuaValue call(LuaValue arg, LuaValue arg1) {
+                String name = arg.checkjstring();
+                double defaultVal = arg1 == LuaValue.NIL ? 0.0 : arg1.checkdouble();
+                definedInputs.add(name);
+                defaultInputs.add(defaultVal);
                 return LuaValue.NIL;
             }
         });
@@ -96,10 +105,20 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
 
         temporary = new LuacuitScript(
                 code,
-                collectedInputs,
+                definedInputs,
+                defaultInputs,
                 collectedOutputs
         );
         return temporary;
+    }
+
+
+    public double getDefault(String input){
+        int idx = definedInputs.indexOf(input);
+        if(definedInputs.size() != defaultInputs.size() || (idx < 0 || idx > defaultInputs.size())){
+            return 0.0;
+        }
+        return defaultInputs.get(idx);
     }
 
 }

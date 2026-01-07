@@ -130,7 +130,7 @@ public abstract class WrappedLinkPort<W extends NamedComponent> extends BlockLin
         setStatus(new Pair<>(openedIn, openedOut));
     }
 
-    protected void setValuesOnly(List<IntegrationPortStatus> inputStatus){
+    public void setValuesOnly(List<IntegrationPortStatus> inputStatus){
         try{
             inputStatus.forEach(cps -> {
                 component().input(cps.portName(), cps.value());

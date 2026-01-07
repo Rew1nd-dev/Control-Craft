@@ -80,6 +80,7 @@ public class MinecraftUtils {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void sendClientMessage(String mst){
         Player p = Minecraft.getInstance().player;
         if(p == null)return;

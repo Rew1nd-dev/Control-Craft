@@ -5,6 +5,7 @@ import com.verr1.controlcraft.content.links.integration.LuaBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitScript;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
+import com.verr1.controlcraft.foundation.data.links.IntegrationPortStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -58,6 +59,14 @@ public class LuaCompilerItem extends Item {
                                 cbe -> {
                                     try {
                                         cbe.loadCircuit(nbtHolder);
+                                        cbe.linkPort().setValuesOnly(
+                                            nbtHolder
+                                                .definedInputs().stream()
+                                                .map(
+                                                    in -> new IntegrationPortStatus(in, nbtHolder.getDefault(in), true, false)
+                                                )
+                                                .toList()
+                                        );
                                     }catch (IllegalArgumentException e){
                                         player.sendSystemMessage(Component.literal("Failed to load circuit: " + e.getMessage()));
                                     }

@@ -18,7 +18,6 @@ public class CircuitBlockEntity extends WirelessIntegrationBlockEntity<Circuit, 
     }
 
 
-
     @Override
     protected CircuitLinkPort create() {
         return new CircuitLinkPort();

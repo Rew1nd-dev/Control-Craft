@@ -274,14 +274,14 @@ public class AIPool extends SavedData {
         Vector3dc yardPosition = allocator.position(spacePointer);
         availableAIAllocatePointer.put(ship.getId(), new Pair<>(spacePointer, yardPosition));
         availableAI.add(ship.getId());
-
-
-
+        Runnable task = () -> {
+            networkOf(ship).onPreRestore();
+            restoreAI(id);
+            networkOf(ship).onPostRestore();
+        };
+        task.run();
         vsWorld().teleportShip(ship, withPosition(yardPosition, ship.getChunkClaimDimension()));
-
-        networkOf(ship).onPreRestore();
-        restoreAI(id);
-        networkOf(ship).onPostRestore();
+        // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
     }
 
     public @NotNull AISpawnResult spawn(long id, SchematicKey overrideKey ,Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
