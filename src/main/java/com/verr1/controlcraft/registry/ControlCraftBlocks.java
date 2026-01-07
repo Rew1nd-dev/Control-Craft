@@ -115,7 +115,7 @@ public class ControlCraftBlocks {
             .item()
             .properties(p -> p.rarity(Rarity.RARE))
             .transform(customItemModel())
-            .lang("Dynamic Physical Piston")
+            .lang("Dynamic Physical Piston (PhysX Only)")
             .register();
 
     public static final BlockEntry<RevoluteJointBlock> REVOLUTE_JOINT_BLOCK = REGISTRATE

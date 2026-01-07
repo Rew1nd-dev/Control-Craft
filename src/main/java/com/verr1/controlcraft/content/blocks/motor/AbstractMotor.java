@@ -184,7 +184,7 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
 
         long compId = comp.getId();
         long selfId = getShipOrGroundID();
-        Vector3dc p_self = selfId == -1L ? getRotationCenterPosJOML().add(new Vector3d(0.5, 0.5, 0.5)) : getRotationCenterPosJOML();
+        Vector3dc p_self = getRotationCenterPosJOML();//selfId == -1L ? getRotationCenterPosJOML().add(new Vector3d(0.5, 0.5, 0.5)) : ;
         Vector3dc p_comp = comp.getTransform().getPositionInShip().add(new Vector3d(0.0, 0.0, 0.0).add(compOffset), new Vector3d());  // new Vector3d();
         // Vector3dc selfOffset = self.map(s -> s.getTransform().getPositionInShip()).orElse(); //.sub(p_self, new Vector3d())
         Quaterniondc q_self = VSMathUtils.getQuaternionToEast_(getServoDirection());

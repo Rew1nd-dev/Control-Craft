@@ -44,7 +44,7 @@
   "block.vscontrolcraft.scope": "示波器",
   "block.vscontrolcraft.servo": "伺服电机",
   "block.vscontrolcraft.shifter": "移位寄存器",
-  "block.vscontrolcraft.slider": "物理活塞",
+  "block.vscontrolcraft.slider": "物理活塞 (仅PhysX)",
   "block.vscontrolcraft.spatial_anchor": "空间锚",
   "block.vscontrolcraft.sphere_hinge": "球铰链",
   "block.vscontrolcraft.spinalyzer": "姿态分析仪",

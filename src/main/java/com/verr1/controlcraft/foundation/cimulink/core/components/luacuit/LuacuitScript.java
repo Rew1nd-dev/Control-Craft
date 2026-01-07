@@ -10,40 +10,44 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-public record LuacuitScript(String code, List<String> definedInputs, List<String> definedOutputs) {
+public record LuacuitScript(String code, List<String> definedInputs, List<Double> defaultInputs, List<String> definedOutputs) {
+    public static final Serializer<List<Double>> DOUBLE_LIST_SER = SerializeUtils.ofList(SerializeUtils.DOUBLE);
     public static final Serializer<List<String>> STRING_LIST_SER = SerializeUtils.ofList(SerializeUtils.STRING);
     public static final String EMPTY_CODE =
-            """
-            
-            function define()
-            
-            end
-            
-            function loop()
-            
-            end
-            
-            """;
-    public static final LuacuitScript EMPTY = new LuacuitScript(EMPTY_CODE, List.of(), List.of());
+        """
+        
+        function define()
+        
+        end
+        
+        function loop()
+        
+        end
+        
+        """;
+    public static final LuacuitScript EMPTY = new LuacuitScript(EMPTY_CODE, List.of(), List.of(), List.of());
 
     public CompoundTag serialize(){
         return CompoundTagBuilder.create()
-                .withString("code", code)
-                .withCompound("inputs", STRING_LIST_SER.serialize(definedInputs))
-                .withCompound("outputs", STRING_LIST_SER.serialize(definedOutputs))
-                .build();
+            .withString("code", code)
+            .withCompound("inputs", STRING_LIST_SER.serialize(definedInputs))
+            .withCompound("default", DOUBLE_LIST_SER.serialize(defaultInputs))
+            .withCompound("outputs", STRING_LIST_SER.serialize(definedOutputs))
+            .build();
     }
 
     public static LuacuitScript deserialize(CompoundTag tag){
         return new LuacuitScript(
-                tag.getString("code"),
-                STRING_LIST_SER.deserialize(tag.getCompound("inputs")),
-                STRING_LIST_SER.deserialize(tag.getCompound("outputs"))
+            tag.getString("code"),
+            STRING_LIST_SER.deserialize(tag.getCompound("inputs")),
+            DOUBLE_LIST_SER.deserialize(tag.getCompound("default")),
+            STRING_LIST_SER.deserialize(tag.getCompound("outputs"))
         );
     }
 
@@ -51,13 +55,17 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
         LuacuitScript temporary;
         Globals defineGlobal = CimulinkLua.createStandardGlobals();
 
-        List<String> collectedInputs = new ArrayList<>();
+        List<String> definedInputs = new ArrayList<>();
+        List<Double> defaultInputs = new ArrayList<>();
         List<String> collectedOutputs = new ArrayList<>();
 
-        defineGlobal.set("defineInput", new OneArgFunction() {
+        defineGlobal.set("defineInput", new TwoArgFunction() {
             @Override
-            public LuaValue call(LuaValue arg) {
-                collectedInputs.add(arg.checkjstring());
+            public LuaValue call(LuaValue arg, LuaValue arg1) {
+                String name = arg.checkjstring();
+                double defaultVal = arg1 == LuaValue.NIL ? 0.0 : arg1.checkdouble();
+                definedInputs.add(name);
+                defaultInputs.add(defaultVal);
                 return LuaValue.NIL;
             }
         });
@@ -78,7 +86,7 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
             if(defineFunc == LuaValue.NIL)return;
             defineFunc.call();
         });
-            //.completeOnTimeout(null, 30, TimeUnit.MILLISECONDS);;
+        //.completeOnTimeout(null, 30, TimeUnit.MILLISECONDS);;
 
         try{
             future.get(30, TimeUnit.MILLISECONDS);
@@ -95,11 +103,21 @@ public record LuacuitScript(String code, List<String> definedInputs, List<String
 
 
         temporary = new LuacuitScript(
-                code,
-                collectedInputs,
-                collectedOutputs
+            code,
+            definedInputs,
+            defaultInputs,
+            collectedOutputs
         );
         return temporary;
+    }
+
+
+    public double getDefault(String input){
+        int idx = definedInputs.indexOf(input);
+        if(definedInputs.size() != defaultInputs.size() || (idx < 0 || idx > defaultInputs.size())){
+            return 0.0;
+        }
+        return defaultInputs.get(idx);
     }
 
 }
