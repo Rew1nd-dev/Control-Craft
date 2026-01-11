@@ -11,10 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TweakerminalBlockEntity extends OnShipBlockEntity implements IPlant {
 
@@ -59,12 +56,12 @@ public class TweakerminalBlockEntity extends OnShipBlockEntity implements IPlant
 
     public double getAxis(int axisIndex){
         if(userUUID == null || axisIndex < 0 || axisIndex >= cachedAxis.size())return 0;
-        return cachedAxis.get(axisIndex);
+        return Optional.ofNullable(cachedAxis.get(axisIndex)).orElse(0.0);
     }
 
     public boolean getButton(int buttonIndex){
         if(userUUID == null || buttonIndex < 0 || buttonIndex >= cachedButtons.size())return false;
-        return cachedButtons.get(buttonIndex);
+        return Optional.ofNullable(cachedButtons.get(buttonIndex)).orElse(false);
     }
 
 

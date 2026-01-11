@@ -40,7 +40,7 @@ public class RemotePacket extends SimplePacketBase {
                         .filter(IRemoteDevice.class::isInstance)
                         .map(IRemoteDevice.class::cast)
                         .map(IRemoteDevice::panel)
-                        .ifPresent(syncable -> syncable.receive(tag)));
+                        .ifPresent(syncable -> syncable.receive(tag, context.getSender())));
         return true;
     }
 }

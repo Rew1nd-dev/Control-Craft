@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.cimulink.game.port.bus;
 
 import com.google.common.collect.Sets;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.Component;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
@@ -77,8 +78,13 @@ public class BusPort extends NamedComponent {
                         c.onInputChange(c.in(port));
                     });
         });
+        try{
+            cache.values().stream().flatMap(Collection::stream).forEach(Component::onPositiveEdge);
+        } catch (RuntimeException e) {
+            ControlCraft.LOGGER.error("Error During Temporal Propagation At BusPort: {}, {}", e.getCause(), e.getMessage());
+            throw new RuntimeException(e);
+        }
 
-        cache.values().stream().flatMap(Collection::stream).forEach(Component::onPositiveEdge);
         allOutNames.forEach(s -> cache
             .getOrDefault(s, Collections.emptySet())
             .forEach(c -> {

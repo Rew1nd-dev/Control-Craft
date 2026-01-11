@@ -5,6 +5,8 @@ import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.foundation.managers.ServerCameraManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +52,8 @@ public class CameraBoundFakePlayer extends FakePlayer implements IPlayer {
             addToLevel(user);
         }
     }
+
+
 
     public void addToLevel(ServerPlayer user){
         reset();

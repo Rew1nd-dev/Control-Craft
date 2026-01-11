@@ -1,11 +1,14 @@
 package com.verr1.controlcraft.foundation.network.remote;
 
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.packets.specific.RemotePacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +29,10 @@ public class RemotePanel {
         ControlCraftPackets.getChannel().sendToServer(new RemotePacket(boundPos, total));
     }
 
-    public void receive(CompoundTag tag) {
+    public void receive(CompoundTag tag, ServerPlayer sender) {
+        if(sender == null)return;
         NetworkKey key = NetworkKey.deserialize(tag.getCompound("key"));
+        if(key.permissionLevel() > ControlCraftServer.INSTANCE.getProfilePermissions(sender.getGameProfile()))return;
         RemotePort<?> port = responses.get(key);
         if (port == null)return;
         Object input = port.deserialize(tag.getCompound("data"));
