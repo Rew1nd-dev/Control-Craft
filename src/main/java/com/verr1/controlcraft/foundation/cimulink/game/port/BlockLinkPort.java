@@ -339,6 +339,7 @@ public abstract class BlockLinkPort {
                 tellNearby(world, position, loe.getMessage());
                 alarmPlayers(position);
             }catch (RuntimeException re){
+                DebugUtils.printStackTrace();
                 ControlCraft.LOGGER.error("Unexpected Exception during temporal propagation at {}: {}", blp.pos(), re.getMessage());
                 blp.removeAllLinks();
             }

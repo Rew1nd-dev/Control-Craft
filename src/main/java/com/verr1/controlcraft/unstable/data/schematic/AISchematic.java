@@ -239,13 +239,13 @@ public class AISchematic {
 
 
                         BlockPos realPos = offsetPos.offset(center);
-                        blockPlacer.destroyBlock(realPos, false, null);
-                        if(!original.isAir()){
-                            ControlCraft.LOGGER.debug("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
-                        }
-                        if(original.getBlock() instanceof IReplaceBlock){
-                            blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 3); // destroy and replace, in order to clear be
-                        }
+                        blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 64);
+//                        if(!original.isAir()){
+//                            ControlCraft.LOGGER.debug("fixing: {} with state: {} and beTag size: {} Bytes", realPos, original, beTag.sizeInBytes());
+//                        }
+//                        if(original.getBlock() instanceof IReplaceBlock){
+//                            blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 3); // destroy and replace, in order to clear be
+//                        }
                         blockPlacer.setBlock(realPos, original, 3);
 
 

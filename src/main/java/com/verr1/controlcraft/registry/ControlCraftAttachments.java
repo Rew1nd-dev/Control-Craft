@@ -48,50 +48,6 @@ public enum ControlCraftAttachments {
 
     public static void register() {
         if(isRegistered) return;
-        /*
-        AttachmentRegistration<?> ANCHOR_INDUCER = ValkyrienSkies.api()
-                .newAttachmentRegistrationBuilder(AnchorForceInducer.class)
-                .useTransientSerializer()
-                .build();
-
-        AttachmentRegistration<?> OBSERVER = ValkyrienSkies.api()
-                .newAttachmentRegistrationBuilder(Observer.class)
-                .useTransientSerializer()
-                .build();
-
-        AttachmentRegistration<?> MOTOR = ValkyrienSkies.api()
-                .newAttachmentRegistrationBuilder(MotorForceInducer.class)
-                .useTransientSerializer()
-                .build();
-
-        AttachmentRegistration<?> QUEUE_FORCE_INDUCER = ValkyrienSkies.api()
-                .newAttachmentRegistrationBuilder(QueueForceInducer.class)
-                .useTransientSerializer()
-                .build();
-
-        AttachmentRegistration<?> SLIDER = ValkyrienSkies.api()
-                .newAttachmentRegistrationBuilder(SliderForceInducer.class)
-                .useTransientSerializer()
-                .build();
-
-        ValkyrienSkies.api().registerAttachment(ANCHOR_INDUCER);
-        ValkyrienSkies.api().registerAttachment(OBSERVER);
-        ValkyrienSkies.api().registerAttachment(MOTOR);
-        ValkyrienSkies.api().registerAttachment(QUEUE_FORCE_INDUCER);
-        ValkyrienSkies.api().registerAttachment(SLIDER);
-        isRegistered = true;
-
-        Arrays
-            .stream(ControlCraftAttachments.values())
-            .forEach(
-                type -> ValkyrienSkies.api().registerAttachment(
-                        ValkyrienSkies.api().newAttachmentRegistrationBuilder(type.clazz)
-                                .useTransientSerializer()
-                                .build()
-                )
-            );
-
-        * */
         Arrays
                 .stream(ControlCraftAttachments.values())
                 .forEach(

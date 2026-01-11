@@ -94,7 +94,6 @@ public class AiBoundFakePlayer extends FakePlayer implements VsiPlayer {
         if(liveCounter-- < 0)dump();
         LoadedServerShip ship = getShip().orElse(null);
         if(ship == null)return;
-
         if(getLevel().players().contains(this)){
             Vector3dc p = ship.getTransform().getPositionInWorld();
             moveTo(p.x(), p.y(), p.z());

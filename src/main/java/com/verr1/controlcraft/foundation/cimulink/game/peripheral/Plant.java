@@ -4,6 +4,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -31,7 +32,11 @@ public class Plant extends NamedComponent {
     @Override
     public void onPositiveEdge() {
         changedInput().forEach(i -> inputHandlers.get(i).accept(retrieveInput(i)));
-        updateOutput(outputHandlers.stream().map(Supplier::get).toList());
+        updateOutput(outputHandlers.stream()
+            .map(Supplier::get)
+            .map(Objects::requireNonNull)
+            .toList()
+        );
     }
 
 

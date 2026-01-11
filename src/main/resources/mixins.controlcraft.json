@@ -7,6 +7,7 @@
     "MixinContraption",
     "MixinCustomPayloadPacket",
     "MixinEntity",
+    "MixinPlayer",
     "camera.MixinChunkMap",
     "camera.MixinChunkMap$TrackedEntity",
     "camera.MixinServerPlayer",

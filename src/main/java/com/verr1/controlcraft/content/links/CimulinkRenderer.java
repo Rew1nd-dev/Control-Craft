@@ -433,9 +433,9 @@ public class CimulinkRenderer implements IRenderer{
                         -(float)(socketRenderOffset) * 16
                 ).fromSide(cbe.getDirection()); //
 
-//        Outliner.getInstance()
-//                .showValueBox(cbe.getBlockPos(), box.transform(transform))
-//                .highlightFace(result.getDirection());
+        Outliner.getInstance()
+                .showOutline(cbe.getBlockPos(), box.transform(transform))
+                .highlightFace(result.getDirection());
 
 
 

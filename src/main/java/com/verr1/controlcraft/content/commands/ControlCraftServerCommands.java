@@ -54,22 +54,6 @@ public class ControlCraftServerCommands {
     }
 
     private static void clearAllAttachments(){
-//        ControlCraftServer
-//                .INSTANCE
-//                .getAllLevels()
-//                .forEach(
-//                    lvl -> ValkyrienSkies.getShipWorld(lvl)
-//                            .getAllShips()
-//                            .forEach(
-//                                s -> Arrays
-//                                        .stream(ControlCraftAttachments.values())
-//                                        .map(ControlCraftAttachments::getClazz)
-//                                        .filter(c -> s.getAttachment(c) != null)
-//                                        .forEach(
-//                                                c -> s.saveAttachment(c, null)
-//                                        )
-//                            )
-//                );
     }
 
     private static int saveAllConstraintsCommand(CommandContext<CommandSourceStack> $){
@@ -250,6 +234,12 @@ public class ControlCraftServerCommands {
         }
         try{
             CircuitCompilerItem.load(player.getName().getString(), saveName, stack);
+            if(player.isCreative()){
+                player.drop(stack, false);
+            } else{
+                player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            }
+            source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         }catch (IOException ioe){
             var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.CIRCUIT);
             ControlCraftPackets.sendToPlayer(p, player);
@@ -260,15 +250,6 @@ public class ControlCraftServerCommands {
             return 0;
         }
 
-        if(player.isCreative()){
-            player.drop(stack, false);
-        } else{
-            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
-        }
-
-
-
-        source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         return 1;
     }
 
@@ -299,6 +280,12 @@ public class ControlCraftServerCommands {
         }
         try{
             LuaCompilerItem.load(player.getName().getString(), saveName, stack);
+            if(player.isCreative()){
+                player.drop(stack, false);
+            } else{
+                player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            }
+            source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         }catch (IOException ioe){
             var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.LUACUIT);
             ControlCraftPackets.sendToPlayer(p, player);
@@ -309,15 +296,6 @@ public class ControlCraftServerCommands {
             return 0;
         }
 
-        if(player.isCreative()){
-            player.drop(stack, false);
-        } else{
-            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
-        }
-
-
-
-        source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         return 1;
     }
 
