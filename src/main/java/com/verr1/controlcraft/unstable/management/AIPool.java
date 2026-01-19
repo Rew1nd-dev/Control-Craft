@@ -29,9 +29,12 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.primitives.AABBi;
+import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
 import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
+import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
+import org.valkyrienskies.mod.common.BlockStateInfo;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
@@ -48,7 +51,7 @@ public class AIPool extends SavedData {
     );
 
     public static final String DATA_NAME = ControlCraft.MODID + "_ai_pool";
-    public static Vector3d SIMPLE_YARD_POSITION = new Vector3d(0, 128, 0);
+    public static Vector3d SIMPLE_YARD_POSITION = new Vector3d(0, -64, 0);
     public static Vector3d SIMPLE_CREATE_POSITION = new Vector3d(0, 96, 0);
     private final Map<Long, AIPersistentData> persistent = new HashMap<>();
 
@@ -61,6 +64,9 @@ public class AIPool extends SavedData {
     private final LazyTicker lazyValidator = new LazyTicker(100, this::validate);
     private final LazyTicker lazyYardGuard = new LazyTicker(60, this::ensureStatic);
     private final LazyTicker lazyAttTicker = new LazyTicker(10, this::tickAttachment);
+    private final LazyTicker lazyFreeCacher = new LazyTicker(100, this::tickFreeAiCountCache);
+
+    private int cachedFreeAi = 0;
 
     private Vector3dc yard(){
         return SIMPLE_YARD_POSITION;
@@ -93,6 +99,7 @@ public class AIPool extends SavedData {
         lazyValidator.tick();
         lazyYardGuard.tick();
         lazyAttTicker.tick();
+        lazyFreeCacher.tick();
     }
 
     public void onServerStarted(){
@@ -262,6 +269,9 @@ public class AIPool extends SavedData {
         if(!isAI(id))return;
         ServerShip ship = getShipOf(id).orElse(null);
         if(ship == null)return;
+        ServerLevel level = getLevelOf(id).orElse(null);
+        if(level == null)return;
+
         ship.setStatic(true);
 
         networkOf(ship).onDiscard();
@@ -277,10 +287,12 @@ public class AIPool extends SavedData {
         Runnable task = () -> {
             networkOf(ship).onPreRestore();
             restoreAI(id);
+            restoreAI(id);
             networkOf(ship).onPostRestore();
         };
         task.run();
         vsWorld().teleportShip(ship, withPosition(yardPosition, ship.getChunkClaimDimension()));
+        remass(level, ship);
         // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
     }
 
@@ -390,6 +402,10 @@ public class AIPool extends SavedData {
         }));
     }
 
+    private void tickFreeAiCountCache(){
+        cachedFreeAi = listFreeAI().size();
+    }
+
     public void tickAttachment(){
         persistent
                 .keySet()
@@ -456,4 +472,65 @@ public class AIPool extends SavedData {
     public static AIPool load(MinecraftServer server){
         return server.overworld().getDataStorage().computeIfAbsent(AIPool::load, AIPool::new, DATA_NAME);
     }
+
+    public static boolean remass(ServerLevel level, ServerShip ship){
+        AABBic aabb = ship.getShipAABB();
+        if(aabb == null)return false;
+        boolean wasStatic = ship.isStatic();
+        ship.setStatic(true);
+        var airBlockMass_airBlockType = BlockStateInfo.INSTANCE.get(Blocks.AIR.defaultBlockState());
+        var solidBlockMass_solidBlockType = BlockStateInfo.INSTANCE.get(Blocks.STONE.defaultBlockState());
+        if(airBlockMass_airBlockType == null || solidBlockMass_solidBlockType == null)return false;
+        ServerShipWorldCore shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+        var airBlockType = airBlockMass_airBlockType.getSecond();
+        BlockPos.betweenClosed(
+            aabb.minX(), aabb.minY(), aabb.minZ(),
+            aabb.maxX(), aabb.maxY(), aabb.maxZ()
+        ).forEach( it -> {
+            var state = level.getBlockState(it);
+            var blockMass_blockType = BlockStateInfo.INSTANCE.get(state);
+            if(blockMass_blockType == null)return;
+            var blockType = blockMass_blockType.getSecond();
+            if(!blockType.equals(airBlockType)){
+                shipWorld.onSetBlock(
+                    it.getX(), it.getY(), it.getZ(),
+                    ship.getChunkClaimDimension(),
+                    blockType, airBlockType,
+                    0.0, 0.0
+                );
+            }
+        });
+
+//        ((ShipDataCommon)ship).setShipAABB();
+        // var solidBlockType = solidBlockMass_solidBlockType.getSecond();
+        shipWorld.onSetBlock(
+            aabb.minX(), aabb.minY(), aabb.minZ(),
+            ship.getChunkClaimDimension(),
+            airBlockType, airBlockType,
+            ship.getInertiaData().getMass(), 0.0
+        );
+
+        BlockPos.betweenClosed(
+            aabb.minX(), aabb.minY(), aabb.minZ(),
+            aabb.maxX(), aabb.maxY(), aabb.maxZ()
+        ).forEach( it -> {
+            var state = level.getBlockState(it);
+            var blockMass_blockType = BlockStateInfo.INSTANCE.get(state);
+            if(blockMass_blockType == null)return;
+            var blockType = blockMass_blockType.getSecond();
+            var blockMass = blockMass_blockType.getFirst();
+            if(!blockType.equals(airBlockType)){
+                shipWorld.onSetBlock(
+                    it.getX(), it.getY(), it.getZ(),
+                    ship.getChunkClaimDimension(),
+                    airBlockType, blockType,
+                    0.0, blockMass
+                );
+            }
+        });
+        ship.setStatic(wasStatic);
+        return true;
+    }
+
 }
