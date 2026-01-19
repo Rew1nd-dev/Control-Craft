@@ -14,6 +14,7 @@ import com.verr1.controlcraft.foundation.data.constraint.ConnectContext;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
 import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.AssembleUtil;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.createmod.catnip.animation.LerpedFloat;
@@ -36,6 +37,7 @@ import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 import java.lang.Math;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.*;
 import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
@@ -249,12 +251,16 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
 
     public void assemble(){
         // Only Assemble 1 Block When Being Right-Clicked with wrench. You Should Build Your Ship Up On This Assembled Block, Or Else Use Linker Tool Instead
-        if(level == null || level.isClientSide)return;
+        if(level == null || level.isClientSide || level.getBlockState(getAssembleBlockPos()).isAir())return;
         Ship self = getShipOn();
         // if(self == null)return;
         ServerLevel serverLevel = (ServerLevel) level;
-        List<BlockPos> collected = List.of(getAssembleBlockPos());
-        ServerShip comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1, true);
+//        List<BlockPos> collected = List.of(getAssembleBlockPos());
+//        ServerShip comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1.0, false);
+
+        Set<BlockPos> collected = Set.of(getAssembleBlockPos());
+        ServerShip comp = AssembleUtil.assembleToShip(serverLevel, collected, 1.0);
+        if(comp == null)return;
 
         Vector3dc comp_at_sc = toJOML(getAssembleBlockPos().getCenter());
         Vector3dc comp_at_wc = getShipOn() != null ?

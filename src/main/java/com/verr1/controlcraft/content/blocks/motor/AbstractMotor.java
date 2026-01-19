@@ -35,6 +35,7 @@ import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 import java.lang.Math;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.verr1.controlcraft.content.blocks.SharedKeys.CONNECT_CONTEXT;
 import static com.verr1.controlcraft.content.blocks.SharedKeys.SELF_OFFSET;
@@ -162,11 +163,16 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
     }
 
     public void assemble(){
-        if(level == null || level.isClientSide)return;
+        if(level == null || level.isClientSide || level.getBlockState(getAssembleBlockPos()).isAir())return;
 
         ServerLevel serverLevel = (ServerLevel) level;
-        List<BlockPos> collected = List.of(getAssembleBlockPos());
-        Ship comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1, true);
+//        List<BlockPos> collected = List.of(getAssembleBlockPos());
+//        Ship comp = ShipAssembler.INSTANCE.assembleToShip(serverLevel, collected, true, 1.0, false);//.assembleToShip(serverLevel, collected, 1.0);
+
+        Set<BlockPos> collected = Set.of(getAssembleBlockPos());
+        Ship comp = AssembleUtil.assembleToShip(serverLevel, collected, 1.0);
+        if(comp == null)return;
+
 
         Vector3dc comp_at_sc = toJOML(getAssembleBlockPos().getCenter());
         Vector3dc comp_at_wc = getShipOn() != null ?

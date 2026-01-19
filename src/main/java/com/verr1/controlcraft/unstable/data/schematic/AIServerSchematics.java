@@ -66,10 +66,10 @@ public class AIServerSchematics {
             CompoundTag schematicContentTag = tag.getCompound(SCHEMATICS_CONTENT);
             SchematicKey key = SchematicKey.deserialize(schematicKeyTag);
 
-            if(LOADED_SCHEMATICS.containsKey(key)){
-                ControlCraft.LOGGER.warn("Schematic with key {} already loaded. Skipping duplicate.", key);
-                return;
-            }
+//            if(LOADED_SCHEMATICS.containsKey(key)){
+//                ControlCraft.LOGGER.warn("Schematic with key {} already loaded. Skipping duplicate.", key);
+//                return;
+//            }
 
             AISchematic schematic = AISchematic.deserialize(schematicContentTag);
 

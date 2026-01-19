@@ -197,13 +197,13 @@ dependencies {
     compileOnly fg.deobf("libs:cbcmodernwarfare:0.0.6c")
     compileOnly fg.deobf("libs:createbigcannons:5.10.0")
     compileOnly fg.deobf("libs:trackwork:1.1.1")
-    compileOnly fg.deobf("libs:shaolib:1.4.3")
+    compileOnly fg.deobf("libs:shaolib:2.0.1")
     compileOnly fg.deobf("libs:vmod:1.8.0")
     implementation fg.deobf("libs:tweakcontroller-1.2.5:forge")
     implementation fg.deobf("libs:we-7.2.15:forge")
     implementation fg.deobf("libs:fcs-8.0.2:forge")
     implementation fg.deobf("libs:cct-1.116.2:forge")
-    compileOnly fg.deobf("libs:shaolib:1.4.3")
+    // compileOnly fg.deobf("libs:shaolib:1.4.3")
     compileOnly fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
 
     minecraftLibrary(jarJar("libs:luaj:3.0.2"){

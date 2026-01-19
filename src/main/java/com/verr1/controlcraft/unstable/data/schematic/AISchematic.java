@@ -15,11 +15,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.AABB;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockItem;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockPaletteHashMapV1;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.ChunkyBlockData;
 import net.spaceeye.valkyrien_ship_schematics.interfaces.ICopyableBlock;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 import org.joml.primitives.AABBi;
@@ -30,6 +32,7 @@ import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
 
@@ -280,6 +283,58 @@ public class AISchematic {
 
                 }}}
     }
+
+    public AABB computeBounds(){
+        BlockPos.MutableBlockPos min = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos max = new BlockPos.MutableBlockPos();
+        blockData.forEach((x, y, z, item) -> {
+            min.set(Math.min(x, min.getX()), Math.min(y, min.getY()), Math.min(z, min.getZ()));
+            max.set(Math.max(x, max.getX()), Math.max(y, max.getY()), Math.max(z, max.getZ()));
+            return null;
+        });
+        return new AABB(min.getX(), min.getY(), min.getZ(), max.getX() + 1, max.getY() + 1, max.getZ() + 1);
+    }
+
+    public @NotNull BlockItemResult get(BlockPos offsetPosition){
+        BlockItem item = getRaw(offsetPosition);
+        if(item == null)return new BlockItemResult(Blocks.AIR.defaultBlockState(), null);
+        BlockState state = Objects.requireNonNullElseGet(offsetPalette.fromId(item.getPaletteId()), Blocks.AIR::defaultBlockState);
+        CompoundTag tag = item.getExtraDataId() == -1 ? null : savedBeTags.get(item.getExtraDataId()).copy();
+        return new BlockItemResult(state, tag);
+    }
+
+    protected BlockItem getRaw(BlockPos offsetPosition){
+        BlockPos chunkMin = new BlockPos((offsetPosition.getX() >> 4) << 4, 0, (offsetPosition.getZ() >> 4) << 4);
+        return blockData
+            .getBlocks()
+            .getOrDefault(
+                new BlockPos(offsetPosition.getX() >> 4, 0, offsetPosition.getZ() >> 4),
+                new HashMap<>()
+            )
+            .get(offsetPosition.subtract(chunkMin));
+    }
+
+    public List<Pair<BlockPos, BlockItemResult>> blocksWithFilter(Predicate<Pair<BlockPos, BlockState>> filter){
+        List<Pair<BlockPos, BlockItemResult>> result = new ArrayList<>();
+        blockData.forEach((x, y, z, item) -> {
+            BlockState state = offsetPalette.fromId(item.getPaletteId());
+            if(state == null){
+                state = Blocks.AIR.defaultBlockState();
+            }
+
+            BlockPos pos = new BlockPos(x, y, z);
+            Pair<BlockPos, BlockState> pair = new Pair<>(pos, state);
+            if(filter.test(pair)){
+                CompoundTag tag = item.getExtraDataId() == -1 ? null : savedBeTags.get(item.getExtraDataId()).copy();
+                result.add(new Pair<>(pos, new BlockItemResult(state, tag)));
+            }
+            return null;
+        });
+        return result;
+    }
+
+    public record BlockItemResult(@NotNull BlockState state, @Nullable CompoundTag tag){};
+
 
 
     public static List<ChunkPos> createToIterate(@NotNull AABBic shipBound){

@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.unstable.management;
+package com.verr1.controlcraft.unstable.management.v1;
 
 public class AISpawnResult {
     public static final AISpawnResult USE_UP = new AISpawnResult(-1, Status.USE_UP, RepairResult.DID_NOT_REPAIR);

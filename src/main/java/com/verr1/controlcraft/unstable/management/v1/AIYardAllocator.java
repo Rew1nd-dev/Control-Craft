@@ -1,11 +1,10 @@
-package com.verr1.controlcraft.unstable.management;
+package com.verr1.controlcraft.unstable.management.v1;
 
 import com.verr1.controlcraft.unstable.valkyrienskies.controls.AIControlUtils;
 import com.verr1.controlcraft.utils.MathUtils;
 import net.minecraft.nbt.CompoundTag;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-import org.joml.primitives.AABBi;
 import org.joml.primitives.AABBic;
 
 import java.util.HashMap;

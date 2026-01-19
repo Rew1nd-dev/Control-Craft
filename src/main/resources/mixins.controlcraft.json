@@ -8,6 +8,7 @@
     "MixinCustomPayloadPacket",
     "MixinEntity",
     "MixinPlayer",
+    "MixinVsiServerWorld",
     "camera.MixinChunkMap",
     "camera.MixinChunkMap$TrackedEntity",
     "camera.MixinServerPlayer",

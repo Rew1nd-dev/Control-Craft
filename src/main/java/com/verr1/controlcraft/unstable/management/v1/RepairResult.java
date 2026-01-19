@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.unstable.management;
+package com.verr1.controlcraft.unstable.management.v1;
 
 public enum RepairResult {
     SUCCESS,

@@ -225,6 +225,14 @@ public class MathUtils {
         return new Vector3d(hvt.x() / length, hvt.y() / length, hvt.z() / length);
     }
 
+//    public static Vector3d safeNormalize(Vector3d hvt) {
+//        double length = hvt.length();
+//        if (length < 1e-9) {
+//            return new Vector3d(0, 0, 0);
+//        }
+//        return hvt.div(length);
+//    }
+
     public static Vector3d nonNan(Vector3dc v){
         if (Double.isNaN(v.x()) || Double.isNaN(v.y()) || Double.isNaN(v.z())) {
             return new Vector3d(0, 0, 0);
@@ -246,4 +254,11 @@ public class MathUtils {
         }
         return new Vector3d(hvt.x() / length, hvt.y() / length, hvt.z() / length);
     }
+
+    public static AABBi inflate(AABBi src, int x, int y, int z){
+        src.setMin(src.minX - x, src.minY - y, src.minZ - z);
+        src.setMax(src.maxX + x, src.maxY + y, src.maxZ + z);
+        return src;
+    }
+
 }

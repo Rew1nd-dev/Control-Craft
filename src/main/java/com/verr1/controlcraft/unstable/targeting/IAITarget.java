@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 
@@ -67,7 +68,7 @@ public interface IAITarget {
         return new IAITarget() {
             final BlockPos blockPos = BlockPos.containing(toMinecraft(blockPositionShip));
 
-            ServerShip ship(){
+            LoadedServerShip ship(){
                 return AIServer.MANAGER.getShipAt(WorldBlockPos.of(level, blockPos)).orElse(null);
             }
 
@@ -89,10 +90,10 @@ public interface IAITarget {
     @NotNull
     static Vector3dc _velocity(Vector3dc blockPositionShip, ServerLevel level){
         BlockPos blockPos = BlockPos.containing(toMinecraft(blockPositionShip));
-        ServerShip ship = AIServer.MANAGER.getShipAt(WorldBlockPos.of(level, blockPos)).orElse(null);;
+        LoadedServerShip ship = AIServer.MANAGER.getShipAt(WorldBlockPos.of(level, blockPos)).orElse(null);;
         if(ship == null)return new Vector3d();
         Vector3dc sv_wc = ship.getVelocity();
-        Vector3dc sw_wc = ship.getOmega();
+        Vector3dc sw_wc = ship.getAngularVelocity();
         Vector3dc r_sc = new Vector3d(blockPositionShip).sub(ship.getTransform().getPositionInShip());
         Vector3dc r_wc = ship.getShipToWorld().transformDirection(r_sc, new Vector3d());
         return new Vector3d(sv_wc).add(new Vector3d(sw_wc).cross(r_wc));

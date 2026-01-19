@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
+import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
@@ -22,6 +23,9 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Quaterniond;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import static org.valkyrienskies.mod.api.ValkyrienSkies.toJOML;
@@ -40,6 +44,13 @@ public class AIServerCommands {
 
 
     private static int reloadCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        ServerPlayer player = source.getPlayer();
+        if(player != null && !isOp(player)){
+            source.sendFailure(Component.literal("You must be an operator to perform this command!"));
+            return 0;
+        }
+
         AIServer.SCHEMATICS_MANAGER.reload();
         return 1;
     }
@@ -63,7 +74,7 @@ public class AIServerCommands {
         if(!(hit instanceof BlockHitResult blockHitResult))return 0;
 
         WorldBlockPos pos = WorldBlockPos.of(player.level(), blockHitResult.getBlockPos());
-        ServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
+        LoadedServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
 
         if(ship == null){
             source.sendFailure(Component.literal("No ship found at your vicinity!"));
@@ -95,7 +106,7 @@ public class AIServerCommands {
         if(!(hit instanceof BlockHitResult blockHitResult))return 0;
 
         WorldBlockPos pos = WorldBlockPos.of(player.level(), blockHitResult.getBlockPos());
-        ServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
+        LoadedServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
 
         if(ship == null){
             source.sendFailure(Component.literal("No ship found at your vicinity!"));
@@ -130,7 +141,35 @@ public class AIServerCommands {
         return 1;
     }
 
+    private static boolean isOp(ServerPlayer player){
+        return ControlCraftServer.INSTANCE.getProfilePermissions(player.getGameProfile()) >= 4;
+    }
+
     private static int debugDiscardCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to perform this command!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+
+        HitResult hit = player.pick(10, 1, false);
+        if(!(hit instanceof BlockHitResult blockHitResult))return 0;
+
+        WorldBlockPos pos = WorldBlockPos.of(player.level(), blockHitResult.getBlockPos());
+        LoadedServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
+
+        if(ship == null){
+            source.sendFailure(Component.literal("No ship found at your vicinity!"));
+            return 0;
+        }
+
+        AIServer.MANAGER.discard(ship.getId());
+
+        return 1;
+    }
+
+    private static int debugInfoCommand(CommandContext<CommandSourceStack> context){
         CommandSourceStack source = context.getSource();
 
 
@@ -144,15 +183,21 @@ public class AIServerCommands {
         if(!(hit instanceof BlockHitResult blockHitResult))return 0;
 
         WorldBlockPos pos = WorldBlockPos.of(player.level(), blockHitResult.getBlockPos());
-        ServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
-
+        LoadedServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
         if(ship == null){
             source.sendFailure(Component.literal("No ship found at your vicinity!"));
             return 0;
         }
 
-        AIServer.MANAGER.discard(ship.getId());
-
+        Vector3dc p  = ship.getTransform().getPositionInWorld();
+        Vector3dc ps = ship.getTransform().getPositionInShip();
+        Vector3dc v  = ship.getVelocity();
+        Vector3dc w  = ship.getAngularVelocity();
+        source.sendSystemMessage(Component.literal("Ship Information " + ship.getId()));
+        source.sendSystemMessage(Component.literal("p : " + p));
+        source.sendSystemMessage(Component.literal("ps: " + ps));
+        source.sendSystemMessage(Component.literal("v : " + v));
+        source.sendSystemMessage(Component.literal("w : " + w));
         return 1;
     }
 
@@ -162,13 +207,13 @@ public class AIServerCommands {
     }
 
     private static int debugResetCommand(CommandContext<CommandSourceStack> context){
+
         AIServer.MANAGER.reset();
         return 1;
     }
 
     private static int debugJoinPollCommand(CommandContext<CommandSourceStack> context){
         CommandSourceStack source = context.getSource();
-
 
 
         String namespace = context.getArgument("namespace", String.class);
@@ -223,6 +268,11 @@ public class AIServerCommands {
                                                                         .executes(AIServerCommands::debugRepairShipCommand)
                                                         )
                                         )
+                        ).then(
+                            lt("info")
+                                .executes(
+                                    AIServerCommands::debugInfoCommand
+                                )
                         )
                 ).then(
                         lt("spawn")
@@ -258,6 +308,7 @@ public class AIServerCommands {
                                                         arg("name", StringArgumentType.string())
                                                                 .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
                                                                 .executes(AIServerCommands::debugJoinPollCommand)
+
                                                 )
                                 )
                 ).then(
@@ -266,12 +317,13 @@ public class AIServerCommands {
                                         arg("coordinate", Vec3Argument.vec3()).executes(
                                                 AIServerCommands::setYardPositionCommand
                                         )
+
                                 )
                 ).then(
                         lt("reload-schematics").executes(
                                 AIServerCommands::reloadCommand
                         )
-                )
+                ).requires(csc -> csc.hasPermission(4))
 
         );
     }
