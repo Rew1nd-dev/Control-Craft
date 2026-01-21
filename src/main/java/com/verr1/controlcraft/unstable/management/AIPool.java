@@ -21,6 +21,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +47,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft
 
 public class AIPool extends SavedData {
 
+    public static final TicketType<Long> CHUNK_LOAD_TICKET = TicketType.create("cai:chunk_load", Long::compareTo);
     private static final Serializer<Map<Long, AIPersistentData>> PERSISTENT = SerializeUtils.ofMap(
             SerializeUtils.LONG,
             AIPersistentData.SER
@@ -54,10 +57,8 @@ public class AIPool extends SavedData {
     public static Vector3d SIMPLE_YARD_POSITION = new Vector3d(0, -64, 0);
     public static Vector3d SIMPLE_CREATE_POSITION = new Vector3d(0, 96, 0);
     private final Map<Long, AIPersistentData> persistent = new HashMap<>();
+    public static int SIMPLE_ARRANGE_SPACING = 3;
 
-
-    private final AIYardAllocator allocator = new AIYardAllocator.Simple(this::yard);
-    private final Map<Long, Pair<Long, Vector3dc>> availableAIAllocatePointer = new HashMap<>();
     private final Set<Long> availableAI = new HashSet<>();
 
 
@@ -66,20 +67,34 @@ public class AIPool extends SavedData {
     private final LazyTicker lazyAttTicker = new LazyTicker(10, this::tickAttachment);
     private final LazyTicker lazyFreeCacher = new LazyTicker(100, this::tickFreeAiCountCache);
 
+
+    private boolean initialized = false;
     private int cachedFreeAi = 0;
 
     private Vector3dc yard(){
         return SIMPLE_YARD_POSITION;
     }
 
+    private Vector3dc yardv(){
+        return SIMPLE_YARD_POSITION;
+    }
 
+    private ChunkPos yardc(){
+        Vector3dc yardv = yardv();
+        return new ChunkPos(BlockPos.containing(toMinecraft(yardv)));
+    }
 
+    private static ChunkPos toChunkPos(Vector3dc v){
+        return new ChunkPos(BlockPos.containing(toMinecraft(v)));
+    }
+
+    public int getFreeAICount(){
+        return cachedFreeAi;
+    }
 
     public void reset(){
         availableAI.clear();
-        availableAIAllocatePointer.clear();
-        allocator.clear();
-        persistent.keySet().forEach(this::discard);
+        listAllAI().forEach(this::discard);
         setDirty();
     }
 
@@ -87,15 +102,11 @@ public class AIPool extends SavedData {
         getFreeAI().forEach(this::discard);
     }
 
-    private void clearAll(){
-        availableAI.clear();
-        availableAIAllocatePointer.clear();
-        allocator.clear();
-        persistent.clear();
-        setDirty();
-    }
-
     public void tick(){
+        if(!initialized){
+            initialized = true;
+            initialize();
+        }
         lazyValidator.tick();
         lazyYardGuard.tick();
         lazyAttTicker.tick();
@@ -148,14 +159,8 @@ public class AIPool extends SavedData {
     }
 
     public Optional<ServerShip> getShipAt(WorldBlockPos pos){
-        return Optional
-                .ofNullable(
-                        VSGameUtilsKt
-                                .getShipManagingPos(
-                                        pos.level(server()),
-                                        pos.pos()
-                                )
-                );
+        return Optional.ofNullable(VSGameUtilsKt.getShipManagingPos(pos.level(server()), pos.pos())
+        );
     }
 
     public List<Long> listAvailableAI(){
@@ -173,11 +178,14 @@ public class AIPool extends SavedData {
     private void remove(long i){
         persistent.remove(i);
         availableAI.remove(i);
-        if(availableAIAllocatePointer.containsKey(i)){
-            allocator.free(availableAIAllocatePointer.get(i).getFirst());
-            availableAIAllocatePointer.remove(i);
-        }
         setDirty();
+    }
+
+    private void moveYard(Vector3dc yardvo, Vector3dc yardvn){
+        ChunkPos o = toChunkPos(yardvo);
+        ChunkPos n = toChunkPos(yardvn);
+        ControlCraftServer.OVERWORLD.getChunkSource().removeRegionTicket(CHUNK_LOAD_TICKET, o, 3, o.toLong(), false);
+        ControlCraftServer.OVERWORLD.getChunkSource().addRegionTicket(CHUNK_LOAD_TICKET, n, 3, n.toLong(), false);
     }
 
     public void validate(){
@@ -207,6 +215,8 @@ public class AIPool extends SavedData {
                 () -> logAbsentId(id)
         );
     }
+
+
 
     public void unMarkAI(long id){
         getShipOf(id).ifPresentOrElse(s -> {
@@ -273,16 +283,7 @@ public class AIPool extends SavedData {
         if(level == null)return;
 
         ship.setStatic(true);
-
         networkOf(ship).onDiscard();
-
-        if(availableAIAllocatePointer.containsKey(id)){
-            allocator.free(availableAIAllocatePointer.get(id).getFirst());
-        }
-
-        Long spacePointer = allocator.allocate(Optional.ofNullable(ship.getShipAABB()).orElse(new AABBi()));
-        Vector3dc yardPosition = allocator.position(spacePointer);
-        availableAIAllocatePointer.put(ship.getId(), new Pair<>(spacePointer, yardPosition));
         availableAI.add(ship.getId());
         Runnable task = () -> {
             networkOf(ship).onPreRestore();
@@ -291,9 +292,19 @@ public class AIPool extends SavedData {
             networkOf(ship).onPostRestore();
         };
         task.run();
-        vsWorld().teleportShip(ship, withPosition(yardPosition, ship.getChunkClaimDimension()));
+        vsWorld().teleportShip(ship, withPosition(computeYardPosition(id)));
         remass(level, ship);
-        // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
+    }
+
+    private int computeYardIndex(long id){
+        return Math.toIntExact(persistent.keySet().stream().filter(k -> id > k).count());
+    }
+
+    private Vector3dc computeYardPosition(long id){
+        int index = computeYardIndex(id);
+        int x = index % 8;
+        int y = index / 8;
+        return new Vector3d(SIMPLE_YARD_POSITION).add(x * SIMPLE_ARRANGE_SPACING, 0, y * SIMPLE_ARRANGE_SPACING);
     }
 
     public @NotNull AISpawnResult spawn(long id, SchematicKey overrideKey ,Vector3dc position, Quaterniondc rotation, Vector3dc velocity, Vector3dc omega){
@@ -302,12 +313,9 @@ public class AIPool extends SavedData {
         if(!isAI(id))return AISpawnResult.NOT_AN_AI;
         if(!availableAI.contains(id))return AISpawnResult.NOT_AVAILABLE;
 
-        Long spacePointer = availableAIAllocatePointer.get(id).getFirst();
-        allocator.free(spacePointer);
-        availableAIAllocatePointer.remove(id);
+
         availableAI.remove(id);
         ship.setStatic(false);
-
 
         networkOf(ship).onPreRepair();
         RepairResult result = repairAI(id, overrideKey);
@@ -321,12 +329,13 @@ public class AIPool extends SavedData {
 
         Runnable task = () -> {
             vsWorld().teleportShip(ship, withPose(position, rotation, velocity, omega, ship.getChunkClaimDimension()));
-            networkOf(ship).onSpawn();
+            networkOf(ship).onSpawn()
+            ;
         };
 
-        // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 2);
+        //
         task.run();
-
+        // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 3);
         return new AISpawnResult(id);
     }
 
@@ -372,13 +381,13 @@ public class AIPool extends SavedData {
         return newShip;
     }
 
-    public static ShipTeleportDataImpl withPosition(Vector3dc newPosition, String newDim){
+    public static ShipTeleportDataImpl withPosition(Vector3dc newPosition){
         return new ShipTeleportDataImpl(
                 newPosition,
                 new Quaterniond(),
                 new Vector3d(),
                 new Vector3d(),
-                newDim,
+                null,
                 1.0
         );
     }
@@ -389,16 +398,10 @@ public class AIPool extends SavedData {
 
 
     public void ensureStatic(){
-        availableAI.forEach(i -> getShipOf(i).ifPresent(s -> {
+        listAvailableAI().forEach(i -> getShipOf(i).ifPresent(s -> {
             s.setStatic(true);
-            Optional.ofNullable(availableAIAllocatePointer.get(i))
-                    .map(Pair::getSecond)
-                    .ifPresent(
-                            p -> vsWorld().teleportShip(s, withPosition(
-                                    p,
-                                    s.getChunkClaimDimension()
-                            ))
-                    );
+            Vector3dc p = computeYardPosition(i);
+            vsWorld().teleportShip(s, withPosition(p));
         }));
     }
 
@@ -419,6 +422,10 @@ public class AIPool extends SavedData {
                 });
     }
 
+    private void initialize(){
+        // add to force load
+        moveYard(SIMPLE_YARD_POSITION, SIMPLE_YARD_POSITION);
+    }
 
     public static ShipTeleportDataImpl withPose(Vector3dc newPosition, Quaterniondc newRotation, String newDim){
         return withPose(newPosition, newRotation, new Vector3d(), new Vector3d(), newDim);
@@ -435,7 +442,9 @@ public class AIPool extends SavedData {
     }
 
     public void setYardPosition(double x, double y, double z){
+        moveYard(SIMPLE_YARD_POSITION, new Vector3d(x, y, z));
         SIMPLE_YARD_POSITION.set(x, y, z);
+        SIMPLE_CREATE_POSITION.set(x, Math.min(96, ControlCraftServer.OVERWORLD.getMinBuildHeight()), z);
         setDirty();
     }
 
@@ -450,16 +459,16 @@ public class AIPool extends SavedData {
         return CompoundTagBuilder.create()
                 .withCompound("database", PERSISTENT.serialize(persistent))
                 .withCompound("yard", SerializeUtils.VECTOR3D.serialize(SIMPLE_YARD_POSITION))
+                .withCompound("yardc", SerializeUtils.VECTOR3D.serialize(SIMPLE_CREATE_POSITION))
                 .build();
     }
 
     public void deserialize(CompoundTag tag){
         availableAI.clear();
-        availableAIAllocatePointer.clear();
-        allocator.clear();
         persistent.clear();
         persistent.putAll(PERSISTENT.deserialize(tag.getCompound("database")));
-        SIMPLE_YARD_POSITION = SerializeUtils.VECTOR3D.deserialize(tag.getCompound("yard"));
+        SIMPLE_YARD_POSITION = SerializeUtils.VECTOR3D.deserializeOrElse(tag.getCompound("yard"), SIMPLE_YARD_POSITION);
+        SIMPLE_CREATE_POSITION = SerializeUtils.VECTOR3D.deserializeOrElse(tag.getCompound("yardc"), SIMPLE_CREATE_POSITION);
     }
 
     private static AIPool load(@NotNull CompoundTag tag) {
