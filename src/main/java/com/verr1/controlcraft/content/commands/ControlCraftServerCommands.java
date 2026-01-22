@@ -255,15 +255,28 @@ public class ControlCraftServerCommands {
             }
             source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         }catch (IOException ioe){
-            var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.CIRCUIT);
-            ControlCraftPackets.sendToPlayer(p, player);
-            source.sendFailure(Component.literal("circuit is missing, requesting upload..."));
+//            var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.CIRCUIT);
+//            ControlCraftPackets.sendToPlayer(p, player);
+            source.sendFailure(Component.literal("circuit is missing, please upload..."));
         }catch (Exception e){
             source.sendFailure(Component.literal("Failed to load circuit: " + e.getMessage()));
             ControlCraft.LOGGER.error("Failed to load circuit: " + e.getMessage(), e);
             return 0;
         }
 
+        return 1;
+    }
+
+    public static int uploadCircuitCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        String saveName = context.getArgument("saveName", String.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set save a circuit!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.CIRCUIT);
+        ControlCraftPackets.sendToPlayer(p, player);
         return 1;
     }
 
@@ -301,15 +314,27 @@ public class ControlCraftServerCommands {
             }
             source.sendSuccess(() -> Component.literal("Circuit load successful with size: " + (double)stack.getOrCreateTag().sizeInBytes() / 1000 + " KB"), false);
         }catch (IOException ioe){
-            var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.LUACUIT);
-            ControlCraftPackets.sendToPlayer(p, player);
-            source.sendFailure(Component.literal("lua is missing, requesting upload..."));
+//            var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.LUACUIT);
+//            ControlCraftPackets.sendToPlayer(p, player);
+            source.sendFailure(Component.literal("lua is missing, please upload..."));
         }catch (Exception e){
             source.sendFailure(Component.literal("Failed to load lua: " + e.getMessage()));
             ControlCraft.LOGGER.error("Failed to load lua: " + e.getMessage(), e);
             return 0;
         }
+        return 1;
+    }
 
+    public static int uploadLuaCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        String saveName = context.getArgument("saveName", String.class);
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to set save a circuit!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+        var p = new CodeUploadRequestPacket(saveName, CodeUploadRequestPacket.Type.LUACUIT);
+        ControlCraftPackets.sendToPlayer(p, player);
         return 1;
     }
 
@@ -415,6 +440,12 @@ public class ControlCraftServerCommands {
                         ).then(lt("load-lua")
                                 .then(arg("saveName", StringArgumentType.string())
                                         .executes(ControlCraftServerCommands::loadLuaCommand))
+                        ).then(lt("upload-lua")
+                                .then(arg("saveName", StringArgumentType.string())
+                                        .executes(ControlCraftServerCommands::uploadLuaCommand))
+                        ).then(lt("upload-circuit")
+                                .then(arg("saveName", StringArgumentType.string())
+                                        .executes(ControlCraftServerCommands::uploadCircuitCommand))
                         )
         );
         dispatcher.register(
