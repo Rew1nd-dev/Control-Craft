@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.unstable.data.schematic.AISchematic;
 import com.verr1.controlcraft.unstable.data.schematic.SchematicKey;
+import com.verr1.controlcraft.unstable.management.AIPool;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
@@ -156,6 +157,32 @@ public class AIServerCommands {
         return 1;
     }
 
+    private static int remassCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+
+
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to perform this command!"));
+            return 0;
+        }
+        ServerPlayer player = source.getPlayer();
+
+        HitResult hit = player.pick(10, 1, false);
+        if(!(hit instanceof BlockHitResult blockHitResult))return 0;
+
+        WorldBlockPos pos = WorldBlockPos.of(player.level(), blockHitResult.getBlockPos());
+        ServerShip ship = AIServer.MANAGER.getShipAt(pos).orElse(null);
+
+        if(ship == null){
+            source.sendFailure(Component.literal("No ship found at your vicinity!"));
+            return 0;
+        }
+
+        AIPool.remass(player.serverLevel(), ship);
+        source.sendSystemMessage(Component.literal("remass to: " + ship.getInertiaData().getMass()));
+        return 1;
+    }
+
     private static int debugDiscardAllCommand(CommandContext<CommandSourceStack> context){
         AIServer.MANAGER.resetAlive();
         return 1;
@@ -223,6 +250,10 @@ public class AIServerCommands {
                                                                         .executes(AIServerCommands::debugRepairShipCommand)
                                                         )
                                         )
+                        ).then(
+                            lt("remass").executes(
+                                AIServerCommands::remassCommand
+                            )
                         )
                 ).then(
                         lt("spawn")
@@ -271,7 +302,7 @@ public class AIServerCommands {
                         lt("reload-schematics").executes(
                                 AIServerCommands::reloadCommand
                         )
-                )
+                ).requires(csc -> csc.hasPermission(3))
 
         );
     }

@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -247,7 +248,7 @@ public class AISchematic {
                         }
 
                         // blockPlacer.destroyBlock(realPos, false, null);
-                        blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 64);
+                        blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS);
 //                        if(original.getBlock() instanceof IReplaceBlock){
 //                            // blockPlacer.setBlock(realPos, Blocks.AIR.defaultBlockState(), 64); // destroy and replace, in order to clear be
 //                        }
