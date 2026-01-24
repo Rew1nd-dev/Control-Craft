@@ -51,6 +51,7 @@ public class SchematicBlock extends DirectionalBlock implements IBE<SchematicBlo
                 && handIn == InteractionHand.MAIN_HAND
                 && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()
                 && !player.isShiftKeyDown()
+                && player.isCreative()
         ){
             displayScreen(pos);
             return InteractionResult.SUCCESS;

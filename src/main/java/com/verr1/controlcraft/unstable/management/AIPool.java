@@ -230,6 +230,10 @@ public class AIPool extends SavedData {
         return opt.filter(ship -> ship.getAttachment(AIBlockNetwork.class) != null).isPresent();
     }
 
+    public boolean isRecorded(long id){
+        return persistent.containsKey(id);
+    }
+
     public boolean isAIQuickTest(long id){
         return persistent.containsKey(id);
     }
@@ -264,6 +268,7 @@ public class AIPool extends SavedData {
     }
 
     public void restoreAI(long id){
+        if(!persistent.containsKey(id))return;
         repairAI(id, persistent.get(id).storageSchematic);
     }
 
@@ -276,7 +281,7 @@ public class AIPool extends SavedData {
     }
 
     public void discard(long id){
-        if(!isAI(id))return;
+        if(!isAI(id) || !isRecorded(id))return;
         ServerShip ship = getShipOf(id).orElse(null);
         if(ship == null)return;
         ServerLevel level = getLevelOf(id).orElse(null);
