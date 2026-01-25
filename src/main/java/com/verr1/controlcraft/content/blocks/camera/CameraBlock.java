@@ -82,7 +82,7 @@ public class CameraBlock extends DirectionalBlock implements IBE<CameraBlockEnti
             }
         }
 
-        return InteractionResult.SUCCESS;
+        return InteractionResult.PASS;
     }
 
     @Override

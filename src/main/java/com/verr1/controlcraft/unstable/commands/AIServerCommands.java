@@ -302,7 +302,7 @@ public class AIServerCommands {
                         lt("reload-schematics").executes(
                                 AIServerCommands::reloadCommand
                         )
-                ).requires(csc -> csc.hasPermission(3))
+                ).requires(csc -> csc.hasPermission(2))
 
         );
     }
