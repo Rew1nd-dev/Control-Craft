@@ -13,7 +13,6 @@ import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
-import com.verr1.controlcraft.unstable.AIServer;
 import com.verr1.controlcraft.utils.TimeCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -48,14 +47,14 @@ public class ControlCraftEvents {
         ControlCraftServer.LUA_THREAD = Executors.newSingleThreadExecutor();
         ControlCraftAttachments.register();
 
-        AIServer.init(event.getServer());
+        // AIServer.init(event.getServer());
         /**/
         // VSEvents.ShipLoadEvent.Companion.on(ControlCraftAttachments::onShipLoad);
     }
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        AIServer.MANAGER.onServerStarted();
+        // AIServer.MANAGER.onServerStarted();
         BlockLinkPort.RUN_AT_PHYSICS_THREAD = BlockPropertyConfig._PHYSICS_THREAD_CIMULINK;
     }
 
@@ -69,7 +68,6 @@ public class ControlCraftEvents {
             ControlCraftServer.CC_NETWORK.tick();
             BlockLinkPort.preMainTick();
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
-            AIServer.MANAGER.tick();
             CimulinkBus.tickAll();
             TimeCache.tick();
         } else if (event.phase == TickEvent.Phase.END) {

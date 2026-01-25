@@ -40,14 +40,6 @@ import com.verr1.controlcraft.content.links.sensor.SensorBlock;
 import com.verr1.controlcraft.content.links.shifter.ShifterLinkBlock;
 import com.verr1.controlcraft.content.links.signal.DirectCurrentBlock;
 import com.verr1.controlcraft.content.links.tweakerminal.TweakerminalBlock;
-import com.verr1.controlcraft.unstable.blocks.attacker.AiAttackerBlock;
-import com.verr1.controlcraft.unstable.blocks.autocannon.AiAutoCannonBlock;
-import com.verr1.controlcraft.unstable.blocks.cannon.AiBigCannonBlock;
-import com.verr1.controlcraft.unstable.blocks.cruiser.CruiserBlock;
-import com.verr1.controlcraft.unstable.blocks.explosive.ExplosiveBlock;
-import com.verr1.controlcraft.unstable.blocks.monitor.MonitorBlock;
-import com.verr1.controlcraft.unstable.blocks.schematic.SchematicBlock;
-import com.verr1.controlcraft.unstable.blocks.weight.StandardWeightBlock;
 
 public enum VsMasses {
 
@@ -97,14 +89,14 @@ public enum VsMasses {
     TWEAKERMINAL(TweakerminalBlock.ID, 5),
 
 
-    AI_CRUISER(CruiserBlock.ID, 5),
-    AI_SCHEMATIC(SchematicBlock.ID, 5),
-    AI_ATTACKER(AiAttackerBlock.ID, 5),
-    AI_MONITOR(MonitorBlock.ID, 5),
-    AI_AUTOCANNON(AiAutoCannonBlock.ID, 5),
-    AI_BIG_CANNON(AiBigCannonBlock.ID, 5),
-    AI_EXPLOSIVE(ExplosiveBlock.ID, 5),
-    AI_WEIGHT(StandardWeightBlock.ID, 100)
+//    AI_CRUISER(CruiserBlock.ID, 5),
+//    AI_SCHEMATIC(SchematicBlock.ID, 5),
+//    AI_ATTACKER(AiAttackerBlock.ID, 5),
+//    AI_MONITOR(MonitorBlock.ID, 5),
+//    AI_AUTOCANNON(AiAutoCannonBlock.ID, 5),
+//    AI_BIG_CANNON(AiBigCannonBlock.ID, 5),
+//    AI_EXPLOSIVE(ExplosiveBlock.ID, 5),
+//    AI_WEIGHT(StandardWeightBlock.ID, 100)
     ;
 
     public final String ID;

@@ -39,7 +39,6 @@ import com.verr1.controlcraft.foundation.type.RegisteredPacketType;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixinducks.IEntityDuck;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
-import com.verr1.controlcraft.unstable.targeting.IAITarget;
 import com.verr1.controlcraft.utils.*;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Capabilities;
@@ -93,6 +92,7 @@ import java.util.function.Predicate;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
+import static com.verr1.controlcraft.utils.LegacyAIUtils.velocity;
 
 public class CameraBlockEntity extends OnShipBlockEntity
         implements IPacketHandler, IReceiver, IHaveGoggleInformation, IPlant
@@ -123,7 +123,6 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public EntityHitResult latestEntityHitResult = null;
     public EntityHitResult latestServerPlayerHitResult = null;
     public BlockHitResult latestBlockHitResult = null;
-    public final CameraLocked lastestLocked = new CameraLocked();
 
     private LatestClip latestClipType = LatestClip.BLOCK;
 
@@ -228,7 +227,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
 
     public Vector3dc latestBlockVelocity(){
         return Optional.ofNullable(latestBlockHitResult).map(r -> toJOML(r.getLocation())).map(
-                p -> IAITarget._velocity(p, (ServerLevel) level)
+                p -> velocity(p, (ServerLevel) level)
         ).orElse(new Vector3d());
     }
 

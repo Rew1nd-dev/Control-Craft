@@ -7,8 +7,8 @@ import com.google.common.collect.Sets;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.port.bus.IBusContext;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
-import com.verr1.controlcraft.unstable.AIServer;
-import com.verr1.controlcraft.unstable.util.LazyTicker;
+import com.verr1.controlcraft.utils.LazyTicker;
+import com.verr1.controlcraft.utils.LegacyAIUtils;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
@@ -130,7 +130,7 @@ public class CimulinkBus implements IBusContext {
     }
 
     public static void tickAllAttachments(){
-        AIServer.MANAGER
+        LegacyAIUtils
                 .getAllShips()
                 .stream()
                 .map(s -> s.getAttachment(CimulinkBus.class))

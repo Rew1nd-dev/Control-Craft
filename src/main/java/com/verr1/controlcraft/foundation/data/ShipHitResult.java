@@ -2,7 +2,7 @@ package com.verr1.controlcraft.foundation.data;
 
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
-import com.verr1.controlcraft.unstable.AIServer;
+import com.verr1.controlcraft.utils.LegacyAIUtils;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -21,9 +21,7 @@ public record ShipHitResult(
             return p;
         }
         long id = ship().getId();
-        return Optional
-                .ofNullable(AIServer.MANAGER)
-                .flatMap(m -> m.getShipOf(id))
+        return LegacyAIUtils.getShipOf(id)
                 .map(Observer::getOrCreate)
                 .map(Observer::read)
                 .map(ShipPhysics::position)
@@ -36,9 +34,7 @@ public record ShipHitResult(
             return p;
         }
         long id = ship().getId();
-        return Optional
-                .ofNullable(AIServer.MANAGER)
-                .flatMap(m -> m.getShipOf(id))
+        return LegacyAIUtils.getShipOf(id)
                 .map(Observer::getOrCreate)
                 .map(Observer::read)
                 .map(ShipPhysics::velocity)

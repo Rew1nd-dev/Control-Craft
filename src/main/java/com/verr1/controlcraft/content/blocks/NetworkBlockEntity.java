@@ -6,7 +6,7 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.AsyncLazySynchronizer;
 import com.verr1.controlcraft.foundation.network.remote.RemotePanel;
 import com.verr1.controlcraft.foundation.network.handler.NetworkHandler;
-import com.verr1.controlcraft.unstable.util.LazyTicker;
+import com.verr1.controlcraft.utils.LazyTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;

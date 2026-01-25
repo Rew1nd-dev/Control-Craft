@@ -9,7 +9,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.camera.CameraClientChunkCacheExtension;
-import com.verr1.controlcraft.unstable.pathing.DebugTester;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -72,7 +71,7 @@ public class ControlCraftClientCommands {
             source.sendFailure(Component.literal("You must be a player to set neglect a block!"));
             return 0;
         }
-        DebugTester.setRadius(radius);
+        // DebugTester.setRadius(radius);
         return 1;
     }
 
@@ -86,7 +85,7 @@ public class ControlCraftClientCommands {
         }
         Vector3d start = toJOML(player.getEyePosition());
         Vector3d startHeading = toJOML(player.getViewVector(1));
-        DebugTester.setStart(start, startHeading);
+        // DebugTester.setStart(start, startHeading);
         return 1;
     }
 
@@ -100,7 +99,7 @@ public class ControlCraftClientCommands {
         }
         Vector3d start = toJOML(player.getEyePosition());
         Vector3d startHeading = toJOML(player.getViewVector(1));
-        DebugTester.setEnd(start, startHeading);
+        // DebugTester.setEnd(start, startHeading);
         return 1;
     }
 

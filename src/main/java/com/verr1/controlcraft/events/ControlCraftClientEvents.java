@@ -7,7 +7,6 @@ import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
-import com.verr1.controlcraft.unstable.pathing.DebugTester;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,7 +33,7 @@ public class ControlCraftClientEvents {
             ControlCraftClient.CLIENT_CURVE_OUTLINER.tickOutlines();
             ControlCraftClient.CLIENT_WAND_HANDLER.tick();
             ClientCameraManager.tick();
-            DebugTester.clientTick();
+            // DebugTester.clientTick();
         }
 
 

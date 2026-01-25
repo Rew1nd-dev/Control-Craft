@@ -5,7 +5,6 @@ import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.verr1.controlcraft.content.compact.vmod.CopyableCimulink;
 import com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory;
 import com.verr1.controlcraft.content.links.logic.LogicGateBlockEntity;
-import com.verr1.controlcraft.unstable.ai.api.IReplaceBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -29,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.verr1.controlcraft.registry.ControlCraftShapes.HALF_BOX_BASE;
 
 public abstract class CimulinkBlock<B extends BlockEntity> extends DirectionalBlock implements
-        IBE<B> , CopyableCimulink, IReplaceBlock
+        IBE<B> , CopyableCimulink
 {
 
     protected CimulinkBlock(Properties p) {

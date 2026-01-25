@@ -3,6 +3,7 @@ package com.verr1.controlcraft.utils;
 import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.verr1.controlcraft.content.gui.factory.Converter;
 import com.verr1.controlcraft.content.gui.layouts.api.Descriptive;
+import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -39,6 +41,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.shao.valkyrien_space_war.particle.explotion.ExplosionSmokeOptions;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.ServerShip;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -46,6 +51,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
+
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class MinecraftUtils {
     public static void updateBlockState(@Nullable Level world, BlockPos pos, BlockState newState){
@@ -62,6 +69,8 @@ public class MinecraftUtils {
                 .map(BlockHitResult::getDirection)
                 .orElse(null);
     }
+
+
 
     @OnlyIn(Dist.CLIENT)
     public static int getPerceivedLightLevel(BlockPos pos) {

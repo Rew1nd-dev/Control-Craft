@@ -4,7 +4,6 @@ package com.verr1.controlcraft;
 import com.verr1.controlcraft.foundation.redstone.RedstoneLinkNetworkHandlerExtension;
 import com.verr1.controlcraft.foundation.executor.Executor;
 import com.verr1.controlcraft.foundation.managers.PeripheralNetwork;
-import com.verr1.controlcraft.unstable.AIServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.server.ServerLifecycleHooks;
