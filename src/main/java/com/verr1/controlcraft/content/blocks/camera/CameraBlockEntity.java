@@ -571,7 +571,6 @@ public class CameraBlockEntity extends OnShipBlockEntity
         ArrayList<Vector3dc> points = new ArrayList<>(MathUtils.pointOf(endAABB));
         points.add(center);
         return ValkyrienSkies.toMinecraft(MathUtils.coverOf(points));
-
     }
 
 

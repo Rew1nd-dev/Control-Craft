@@ -119,7 +119,7 @@ public class ClientCameraManager {
         QueryPos = null;
         Minecraft.getInstance().options.bobView().set(lastBobViewOption);
         Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
-        Minecraft.getInstance().levelRenderer.allChanged();
+        // Minecraft.getInstance().levelRenderer.allChanged();
         CameraClientChunkCacheExtension.clear();
         setLatest(null);
     }
