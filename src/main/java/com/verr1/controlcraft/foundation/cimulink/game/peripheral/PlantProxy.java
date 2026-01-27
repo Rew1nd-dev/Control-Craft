@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 
@@ -99,7 +100,13 @@ public class PlantProxy extends NamedComponent {
 
     @Override
     public void onPositiveEdge() {
-        plant.onPositiveEdge();
-        updateOutput();
+        try{
+            plant.onPositiveEdge();
+            updateOutput();
+        }catch (RuntimeException e){
+            ControlCraft.LOGGER.info("error during PlantProxy onPositiveEdge: plant class: {}, {}", plant.getClass(), e.getMessage());
+            throw e;
+        }
+
     }
 }

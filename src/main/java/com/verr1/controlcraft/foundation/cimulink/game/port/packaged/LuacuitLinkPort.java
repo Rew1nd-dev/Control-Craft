@@ -52,7 +52,7 @@ public class LuacuitLinkPort extends WrappedLinkPort<Luacuit>{
             cached = CimulinkLua.EMPTY_LUACUIT;
             cachedEnabledInputs = List.of();
             cachedEnabledOutputs = List.of();
-            ControlCraft.LOGGER.error("build new luacuit failed: {} suspected: {}", e.getMessage(), script.code());
+            ControlCraft.LOGGER.error("build new luacuit failed: {}", e.getMessage());
         }
     }
 

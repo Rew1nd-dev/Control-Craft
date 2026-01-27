@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 
 import java.util.ArrayList;
@@ -31,12 +32,18 @@ public class Plant extends NamedComponent {
 
     @Override
     public void onPositiveEdge() {
-        changedInput().forEach(i -> inputHandlers.get(i).accept(retrieveInput(i)));
-        updateOutput(outputHandlers.stream()
-            .map(Supplier::get)
-            .map(Objects::requireNonNull)
-            .toList()
-        );
+        try{
+            changedInput().forEach(i -> inputHandlers.get(i).accept(retrieveInput(i)));
+            updateOutput(outputHandlers.stream()
+                .map(Supplier::get)
+                .map(Objects::requireNonNull)
+                .toList()
+            );
+        }catch (RuntimeException e){
+            ControlCraft.LOGGER.info("error during Plant onPositiveEdge, self class: {}, {}", getClass(), e.getMessage());
+            throw e;
+        }
+
     }
 
 

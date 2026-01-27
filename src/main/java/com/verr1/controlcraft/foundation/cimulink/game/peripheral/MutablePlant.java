@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.game.peripheral;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 
 import java.util.ArrayList;
@@ -41,10 +42,16 @@ public class MutablePlant extends NamedComponent {
 
     @Override
     public void onPositiveEdge() {
-        prePositiveEdge();
-        changedInput().forEach(i -> inputHandlers.get(i).accept(this, retrieveInput(i)));
-        updateOutput(outputHandlers.stream().map(h -> h.apply(this)).toList());
-        postPositiveEdge();
+        try{
+            prePositiveEdge();
+            changedInput().forEach(i -> inputHandlers.get(i).accept(this, retrieveInput(i)));
+            updateOutput(outputHandlers.stream().map(h -> h.apply(this)).toList());
+            postPositiveEdge();
+        }catch (RuntimeException e){
+            ControlCraft.LOGGER.info("error during MutablePlant onPositiveEdge: self class: {}, {}", getClass(), e.getMessage());
+            throw e;
+        }
+
     }
 
     public static class builder{

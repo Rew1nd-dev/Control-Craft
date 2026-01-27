@@ -79,7 +79,14 @@ public class BusPort extends NamedComponent {
                     });
         });
         try{
-            cache.values().stream().flatMap(Collection::stream).forEach(Component::onPositiveEdge);
+            cache.values().stream().flatMap(Collection::stream).forEach(c -> {
+                try{
+                    c.onPositiveEdge();
+                }catch (RuntimeException e){
+                    ControlCraft.LOGGER.error("Error During Temporal Propagation At : {}, {}", c.getClass(), e.getMessage());
+                    throw e;
+                }
+            });
         } catch (RuntimeException e) {
             ControlCraft.LOGGER.error("Error During Temporal Propagation At BusPort: {}, {}", e.getCause(), e.getMessage());
             throw new RuntimeException(e);
