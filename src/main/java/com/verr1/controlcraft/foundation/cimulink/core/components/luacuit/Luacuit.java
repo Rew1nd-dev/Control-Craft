@@ -1,9 +1,11 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 
-import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.UtilLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.UnpresentPortException;
 import net.minecraft.nbt.CompoundTag;
@@ -16,15 +18,15 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class Luacuit extends NamedComponent{
+public class Luacuit extends NamedComponent {
 
     public static final ExecutorService LUA_THREAD = Executors.newSingleThreadExecutor();
 
     protected final Globals luaGlobals;
     protected final LuaValue loopFunction;
 
-    protected IPhysWorldAccess worldAccess = IPhysWorldAccess.EMPTY;
-
+    protected IPhysAccess physAccess = IPhysAccess.EMPTY;
+    protected IWorldAccess worldAccess = IWorldAccess.EMPTY;
 
     protected final LuacuitScript script;
     protected boolean forbidden = false;
@@ -35,29 +37,36 @@ public class Luacuit extends NamedComponent{
             List<String> outputs,
             Globals luaGlobals,
             LuaValue loopFunction,
-            LuacuitScript script
-    ) {
+            LuacuitScript script) {
         super(inputs, outputs);
         this.luaGlobals = luaGlobals;
         this.loopFunction = loopFunction;
         this.script = script;
         luaGlobals.set("getInput", createBuiltInInput());
         luaGlobals.set("setOutput", createBuiltInOutput());
-        setWorldAccess(IPhysWorldAccess.EMPTY);
+        setPhysAccess(IPhysAccess.EMPTY);
+        setUtilAccess(IWorldAccess.EMPTY);
     }
 
     protected void outputToJava(String name, double value) throws LuaError {
-        try{
+        try {
             updateOutput(out(name), value);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new UnpresentPortException(e.getMessage());
         }
     }
 
-    public void setWorldAccess(@NotNull IPhysWorldAccess worldAccess){
-        this.worldAccess = worldAccess;
+    public void setPhysAccess(@NotNull IPhysAccess physAccess) {
+        this.physAccess = physAccess;
         LUA_THREAD.submit(() -> {
-            luaGlobals.load(new PhysLib(this.worldAccess));
+            luaGlobals.load(new PhysLib(this.physAccess));
+        });
+    }
+
+    public void setUtilAccess(@NotNull IWorldAccess utilAccess) {
+        this.worldAccess = utilAccess;
+        LUA_THREAD.submit(() -> {
+            luaGlobals.load(new UtilLib(this.worldAccess));
         });
     }
 
@@ -65,10 +74,10 @@ public class Luacuit extends NamedComponent{
         this.forbidden = forbidden;
     }
 
-    protected double inputFromJava(String name) throws LuaError{
-        try{
+    protected double inputFromJava(String name) throws LuaError {
+        try {
             return retrieveInput(name);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new UnpresentPortException(e.getMessage());
         }
 
@@ -78,24 +87,24 @@ public class Luacuit extends NamedComponent{
         return script;
     }
 
-    public CompoundTag serialize(){
+    public CompoundTag serialize() {
         return script.serialize();
     }
 
-    public static Luacuit deserialize(CompoundTag tag){
+    public static Luacuit deserialize(CompoundTag tag) {
         LuacuitScript script = LuacuitScript.deserialize(tag);
         return new LuacuitConstructor(script).build();
     }
 
-    public void forbid(){
+    public void forbid() {
         forbidden = true;
     }
 
-    protected TwoArgFunction createBuiltInInput(){
+    protected TwoArgFunction createBuiltInInput() {
         return new TwoArgFunction() {
             @Override
-            public LuaValue call(LuaValue luaValue, LuaValue luaValue1){
-                if (luaValue1.isnil()) {  // 如果是 getInput("name")
+            public LuaValue call(LuaValue luaValue, LuaValue luaValue1) {
+                if (luaValue1.isnil()) { // 如果是 getInput("name")
                     String name = luaValue.checkjstring();
                     return LuaValue.valueOf(inputFromJava(name));
                 } else {
@@ -105,7 +114,7 @@ public class Luacuit extends NamedComponent{
         };
     }
 
-    protected TwoArgFunction createBuiltInOutput(){
+    protected TwoArgFunction createBuiltInOutput() {
         return new TwoArgFunction() {
             @Override
             public LuaValue call(LuaValue luaValue, LuaValue luaValue1) {
@@ -134,11 +143,11 @@ public class Luacuit extends NamedComponent{
         });
 
         try {
-            future.get(tolerantMillis, TimeUnit.MILLISECONDS);  // 超时 160ms
+            future.get(tolerantMillis, TimeUnit.MILLISECONDS); // 超时 160ms
         } catch (TimeoutException e) {
             future.cancel(true);
             boolean interrupted = CimulinkLua.interrupt(luaGlobals);
-            if(!interrupted){
+            if (!interrupted) {
                 throw new RuntimeException("Cannot Interrupt A Running Lua Global Because It Is Not Interruptible");
             }
             forbid();
@@ -147,7 +156,7 @@ public class Luacuit extends NamedComponent{
             if (e.getCause() instanceof LuaError le) {
                 forbid();
                 throw le;
-            }else{
+            } else {
                 throw new RuntimeException(e);
             }
         } catch (InterruptedException e) {
@@ -158,13 +167,12 @@ public class Luacuit extends NamedComponent{
     @Override
     public void onPositiveEdge() throws LuaError, LuaOvertimeException {
         initialized = true;
-        if(forbidden)return;
+        if (forbidden)
+            return;
         doTask(3000);
     }
 
-
-
-    public static void close(){
+    public static void close() {
         LUA_THREAD.shutdown();
     }
 }

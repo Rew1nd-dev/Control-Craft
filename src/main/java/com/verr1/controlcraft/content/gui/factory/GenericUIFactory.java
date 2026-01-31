@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.gui.factory;
 
 import com.verr1.controlcraft.content.blocks.SharedKeys;
+import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlockEntity;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
@@ -512,7 +513,7 @@ public class GenericUIFactory {
 
         var offset_self = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 22);
         var offset_comp = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 22);
-
+        var collision = new BooleanUIField(boundPos, ShipConnectorBlockEntity.COLLISION, Converter.convert(UIContents.COLLISION, Converter::titleStyle));
 
         int maxLen = MinecraftUtils.maxLength(
                 (UnaryOperator<Style>) Converter::titleStyle,
@@ -599,7 +600,7 @@ public class GenericUIFactory {
                 .withTab(
                         ADVANCE_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(pid, limit, offset_self, offset_comp)
+                                .withPort(pid, limit, offset_self, offset_comp, collision)
                                 .build()
                 )
                 .withTab(
@@ -626,6 +627,7 @@ public class GenericUIFactory {
         var self_offset = new Vector3dUIField(boundPos, SharedKeys.SELF_OFFSET, Converter.convert(UIContents.SELF_OFFSET, Converter::titleStyle), 22);
 
         var comp_offset = new Vector3dUIField(boundPos, SharedKeys.COMP_OFFSET, Converter.convert(UIContents.COMP_OFFSET, Converter::titleStyle), 22);
+        var collision = new BooleanUIField(boundPos, ShipConnectorBlockEntity.COLLISION, Converter.convert(UIContents.COLLISION, Converter::titleStyle));
 
         StringUIField name = new StringUIField(
                 boundPos,
@@ -696,7 +698,7 @@ public class GenericUIFactory {
                 .withTab(
                         ADVANCE_TAB
                         , new VerticalFlow.builder(boundPos)
-                                .withPort(self_offset, comp_offset, compliance_field)
+                                .withPort(self_offset, comp_offset, compliance_field, collision)
                                 .build()
                 )
                 .withTab(

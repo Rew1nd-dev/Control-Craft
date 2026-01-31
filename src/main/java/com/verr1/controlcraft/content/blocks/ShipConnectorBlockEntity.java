@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.constraint.ConstraintKey;
 import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
+import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -22,6 +23,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +37,13 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
 
 
 
+    private boolean hasCollision = true;
+
+
     private BlockPos blockConnectContext = BlockPos.ZERO;
     private final Map<String, ConstraintKey> registeredConstraintKeys = new HashMap<>();
 
+    public static final NetworkKey COLLISION = NetworkKey.create("collision");
     public static final NetworkKey COMPANION = NetworkKey.create("companion");
     public static final NetworkKey COMPANION_DIRECTION = NetworkKey.create("companion_direction");
     public static final NetworkKey BLOCK_CONNECT_CONTEXT = NetworkKey.create("block_connect_context");
@@ -51,6 +57,16 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
                 l -> setBlockConnectContext(BlockPos.of(l)),
                 SerializeUtils.LONG)
         ).register();
+        buildRegistry(COLLISION).withBasic(SerializePort.of(this::hasCollision, this::setHasCollision, SerializeUtils.BOOLEAN)).withClient(ClientBuffer.BOOLEAN.get()).register();
+    }
+
+    public boolean hasCollision() {
+        return hasCollision;
+    }
+
+    public void setHasCollision(boolean hasCollision) {
+        this.hasCollision = hasCollision;
+        setCollisionWithCompanion(hasCollision);
     }
 
     public BlockPos blockConnectContext() {
@@ -75,6 +91,18 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
                 .ifPresent(key -> ConstraintCenter.createOrReplaceNewConstrain(key, newConstraint));
     }
 
+    public void setCollisionWithCompanion(boolean collide){
+        long cid = getCompanionShipID();
+        if(cid == -1L)return;
+        getServerShipWorld().ifPresent(ssw -> {
+            if(collide){
+                ssw.enableCollisionBetweenBodies(cid, getShipOrGroundID());
+            }else{
+                ssw.disableCollisionBetweenBodies(cid, getShipOrGroundID());
+            }
+        });
+    }
+
     public void updateConstraint(String id, VSConstraint newConstraint){
         Optional.ofNullable(getConstraintKey(id))
                 .ifPresent(key -> ConstraintCenter.updateOrCreateConstraint(key, newConstraint));
@@ -91,6 +119,12 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
                 .orElse(null);
     }
 
+
+    @Override
+    public void lazyTickServer() {
+        super.lazyTickServer();
+        setCollisionWithCompanion(hasCollision);
+    }
 
     public void setCompanionShipID(long companionShipID) {
         this.companionShipID = companionShipID;
@@ -118,6 +152,12 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
                 .ofNullable(ValkyrienSkies.getShipWorld(lvl))
                 .map(shipWorld -> shipWorld.getLoadedShips().getById(companionShipID))
                 .orElse(null);
+    }
+
+    public Optional<ServerShipWorldCore> getServerShipWorld(){
+        if(!(level instanceof ServerLevel serverLevel))return Optional.empty();
+        return Optional
+            .ofNullable(ValkyrienSkies.getShipWorld(serverLevel));
     }
 
     public void setCompanionShipDirection(@NotNull Direction direction){

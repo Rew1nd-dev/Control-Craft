@@ -44,15 +44,6 @@
     "vscontrolcraft:link_bus",
     "vscontrolcraft:scope",
     "vscontrolcraft:tweakerminal",
-    "vscontrolcraft:easy_connector",
-    "vscontrolcraft:ai_cruiser",
-    "vscontrolcraft:ai_jet",
-    "vscontrolcraft:ai_monitor",
-    "vscontrolcraft:ai_schematic",
-    "vscontrolcraft:ai_autocannon",
-    "vscontrolcraft:ai_big_cannon",
-    "vscontrolcraft:ai_explosive",
-    "vscontrolcraft:ai_weight",
-    "vscontrolcraft:ai_direct_deployer"
+    "vscontrolcraft:easy_connector"
   ]
 }

@@ -6,9 +6,9 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
-public interface IPhysWorldAccess {
+public interface IPhysAccess {
 
-    IPhysWorldAccess EMPTY = new IPhysWorldAccess() {
+    IPhysAccess EMPTY = new IPhysAccess() {
         @Override
         public Quaterniondc quaternionToWorld() {
             return new Quaterniond();
@@ -38,8 +38,8 @@ public interface IPhysWorldAccess {
 
     Vector3dc angularVelocity();
 
-    static IPhysWorldAccess of(OnShipBlockEntity be){
-        return new IPhysWorldAccess() {
+    static IPhysAccess of(OnShipBlockEntity be){
+        return new IPhysAccess() {
             @Override
             public Quaterniondc quaternionToWorld() {
                 return be.readSelf().quaternion();

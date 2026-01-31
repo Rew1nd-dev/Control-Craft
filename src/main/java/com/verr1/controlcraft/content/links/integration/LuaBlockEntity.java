@@ -1,17 +1,15 @@
 package com.verr1.controlcraft.content.links.integration;
 
-import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitScript;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.LuacuitLinkPort;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.List;
-
-public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, LuacuitLinkPort>{
+public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, LuacuitLinkPort> {
 
     public LuaBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -22,8 +20,9 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
         return new LuacuitLinkPort();
     }
 
-    public void setWorldAccess(){
-        linkPort().setWorldAccess(IPhysWorldAccess.of(this));
+    public void setWorldAccess() {
+        linkPort().setPhysAccess(IPhysAccess.of(this));
+        linkPort().setWorldAccess(IWorldAccess.of(this));
     }
 
     @Override
@@ -32,20 +31,20 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
         setWorldAccess();
     }
 
-    public void loadCircuit(LuacuitScript nbt) throws IllegalArgumentException{
+    public void loadCircuit(LuacuitScript nbt) throws IllegalArgumentException {
         var savedStatus = linkPort().viewStatus();
         boolean shouldOpen = linkPort().isEmpty();
-        try{
+        try {
             linkPort().load(nbt);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             setChanged();
             throw e;
         }
         linkPort().setStatus(savedStatus);
-        if(shouldOpen)linkPort().setToAllOpen();
+        if (shouldOpen)
+            linkPort().setToAllOpen();
         updateIOName();
         setChanged();
     }
-
 
 }

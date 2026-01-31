@@ -1,15 +1,16 @@
 // java
 package com.verr1.controlcraft.foundation.cimulink.core.components.lua;
 
-import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3dc;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.*;
 
 public class PhysLib extends TwoArgFunction {
-    private final IPhysWorldAccess source;
+    private final IPhysAccess source;
 
-    public PhysLib(IPhysWorldAccess source) {
+    public PhysLib(@NotNull IPhysAccess source) {
         this.source = source;
     }
 

@@ -27,6 +27,7 @@ public enum UIContents implements Descriptive<UIContents> {
     TARGET(Component.literal("Target"), literals("Target Angle, Velocity, Position Etc.")),
     SELF_OFFSET(Component.literal("Offset"), literals("Rotation Axis Offset For Next Assembly / Connection")),
     COMP_OFFSET(Component.literal("Offset"), literals("Companion Offset For Next Assembly / Connection")),
+    COLLISION(Component.literal("Collision"), literals("Collision With Companion")),
     SPEED_LIMIT(Component.literal("Limit"), literals("Maximum Rotational Speed")),
 
     MODE(Component.literal("Mode"), literals("Velocity / Position")),

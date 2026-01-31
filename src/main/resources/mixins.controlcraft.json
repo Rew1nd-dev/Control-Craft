@@ -16,10 +16,6 @@
     "cbc.MixinCannonMountBlockEntity",
     "cbc.MixinFixedCannonMountBlockEntity",
     "tweak.MixinTweakedControllerClientHandler",
-    "tweak.MixinTweakedLecternControllerBlockEntity",
-    "tweak.MixinTweakLecternRangeFirst",
-    "tweak.MixinTweakLecternRangeSecond",
-    "tweak.MixinTweakLinkedControllerAxisPacket",
     "tweak.MixinTweakLinkedControllerButtonPacket"
   ],
   "package": "com.verr1.controlcraft.mixin",
