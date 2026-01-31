@@ -248,6 +248,7 @@ public class ControlCraftServerCommands {
         }
         try{
             CircuitCompilerItem.load(player.getName().getString(), saveName, stack);
+            stack.setHoverName(Component.literal(saveName));
             if(player.isCreative()){
                 player.drop(stack, false);
             } else{
@@ -307,6 +308,7 @@ public class ControlCraftServerCommands {
         }
         try{
             LuaCompilerItem.load(player.getName().getString(), saveName, stack);
+            stack.setHoverName(Component.literal(saveName));
             if(player.isCreative()){
                 player.drop(stack, false);
             } else{
