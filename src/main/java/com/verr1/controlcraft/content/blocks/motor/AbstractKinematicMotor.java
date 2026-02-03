@@ -223,9 +223,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         Optional.ofNullable(getCompanionServerShip()).ifPresent(s -> s.setStatic(false));
         clearCompanionShipInfo();
         super.destroyConstraints(); // set non-static before ship info is cleared
-        if(USE_CONSTRAINT_SPAMMING){
-            destroyConstraintForMode();
-        }
+        destroyConstraintForMode();
     }
 
     private void destroyConstraintForMode(){
@@ -238,9 +236,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     @Override
     public void bruteDirectionalConnectWith(BlockPos bp_comp, Direction dir_comp, Direction forward) {
         super.bruteDirectionalConnectWith(bp_comp, dir_comp, forward);
-        if(!USE_CONSTRAINT_SPAMMING){
-            destroyConstraintForMode();
-        }
+        destroyConstraintForMode();
     }
 
     @Override
@@ -255,9 +251,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     @Override
     public void assemble() {
         super.assemble();
-        if(!USE_CONSTRAINT_SPAMMING){
-            destroyConstraintForMode();
-        }
+        destroyConstraintForMode();
     }
 
     public @Nullable PhysPose tickPose(){
@@ -276,32 +270,15 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     public void tickServer() {
         super.tickServer();
         syncForNear(true, FIELD);
-        if(USE_CONSTRAINT_SPAMMING) {
-            tickConstraint();
-        } else{
-            syncAttachTransformProviderServer();
-        }
+        tickConstraint();
+
         kineticPeripheral.tick();
     }
-
-    public void syncAttachInducer(){
-        if(level == null || level.isClientSide)return;
-        /*
-        Optional
-                .ofNullable(getCompanionServerShip())
-                .map(KinematicMotorForceInducer_::getOrCreate)
-                .ifPresent(inducer -> inducer.alive(WorldBlockPos.of(level, getBlockPos())));
-        * */
-
-    }
-
-    // simply for debugging
 
 
     @Override
     public void tickClient() {
         super.tickClient();
-        // syncAttachTransformProviderClient();
     }
 
     public void syncAttachTransformProviderClient(){
