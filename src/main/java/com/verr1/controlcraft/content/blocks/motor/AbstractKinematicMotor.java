@@ -220,7 +220,6 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
 
     @Override
     public void destroyConstraints() {
-        Optional.ofNullable(getCompanionServerShip()).ifPresent(s -> s.setStatic(false));
         clearCompanionShipInfo();
         super.destroyConstraints(); // set non-static before ship info is cleared
         destroyConstraintForMode();
@@ -234,24 +233,12 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
     }
 
     @Override
-    public void bruteDirectionalConnectWith(BlockPos bp_comp, Direction dir_comp, Direction forward) {
-        super.bruteDirectionalConnectWith(bp_comp, dir_comp, forward);
-        destroyConstraintForMode();
-    }
-
-    @Override
     public void setStartingAngleOfCompanionShip() {
         Ship asm = getCompanionServerShip();
         Ship own = getShipOn();
         if(asm == null)return;
         double target = VSMathUtils.get_yc2xc(own, asm, getServoDirection(), getCompanionShipAlign());
         controller.setTarget(target);
-    }
-
-    @Override
-    public void assemble() {
-        super.assemble();
-        destroyConstraintForMode();
     }
 
     public @Nullable PhysPose tickPose(){
