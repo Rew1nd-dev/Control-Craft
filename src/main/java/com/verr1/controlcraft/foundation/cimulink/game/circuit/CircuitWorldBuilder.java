@@ -97,19 +97,6 @@ public class CircuitWorldBuilder {
             });
         });
 
-        /*
-        else if (outputs.containsKey(bp.pos())) {
-                    // actually, should not happen
-                    String circuitOutName = outputs.get(bp.pos()).name();
-                    inOuts.add(new IoNbt(
-                            false,
-                            circuitOutName,
-                            inName,
-                            inPortName
-                    ));
-                }
-        * */
-
         outputs.forEach((pos, blp) -> {
             String outputName = blp.name();
             blp.backwardLinks().forEach((inName, bp) -> {

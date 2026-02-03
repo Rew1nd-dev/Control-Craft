@@ -2,10 +2,7 @@ package com.verr1.controlcraft.registry;
 
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
-import com.verr1.controlcraft.content.items.AweInWandItem;
-import com.verr1.controlcraft.content.items.CameraLinkItem;
-import com.verr1.controlcraft.content.items.CircuitCompilerItem;
-import com.verr1.controlcraft.content.items.LuaCompilerItem;
+import com.verr1.controlcraft.content.items.*;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
 
@@ -42,6 +39,12 @@ public class ControlCraftItems {
             .model(AssetLookup.existingItemModel())
             .properties(p -> p.stacksTo(1))
             .lang("Lua Compiler")
+            .register();
+
+    public static final ItemEntry<CimulinkRecordItem> LINK_RECORD = REGISTRATE.item("link_record", CimulinkRecordItem::new)
+            //.model(AssetLookup.existingItemModel())
+            .properties(p -> p.stacksTo(1))
+            .lang("Link Record")
             .register();
 
     public static void register(){
