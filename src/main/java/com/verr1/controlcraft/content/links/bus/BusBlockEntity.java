@@ -8,13 +8,17 @@ import com.verr1.controlcraft.foundation.cimulink.game.port.bus.IBusContext;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.utils.ConstraintClusterUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BusBlockEntity extends CimulinkBlockEntity<BusLinkPort> implements IBusContext {
 
@@ -47,39 +51,28 @@ public class BusBlockEntity extends CimulinkBlockEntity<BusLinkPort> implements 
         linkPort().updateCache();
     }
 
-//    @Override
-//    public String receiverName() {
-//        return name;
-//    }
-//
-//    @Override
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-
-
-//    @Override
-//    public void setDeviceName(String name) {
-//        linkPort().setName(name);
-//    }
-//
-//    @Override
-//    public String deviceName() {
-//        return linkPort().name();
-//    }
-
     protected Optional<CimulinkBus> bus(){
         return Optional.ofNullable(getLoadedServerShip())
                 .map(CimulinkBus::getOrCreate);
     }
 
+    protected Stream<CimulinkBus> buses(){
+        return ConstraintClusterUtil.clusterOf(getShipOrGroundID())
+            .stream()
+            .map(ConstraintClusterUtil::getShipOf)
+            .filter(Optional::isPresent)
+            .flatMap(Optional::stream)
+            .map(CimulinkBus::getOrCreate)
+            ;
+    }
+
     @Override
     public @NotNull Set<NamedComponent> access(String name) {
-        return bus().map(b -> b.access(name)).orElse(Set.of());
+        return buses().flatMap(b -> b.access(name).stream()).collect(Collectors.toSet());
     }
 
     @Override
     public @NotNull Set<String> allNames() {
-        return bus().map(CimulinkBus::allNames).orElse(Set.of());
+        return buses().flatMap(b -> b.allNames().stream()).collect(Collectors.toSet());
     }
 }

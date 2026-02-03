@@ -54,30 +54,30 @@ public abstract class BlockLinkPort {
 
     // For Physics Thread Non-Blocking BlockEntity Access
     private static final LoadingCache<WorldBlockPos, Optional<BlockLinkPort>> CACHE = CacheBuilder.newBuilder()
-            .maximumSize(1024)
-            .refreshAfterWrite(2, TimeUnit.SECONDS)
-            .expireAfterAccess(4, TimeUnit.SECONDS)
-            .build(
-                    new CacheLoader<>() {
-                        @Override
-                        public @NotNull ListenableFuture<Optional<BlockLinkPort>> reload(
-                                @NotNull WorldBlockPos key,
-                                @NotNull Optional<BlockLinkPort> oldValue
-                        ) {
-                            ListenableFutureTask<Optional<BlockLinkPort>> task = ListenableFutureTask.create(() -> load(key));
-                            ControlCraftServer.getMainThreadExecutor().execute(task);
-                            return task;
-                        }
+        .maximumSize(1024)
+        .refreshAfterWrite(2, TimeUnit.SECONDS)
+        .expireAfterAccess(4, TimeUnit.SECONDS)
+        .build(
+            new CacheLoader<>() {
+                @Override
+                public @NotNull ListenableFuture<Optional<BlockLinkPort>> reload(
+                    @NotNull WorldBlockPos key,
+                    @NotNull Optional<BlockLinkPort> oldValue
+                ) {
+                    ListenableFutureTask<Optional<BlockLinkPort>> task = ListenableFutureTask.create(() -> load(key));
+                    ControlCraftServer.getMainThreadExecutor().execute(task);
+                    return task;
+                }
 
-                        @Override
-                        public @NotNull Optional<BlockLinkPort> load(@NotNull WorldBlockPos pos) {
-                            return BlockEntityGetter.INSTANCE
-                                    .getBlockEntityAt(
-                                            pos.globalPos(),
-                                            ILinkableBlock.class
-                                    ).map(ILinkableBlock::linkPort);
-                        }
-                    });
+                @Override
+                public @NotNull Optional<BlockLinkPort> load(@NotNull WorldBlockPos pos) {
+                    return BlockEntityGetter.INSTANCE
+                        .getBlockEntityAt(
+                            pos.globalPos(),
+                            ILinkableBlock.class
+                        ).map(ILinkableBlock::linkPort);
+                }
+            });
 
     // make it concurrent
     public static Optional<BlockLinkPort> get(@NotNull WorldBlockPos pos) {
