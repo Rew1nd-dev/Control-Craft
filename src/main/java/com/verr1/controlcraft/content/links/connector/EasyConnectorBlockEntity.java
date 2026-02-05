@@ -11,6 +11,7 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.network.remote.RemotePort;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
+import com.verr1.controlcraft.utils.ConstraintClusterUtil;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
 import net.minecraft.core.BlockPos;
@@ -23,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EasyConnectorBlockEntity extends OnShipBlockEntity {
 
@@ -42,11 +45,18 @@ public class EasyConnectorBlockEntity extends OnShipBlockEntity {
         panel().register(DISCONNECT, RemotePort.of(ConnectionStatus.class, this::disconnect, ConnectionStatus.CS));
     }
 
-
+    public Stream<CimulinkPorts> linkStorages(){
+        return  ConstraintClusterUtil.clusterOf(getShipOrGroundID())
+            .stream()
+            .map(ConstraintClusterUtil::getShipOf)
+            .filter(Optional::isPresent)
+            .flatMap(Optional::stream)
+            .map(CimulinkPorts::getOrCreate);
+    }
 
 
     public Set<WorldBlockPos> getLinkPositions(){
-        return linkStorage().map(CimulinkPorts::getAll).orElse(Set.of());
+        return linkStorages().flatMap(b -> b.getAll().stream()).collect(Collectors.toSet());
     }
 
 

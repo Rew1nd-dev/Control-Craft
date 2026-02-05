@@ -138,9 +138,12 @@ public class CimulinkRecordItem extends Item {
                     player.sendSystemMessage(Component.literal("Missing output component: " + out.componentName()));
                     continue;
                 }
-
-                inPort.connectBy(outPort.pos(), out.portName(), in.portName());
-                appliedCount++;
+                try{
+                    outPort.connectTo(out.portName(), inPort.pos(), in.portName());
+                    appliedCount++;
+                } catch (Exception e) {
+                    player.sendSystemMessage(Component.literal(out + " -> " + in + " Failed With: " + e.getMessage()));
+                }
             }
 
             player.sendSystemMessage(Component.literal("Applied " + appliedCount + " Links."));

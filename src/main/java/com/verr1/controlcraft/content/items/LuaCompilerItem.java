@@ -67,6 +67,7 @@ public class LuaCompilerItem extends Item {
                                                 )
                                                 .toList()
                                         );
+                                        cbe.setDeviceName(stack.getHoverName().getString());
                                     }catch (IllegalArgumentException e){
                                         player.sendSystemMessage(Component.literal("Failed to load circuit: " + e.getMessage()));
                                     }

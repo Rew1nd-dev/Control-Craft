@@ -53,6 +53,7 @@ public class CircuitCompilerItem extends Item {
                                 cbe -> {
                                     try {
                                         cbe.loadCircuit(nbtHolder);
+                                        cbe.setDeviceName(stack.getHoverName().getString());
                                     }catch (IllegalArgumentException e){
                                         player.sendSystemMessage(Component.literal("Failed to load circuit: " + e.getMessage()));
                                     }
