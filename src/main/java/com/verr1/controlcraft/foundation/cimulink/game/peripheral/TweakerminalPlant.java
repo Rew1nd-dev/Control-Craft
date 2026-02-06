@@ -35,4 +35,6 @@ public class TweakerminalPlant extends Plant{
         return b ? 1.0 : 0.0;
     }
 
+
+
 }

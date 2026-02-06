@@ -37,7 +37,7 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
 
 
 
-    private boolean hasCollision = true;
+    private boolean hasCollision = false;
 
 
     private BlockPos blockConnectContext = BlockPos.ZERO;

@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.foundation.cimulink.core.api;
 
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
@@ -47,7 +48,8 @@ public interface IPhysAccess {
 
             @Override
             public Vector3dc position() {
-                return be.readSelf().position();
+                Vector3d p_sc = ValkyrienSkies.set(new Vector3d(), be.getBlockPos().getCenter());
+                return be.readSelf().s2wTransform().transformPosition(p_sc);
             }
 
             @Override

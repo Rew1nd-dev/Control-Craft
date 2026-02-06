@@ -258,7 +258,7 @@ public abstract class AbstractKinematicMotor extends AbstractMotor implements
         super.tickServer();
         syncForNear(true, FIELD);
         tickConstraint();
-
+        setHasCollision(false);
         kineticPeripheral.tick();
     }
 

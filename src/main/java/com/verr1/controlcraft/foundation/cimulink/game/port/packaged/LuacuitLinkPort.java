@@ -2,6 +2,7 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.packaged;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
@@ -66,6 +67,10 @@ public class LuacuitLinkPort extends WrappedLinkPort<Luacuit> {
 
     public void setWorldAccess(IWorldAccess access) {
         component().setUtilAccess(access);
+    }
+
+    public void setBusAccess(IBusAccess access) {
+        component().setBusAccess(access);
     }
 
     @Override

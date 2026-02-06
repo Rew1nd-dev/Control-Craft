@@ -1,7 +1,9 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 
+import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.BusLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
@@ -27,6 +29,7 @@ public class Luacuit extends NamedComponent {
 
     protected IPhysAccess physAccess = IPhysAccess.EMPTY;
     protected IWorldAccess worldAccess = IWorldAccess.EMPTY;
+    protected IBusAccess busAccess = IBusAccess.EMPTY;
 
     protected final LuacuitScript script;
     protected boolean forbidden = false;
@@ -46,6 +49,7 @@ public class Luacuit extends NamedComponent {
         luaGlobals.set("setOutput", createBuiltInOutput());
         setPhysAccess(IPhysAccess.EMPTY);
         setUtilAccess(IWorldAccess.EMPTY);
+        setBusAccess(IBusAccess.EMPTY);
     }
 
     protected void outputToJava(String name, double value) throws LuaError {
@@ -67,6 +71,13 @@ public class Luacuit extends NamedComponent {
         this.worldAccess = utilAccess;
         LUA_THREAD.submit(() -> {
             luaGlobals.load(new UtilLib(this.worldAccess));
+        });
+    }
+
+    public void setBusAccess(@NotNull IBusAccess busAccess) {
+        this.busAccess = busAccess;
+        LUA_THREAD.submit(() -> {
+            luaGlobals.load(new BusLib(this.busAccess));
         });
     }
 
@@ -170,6 +181,7 @@ public class Luacuit extends NamedComponent {
         if (forbidden)
             return;
         doTask(3000);
+        busAccess.onPositiveEdge();
     }
 
     public static void close() {

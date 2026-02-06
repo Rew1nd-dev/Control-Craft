@@ -94,12 +94,12 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
             ControlCraft.LOGGER.error("error encountered when initializing CimulinkBlockEntity at {}", getBlockPos().toShortString());
             ControlCraft.LOGGER.error("error message:{}", e.getMessage());
         }
-        linkPort.setInitialized();
         linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
         initializeExtra();
         isInitialized = true;
         syncForNear(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
         ControlCraft.LOGGER.debug("be at {} finish initialization", getBlockPos().toShortString());
+        linkPort.setInitialized();
     }
 
     public boolean initialized(){

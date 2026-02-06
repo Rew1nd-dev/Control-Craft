@@ -30,6 +30,10 @@ public class Plant extends NamedComponent {
 
     }
 
+    // Be aware of thread-unsafe operations
+    // Current Callers:
+    //
+    // Others -- Cimulink Thread (Server Thread or Physics Thread)
     @Override
     public void onPositiveEdge() {
         try{
