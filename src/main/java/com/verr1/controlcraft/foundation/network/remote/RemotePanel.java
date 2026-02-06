@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class RemotePanel {
 
@@ -36,7 +37,7 @@ public class RemotePanel {
         if (port == null)return;
         Object input = port.deserialize(tag.getCompound("data"));
         if (input == null)return;
-        port.accept(input);
+        port.accept(sender, input);
     }
 
 
@@ -46,12 +47,23 @@ public class RemotePanel {
 
     public <T> void registerUnit(NetworkKey key, Runnable task) {
         register(
-                key,
-                RemotePort.of(
-                        Double.class,
-                        $ -> task.run(),
-                        SerializeUtils.DOUBLE
-                )
+            key,
+            RemotePort.of(
+                Double.class,
+                $ -> task.run(),
+                SerializeUtils.DOUBLE
+            )
+        );
+    }
+
+    public <T> void registerUnitWithSender(NetworkKey key, Consumer<ServerPlayer> task) {
+        register(
+            key,
+            RemotePort.of(
+                Double.class,
+                (player, $) -> task.accept(player),
+                SerializeUtils.DOUBLE
+            )
         );
     }
 

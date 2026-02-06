@@ -236,7 +236,7 @@ public class NetworkHandler {
     }
 
     public boolean checkPermission(NetworkKey key, Player player){
-        if(delegate.getLevel() == null || delegate.getLevel().isClientSide)return true;
+        if(delegate.getLevel() == null || delegate.getLevel().isClientSide || player == null)return true;
         return Optional
                 .ofNullable(delegate.getLevel().getServer())
                 .map(s -> s.getProfilePermissions(player.getGameProfile()))

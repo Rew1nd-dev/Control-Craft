@@ -62,7 +62,7 @@ public abstract class AbstractDeployerBlockEntity extends OnShipBlockEntity {
             var type = nextType();
             var pose = nextPose();
             var vel  = nextVel();
-            var ship = pool().spawn(type, pose.pos(), pose.rot(), vel.velocity(), vel.angularVelocity());
+            var ship = pool().spawn(type, pose.pos(), pose.rot(), vel.velocity(), vel.angularVelocity(), false);
             ServerShip serverShip = get(ship.id).orElse(null);
             if(ship.id == -1L || serverShip == null){
                 onDeployFailure(type);

@@ -211,18 +211,22 @@ public class AIPool extends SavedData {
 
         statuses.put(id, AIStatus.ON_DISCARD_PROCESS);
 
-
+        // avoid holding ship reference across ticks !!
         CoroutineBase teleportFirst = Coroutines.immediate(() -> {
-            networkOf(ship).onPreRestore();
-            vsWorld.teleportShip(ship, withPosition(SIMPLE_PROCESS_POSITION));
-            ship.setStatic(true);
+            LoadedServerShip loaded = getShipOf(ship.getId()).orElse(null);
+            if(loaded == null)return;
+            networkOf(loaded).onPreRestore();
+            vsWorld.teleportShip(loaded, withPosition(SIMPLE_PROCESS_POSITION));
+            loaded.setStatic(true);
         });
         Either<CoroutineBase, AIRepairErrors> taskOrError = repairAI(id, persistent.get(id).storageSchematic);
         CoroutineBase teleportSecond = Coroutines.immediate(() -> {
-            vsWorld.teleportShip(ship, withPosition(computeYardPosition(id)));
-            BlockStateInfo.INSTANCE.remassShip(level, ship);
-            networkOf(ship).onPostRestore();
-            ship.setStatic(true);
+            LoadedServerShip loaded = getShipOf(ship.getId()).orElse(null);
+            if(loaded == null)return;
+            vsWorld.teleportShip(loaded, withPosition(computeYardPosition(id)));
+            BlockStateInfo.INSTANCE.remassShip(level, loaded);
+            networkOf(loaded).onPostRestore();
+            loaded.setStatic(true);
             statuses.put(id, AIStatus.IN_POOL);
         });
 
@@ -273,8 +277,8 @@ public class AIPool extends SavedData {
 
     }
 
-    public @NotNull AISpawnResult spawn(SchematicKey type, Vector3dc position, Quaterniondc rotation){
-        return spawn(type, position, rotation, new Vector3d(), new Vector3d());
+    public @NotNull AISpawnResult spawn(SchematicKey type, Vector3dc position, Quaterniondc rotation, boolean immediate){
+        return spawn(type, position, rotation, new Vector3d(), new Vector3d(), immediate);
     }
 
 
@@ -284,7 +288,8 @@ public class AIPool extends SavedData {
         Vector3dc position,
         Quaterniondc rotation,
         Vector3dc velocity,
-        Vector3dc omega
+        Vector3dc omega,
+        boolean immediate
     ){
         long id = pollPool().orElse(-1L);
         if(id == -1L)return AISpawnResult.USE_UP;
@@ -310,7 +315,12 @@ public class AIPool extends SavedData {
         AtomicReference<AISpawnResult> atr = new AtomicReference<>(null);
         taskOrError.ifLeft(repairTask -> {
             atr.set(new AISpawnResult(id));
-            worker.enqueueTask(Coroutines.chained(repairTask, teleport));
+            CoroutineBase task = Coroutines.chained(repairTask, teleport);
+            if(immediate){
+                task.force();
+            }else{
+                worker.enqueueTask(task);
+            }
         });
         taskOrError.ifRight(err -> {
             // TODO: use err later
@@ -318,6 +328,8 @@ public class AIPool extends SavedData {
         });
         return Objects.requireNonNull(atr.get());
     }
+
+
 
     public static ShipTeleportDataImpl withPose(
         Vector3dc newPosition,
@@ -525,7 +537,7 @@ public class AIPool extends SavedData {
                 .withExpirationTicks(400)
                 .build();
 
-        // ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 20);
+        ControlCraftServer.SERVER_EXECUTOR.execute(task);
     }
 
     public boolean isInPool(long ownerId) {

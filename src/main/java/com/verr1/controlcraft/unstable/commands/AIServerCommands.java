@@ -2,6 +2,7 @@ package com.verr1.controlcraft.unstable.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -125,12 +126,22 @@ public class AIServerCommands {
         return 1;
     }
 
+    private static int debugFspawnCommand(CommandContext<CommandSourceStack> context){
+        Vec3 position = Vec3Argument.getVec3(context, "coordinate");
+        String namespace = context.getArgument("namespace", String.class);
+        String name = context.getArgument("name", String.class);
+        // boolean forced = context.getArgument("forced", Boolean.class);
+        AIServer.MANAGER.spawn(new SchematicKey(namespace, name), toJOML(position), new Quaterniond(), true);
+
+        return 1;
+    }
+
     private static int debugSpawnCommand(CommandContext<CommandSourceStack> context){
         Vec3 position = Vec3Argument.getVec3(context, "coordinate");
         String namespace = context.getArgument("namespace", String.class);
         String name = context.getArgument("name", String.class);
-
-        AIServer.MANAGER.spawn(new SchematicKey(namespace, name), toJOML(position), new Quaterniond());
+        // boolean forced = context.getArgument("forced", Boolean.class);
+        AIServer.MANAGER.spawn(new SchematicKey(namespace, name), toJOML(position), new Quaterniond(), false);
 
         return 1;
     }
@@ -238,91 +249,104 @@ public class AIServerCommands {
 
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
-                lt("cai")
+            lt("cai")
                 .then(
-                        lt("debug").then(
-                                lt("save-schematic")
-                                        .then(
-                                                arg("namespace", StringArgumentType.string())
-                                                        .then(
-                                                                arg("name", StringArgumentType.string())
-                                                                        .executes(AIServerCommands::debugSaveSchematicCommand)
-                                                        )
-                                        )
-                        ).then(
-                                lt("list-ai").executes(
-                                        AIServerCommands::listAllAICommand
+                    lt("debug").then(
+                        lt("save-schematic")
+                            .then(
+                                arg("namespace", StringArgumentType.string())
+                                    .then(
+                                        arg("name", StringArgumentType.string())
+                                            .executes(AIServerCommands::debugSaveSchematicCommand)
+                                    )
+                            )
+                    ).then(
+                        lt("list-ai").executes(
+                            AIServerCommands::listAllAICommand
 
-                                )
-                        ).then(
-                                lt("list-pool-ai").executes(
-                                        AIServerCommands::listAvailableAICommand
+                        )
+                    ).then(
+                        lt("list-pool-ai").executes(
+                            AIServerCommands::listAvailableAICommand
 
+                        )
+                    ).then(
+                        lt("rewind")
+                            .then(
+                                arg("namespace", StringArgumentType.string())
+                                    .then(
+                                        arg("name", StringArgumentType.string())
+                                            .executes(AIServerCommands::debugRepairShipCommand)
+                                    )
+                            )
+                    ).then(
+                        lt("info")
+                            .executes(
+                                AIServerCommands::debugInfoCommand
+                            )
+                    )
+                ).then(
+                    lt("spawn")
+                        .then(arg("namespace", StringArgumentType.string())
+                            .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
+                            .then(arg("name", StringArgumentType.string())
+                                .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
+                                .then(arg("coordinate", Vec3Argument.vec3())
+                                    .executes(
+                                        AIServerCommands::debugSpawnCommand
+                                    )
                                 )
-                        ).then(
-                                lt("rewind")
-                                        .then(
-                                                arg("namespace", StringArgumentType.string())
-                                                        .then(
-                                                                arg("name", StringArgumentType.string())
-                                                                        .executes(AIServerCommands::debugRepairShipCommand)
-                                                        )
-                                        )
-                        ).then(
-                            lt("info")
-                                .executes(
-                                    AIServerCommands::debugInfoCommand
-                                )
+
+                            )
                         )
                 ).then(
-                        lt("spawn")
-                                .then(
-                                        arg("namespace", StringArgumentType.string())
-                                        .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
-                                                .then(
-                                                        arg("name", StringArgumentType.string())
-                                                        .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
-                                                                .then(
-                                                                        arg("coordinate", Vec3Argument.vec3()).executes(
-                                                                                AIServerCommands::debugSpawnCommand
-                                                                        )
-                                                                )
-
-                                                )
+                    lt("fspawn")
+                        .then(arg("namespace", StringArgumentType.string())
+                            .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
+                            .then(arg("name", StringArgumentType.string())
+                                .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
+                                .then(arg("coordinate", Vec3Argument.vec3())
+                                    .executes(
+                                        AIServerCommands::debugFspawnCommand
+                                    )
                                 )
-                ).then(
-                        lt("kill")
-                                .executes(AIServerCommands::debugDiscardCommand)
-                ).then(
-                        lt("kill-all")
-                                .executes(AIServerCommands::debugResetCommand)
-                ).then(
-                        lt("kill-alive")
-                                .executes(AIServerCommands::debugDiscardAllCommand)
-                ).then(
-                        lt("join")
-                                .then(
-                                        arg("namespace", StringArgumentType.string())
-                                                .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
-                                                .then(
-                                                        arg("name", StringArgumentType.string())
-                                                                .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
-                                                                .executes(AIServerCommands::debugJoinPollCommand)
 
-                                                )
-                                )
-                ).then(
-                        lt("set-yard")
-                                .then(
-                                        arg("coordinate", Vec3Argument.vec3()).executes(
-                                                AIServerCommands::setYardPositionCommand
-                                        )
-
-                                )
-                ).then(
-                        lt("reload-schematics").executes(
-                                AIServerCommands::reloadCommand
+                            )
                         )
+                )
+
+                .then(
+                    lt("kill")
+                        .executes(AIServerCommands::debugDiscardCommand)
+                ).then(
+                    lt("kill-all")
+                        .executes(AIServerCommands::debugResetCommand)
+                ).then(
+                    lt("kill-alive")
+                        .executes(AIServerCommands::debugDiscardAllCommand)
+                ).then(
+                    lt("join")
+                        .then(arg("namespace", StringArgumentType.string())
+                            .suggests(SchematicSuggestion.NAMESPACE_SUGGESTIONS)
+                            .then(
+                                arg("name", StringArgumentType.string())
+                                    .suggests(SchematicSuggestion.NAME_SUGGESTIONS)
+                                    .executes(AIServerCommands::debugJoinPollCommand)
+
+                            )
+                        )
+                ).then(
+                    lt("set-yard")
+                        .then(
+                            arg("coordinate", Vec3Argument.vec3()).executes(
+                                AIServerCommands::setYardPositionCommand
+                            )
+
+                        )
+                ).then(
+                    lt("reload-schematics").executes(
+                        AIServerCommands::reloadCommand
+                    )
                 ).requires(csc -> csc.hasPermission(4))
 
         );
