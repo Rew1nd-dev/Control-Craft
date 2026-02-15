@@ -4,18 +4,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Sets;
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.port.bus.IBusContext;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.utils.LazyTicker;
-import com.verr1.controlcraft.utils.LegacyAIUtils;
+import com.verr1.controlcraft.utils.VSAccessUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -64,6 +63,22 @@ public class CimulinkBus implements IBusContext {
                         .collect(Collectors.toSet())
                 )
                 .orElseGet(Sets::newConcurrentHashSet);
+    }
+
+
+    public void onPositiveEdge(){
+
+        devices.values().forEach(c -> {
+            try{
+                c.onPositiveEdge();
+            } catch (RuntimeException e) {
+                ControlCraft.LOGGER.error("Error During Temporal Propagation For {} At CimulinkBus: {}, {}", c.getClass(), e.getCause(), e.getMessage());
+                throw new RuntimeException(e);
+            }
+        });
+
+
+
     }
 
     public @NotNull Set<String> allNames(){
@@ -125,12 +140,17 @@ public class CimulinkBus implements IBusContext {
         return obj;
     }
 
+    public static @Nullable CimulinkBus get(ServerShip ship){
+        //return ship.getOrPutAttachment(AnchorForceInducer.class, AnchorForceInducer::new);
+        return ship.getAttachment(CimulinkBus.class);
+    }
+
     public static void tickAll(){
         ticker.tick();
     }
 
     public static void tickAllAttachments(){
-        LegacyAIUtils
+        VSAccessUtils
                 .getAllShips()
                 .stream()
                 .map(s -> s.getAttachment(CimulinkBus.class))

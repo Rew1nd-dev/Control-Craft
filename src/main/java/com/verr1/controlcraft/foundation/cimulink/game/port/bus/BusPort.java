@@ -78,19 +78,20 @@ public class BusPort extends NamedComponent {
                         c.onInputChange(c.in(port));
                     });
         });
-        try{
-            cache.values().stream().flatMap(Collection::stream).forEach(c -> {
-                try{
-                    c.onPositiveEdge();
-                }catch (RuntimeException e){
-                    ControlCraft.LOGGER.error("Error During Temporal Propagation At : {}, {}", c.getClass(), e.getMessage());
-                    throw e;
-                }
-            });
-        } catch (RuntimeException e) {
-            ControlCraft.LOGGER.error("Error During Temporal Propagation At BusPort: {}, {}", e.getCause(), e.getMessage());
-            throw new RuntimeException(e);
-        }
+
+//        try{
+//            cache.values().stream().flatMap(Collection::stream).forEach(c -> {
+//                try{
+//                    c.onPositiveEdge();
+//                }catch (RuntimeException e){
+//                    ControlCraft.LOGGER.error("Error During Temporal Propagation At : {}, {}", c.getClass(), e.getMessage());
+//                    throw e;
+//                }
+//            });
+//        } catch (RuntimeException e) {
+//            ControlCraft.LOGGER.error("Error During Temporal Propagation At BusPort: {}, {}", e.getCause(), e.getMessage());
+//            throw new RuntimeException(e);
+//        }
 
         allOutNames.forEach(s -> cache
             .getOrDefault(s, Collections.emptySet())

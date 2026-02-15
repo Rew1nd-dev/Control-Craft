@@ -7,7 +7,7 @@ import com.verr1.controlcraft.foundation.cimulink.standalone.eval.Evaluator;
 import com.verr1.controlcraft.foundation.cimulink.standalone.eval.Val;
 import com.verr1.controlcraft.foundation.cimulink.standalone.eval.operation.cluster.QuaternionVal;
 import com.verr1.controlcraft.foundation.cimulink.standalone.eval.operation.cluster.Vector3Val;
-import com.verr1.controlcraft.utils.LegacyAIUtils;
+import com.verr1.controlcraft.utils.VSAccessUtils;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
@@ -72,7 +72,7 @@ public class AimPredict {
         aim.input("vtx", vtx.x()).input("vty", vtx.y()).input("vtz", vtx.z());
         aim.input("bv", bv);
 
-        Vector3dc aimTrue = LegacyAIUtils.aimPredict(ptx, vtx, new Vector3d(0, 0, 0), bv);
+        Vector3dc aimTrue = VSAccessUtils.aimPredict(ptx, vtx, new Vector3d(0, 0, 0), bv);
         System.out.println("True Aim: " + (aimTrue == null ? "null" : aimTrue));
 
         db.trackWithPeriod(1, 1, 1);

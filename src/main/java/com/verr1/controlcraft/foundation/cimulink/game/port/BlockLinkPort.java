@@ -9,6 +9,7 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.compact.vmod.version.VSchematicCompactCimulinkV1;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.components.general.Temporal;
@@ -346,6 +347,12 @@ public abstract class BlockLinkPort {
                 blp.removeAllLinks();
             }
         }));
+
+        VSAccessUtils.getAllShips()
+                .stream()
+                .map(CimulinkBus::get)
+                .filter(Objects::nonNull)
+                .forEach(CimulinkBus::onPositiveEdge);
 
         // stage 3
         // Temporal output can be considered as a kind of input in a loop-less directional graph

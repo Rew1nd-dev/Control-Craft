@@ -72,7 +72,7 @@ public class WirelessIO implements $IRedstoneLinkable {
         try {
             delegate.linkCircuit().input(ioName, value);
         } catch (Exception e) {
-            ControlCraft.LOGGER.warn("io exception of circuit: " + e.getMessage());
+            ControlCraft.LOGGER.warn("io exception of circuit: {}", e.getMessage());
         }
     }
 

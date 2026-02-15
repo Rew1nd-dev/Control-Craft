@@ -4,11 +4,9 @@ import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.utility.Color;
 import com.simibubi.create.foundation.utility.Couple;
-import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.compact.shaolib.ShaoLibCompact;
-import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.camera.CameraMovementTracker;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -92,7 +90,7 @@ import java.util.function.Predicate;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
-import static com.verr1.controlcraft.utils.LegacyAIUtils.velocity;
+import static com.verr1.controlcraft.utils.VSAccessUtils.velocity;
 
 public class CameraBlockEntity extends OnShipBlockEntity
         implements IPacketHandler, IReceiver, IHaveGoggleInformation, IPlant

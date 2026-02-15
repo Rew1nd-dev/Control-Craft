@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
-public class LegacyAIUtils {
+public class VSAccessUtils {
 
     @NotNull
     public static Vector3dc velocity(Vector3dc blockPositionShip, ServerLevel level){

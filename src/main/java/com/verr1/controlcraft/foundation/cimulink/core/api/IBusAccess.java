@@ -15,10 +15,10 @@ public interface IBusAccess {
 
         }
 
-        @Override
-        public void onPositiveEdge() {
-
-        }
+//        @Override
+//        public void onPositiveEdge() {
+//
+//        }
     };
 
 
@@ -26,7 +26,7 @@ public interface IBusAccess {
 
     void propagate(String componentName, String port, double value);
 
-    void onPositiveEdge();
+    // void onPositiveEdge();
 
     static IBusAccess of(LuaBlockEntity be){
         return new IBusAccess() {
@@ -40,10 +40,10 @@ public interface IBusAccess {
                 be.propagateTo(componentName, port, value);
             }
 
-            @Override
-            public void onPositiveEdge() {
-                be.onPositiveEdge();
-            }
+//            @Override
+//            public void onPositiveEdge() {
+//                be.onPositiveEdge();
+//            }
         };
     }
 

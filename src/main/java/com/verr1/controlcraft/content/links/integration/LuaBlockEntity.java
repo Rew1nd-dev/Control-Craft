@@ -116,19 +116,19 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
     // just like what BusBlockEntity does
     // This is call delegate from Luacuit onPositiveEdge
     public void onPositiveEdge(){
-        try{
-            cache.values().stream().flatMap(Collection::stream).forEach(c -> {
-                try{
-                    c.onPositiveEdge();
-                }catch (RuntimeException e){
-                    ControlCraft.LOGGER.error("Error During Temporal Propagation At : {}, {}", c.getClass(), e.getMessage());
-                    throw e;
-                }
-            });
-        } catch (RuntimeException e) {
-            ControlCraft.LOGGER.error("Error During Temporal Propagation At LuaBlock: {}, {}", e.getCause(), e.getMessage());
-            throw new RuntimeException(e);
-        }
+//        try{
+//            cache.values().stream().flatMap(Collection::stream).forEach(c -> {
+//                try{
+//                    c.onPositiveEdge();
+//                }catch (RuntimeException e){
+//                    ControlCraft.LOGGER.error("Error During Temporal Propagation At : {}, {}", c.getClass(), e.getMessage());
+//                    throw e;
+//                }
+//            });
+//        } catch (RuntimeException e) {
+//            ControlCraft.LOGGER.error("Error During Temporal Propagation At LuaBlock: {}, {}", e.getCause(), e.getMessage());
+//            throw new RuntimeException(e);
+//        }
     }
 
     @Override

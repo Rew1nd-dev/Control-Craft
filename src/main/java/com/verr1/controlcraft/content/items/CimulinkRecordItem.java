@@ -2,7 +2,6 @@ package com.verr1.controlcraft.content.items;
 
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.foundation.cimulink.core.records.ComponentPortName;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.ConnectionNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.utils.*;
@@ -17,7 +16,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,11 +43,11 @@ public class CimulinkRecordItem extends Item {
             return InteractionResult.SUCCESS;
         }
         boolean store = !player.isShiftKeyDown();
-        ServerShip ship = LegacyAIUtils.getShipAt(WorldBlockPos.of(world, blockPos)).orElse(null);
+        ServerShip ship = VSAccessUtils.getShipAt(WorldBlockPos.of(world, blockPos)).orElse(null);
         if(ship == null){
             return InteractionResult.PASS;
         }
-        List<ServerShip> allShips = ConstraintClusterUtil.clusterOf(ship.getId()).stream().map(LegacyAIUtils::getShipOf)
+        List<ServerShip> allShips = ConstraintClusterUtil.clusterOf(ship.getId()).stream().map(VSAccessUtils::getShipOf)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();

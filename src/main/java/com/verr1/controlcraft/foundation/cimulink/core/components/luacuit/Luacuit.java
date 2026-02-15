@@ -181,7 +181,7 @@ public class Luacuit extends NamedComponent {
         if (forbidden)
             return;
         doTask(3000);
-        busAccess.onPositiveEdge();
+        // busAccess.onPositiveEdge();
     }
 
     public static void close() {

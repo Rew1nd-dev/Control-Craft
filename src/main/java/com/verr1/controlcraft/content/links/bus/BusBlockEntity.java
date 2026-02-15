@@ -37,6 +37,7 @@ public class BusBlockEntity extends CimulinkBlockEntity<BusLinkPort> implements 
                         BusLinkPort.SER,
                         BusLinkPort.Status.class
                 ))
+                .runtimeOnly()
                 .register();
     }
 

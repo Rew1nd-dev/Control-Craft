@@ -21,6 +21,7 @@ import org.valkyrienskies.core.impl.hooks.VSEvents;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class ConstraintCenter {
 
     private static MinecraftServer server;
 
-    private static final HashMap<ConstraintKey, ConstraintWithID> cache = new HashMap<>();
+    private static final Map<ConstraintKey, ConstraintWithID> cache = new ConcurrentHashMap<>();
 
     public static void onServerStaring(MinecraftServer _server){
         cache.clear();

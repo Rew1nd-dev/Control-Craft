@@ -6,6 +6,7 @@ import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.misc.CircuitWirelessMenu;
+import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.WrappedLinkPort;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.data.links.IntegrationPortStatus;
@@ -78,7 +79,7 @@ public abstract class WirelessIntegrationBlockEntity<W extends NamedComponent, T
         buildRegistry(CIRCUIT).withBasic(
                         CompoundTagPort.of(
                                 () -> PAIR_SER.serialize(linkPort().viewStatus()),
-                                t -> linkPort().setStatus(PAIR_SER.deserialize(t))
+                                t -> setStatus(PAIR_SER.deserialize(t))
                         )
                 )
                 .withClient(ClientBuffer.UNIT.get())
@@ -111,9 +112,18 @@ public abstract class WirelessIntegrationBlockEntity<W extends NamedComponent, T
         return linkPort().component();
     }
 
+    public PlantProxy linkProxy(){
+        return linkPort().proxy();
+    }
+
+    protected void setStatus(Pair<List<IntegrationPortStatus>, List<IntegrationPortStatus>> statues){
+        linkPort().setStatus(statues);
+        updateIOName();
+    }
+
     protected void updateIOName(){
         AtomicInteger ioIndex = new AtomicInteger(0);
-        linkCircuit().inputsExcludeSignals()
+        linkProxy().inputsExcludeSignals()
                 .forEach(s -> {
                     int ioId = ioIndex.get();
                     if(ioId >= io.size())return;
@@ -122,7 +132,7 @@ public abstract class WirelessIntegrationBlockEntity<W extends NamedComponent, T
                     WirelessIO wirelessIO = io.get(ioId);
                     wirelessIO.setAsInput(s);
                 });
-        linkCircuit().outputs()
+        linkProxy().outputs()
                 .forEach(s -> {
                     int ioId = ioIndex.get();
                     if(ioId >= io.size())return;
