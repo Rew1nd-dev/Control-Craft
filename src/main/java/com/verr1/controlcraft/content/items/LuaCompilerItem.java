@@ -6,6 +6,7 @@ import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitScript;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.data.links.IntegrationPortStatus;
+import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -103,9 +104,11 @@ public class LuaCompilerItem extends Item {
         try{
             String code = loadLua(file.toString());
 
-            LuacuitScript ls = LuacuitScript.fromCode(code);
+            // LuacuitScript ls = LuacuitScript.fromCode(code);
 
-            return ls.serialize();
+            return CompoundTagBuilder.create()
+                    .withString("code", code)
+                    .build();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -118,8 +121,8 @@ public class LuaCompilerItem extends Item {
     public static void saveTag(CompoundTag tag, String uploaded, String uploader){
         Path file = LUALINKS.resolve(uploader).resolve(uploaded + ".lua").toAbsolutePath();
 
-        LuacuitScript ls = LuacuitScript.deserialize(tag);
-        String code = ls.code();
+        // LuacuitScript ls = LuacuitScript.deserialize(tag);
+        String code = tag.getString("code");//ls.code();
 
         try {
             Path parent = file.getParent();

@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.items.CircuitCompilerItem;
 import com.verr1.controlcraft.content.items.LuaCompilerItem;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
@@ -377,6 +378,12 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int enableCameraTrack(CommandContext<CommandSourceStack> context){
+        boolean on = context.getArgument("on", Boolean.class);
+        BlockPropertyConfig._CAMERA_TRACK_CHUNKS = on;
+        return 1;
+    }
+
     public static void registerServerCommands(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(
             Commands
@@ -390,20 +397,26 @@ public class ControlCraftServerCommands {
                         })
                 ).then(
                     lt("free-key").then(
-                            arg("protocol", LongArgumentType.longArg()).then(
-                                    arg("name", StringArgumentType.string()).executes(
-                                        ControlCraftServerCommands::freeCommand
-                                    )
+                        arg("protocol", LongArgumentType.longArg()).then(
+                            arg("name", StringArgumentType.string()).executes(
+                                ControlCraftServerCommands::freeCommand
                             )
+                        )
                     )
                 ).then(
-                        lt("debug-count-fake-player").executes(
-                                ControlCraftServerCommands::countFPCommand
-                        )
+                    lt("debug-count-fake-player").executes(
+                            ControlCraftServerCommands::countFPCommand
+                    )
                 ).then(
-                        lt("save-all-constraints").executes(
-                                ControlCraftServerCommands::saveAllConstraintsCommand
+                    lt("save-all-constraints").executes(
+                            ControlCraftServerCommands::saveAllConstraintsCommand
+                    )
+                ).then(
+                    lt("cam-track-chunks").then(
+                        arg("on", BoolArgumentType.bool()).executes(
+                            ControlCraftServerCommands::enableCameraTrack
                         )
+                    )
                 )
         );
         dispatcher.register(

@@ -6,6 +6,7 @@ import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.camera.CameraBoundFakePlayer;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
+import com.verr1.controlcraft.mixinducks.IServerPlayerDuck;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -38,6 +39,9 @@ public class ServerCameraManager {
     public static void registerUser(WorldBlockPos cameraPos, ServerPlayer player){
         player2Camera.put(player.getUUID(), cameraPos);
         camera2Player.put(cameraPos, player.getUUID());
+        if (player instanceof IServerPlayerDuck duck) {
+            duck.controlcraft$setLastSectionPos(SectionPos.of(player.blockPosition()));
+        }
     }
 
     public static void remove(WorldBlockPos pos){

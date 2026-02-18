@@ -155,8 +155,12 @@ public abstract class MixinCamera implements ICameraDuck {
                     new Vec3(this.position.x - (double) this.forwards.x() * maxZoom + (double) f + (double) h,
                             this.position.y - (double) this.forwards.y() * maxZoom + (double) g,
                             this.position.z - (double) this.forwards.z() * maxZoom + (double) h);
-            final HitResult hitResult = RaycastUtilsKt.clipIncludeShips(level,
-                    new ClipContext(vec3, vec32, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, this.entity), true, toIgnore.getId());
+            final HitResult hitResult = RaycastUtilsKt.vanillaClip(
+                    level,
+                    new ClipContext(vec3, vec32, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, this.entity)
+            );
+            //true,
+            //toIgnore.getId()
             if (hitResult.getType() != HitResult.Type.MISS) {
                 final double e = hitResult.getLocation().distanceTo(this.position);
                 if (e < maxZoom) {

@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.links;
 
+import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
@@ -40,7 +41,7 @@ import java.util.stream.IntStream;
 import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
 
 public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShipBlockEntity implements
-        ILinkableBlock, IHaveHoveringInformation
+        ILinkableBlock, IHaveGoggleInformation
 {
 
     private final T linkPort;
@@ -311,7 +312,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
 
     @Override
-    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if(level == null)return false;
         if(isPlayerSneaking){
             tooltip.addAll(makeDetailedToolTip(readClientConnectionStatus(), level));

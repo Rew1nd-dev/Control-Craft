@@ -53,7 +53,10 @@ public class CameraBoundFakePlayer extends FakePlayer implements IPlayer {
         }
     }
 
-
+    @Override
+    public boolean isSpectator() {
+        return false;
+    }
 
     public void addToLevel(ServerPlayer user){
         reset();

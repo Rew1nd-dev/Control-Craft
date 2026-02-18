@@ -1,6 +1,12 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 
+import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.BusLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.UtilLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
 import com.verr1.controlcraft.utils.SerializeUtils;
@@ -55,6 +61,9 @@ public record LuacuitScript(String code, List<String> definedInputs, List<Double
     public static LuacuitScript fromCode(String code) throws LuaOvertimeException, LuaError {
         LuacuitScript temporary;
         Globals defineGlobal = CimulinkLua.createStandardGlobals();
+        defineGlobal.load(new PhysLib(IPhysAccess.EMPTY));
+        defineGlobal.load(new UtilLib(IWorldAccess.EMPTY));
+        defineGlobal.load(new BusLib(IBusAccess.EMPTY));
 
         List<String> definedInputs = new ArrayList<>();
         List<Double> defaultInputs = new ArrayList<>();

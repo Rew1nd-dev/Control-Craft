@@ -96,9 +96,9 @@ public class BusPort extends NamedComponent {
         allOutNames.forEach(s -> cache
             .getOrDefault(s, Collections.emptySet())
             .forEach(c -> {
-                c.changedOutput().forEach(i -> {
-                   double val = c.retrieveOutput(i);
-                   String outPort = c.out(i);
+                c.outputs().forEach(outPort -> {
+                   double val = c.peekOutput(outPort);
+                   // String outPort = c.out(i);
                    String compressed = compress(s, outPort);
                    if(hasOutput(compressed)){
                        updateOutput(out(compressed), val);

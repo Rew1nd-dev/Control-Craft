@@ -145,6 +145,8 @@ public class BlockPropertyConfig
 
     public static boolean _ALWAYS_REQUEST_PORT_INFO;
 
+    public static boolean _CAMERA_TRACK_CHUNKS = true;
+
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
