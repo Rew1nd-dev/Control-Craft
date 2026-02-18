@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.networking.SimplePacketBase;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
 import com.verr1.controlcraft.content.links.integration.IoSettings;
+import com.verr1.controlcraft.content.links.integration.WirelessIntegrationBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.Serializer;
@@ -44,13 +45,14 @@ public class CircuitSettingsPacket extends SimplePacketBase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean handle(NetworkEvent.Context context) {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if(player == null)return;
             ServerLevel level = player.serverLevel();
             BlockEntityGetter
-                    .getLevelBlockEntityAt(level, pos, CircuitBlockEntity.class)
+                    .getLevelBlockEntityAt(level, pos, WirelessIntegrationBlockEntity.class)
                     .ifPresent(be -> {
                         be.setWithIoSettings(settings);
                         ControlCraftServer.SERVER_EXECUTOR.executeLater(be::setFrequency, 10);
