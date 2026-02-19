@@ -328,7 +328,7 @@ public abstract class BlockLinkPort {
                 ControlCraft.LOGGER.error("Lua Execution Exception at {}: {}, sus code: {}",
                         blp.pos(), le.getMessage(), sus
                 );
-                blp.removeAllLinks();
+                // blp.removeAllLinks();
                 tellNearby(world, position, le.getMessage());
                 alarmPlayers(position);
             }catch (LuaOvertimeException loe){
@@ -338,13 +338,13 @@ public abstract class BlockLinkPort {
                 ControlCraft.LOGGER.error("Lua Execution Overtime at {}: {}, sus code: {}",
                         blp.pos(), loe.getMessage(), sus
                 );
-                blp.removeAllLinks();
+                // blp.removeAllLinks();
                 tellNearby(world, position, loe.getMessage());
                 alarmPlayers(position);
             }catch (RuntimeException re){
                 DebugUtils.printStackTrace();
                 ControlCraft.LOGGER.error("Unexpected Exception during temporal propagation at {}: {}", blp.pos(), re.getMessage());
-                blp.removeAllLinks();
+                // blp.removeAllLinks();
             }
         }));
 

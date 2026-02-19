@@ -32,12 +32,12 @@ import java.util.Optional;
 public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
         implements IConstraintHolder
 {
-    private long companionShipID;
+    private long companionShipID = -1L;
     private Direction companionShipDirection = Direction.UP;
 
 
 
-    private boolean hasCollision = false;
+    private boolean hasCollision = true;
 
 
     private BlockPos blockConnectContext = BlockPos.ZERO;
