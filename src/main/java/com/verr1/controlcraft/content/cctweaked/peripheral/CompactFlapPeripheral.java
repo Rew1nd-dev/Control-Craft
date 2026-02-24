@@ -33,4 +33,14 @@ public class CompactFlapPeripheral extends AbstractAttachedPeripheral<CompactFla
         getTarget().setAngle(angle);
     }
 
+    @LuaFunction
+    public final double getTilt(){
+        return getTarget().tilt();
+    }
+
+    @LuaFunction
+    public final void setTilt(double tilt){
+        getTarget().setTilt(tilt);
+    }
+
 }

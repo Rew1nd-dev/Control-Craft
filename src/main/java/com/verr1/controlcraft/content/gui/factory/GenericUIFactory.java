@@ -283,6 +283,12 @@ public class GenericUIFactory {
                 Converter.convert(SlotType.DEGREE, Converter::titleStyle)
         );
 
+        DoubleUIField tilt = new DoubleUIField(
+                boundPos,
+                CompactFlapBlockEntity.TILT,
+                Converter.convert(SlotType.TILT, Converter::titleStyle)
+        );
+
         DoubleUIField offset = new DoubleUIField(
                 boundPos,
                 CompactFlapBlockEntity.OFFSET,
@@ -322,7 +328,7 @@ public class GenericUIFactory {
         );
 
         Runnable alignLabels = () -> {
-            Converter.alignLabel(name, angle, offset);
+            Converter.alignLabel(name, angle, offset, tilt);
             Converter.alignLabel(lift, drag, bias);
             Converter.alignLabel(assemble, disassemble);
         };
@@ -334,7 +340,7 @@ public class GenericUIFactory {
                         new VerticalFlow.builder(boundPos)
                                 .withPort(name)
                                 .withPort(SharedKeys.PLACE_HOLDER, angle_view)
-                                .withPort(angle, offset)
+                                .withPort(angle, offset, tilt)
                                 .withPreDoLayout(alignLabels)
                                 .build()
                 )

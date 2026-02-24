@@ -308,7 +308,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     }
 
 
-    public AbstractDynamicMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public  AbstractDynamicMotor(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         registerConstraintKey("fix");
 

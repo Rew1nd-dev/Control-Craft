@@ -29,6 +29,18 @@ public interface IPhysAccess {
         public Vector3dc angularVelocity() {
             return new Vector3d();
         }
+
+        @Override
+        public double mass() {
+            return 0;
+        }
+
+        @Override
+        public double inertia() {
+            return 0;
+        }
+
+
     };
 
     Quaterniondc quaternionToWorld();
@@ -38,6 +50,10 @@ public interface IPhysAccess {
     Vector3dc velocity();
 
     Vector3dc angularVelocity();
+
+    double mass();
+
+    double inertia();
 
     static IPhysAccess of(OnShipBlockEntity be){
         return new IPhysAccess() {
@@ -60,6 +76,16 @@ public interface IPhysAccess {
             @Override
             public Vector3dc angularVelocity() {
                 return be.readSelf().omega();
+            }
+
+            @Override
+            public double mass() {
+                return be.readSelf().mass();
+            }
+
+            @Override
+            public double inertia() {
+                return be.readSelf().inertiaTensor().m00();
             }
         };
     }

@@ -46,6 +46,20 @@ public class PhysLib extends TwoArgFunction {
             }
         });
 
+        phys.set("mass", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return LuaValue.valueOf(source.mass());
+            }
+        });
+
+        phys.set("inertia", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return LuaValue.valueOf(source.inertia());
+            }
+        });
+
         env.set("Phys", phys);
         env.get("package").get("loaded").set("Phys", phys);
         return phys;

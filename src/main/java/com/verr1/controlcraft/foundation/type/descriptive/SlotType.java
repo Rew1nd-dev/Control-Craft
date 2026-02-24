@@ -80,11 +80,11 @@ public enum SlotType implements Descriptive<SlotType> {
                     "Angle in °"
             )
     ),
-    DEGREE$1(false),
-    DEGREE$2(false),
-    DEGREE$3(false),
-    DEGREE$4(false),
-    DEGREE$5(false),
+    PLACE_HOLDER$1(false),
+    PLACE_HOLDER$2(false),
+    PLACE_HOLDER$3(false),
+    PLACE_HOLDER$4(false),
+    PLACE_HOLDER$5(false),
 
     HORIZONTAL_TILT(false, Component.literal("Horizontal"),
             literals(
@@ -103,11 +103,11 @@ public enum SlotType implements Descriptive<SlotType> {
     VERTICAL_TILT$1(false),
 
     SPEED(false),
-    SPEED$1(false),
-    SPEED$2(false),
-    SPEED$3(false),
-    SPEED$4(false),
-    SPEED$5(false),
+    PLACE_HOLDER_$1(false),
+    PLACE_HOLDER_$2(false),
+    PLACE_HOLDER_$3(false),
+    PLACE_HOLDER_$4(false),
+    PLACE_HOLDER_$5(false),
 
     TORQUE(false),
     FORCE(false),
@@ -256,7 +256,9 @@ public enum SlotType implements Descriptive<SlotType> {
     MODE_CHEAT(false),
 
     THRUST_RATIO(false),
-    TORQUE_RATIO(false);
+    TORQUE_RATIO(false),
+
+    TILT(false);
 
     private boolean isBoolean = false;
 

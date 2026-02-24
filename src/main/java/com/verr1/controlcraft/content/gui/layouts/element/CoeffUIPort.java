@@ -45,9 +45,8 @@ public class CoeffUIPort extends ListUIPort<StringDouble, Coefficients>{
 
     @Override
     protected void writeList(List<StringDouble> value) {
-        currentSize = value.size();
-        int size = Math.min(max_size, value.size());
-        IntStream.range(0, size).forEach(i -> widgets.get(i).write(value.get(i)));
+        currentSize = Math.min(max_size, value.size());
+        IntStream.range(0, currentSize).forEach(i -> widgets.get(i).write(value.get(i)));
     }
 
     @Override

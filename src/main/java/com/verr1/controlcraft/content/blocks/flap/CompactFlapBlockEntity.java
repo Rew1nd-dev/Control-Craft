@@ -28,6 +28,7 @@ import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
+import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -48,6 +49,8 @@ import org.joml.Vector3dc;
 
 import java.util.Optional;
 
+import static com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
+import static com.verr1.controlcraft.content.blocks.joints.AbstractJointBlock.FLIPPED;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
@@ -56,8 +59,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 {
 
     public SynchronizedField<Double> angle = new SynchronizedField<>(0.0);
+    public SynchronizedField<Double> tilt  = new SynchronizedField<>(0.0);
 
     public static final NetworkKey ANGLE = NetworkKey.create("attack_angle");
+    public static final NetworkKey TILT = NetworkKey.create("attack_tilt");
     public static final NetworkKey OFFSET = NetworkKey.create("angle_offset");
     public static final NetworkKey LIFT = NetworkKey.create("lift");
     public static final NetworkKey DRAG = NetworkKey.create("drag");
@@ -76,6 +81,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     private double liftRatio = 150.0;
 
     protected LerpedFloat clientAnimatedAngle = LerpedFloat.angular();
+    protected LerpedFloat clientAnimatedTilt = LerpedFloat.angular();
 
     private CompactFlapPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
@@ -111,6 +117,16 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 .withBasic(SerializePort.of(
                         this::angle,
                         this::setAngle,
+                        SerializeUtils.DOUBLE
+                ))
+                .withClient(ClientBuffer.DOUBLE.get())
+                .dispatchToSync()
+                .register();
+
+        buildRegistry(TILT)
+                .withBasic(SerializePort.of(
+                        this::tilt,
+                        this::setTilt,
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
@@ -172,11 +188,18 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 ),
                 new DirectReceiver.InitContext(SlotType.DEGREE, Couple.create(0.0, 1.0)),
                 8
+        ).register(
+                new NumericField(
+                        () -> tilt.read(),
+                        a -> {
+                            tilt.write(a);
+                            queueUpdate(TILT);
+                        },
+                        "tilt"
+                ),
+                new DirectReceiver.InitContext(SlotType.TILT, Couple.create(0.0, 1.0)),
+                8
         );
-    }
-
-    public void setAttackAngle(double angle){
-        this.angle.write(angle);
     }
 
     @Override
@@ -198,11 +221,53 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         return getDirectionJOML();
     }
 
+    private Vector3d getTiltAxis(){
+        Direction tiltAxis = leftDirection();
+        return ValkyrienSkies.set(new Vector3d(), tiltAxis.getNormal());
+    }
+
+    public Direction leftDirection() {
+        BlockState state = getBlockState();
+        if (state.hasProperty(AXIS_ALONG_FIRST_COORDINATE)) {
+            Direction direction = getDirection();
+            boolean alignFirst = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
+
+            boolean flipped = false;
+            if (state.hasProperty(FLIPPED)) {
+                flipped = state.getValue(FLIPPED);
+            }
+
+            Direction d0 = switch (direction) {
+                case SOUTH, NORTH -> alignFirst ? Direction.WEST : Direction.UP;
+                case EAST -> alignFirst ? Direction.UP : Direction.SOUTH;
+                case WEST -> alignFirst ? Direction.UP : Direction.NORTH;
+                case UP, DOWN -> alignFirst ? Direction.WEST : Direction.NORTH;
+            };
+
+            return flipped ? d0.getOpposite() : d0;
+
+        } else {
+            return left(getDirection());
+        }
+
+    }
+
+    public static Direction left(Direction direction){
+        if(direction.getAxis().isHorizontal()){
+            return direction.getCounterClockWise(Direction.Axis.Y);
+        }
+        return direction.getCounterClockWise(Direction.Axis.Z);
+    }
+
     private Vector3d getNormal(){
         Vector3d baseNormal = getBaseNormal();
         Vector3d rotateAxis = getRotateAxis();
-        double radians = Math.toRadians(MathUtils.angleReset(this.angle.read() + offset));
-        return baseNormal.rotateAxis((radians), rotateAxis.x(), rotateAxis.y(), rotateAxis.z());
+        Vector3d tiltAxis = getTiltAxis();
+        double radians0 = Math.toRadians(MathUtils.angleReset(this.angle.read() + offset));
+        double radians1 = Math.toRadians(MathUtils.angleReset(this.tilt.read()));
+        return baseNormal
+                .rotateAxis((radians0), rotateAxis.x(), rotateAxis.y(), rotateAxis.z())
+                .rotateAxis((radians1), tiltAxis.x(), tiltAxis.y(), tiltAxis.z());
     }
 
     public LogicalFlap getLogicalFlap(){
@@ -307,6 +372,15 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         queueUpdate(ANGLE);
     }
 
+    public double tilt(){
+        return tilt.read();
+    }
+
+    public void setTilt(double tilt){
+        this.tilt.write(tilt);
+        queueUpdate(TILT);
+    }
+
     @Override
     public String receiverName() {
         return "compact_flap";
@@ -335,9 +409,16 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         return clientAnimatedAngle;
     }
 
+    public LerpedFloat getClientAnimatedTilt() {
+        return clientAnimatedTilt;
+    }
+
     private void tickAnimationData(){
         clientAnimatedAngle.chase(angle.read() + offset, 0.1, LerpedFloat.Chaser.EXP);
         clientAnimatedAngle.tickChaser();
+
+        clientAnimatedTilt.chase(tilt.read(), 0.1, LerpedFloat.Chaser.EXP);
+        clientAnimatedTilt.tickChaser();
     }
 
     private static double angleFix(Direction direction, double realAngle){
