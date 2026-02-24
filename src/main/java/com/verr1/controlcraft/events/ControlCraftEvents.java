@@ -70,6 +70,7 @@ public class ControlCraftEvents {
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
             CimulinkBus.tickAll();
             TimeCache.tick();
+            ConstraintCenter.tick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();
         }

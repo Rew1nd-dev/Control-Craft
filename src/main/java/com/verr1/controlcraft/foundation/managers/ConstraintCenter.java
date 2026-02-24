@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.data.constraint.ConstraintWithID;
 import com.verr1.controlcraft.foundation.data.constraint.SavedConstraintObject;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.mixin.accessor.ShipObjectServerWorldAccessor;
+import com.verr1.controlcraft.utils.LazyTicker;
 import com.verr1.controlcraft.utils.VSGetterUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -26,12 +27,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ConstraintCenter {
-    private static final int lazyTickRate = 3;
-    private static int lazyTick = 0;
 
     private static MinecraftServer server;
 
     private static final Map<ConstraintKey, ConstraintWithID> cache = new ConcurrentHashMap<>();
+    private static final LazyTicker lazySaver = new LazyTicker(3 * 60 * 20, ConstraintCenter::saveAll);
 
     public static void onServerStaring(MinecraftServer _server){
         cache.clear();
@@ -192,15 +192,8 @@ public class ConstraintCenter {
     }
 
 
-    public static void lazyTick(){
-        if(--lazyTick > 0){
-            return;
-        }
-        lazyTick = lazyTickRate;
-    }
-
     public static void tick(){
-        lazyTick();
+        lazySaver.tick();
     }
 
 

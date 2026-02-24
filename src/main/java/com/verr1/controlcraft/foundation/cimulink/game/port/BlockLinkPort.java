@@ -17,6 +17,7 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.sources.Signal
 import com.verr1.controlcraft.foundation.cimulink.core.utils.ArrayUtils;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.Debug;
 import com.verr1.controlcraft.foundation.cimulink.game.debug.TestEnvBlockLinkWorld;
+import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.EncloseLoopException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.data.WorldBlockPos;
@@ -288,12 +289,20 @@ public abstract class BlockLinkPort {
         ));
     }
 
+    private static String sanitizeLuaError(String message, String code) {
+        if (message == null) return "";
+        String sanitized = message.replaceAll("\\[string \".*?\"\\]", "[script]");
+        if (code != null && !code.isEmpty()) {
+            sanitized = sanitized.replace(code, "[script]");
+        }
+        return sanitized;
+    }
+
     private static String getSuspectedLuaCode(BlockLinkPort raw){
-//        if(raw instanceof LuacuitLinkPort llp){
-//            Luacuit lc = llp.component();
-//            return lc.script().code();
-//        }
-        return "{code spam is disabled}";
+        if (raw.__raw() instanceof Luacuit lc) {
+            return lc.script().code();
+        }
+        return null;
     }
 
     private static void alarmPlayers(Vec3 position){
@@ -325,21 +334,23 @@ public abstract class BlockLinkPort {
                 Level world = blp.pos().level(ControlCraftServer.INSTANCE);
                 Vec3 position = Vec3.atCenterOf(blp.pos().pos());
                 String sus = getSuspectedLuaCode(blp);
+                String sanitized = sanitizeLuaError(le.getMessage(), sus);
                 ControlCraft.LOGGER.error("Lua Execution Exception at {}: {}, sus code: {}",
-                        blp.pos(), le.getMessage(), sus
+                        blp.pos(), sanitized, sus
                 );
                 // blp.removeAllLinks();
-                tellNearby(world, position, le.getMessage());
+                tellNearby(world, position, sanitized);
                 alarmPlayers(position);
             }catch (LuaOvertimeException loe){
                 Level world = blp.pos().level(ControlCraftServer.INSTANCE);
                 Vec3 position = Vec3.atCenterOf(blp.pos().pos());
                 String sus = getSuspectedLuaCode(blp);
+                String sanitized = sanitizeLuaError(loe.getMessage(), sus);
                 ControlCraft.LOGGER.error("Lua Execution Overtime at {}: {}, sus code: {}",
-                        blp.pos(), loe.getMessage(), sus
+                        blp.pos(), sanitized, sus
                 );
                 // blp.removeAllLinks();
-                tellNearby(world, position, loe.getMessage());
+                tellNearby(world, position, sanitized);
                 alarmPlayers(position);
             }catch (RuntimeException re){
                 DebugUtils.printStackTrace();
