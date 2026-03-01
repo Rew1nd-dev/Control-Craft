@@ -67,6 +67,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public static final NetworkKey LIFT = NetworkKey.create("lift");
     public static final NetworkKey DRAG = NetworkKey.create("drag");
     public static final NetworkKey BIAS = NetworkKey.create("bias");
+    public static final NetworkKey LEGACY = NetworkKey.create("legacy");
 
     private final DirectReceiver receiver = new DirectReceiver();
 
@@ -75,6 +76,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     private double offset = 0.0;
 
 
+
+    private boolean legacyAeroDynamic = true;
 
     private double bias = 0.0;
     private double resistRatio = 30.0;
@@ -131,6 +134,15 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
                 .dispatchToSync()
+                .register();
+
+        buildRegistry(LEGACY)
+                .withBasic(SerializePort.of(
+                        this::legacyAeroDynamic,
+                        this::setLegacyAeroDynamic,
+                        SerializeUtils.BOOLEAN
+                ))
+                .withClient(ClientBuffer.BOOLEAN.get())
                 .register();
 
         buildRegistry(OFFSET)
@@ -200,6 +212,14 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 new DirectReceiver.InitContext(SlotType.TILT, Couple.create(0.0, 1.0)),
                 8
         );
+    }
+
+    public boolean legacyAeroDynamic() {
+        return legacyAeroDynamic;
+    }
+
+    public void setLegacyAeroDynamic(boolean legacyAeroDynamic) {
+        this.legacyAeroDynamic = legacyAeroDynamic;
     }
 
     @Override
@@ -275,7 +295,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 getBlockPos(),
                 getNormal(),
                 liftRatio,
-                resistRatio
+                resistRatio,
+                legacyAeroDynamic
         );
     }
 

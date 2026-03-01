@@ -258,7 +258,16 @@ public enum SlotType implements Descriptive<SlotType> {
     THRUST_RATIO(false),
     TORQUE_RATIO(false),
 
-    TILT(false);
+    TILT(false),
+
+    LEGACY(true, Component.literal("Legacy"), // in order to hide min and max
+            literals(
+                    "Legacy Aerodynamics"
+            )),
+
+    ;
+
+
 
     private boolean isBoolean = false;
 

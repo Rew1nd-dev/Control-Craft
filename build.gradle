@@ -123,7 +123,7 @@ repositories
     maven {url = "https://modmaven.dev/" } // Create, Flywheel
     maven {url = "https://maven.ithundxr.dev/mirror" } // Registrate
     maven {url = "https://cursemaven.com"}
-    maven {url = "https://repo.essential.gg/repository/maven-public"}
+    // maven {url = "https://repo.essential.gg/repository/maven-public"}
     maven {url = 'https://thedarkcolour.github.io/KotlinForForge/'}
     maven {url = 'https://maven.valkyrienskies.org/'}
     maven {url = 'https://maven.fabricmc.net/' }

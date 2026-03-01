@@ -11,6 +11,10 @@ public class SerializePort<T> extends CompoundTagPort {
         super(() -> serializer.serialize(supplier.get()), tag -> consumer.accept(serializer.deserialize(tag)));
     }
 
+    private SerializePort(Supplier<T> supplier, Consumer<T> consumer, Serializer<T> serializer, T defaultValue) {
+        super(() -> serializer.serialize(supplier.get()), tag -> consumer.accept(serializer.deserializeOrElse(tag, defaultValue)));
+    }
+
     public static <T> SerializePort<T> of(
             Supplier<T> supplier,
             Consumer<T> consumer,
@@ -19,5 +23,12 @@ public class SerializePort<T> extends CompoundTagPort {
         return new SerializePort<>(supplier, consumer, serializer);
     }
 
-
+    public static <T> SerializePort<T> of(
+            Supplier<T> supplier,
+            Consumer<T> consumer,
+            Serializer<T> serializer,
+            T defaultValue
+    ) {
+        return new SerializePort<>(supplier, consumer, serializer, defaultValue);
+    }
 }

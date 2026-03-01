@@ -292,10 +292,11 @@ public class InducerControls {
     }
 
 
+
     public static void flapTickControls(LogicalFlap flap, PhysShipWrapper ship){
         double lift = flap.lift();
         double drag = flap.drag();
-
+        boolean legacy = flap.legacyAerodynamics();
         Vector3dc p_sc = ship.getTransform().getPositionInShip();
         Vector3dc r_sc = toJOML(flap.posInShip().getCenter()).sub(p_sc, new Vector3d());
 
@@ -311,6 +312,9 @@ public class InducerControls {
 
         if(pj_wc.lengthSquared() < 1.0E-12 || rv_wc.lengthSquared() < 1.0E-12)return;
 
+        Vector3dc lift_d_wc = legacy ? n_wc : MathUtils.tangent(n_wc, rv_wc).normalize();
+
+
         Vector3dc pj_d_wc = pj_wc.normalize(new Vector3d());
 
         double angle = pj_d_wc.angle(rv_wc) * -Math.signum(n_wc.dot(rv_wc));
@@ -319,7 +323,7 @@ public class InducerControls {
 
         double s2a = Math.sin(2 * angle);
         double lift_scale = MathUtils.clamp(lift * s2a * pj_wc.lengthSquared(), 1.0E12);
-        Vector3dc lift_wc = n_wc.mul(lift_scale, new Vector3d());
+        Vector3dc lift_wc = lift_d_wc.mul(lift_scale, new Vector3d());
 
         double c2a = 1 - Math.cos(2 * angle);
         double drag_scale = MathUtils.clamp(drag * c2a * rv_wc.lengthSquared(), 1.0E12);

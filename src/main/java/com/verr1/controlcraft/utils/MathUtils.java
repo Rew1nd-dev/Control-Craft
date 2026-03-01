@@ -217,6 +217,10 @@ public class MathUtils {
         ));
     }
 
+    public static Vector3d tangent(Vector3dc v, Vector3dc proj){
+        return v.sub(proj.normalize(v.dot(proj) / proj.length(), new Vector3d()), new Vector3d());
+    }
+
     public static Vector3d safeNormalize(Vector3dc hvt) {
         double length = hvt.length();
         if (length < 1e-9) {

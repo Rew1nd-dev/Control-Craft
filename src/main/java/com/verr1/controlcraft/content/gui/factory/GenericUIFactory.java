@@ -313,6 +313,12 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.FLAP_BIAS, Converter::titleStyle)
         );
 
+        BooleanUIField legacy = new BooleanUIField(
+                boundPos,
+                CompactFlapBlockEntity.LEGACY,
+                Converter.convert(SlotType.LEGACY, Converter::titleStyle)
+        );
+
         UnitUIPanel assemble = new UnitUIPanel(
                 boundPos,
                 SharedKeys.ASSEMBLE,
@@ -329,7 +335,7 @@ public class GenericUIFactory {
 
         Runnable alignLabels = () -> {
             Converter.alignLabel(name, angle, offset, tilt);
-            Converter.alignLabel(lift, drag, bias);
+            Converter.alignLabel(lift, drag, bias, legacy);
             Converter.alignLabel(assemble, disassemble);
         };
 
@@ -347,7 +353,7 @@ public class GenericUIFactory {
                 .withTab(
                         ADVANCE_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(lift, drag, bias)
+                                .withPort(lift, drag, bias, legacy)
                                 .build()
                 )
                 .withTab(
