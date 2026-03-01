@@ -3,10 +3,8 @@ package com.verr1.controlcraft.content.blocks.flap;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
-import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.content.contraptions.bearing.BearingContraption;
-import com.simibubi.create.content.contraptions.bearing.IBearingBlockEntity;
 import com.simibubi.create.foundation.utility.Color;
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
@@ -15,7 +13,6 @@ import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.cctweaked.peripheral.CompactFlapPeripheral;
-import com.verr1.controlcraft.content.cctweaked.peripheral.FlapBearingPeripheral;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
@@ -36,10 +33,9 @@ import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +51,7 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class CompactFlapBlockEntity extends OnShipBlockEntity implements
-        IReceiver, IBearingBlockEntity, IPlant
+        IReceiver, IPlant
 {
 
     public SynchronizedField<Double> angle = new SynchronizedField<>(0.0);
@@ -68,6 +64,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public static final NetworkKey DRAG = NetworkKey.create("drag");
     public static final NetworkKey BIAS = NetworkKey.create("bias");
     public static final NetworkKey LEGACY = NetworkKey.create("legacy");
+    public static final NetworkKey ASM = NetworkKey.create("c_asm");
 
     private final DirectReceiver receiver = new DirectReceiver();
 
@@ -88,6 +85,10 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     private CompactFlapPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
+
+
+
+    private int clientContraptionId = 0;
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
@@ -185,6 +186,17 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 .dispatchToSync()
                 .register();
 
+        buildRegistry(ASM)
+            .withBasic(SerializePort.of(
+                this::clientContraptionId,
+                this::setClientContraptionId,
+                SerializeUtils.INT
+            ))
+            .dispatchToSync()
+            .runtimeOnly()
+            .register();
+
+
         panel().registerUnit(SharedKeys.ASSEMBLE, this::assemble);
 
         panel().registerUnit(SharedKeys.DISASSEMBLE, this::disassemble);
@@ -212,6 +224,24 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 new DirectReceiver.InitContext(SlotType.TILT, Couple.create(0.0, 1.0)),
                 8
         );
+    }
+
+    public int clientContraptionId() {
+        if(level == null || level.isClientSide){
+            return clientContraptionId;
+        }
+        return physicalWing == null ? -1 : physicalWing.getId();
+    }
+
+    public void setClientContraptionId(int clientContraptionId) {
+        if(clientContraptionId == this.clientContraptionId)return;
+        this.clientContraptionId = clientContraptionId;
+        if(level != null && level.isClientSide){
+            Entity e = level.getEntity(clientContraptionId);
+            if(e instanceof FlapContraptionEntity flap){
+                physicalWing = flap;
+            }
+        }
     }
 
     public boolean legacyAeroDynamic() {
@@ -363,6 +393,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
+        queueUpdate(ASM);
         // syncForNear(true, ANGLE);
     }
 
@@ -410,7 +441,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public void destroy() {
-        if(level == null || !level.isClientSide){
+        if(level != null && !level.isClientSide){
             disassemble();
         }
         super.destroy();
@@ -418,7 +449,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
     @Override
     public void remove() {
-        if(level == null || !level.isClientSide){
+        if(level != null && !level.isClientSide){
             disassemble();
         }
         super.remove();
@@ -443,11 +474,12 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     private static double angleFix(Direction direction, double realAngle){
-        return direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ?
-                realAngle  : -realAngle;
+//        return direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ?
+//                realAngle  : -realAngle;
+        return realAngle;
     }
 
-    protected ControlledContraptionEntity physicalWing;
+    protected FlapContraptionEntity physicalWing;
     protected float adjustSpeed;
     protected double visualAngle;
     protected boolean running;
@@ -461,7 +493,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         if (level == null || !(level.getBlockState(worldPosition).getBlock() instanceof BearingBlock))
             return;
 
-        Direction direction = getBlockState().getValue(BearingBlock.FACING);
+        Direction direction = getDirection();
+        Direction left = leftDirection();
         WingContraption wingContraption = new WingContraption(direction);
 
         AssemblyException lastException;
@@ -479,17 +512,21 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
         running = true;
         wingContraption.removeBlocksFromWorld(level, BlockPos.ZERO);
-        physicalWing = ControlledContraptionEntity.create(level, this, wingContraption);
+        physicalWing = FlapContraptionEntity.create(level, this, wingContraption);
         BlockPos anchor = worldPosition.relative(direction);
         physicalWing.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
-        physicalWing.setRotationAxis(direction.getAxis());
+        physicalWing.setAngleDirection(direction);
+        physicalWing.setTiltDirection(left);
         level.addFreshEntity(physicalWing);
 
         AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
         visualAngle = 0;
+        queueUpdate(ASM);
         sendData();
 
     }
+
+
 
     public void disassemble() {
         if (!isAssembled()) return;
@@ -498,31 +535,32 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         physicalWing.disassemble();
         AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(level, worldPosition);
         physicalWing = null;
+        queueUpdate(ASM);
         sendData();
     }
 
     protected void applyRotation() {
         if(level == null)return;
-        float wingAngle = level.isClientSide ? clientAnimatedAngle.getValue() : angle.read().floatValue();
-        if (physicalWing == null)
-            return;
+        if (physicalWing == null) return;
+        float wingAngle = level.isClientSide ? clientAnimatedAngle.getValue() : (float) (angle.read().floatValue() + offset);
+        float wingTilt = level.isClientSide ? clientAnimatedTilt.getValue() : tilt.read().floatValue();
+
         physicalWing.setAngle((float) angleFix(getDirection(), wingAngle));
-        BlockState blockState = getBlockState();
-        if (blockState.hasProperty(BlockStateProperties.FACING))
-            physicalWing.setRotationAxis(
-                    blockState
-                            .getValue(BlockStateProperties.FACING)
-                            .getAxis()
-            );
+        physicalWing.setTilt((float) angleFix(getDirection(), wingTilt));
+        physicalWing.setAngleDirection(
+            getDirection()
+        );
+        physicalWing.setTiltDirection(
+            leftDirection()
+        );
     }
 
-    @Override
     public boolean isAttachedTo(AbstractContraptionEntity contraption) {
         return contraption == physicalWing;
     }
 
-    @Override
-    public void attach(ControlledContraptionEntity contraption) {
+
+    public void attach(FlapContraptionEntity contraption) {
         BlockState blockState = getBlockState();
         if (!(contraption.getContraption() instanceof BearingContraption))
             return;
@@ -538,33 +576,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         }
     }
 
-    @Override
-    public void onStall() {
-        if (level == null || !level.isClientSide)
-            sendData();
-    }
 
-    @Override
-    public boolean isValid() {
-        return isRemoved();
-    }
-
-    @Override
-    public BlockPos getBlockPosition() {
-        return getBlockPos();
-    }
-
-    @Override
-    public float getInterpolatedAngle(float partialTicks) {
-        return (float) Mth.lerp(partialTicks, visualAngle, visualAngle + adjustSpeed * 0.05f);
-    }
-
-    @Override
-    public boolean isWoodenTop() {
-        return false;
-    }
-
-    @Override
     public void setAngle(float v) {
         setVisualAngle((double)v);
     }
