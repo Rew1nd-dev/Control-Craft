@@ -480,7 +480,6 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     protected FlapContraptionEntity physicalWing;
-    protected float adjustSpeed;
     protected double visualAngle;
     protected boolean running;
 
