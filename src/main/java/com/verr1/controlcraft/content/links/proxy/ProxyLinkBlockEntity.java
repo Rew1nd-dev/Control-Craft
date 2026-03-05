@@ -1,8 +1,6 @@
 package com.verr1.controlcraft.content.links.proxy;
 
-import com.verr1.controlcraft.content.compact.tweak.TweakControllerCompact;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
-import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.PlantGetter;
@@ -29,7 +27,7 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
         buildRegistry(ALL_STATUS)
                 .withBasic(SerializePort.of(
                         () -> linkPort().viewAll(),
-                        s -> linkPort().setAll(s),
+                        s -> linkPort().setAllAndUpdate(s), //
                         PlantProxyLinkPort.PROXY_PORT
                 ))
                 .runtimeOnly()
@@ -43,13 +41,19 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
         if(!(level instanceof ServerLevel serverLevel))return;
         NamedComponent plant = PlantGetter.get(serverLevel, getBlockPos().relative(getDirection().getOpposite()));
         linkPort().setPlant(plant);
+        linkPort().recreate();
     }
 
 
+    @Override
+    protected void initializeExtra() {
+        super.initializeExtra();
+        updateAttachedPlant();
+    }
 
     @Override
     protected PlantProxyLinkPort create() {
-        return new PlantProxyLinkPort(this);
+        return new PlantProxyLinkPort(); //this
     }
 
     @Override

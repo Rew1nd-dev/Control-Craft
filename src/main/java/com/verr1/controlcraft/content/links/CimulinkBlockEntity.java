@@ -50,31 +50,36 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 
     private IRenderer renderer;
 
-    private final DeferralInitializer lateInitLinkPort = new DeferralInitializer() {
-        @Override
-        void deferralLoad(CompoundTag tag) {
-            try{
-                linkPort().deserialize(tag);
-            }catch (NullPointerException e){
-                ControlCraft.LOGGER.error("linkPort at: {} did not initialize linkPort!", getBlockPos().toShortString());
-            }
-        }
-    };
-
-    private final DeferralInitializer lateInitVModCompact = new DeferralInitializer() {
-        @Override
-        void deferralLoad(CompoundTag tag) {
-            CimulinkSerializations.INSTANCE.finalize(CimulinkBlockEntity.this, tag);
-        }
-    };
+//    private final DeferralInitializer lateInitLinkPort = new DeferralInitializer() {
+//        @Override
+//        void deferralLoad(CompoundTag tag) {
+//            try{
+//                linkPort().deserialize(tag);
+//            }catch (NullPointerException e){
+//                ControlCraft.LOGGER.error("linkPort at: {} did not initialize linkPort!", getBlockPos().toShortString());
+//            }
+//        }
+//    };
+//
+//    private final DeferralInitializer lateInitVModCompact = new DeferralInitializer() {
+//        @Override
+//        void deferralLoad(CompoundTag tag) {
+//            CimulinkSerializations.INSTANCE.finalize(CimulinkBlockEntity.this, tag);
+//        }
+//    };
 
     protected void initializeEarly(){
 
     }
 
+    protected void initializeExtra(){
+
+    }
+
     @Override
     protected void readExtra(CompoundTag compound) {
-        lateInitVModCompact.load(compound);
+        CimulinkSerializations.INSTANCE.finalize(CimulinkBlockEntity.this, compound);
+        // lateInitVModCompact.load(compound);
     }
 
     @Override
@@ -86,15 +91,14 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
     @Override
     public final void initializeServer() {
         super.initializeServer();
-
         initializeEarly();
-        try{
-            lateInitLinkPort.load(); // restore connections
-            lateInitVModCompact.load(); // load with vmod compact (offset all links)
-        }catch (IllegalArgumentException e){
-            ControlCraft.LOGGER.error("error encountered when initializing CimulinkBlockEntity at {}", getBlockPos().toShortString());
-            ControlCraft.LOGGER.error("error message:{}", e.getMessage());
-        }
+//        try{
+//            // lateInitLinkPort.load(); // restore connections
+//            // lateInitVModCompact.load(); // load with vmod compact (offset all links)
+//        }catch (IllegalArgumentException e){
+//            ControlCraft.LOGGER.error("error encountered when initializing CimulinkBlockEntity at {}", getBlockPos().toShortString());
+//            ControlCraft.LOGGER.error("error message:{}", e.getMessage());
+//        }
         linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
         initializeExtra();
         isInitialized = true;
@@ -112,9 +116,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         return renderer;
     }
 
-    protected void initializeExtra(){
 
-    }
 
     protected abstract T create();
 
@@ -124,7 +126,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         buildRegistry(SharedKeys.BLP)
                 .withBasic(CompoundTagPort.of(
                         () -> linkPort().serialize(),
-                        lateInitLinkPort::load
+                        tag -> linkPort().deserialize(tag)
                 ))
                 .register();
 
@@ -152,10 +154,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         return linkPort().collectVModCompact();
     }
 
-    public Vec3 getFaceCenter(){
-        Vec3 faceDir = toVec3(getDirection().getNormal());
-        return getBlockPos().getCenter().add(faceDir.scale(-0.2));
-    }
 
 //    public void setName(String name){
 //        linkPort().setName(name);
@@ -385,40 +383,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         return result;
     }
 
-
-    protected abstract static class DeferralInitializer{
-
-        CompoundTag savedTag = new CompoundTag();
-
-        void load(CompoundTag savedTag){
-            this.savedTag = savedTag;
-        }
-
-        void load(){
-            deferralLoad(savedTag);
-        }
-
-        abstract void deferralLoad(CompoundTag tag);
-    }
-
-
 }
 
 
-
-// TODO:
-// 目前：
-// ConnectionStatus: 保存自己和谁连接，被谁连了 String -> BlockPort, index -> String
-// ValueStatus：端口的值，index -> double
-// RenderCenter： 计算ValueBox，渲染端口
-// Curve：需要输出端的位置
-
-// 一个ClientSide的RenderManager：(inner class)
-// 请求同步cs,vs
-// 类似服务端BlockLinkPort::of，通过BlockPos获取其他cbe的RenderManager
-// 根据cs,vs,获取各种反查函数，如name->index index->name, index->vec3....
-// 管理ValueBox，动态改变其offset，根据cs和vs
-// 监听vs变化，
-// 生成渲染用的BezierCurveEntry
-// 计算客户端玩家正在看着哪个端口
 

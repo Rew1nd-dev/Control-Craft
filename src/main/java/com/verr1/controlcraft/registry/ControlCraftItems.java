@@ -41,11 +41,11 @@ public class ControlCraftItems {
             .lang("Lua Compiler")
             .register();
 
-    public static final ItemEntry<CimulinkRecordItem> LINK_RECORD = REGISTRATE.item("link_record", CimulinkRecordItem::new)
-            //.model(AssetLookup.existingItemModel())
-            .properties(p -> p.stacksTo(1))
-            .lang("Link Record")
-            .register();
+//    public static final ItemEntry<CimulinkRecordItem> LINK_RECORD = REGISTRATE.item("link_record", CimulinkRecordItem::new)
+//
+//            .properties(p -> p.stacksTo(1))
+//            .lang("Link Record")
+//            .register();
 
     public static void register(){
 

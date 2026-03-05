@@ -61,8 +61,8 @@ end
 local v0 = Vector3d:new(1, 2, 3) -- x, y, z
 local q0 = Quaterniond:new(0, 0, 0, 1) -- x, y, z, w
 ```
-- 对于它们可以调用的方法，你可以在控制学mod的jar里，找到
-`data/vscontrolcraft/lua/luaml.lua`
+- 对于它们可以调用的方法，你可以在控制学mod的jar，或者github中，找到
+`resouces/data/vscontrolcraft/lua/luaml.lua`
 在这里你可以查看可以调用的方法
 
 #### 物理信息获取
