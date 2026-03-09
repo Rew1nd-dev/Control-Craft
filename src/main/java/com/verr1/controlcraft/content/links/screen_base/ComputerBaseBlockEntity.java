@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import org.jetbrains.annotations.Nullable;
 import org.luaj.vm2.LuaError;
 
 import java.util.HashMap;
@@ -94,7 +95,7 @@ public class ComputerBaseBlockEntity extends OnShipBlockEntity
         }
     }
 
-    public ComputerScreen getScreen() {
+    public @Nullable ComputerScreen getScreen() {
         return screen;
     }
 

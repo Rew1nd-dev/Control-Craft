@@ -41,6 +41,8 @@ import com.verr1.controlcraft.content.blocks.terminal.TerminalBlock;
 import com.verr1.controlcraft.content.blocks.transmitter.PeripheralProxyBlock;
 import com.verr1.controlcraft.content.blocks.transmitter.PeripheralProxyBlockEntity;
 import com.verr1.controlcraft.content.blocks.terminal.TerminalBlockEntity;
+import com.verr1.controlcraft.content.links.screen_base.ComputerBaseBlock;
+import com.verr1.controlcraft.content.links.screen_base.ComputerBaseBlockEntity;
 import com.verr1.controlcraft.render.*;
 
 import static com.verr1.controlcraft.ControlCraft.REGISTRATE;
@@ -185,6 +187,12 @@ public class ControlCraftBlockEntities {
             .blockEntity(CompactFlapBlock.ID, CompactFlapBlockEntity::new)
             .validBlock(ControlCraftBlocks.COMPACT_FLAP_BLOCK)
             .renderer(() -> CompactFlapRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<ComputerBaseBlockEntity> COMPUTER_BLOCKENTITY = REGISTRATE
+            .blockEntity(ComputerBaseBlock.ID, ComputerBaseBlockEntity::new)
+            .validBlock(ControlCraftBlocks.COMPACT_FLAP_BLOCK)
+            .renderer(() -> ComputerBlockEntityRenderer::new)
             .register();
 
     public static void register(){

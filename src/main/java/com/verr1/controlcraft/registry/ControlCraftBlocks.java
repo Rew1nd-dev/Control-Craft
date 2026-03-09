@@ -31,6 +31,7 @@ import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlock;
 import com.verr1.controlcraft.content.blocks.terminal.TerminalBlock;
 import com.verr1.controlcraft.content.blocks.transmitter.PeripheralProxyBlock;
 import com.verr1.controlcraft.content.items.KinematicDeviceBlockItem;
+import com.verr1.controlcraft.content.links.screen_base.ComputerBaseBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.material.MapColor;
@@ -397,6 +398,19 @@ public class ControlCraftBlocks {
 
     public static final BlockEntry<CompactFlapBlock> COMPACT_FLAP_BLOCK = REGISTRATE
             .block(CompactFlapBlock.ID, CompactFlapBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
+            .transform(TagGen.pickaxeOnly())
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .blockstate(
+                    BlockStateGen.directionalBlockProvider(true)
+            )
+            .item()
+            .transform(customItemModel())
+            .register();
+
+    public static final BlockEntry<ComputerBaseBlock> COMPUTER = REGISTRATE
+            .block(ComputerBaseBlock.ID, ComputerBaseBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
