@@ -2,6 +2,7 @@ package com.verr1.controlcraft.foundation.cimulink.core.api;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.links.integration.LuaBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -43,7 +44,7 @@ public interface IWorldAccess {
 
     void beep(float distance, float volume, float pitch);
 
-    static IWorldAccess of(LuaBlockEntity be) {
+    static IWorldAccess of(OnShipBlockEntity be) {
         return new IWorldAccess() {
             @Override
             public void yell(float distance, String msg) {
@@ -90,6 +91,57 @@ public interface IWorldAccess {
                 };
                 ControlCraftServer.SERVER_EXECUTOR.executeLater(task, 1);
 
+            }
+        };
+    }
+
+
+    static IWorldAccess ofImmediate(OnShipBlockEntity be) {
+        return new IWorldAccess() {
+            @Override
+            public void yell(float distance, String msg) {
+                Runnable task = () -> {
+                    Level level = be.getLevel();
+                    Vec3 pos = toMinecraft(be.getBasePosition());
+                    if (level != null && !level.isClientSide) {
+                        List<ServerPlayer> players = level.getEntitiesOfClass(
+                            ServerPlayer.class,
+                            new AABB(BlockPos.containing(pos)).inflate(distance));
+                        for (ServerPlayer player : players) {
+                            player.sendSystemMessage(Component.literal(msg));
+                        }
+                    }
+                };
+                task.run();
+            }
+
+            @Override
+            public void log(String msg) {
+                ControlCraft.LOGGER.info(msg);
+            }
+
+            @Override
+            public void beep(float distance, float volume, float pitch) {
+                Runnable task = () -> {
+                    Level level = be.getLevel();
+                    Vec3 pos = toMinecraft(be.getBasePosition());
+                    if (level != null && !level.isClientSide) {
+                        List<ServerPlayer> players = level.getEntitiesOfClass(
+                            ServerPlayer.class,
+                            new AABB(BlockPos.containing(pos)).inflate(distance)
+                        );
+                        for (ServerPlayer player : players) {
+                            player.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(
+                                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.NOTE_BLOCK_PLING.get()),
+                                SoundSource.BLOCKS,
+                                pos.x, pos.y, pos.z,
+                                volume, pitch,
+                                ThreadLocalRandom.current().nextLong())
+                            );
+                        }
+                    }
+                };
+                task.run();
             }
         };
     }

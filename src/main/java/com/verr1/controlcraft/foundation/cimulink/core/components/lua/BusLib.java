@@ -38,7 +38,7 @@ public class BusLib extends TwoArgFunction {
 
 
         env.set("Bus", bus);
-        env.get("package").get("loaded").set("Bus", bus);
+        // env.get("package").get("loaded").set("Bus", bus);
         return bus;
     }
 }

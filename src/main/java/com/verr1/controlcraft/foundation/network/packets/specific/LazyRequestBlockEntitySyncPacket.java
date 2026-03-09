@@ -14,15 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LazyRequestBlockEntitySyncPacket extends SimplePacketBase {
+    private final boolean simplex;
     private final BlockPos pos;
     private final ArrayList<NetworkKey> requests = new ArrayList<>();
 
-    public LazyRequestBlockEntitySyncPacket(BlockPos pos, List<NetworkKey> requests) {
+    public LazyRequestBlockEntitySyncPacket(boolean simplex, BlockPos pos, List<NetworkKey> requests) {
+        this.simplex = simplex;
         this.pos = pos;
         this.requests.addAll(requests);
     }
 
     public LazyRequestBlockEntitySyncPacket(FriendlyByteBuf buf){
+        simplex = buf.readBoolean();
         pos = buf.readBlockPos();
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
@@ -32,6 +35,7 @@ public class LazyRequestBlockEntitySyncPacket extends SimplePacketBase {
 
     @Override
     public void write(FriendlyByteBuf buffer) {
+        buffer.writeBoolean(simplex);
         buffer.writeBlockPos(pos);
         buffer.writeInt(requests.size());
         for (NetworkKey request : requests) {
@@ -44,7 +48,7 @@ public class LazyRequestBlockEntitySyncPacket extends SimplePacketBase {
         context.enqueueWork(()->{
             BlockEntity be = context.getSender().level().getExistingBlockEntity(pos);
             if(be instanceof INetworkHandle obe){
-                obe.handler().receiveRequest(requests, context.getSender());
+                obe.handler().receiveRequest(simplex, requests, context.getSender());
             }
 
         });

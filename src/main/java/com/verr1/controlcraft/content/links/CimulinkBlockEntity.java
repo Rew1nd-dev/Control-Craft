@@ -1,7 +1,6 @@
 package com.verr1.controlcraft.content.links;
 
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.content.equipment.goggles.IHaveHoveringInformation;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
@@ -26,7 +25,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
@@ -37,8 +35,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-
-import static com.verr1.controlcraft.utils.MinecraftUtils.toVec3;
 
 public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShipBlockEntity implements
         ILinkableBlock, IHaveGoggleInformation
@@ -99,7 +95,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
 //            ControlCraft.LOGGER.error("error encountered when initializing CimulinkBlockEntity at {}", getBlockPos().toShortString());
 //            ControlCraft.LOGGER.error("error message:{}", e.getMessage());
 //        }
-        linkStorage().ifPresent(s -> s.add(getWorldBlockPos()));
+        linkStorage().ifPresent(s -> s.set(getWorldBlockPos(), deviceName()));
         initializeExtra();
         isInitialized = true;
         syncForNear(false, SharedKeys.CONNECTION_STATUS, SharedKeys.VALUE_STATUS);
@@ -228,7 +224,6 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         requestConnectionStatusOnFocus();
     }
 
-
     public void setDeviceName(String name){
         linkPort().setName(name);
     }
@@ -260,6 +255,7 @@ public abstract class CimulinkBlockEntity<T extends BlockLinkPort> extends OnShi
         super.lazyTickServer();
         if(linkPort() == null)return;
         linkPort().removeInvalid();
+        linkStorage().ifPresent(s -> s.set(getWorldBlockPos(), deviceName()));
         syncForNear(false, SharedKeys.COMPONENT_NAME);
     }
 

@@ -110,13 +110,17 @@ public class NetworkHandler {
     }
 
     public void request(NetworkKey... requests){
+        request(false, requests);
+    }
+
+    public void request(boolean simplex, NetworkKey... requests){
         if(delegate.getLevel() == null || !delegate.getLevel().isClientSide)return;
-        var p = new LazyRequestBlockEntitySyncPacket(delegate.getBlockPos(), List.of(requests));
+        var p = new LazyRequestBlockEntitySyncPacket(simplex, delegate.getBlockPos(), List.of(requests));
         ControlCraftPackets.getChannel().sendToServer(p);
     }
 
-    public void receiveRequest(List<NetworkKey> requests, ServerPlayer sender){
-        syncForPlayer(false, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class));
+    public void receiveRequest(boolean simplex, List<NetworkKey> requests, ServerPlayer sender){
+        syncForPlayer(simplex, sender, Arrays.copyOf(requests.toArray(), requests.size(), NetworkKey[].class));
     }
 
     public void syncForNear(boolean simplex, NetworkKey... key){

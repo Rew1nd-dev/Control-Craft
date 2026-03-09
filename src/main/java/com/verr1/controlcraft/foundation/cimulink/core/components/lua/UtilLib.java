@@ -44,7 +44,7 @@ public class UtilLib extends TwoArgFunction {
         });
 
         env.set("World", util);
-        env.get("package").get("loaded").set("World", util);
+        // env.get("package").get("loaded").set("World", util);
         return util;
     }
 }

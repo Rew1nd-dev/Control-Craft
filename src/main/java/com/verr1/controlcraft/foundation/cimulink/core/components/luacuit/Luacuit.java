@@ -3,11 +3,8 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
-import com.verr1.controlcraft.foundation.cimulink.core.components.lua.BusLib;
-import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
-import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.*;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
-import com.verr1.controlcraft.foundation.cimulink.core.components.lua.UtilLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.UnpresentPortException;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.DebugLib;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import java.util.List;
@@ -33,6 +31,9 @@ public class Luacuit extends NamedComponent {
 
     protected final LuacuitScript script;
     protected boolean forbidden = false;
+
+
+
     private boolean initialized = false;
 
     Luacuit(
@@ -83,6 +84,10 @@ public class Luacuit extends NamedComponent {
 
     public void setForbidden(boolean forbidden) {
         this.forbidden = forbidden;
+    }
+
+    public boolean initialized() {
+        return initialized;
     }
 
     protected double inputFromJava(String name) throws LuaError {
@@ -148,7 +153,14 @@ public class Luacuit extends NamedComponent {
     }
 
     protected void doTask(int tolerantMillis) throws LuaError, LuaOvertimeException {
+
         Future<Void> future = LUA_THREAD.submit(() -> {
+
+            DebugLib debuglib = luaGlobals.debuglib;
+            if (debuglib instanceof WatcherLib watcher) {
+                watcher.startMonitor();
+            }
+
             loopFunction.call();
             return null;
         });

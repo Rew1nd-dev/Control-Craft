@@ -61,7 +61,7 @@ public class PhysLib extends TwoArgFunction {
         });
 
         env.set("Phys", phys);
-        env.get("package").get("loaded").set("Phys", phys);
+        // env.get("package").get("loaded").set("Phys", phys);
         return phys;
     }
 
