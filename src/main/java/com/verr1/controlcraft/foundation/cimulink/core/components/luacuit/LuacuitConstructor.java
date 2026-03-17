@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 
-import com.verr1.controlcraft.content.links.screen_base.lua.LuaUtils;
+import com.verr1.controlcraft.content.links.computer.lua.LuaUtils;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.UndefineMethodException;

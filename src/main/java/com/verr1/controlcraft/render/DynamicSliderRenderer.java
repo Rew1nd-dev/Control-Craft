@@ -39,7 +39,7 @@ public class DynamicSliderRenderer extends SafeBlockEntityRenderer<DynamicSlider
                 .renderInto(ms, solid);
 
 
-        buffer_top.translate(new Vector3f(be.getDirectionJOML().get(new Vector3f()).mul(distance)))
+        buffer_top.translate(new Vector3f(be.frontLocal().get(new Vector3f()).mul(distance)))
                 .light(light)
                 .renderInto(ms, solid);
     }

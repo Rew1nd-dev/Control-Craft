@@ -1,6 +1,5 @@
 package com.verr1.controlcraft.content.blocks;
 
-import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
@@ -11,22 +10,21 @@ import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.joml.primitives.AABBdc;
+import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -36,9 +34,11 @@ import org.valkyrienskies.core.impl.game.ships.DummyShipWorldServer;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
+import static com.simibubi.create.content.kinetics.saw.SawBlock.FLIPPED;
 import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toJOML;
 
-public abstract class OnShipBlockEntity extends NetworkBlockEntity implements ClipboardCloneable
+public abstract class OnShipBlockEntity extends NetworkBlockEntity
 {
 
 
@@ -50,14 +50,107 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
                 .register();
     }
 
-    public Vector3d getDirectionJOML() {
+    public Vector3d positionModel() {
+        return ValkyrienSkies.toJOML(getBlockPos().getCenter());
+    }
+
+    public Vector3d position() {
+        return readSelf().s2wTransform().transformPosition(positionModel());
+    }
+
+    public Vector3d positionCenterModel(){
+        return Optional.ofNullable(getShipOn()).map(s -> new Vector3d(s.getTransform().getPositionInShip())).orElse(positionModel());
+    }
+
+    public Vector3d positionCenter(){
+        return Optional.ofNullable(getShipOn()).map(s -> new Vector3d(s.getTransform().getPositionInWorld())).orElse(positionModel());
+    }
+
+    public double mass() {
+        return Optional
+            .ofNullable(getLoadedServerShip())
+            .map(s -> s.getInertiaData().getMass())
+            .orElse(readSelf().mass());
+    }
+
+    public Vector3d frontLocal() {
         return ValkyrienSkies.set(new Vector3d(), getDirection().getNormal());
     }
 
-    public @NotNull Direction getDirection(){
-        if(getBlockState().hasProperty(BlockStateProperties.FACING)) return getBlockState().getValue(BlockStateProperties.FACING);
-        return Direction.UP;
+    public Vector3d front() {
+        return readSelf().s2wTransform().transformDirection(frontLocal());
     }
+
+    public Vector3dc leftLocal() {
+        return VSMathUtils.toJOML(leftDirection());
+    }
+
+    public Vector3d left() {
+        return readSelf().s2wTransform().transformDirection(leftLocal(), new Vector3d());
+    }
+
+    public Vector3d upLocal(){
+        return frontLocal().cross(leftLocal()).normalize();
+    }
+
+    public Vector3d up(){
+        return readSelf().s2wTransform().transformDirection(upLocal());
+    }
+
+    public @NotNull Direction getDirection() {
+        BlockState state = this.getBlockState();
+        return state.hasProperty(BlockStateProperties.FACING) ? state.getValue(BlockStateProperties.FACING)
+            : state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+            ? state.getValue(BlockStateProperties.HORIZONTAL_FACING)
+            : Direction.SOUTH;
+    }
+
+    public Direction leftDirection() {
+        BlockState state = getBlockState();
+        if (state.hasProperty(AXIS_ALONG_FIRST_COORDINATE)) {
+            Direction direction = getDirection();
+            boolean alignFirst = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
+
+            boolean flipped = false;
+            if (state.hasProperty(FLIPPED)) {
+                flipped = state.getValue(FLIPPED);
+            }
+
+            Direction d0 = switch (direction) {
+                case SOUTH, NORTH -> alignFirst ? Direction.WEST : Direction.UP;
+                case EAST -> alignFirst ? Direction.UP : Direction.SOUTH;
+                case WEST -> alignFirst ? Direction.UP : Direction.NORTH;
+                case UP, DOWN -> alignFirst ? Direction.WEST : Direction.NORTH;
+            };
+
+            return flipped ? d0.getOpposite() : d0;
+
+        } else {
+            return VSMathUtils.left(getDirection());
+        }
+
+    }
+
+    public Vector3d geometricPositionModel() {
+        AABBic aabb = aabbModel();
+        if (aabb == null)
+            return positionModel();
+        return aabb.center(new Vector3d());
+    }
+
+    public Vector3d geometricPosition() {
+        return readSelf().s2wTransform().transformPosition(geometricPositionModel());
+    }
+
+    public @Nullable AABBic aabbModel() {
+        return Optional.ofNullable(getShipOn()).map(Ship::getShipAABB).orElse(null);
+    }
+
+    public @Nullable AABBdc aabb() {
+        return Optional.ofNullable(getShipOn()).map(Ship::getWorldAABB).orElse(null);
+    }
+
+
 
     public void setDeviceName(String name){
         if(this instanceof IPlant plant){
@@ -76,19 +169,6 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
         return Optional.ofNullable(getLoadedServerShip()).map(CimulinkPorts::getOrCreate);
     }
 
-
-
-    public Vector3d getBasePosition(){
-        Vector3d p_sc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter());
-        return Optional
-                .ofNullable(getShipOn())
-                .map(ship -> ship
-                        .getTransform()
-                        .getShipToWorld()
-                        .transformPosition(p_sc)
-                )
-                .orElse(p_sc);
-    }
 
     public Vector3d getBaseVelocity(){
         return Optional
@@ -110,20 +190,10 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
 
     }
 
-    @Override
-    public boolean writeToClipboard(CompoundTag tag, Direction side) {
-        write(tag, false);
-        return true;
-    }
-
-    @Override
-    public boolean readFromClipboard(CompoundTag tag, Player player, Direction side, boolean simulate) {
-        read(tag, false);
-        return true;
-    }
-
     public @NotNull ShipPhysics readSelf(){
-        if(level == null || level.isClientSide)return ShipPhysics.EMPTY;
+        if(level == null || level.isClientSide){
+            return ShipPhysics.of(getShipOn());
+        }
 
         return Optional
                 .ofNullable(getLoadedServerShip())
@@ -156,28 +226,10 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
         return ValkyrienSkies.getShipManagingBlock(level, getBlockPos());
     }
 
-    public Quaterniondc getSelfShipQuaternion(){
-        Quaterniond q = new Quaterniond();
-        Optional
-            .ofNullable(getShipOn())
-            .ifPresent(
-                    serverShip -> serverShip
-                            .getTransform()
-                            .getShipToWorldRotation()
-                            .get(q)
-            );
-        return q;
-    }
-
     @Override
     public void lazyTickServer() {
         super.lazyTickServer();
         tickBus();
-    }
-
-    @Override
-    public String getClipboardKey() {
-        return this.getClass().getSimpleName();
     }
 
     protected void tickBus(){

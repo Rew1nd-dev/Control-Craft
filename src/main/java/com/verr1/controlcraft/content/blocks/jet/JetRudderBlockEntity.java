@@ -2,11 +2,9 @@ package com.verr1.controlcraft.content.blocks.jet;
 
 import com.simibubi.create.foundation.utility.Couple;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
-import com.verr1.controlcraft.content.blocks.NetworkBlockEntity;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
-import com.verr1.controlcraft.foundation.type.Side;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.IPacketHandler;
 import com.verr1.controlcraft.foundation.network.packets.BlockBoundClientPacket;
@@ -19,7 +17,6 @@ import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,7 +26,6 @@ import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.impl.shadow.H;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class JetRudderBlockEntity extends OnShipBlockEntity implements
@@ -49,6 +45,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     public float targetHorizontalAngle = 0;
     public LerpedFloat animatedVerticalAngle = LerpedFloat.angular();
     public float targetVerticalAngle = 0;
+    public LerpedFloat animatedThrust = LerpedFloat.linear();
     public float targetThrust = 0;
 
     private Direction vertical = Direction.UP;
@@ -56,6 +53,11 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
 
     public float getTargetThrust() {
         return targetThrust;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public float getAnimatedThrust(float partialTick) {
+        return animatedThrust.getValue(partialTick);
     }
 
     public float getTargetVerticalAngle() {
@@ -167,7 +169,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     public void tickClient() {
         super.tickClient();
         tickAnimation();
-        tickParticles();
+        // tickParticles();
         tickDirections();
     }
 
@@ -208,7 +210,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
 
         Vector3d dir = getRenderThrustDir().mul(-1);
 
-        Vector3d p_wc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter()).fma(0.2, getDirectionJOML());
+        Vector3d p_wc = ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter()).fma(0.2, frontLocal());
         Vector3d v_wc = dir.mul(MathUtils.clamp1(targetThrust * 1e-3) * 3, new Vector3d());
 
         if(v_wc.lengthSquared() < 1e-2)return;
@@ -251,7 +253,7 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
     private Vector3d getRenderThrustDir() {
         Vector3dc basis_h = getHorizontalJOML();
         Vector3dc basis_v = getVerticalJOML();
-        Vector3dc basis_t = getDirectionJOML().mul(-1);  // make it the opposite (set to bounded attacker direction)
+        Vector3dc basis_t = frontLocal().mul(-1);  // make it the opposite (set to bounded attacker direction)
 
         float h = targetHorizontalAngle;
         float v = targetVerticalAngle;
@@ -275,10 +277,12 @@ public class JetRudderBlockEntity extends OnShipBlockEntity implements
 
     @OnlyIn(Dist.CLIENT)
     private void tickAnimation(){
-        animatedHorizontalAngle.chase(targetHorizontalAngle , 0.1, LerpedFloat.Chaser.EXP);
-        animatedVerticalAngle.chase(targetVerticalAngle , 0.1, LerpedFloat.Chaser.EXP);
+        animatedHorizontalAngle.chase(targetHorizontalAngle , 0.05, LerpedFloat.Chaser.EXP);
+        animatedVerticalAngle.chase(targetVerticalAngle , 0.05, LerpedFloat.Chaser.EXP);
+        animatedThrust.chase(targetThrust , 0.05, LerpedFloat.Chaser.EXP);
         animatedHorizontalAngle.tickChaser();
         animatedVerticalAngle.tickChaser();
+        animatedThrust.tickChaser();
     }
 
 

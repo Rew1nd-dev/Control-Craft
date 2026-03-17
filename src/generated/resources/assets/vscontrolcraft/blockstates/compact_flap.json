@@ -1,30 +1,148 @@
 {
   "variants": {
-    "facing=down": {
-      "model": "vscontrolcraft:block/compact_flap/block",
-      "x": 180
+    "axis_along_first=false,facing=down,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
+      "x": 270,
+      "y": 90
     },
-    "facing=east": {
-      "model": "vscontrolcraft:block/compact_flap/block",
+    "axis_along_first=false,facing=down,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
+      "x": 270,
+      "y": 90
+    },
+    "axis_along_first=false,facing=down,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "x": 270,
+      "y": 90
+    },
+    "axis_along_first=false,facing=east,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
+      "y": 270
+    },
+    "axis_along_first=false,facing=east,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
+      "y": 270
+    },
+    "axis_along_first=false,facing=east,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "y": 270
+    },
+    "axis_along_first=false,facing=north,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_m",
+      "y": 180
+    },
+    "axis_along_first=false,facing=north,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_u",
+      "y": 180
+    },
+    "axis_along_first=false,facing=north,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_d",
+      "y": 180
+    },
+    "axis_along_first=false,facing=south,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_m"
+    },
+    "axis_along_first=false,facing=south,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_u"
+    },
+    "axis_along_first=false,facing=south,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_d"
+    },
+    "axis_along_first=false,facing=up,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
       "x": 90,
       "y": 90
     },
-    "facing=north": {
-      "model": "vscontrolcraft:block/compact_flap/block",
-      "x": 90
-    },
-    "facing=south": {
-      "model": "vscontrolcraft:block/compact_flap/block",
+    "axis_along_first=false,facing=up,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
       "x": 90,
+      "y": 90
+    },
+    "axis_along_first=false,facing=up,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "x": 90,
+      "y": 90
+    },
+    "axis_along_first=false,facing=west,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
+      "y": 90
+    },
+    "axis_along_first=false,facing=west,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
+      "y": 90
+    },
+    "axis_along_first=false,facing=west,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "y": 90
+    },
+    "axis_along_first=true,facing=down,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
+      "x": 270
+    },
+    "axis_along_first=true,facing=down,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
+      "x": 270
+    },
+    "axis_along_first=true,facing=down,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "x": 270
+    },
+    "axis_along_first=true,facing=east,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_m",
+      "y": 270
+    },
+    "axis_along_first=true,facing=east,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_u",
+      "y": 270
+    },
+    "axis_along_first=true,facing=east,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_d",
+      "y": 270
+    },
+    "axis_along_first=true,facing=north,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
       "y": 180
     },
-    "facing=up": {
-      "model": "vscontrolcraft:block/compact_flap/block"
+    "axis_along_first=true,facing=north,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
+      "y": 180
     },
-    "facing=west": {
-      "model": "vscontrolcraft:block/compact_flap/block",
-      "x": 90,
-      "y": 270
+    "axis_along_first=true,facing=north,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "y": 180
+    },
+    "axis_along_first=true,facing=south,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m"
+    },
+    "axis_along_first=true,facing=south,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u"
+    },
+    "axis_along_first=true,facing=south,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d"
+    },
+    "axis_along_first=true,facing=up,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_m",
+      "x": 90
+    },
+    "axis_along_first=true,facing=up,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_u",
+      "x": 90
+    },
+    "axis_along_first=true,facing=up,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_p_d",
+      "x": 90
+    },
+    "axis_along_first=true,facing=west,offset_mode=0": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_m",
+      "y": 90
+    },
+    "axis_along_first=true,facing=west,offset_mode=1": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_u",
+      "y": 90
+    },
+    "axis_along_first=true,facing=west,offset_mode=2": {
+      "model": "vscontrolcraft:block/compact_flap/block_n_d",
+      "y": 90
     }
   }
 }

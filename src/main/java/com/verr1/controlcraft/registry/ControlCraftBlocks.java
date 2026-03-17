@@ -26,12 +26,11 @@ import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlock;
 import com.verr1.controlcraft.content.blocks.slider.DynamicSliderBlock;
 import com.verr1.controlcraft.content.blocks.slider.KinematicSliderBlock;
 import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlock;
-import com.verr1.controlcraft.content.blocks.spatial.SpatialMovementBehavior;
 import com.verr1.controlcraft.content.blocks.spinalyzer.SpinalyzerBlock;
 import com.verr1.controlcraft.content.blocks.terminal.TerminalBlock;
 import com.verr1.controlcraft.content.blocks.transmitter.PeripheralProxyBlock;
 import com.verr1.controlcraft.content.items.KinematicDeviceBlockItem;
-import com.verr1.controlcraft.content.links.screen_base.ComputerBaseBlock;
+import com.verr1.controlcraft.content.links.computer.ComputerBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.material.MapColor;
@@ -403,20 +402,20 @@ public class ControlCraftBlocks {
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
-                    BlockStateGen.directionalBlockProvider(true)
+                CompactFlapBlock.CompactFlapDataGenerator.generate()
             )
             .item()
             .transform(customItemModel())
             .register();
 
-    public static final BlockEntry<ComputerBaseBlock> COMPUTER = REGISTRATE
-            .block(ComputerBaseBlock.ID, ComputerBaseBlock::new)
+    public static final BlockEntry<ComputerBlock> COMPUTER = REGISTRATE
+            .block(ComputerBlock.ID, ComputerBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
             .transform(TagGen.pickaxeOnly())
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
             .blockstate(
-                    BlockStateGen.directionalBlockProvider(true)
+                    BlockStateGen.horizontalBlockProvider(true)
             )
             .item()
             .transform(customItemModel())

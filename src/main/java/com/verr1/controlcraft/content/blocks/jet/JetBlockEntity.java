@@ -150,7 +150,7 @@ public class JetBlockEntity extends OnShipBlockEntity implements
     public @Nullable LogicalJet getLogicalJet(){
         Vector3dc basis_h = getHorizontalJOML();
         Vector3dc basis_v = getVerticalJOML();
-        Vector3dc basis_t = getDirectionJOML();
+        Vector3dc basis_t = frontLocal();
 
         double h = canVectorize ? horizontalAngle.read() : 0;
         double v = canVectorize ? verticalAngle.read() : 0;

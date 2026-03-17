@@ -10,6 +10,8 @@ import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.items.CircuitCompilerItem;
 import com.verr1.controlcraft.content.items.LuaCompilerItem;
+import com.verr1.controlcraft.content.links.computer.ComputerBlockEntity;
+import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
@@ -328,6 +330,50 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int loadLookedComputerLuaCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        String saveName = context.getArgument("saveName", String.class);
+        if (source.getPlayer() == null) {
+            source.sendFailure(Component.literal("You must be a player to load lua into a computer!"));
+            return 0;
+        }
+
+        ServerPlayer player = source.getPlayer();
+        HitResult ht = player.pick(8, 1, false);
+        if (!(ht instanceof BlockHitResult bht)) {
+            source.sendFailure(Component.literal("No block found in your sight."));
+            return 0;
+        }
+
+        return BlockEntityGetter
+                .getLevelBlockEntityAt(player.serverLevel(), bht.getBlockPos(), ComputerBlockEntity.class)
+                .map(computer -> {
+                    try {
+                        String code = LuaCompilerItem.loadCode(player.getName().getString(), saveName);
+                        computer.loadCode(code);
+                        computer.setChanged();
+                        source.sendSuccess(
+                                () -> Component.literal("Loaded lua '" + saveName + "' into computer at " + bht.getBlockPos().toShortString()),
+                                false
+                        );
+                        return 1;
+                    } catch (IOException ioe) {
+                        source.sendFailure(Component.literal(
+                                "Lua not found: " + ioe.getMessage()
+                        ));
+                        return 0;
+                    } catch (Exception e) {
+                        source.sendFailure(Component.literal("Failed to load lua into computer: " + e.getMessage()));
+                        ControlCraft.LOGGER.error("Failed to load lua into looked computer: " + e.getMessage(), e);
+                        return 0;
+                    }
+                })
+                .orElseGet(() -> {
+                    source.sendFailure(Component.literal("The block you are looking at is not a computer."));
+                    return 0;
+                });
+    }
+
     public static int uploadLuaCommand(CommandContext<CommandSourceStack> context){
         CommandSourceStack source = context.getSource();
         String saveName = context.getArgument("saveName", String.class);
@@ -458,6 +504,9 @@ public class ControlCraftServerCommands {
                         ).then(lt("upload-lua")
                                 .then(arg("saveName", StringArgumentType.string())
                                         .executes(ControlCraftServerCommands::uploadLuaCommand))
+                        ).then(lt("load-computer-lua")
+                                .then(arg("saveName", StringArgumentType.string())
+                                        .executes(ControlCraftServerCommands::loadLookedComputerLuaCommand))
                         ).then(lt("upload-circuit")
                                 .then(arg("saveName", StringArgumentType.string())
                                         .executes(ControlCraftServerCommands::uploadCircuitCommand))

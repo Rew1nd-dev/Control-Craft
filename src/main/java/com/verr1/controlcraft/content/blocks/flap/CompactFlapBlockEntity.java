@@ -268,7 +268,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     }
 
     private Vector3d getRotateAxis(){
-        return getDirectionJOML();
+        return frontLocal();
     }
 
     private Vector3d getTiltAxis(){

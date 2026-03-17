@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class Luacuit extends NamedComponent {
-
     public static final ExecutorService LUA_THREAD = Executors.newSingleThreadExecutor();
 
     protected final Globals luaGlobals;

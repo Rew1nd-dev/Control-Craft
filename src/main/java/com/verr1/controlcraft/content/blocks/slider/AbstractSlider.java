@@ -5,8 +5,6 @@ import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
-import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
-import com.verr1.controlcraft.foundation.cimulink.game.peripheral.KinematicPlant;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
@@ -20,7 +18,6 @@ import com.verr1.controlcraft.foundation.vsapi.ShipAssembler;
 import com.verr1.controlcraft.foundation.vsapi.VSJointPose;
 import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
-import com.verr1.controlcraft.utils.MathUtils;
 import com.verr1.controlcraft.utils.SerializeUtils;
 import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.core.BlockPos;
@@ -204,7 +201,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
                 p_self,
                 p_comp,
                 1.0E20,
-                getDirectionJOML(),
+                frontLocal(),
                 MAX_SLIDE_DISTANCE
         );
 
@@ -300,7 +297,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
                 new ShipTransformImpl(
                         comp_at_wc,
                         comp.getInertiaData().getCenterOfMassInShip(),
-                        getSelfShipQuaternion(),
+                        readSelf().quaternion(),
                         new Vector3d(1, 1, 1)
                 ));
 
@@ -342,7 +339,7 @@ public abstract class AbstractSlider extends ShipConnectorBlockEntity implements
                 selfContact,
                 compContact,
                 1.0E20,
-                getDirectionJOML(),
+                frontLocal(),
                 MAX_SLIDE_DISTANCE
         );
 

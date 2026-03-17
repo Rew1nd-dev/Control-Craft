@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import java.util.Map;
@@ -72,6 +73,24 @@ public record ShipPhysics(Vector3dc velocity,
                 ship.getInertiaData().getMass(),
                 ship.getTransform().getShipToWorldScaling().get(0),
                 ship.getId()
+        );
+    }
+
+    public static ShipPhysics of(@Nullable Ship ship){
+        if(ship == null)return EMPTY;
+        return new ShipPhysics(
+            new Vector3d(ship.getVelocity()),
+            new Vector3d(ship.getOmega()),
+            new Vector3d(ship.getTransform().getPositionInWorld()),
+            new Vector3d(ship.getTransform().getPositionInShip()),
+            new Quaterniond(ship.getTransform().getShipToWorldRotation()),
+            new Matrix3d(),
+            new Matrix3d(ship.getTransform().getShipToWorld()),
+            new Matrix4d(ship.getTransform().getShipToWorld()),
+            new Matrix4d(ship.getTransform().getWorldToShip()),
+            1,
+            ship.getTransform().getShipToWorldScaling().get(0),
+            ship.getId()
         );
     }
 

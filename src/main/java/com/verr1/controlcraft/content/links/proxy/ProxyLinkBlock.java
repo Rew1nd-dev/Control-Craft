@@ -41,7 +41,7 @@ public class ProxyLinkBlock extends CimulinkBlock<ProxyLinkBlockEntity> {
 
         if(direction == null)return;
         if(direction != state.getValue(FACING).getOpposite())return;
-        withBlockEntityDo(world, pos, ProxyLinkBlockEntity::updateAttachedPlant);
+        withBlockEntityDo(world, pos, be -> be.updateAttachedPlant(false));
     }
 
     @Override

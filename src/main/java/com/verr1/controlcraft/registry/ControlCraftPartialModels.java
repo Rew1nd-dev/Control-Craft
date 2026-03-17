@@ -15,6 +15,7 @@ public class ControlCraftPartialModels {
         CAMERA_LENS = block("camera_lens"),
         CAMERA_YAW = block("camera_yaw"),
         RUDDER_PART = block("rudder"),
+        JET_RUDDER_FLAME = block("jet_rudder_flame"),
 
         SOCKET = block("socket"),
 

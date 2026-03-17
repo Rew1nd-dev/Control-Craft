@@ -26,8 +26,8 @@ public abstract class AbstractJointBlockEntity extends ShipConnectorBlockEntity 
 
     protected Vector3d getJointConnectorPosJOML() {
         return ValkyrienSkies.set(new Vector3d(), getBlockPos().getCenter())
-                .fma(-0.5, getDirectionJOML())
-                .fma(getAdjustment().length(), getDirectionJOML());
+                .fma(-0.5, frontLocal())
+                .fma(getAdjustment().length(), frontLocal());
     }
 
     @Override

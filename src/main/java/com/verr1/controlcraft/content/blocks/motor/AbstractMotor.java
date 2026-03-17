@@ -167,7 +167,7 @@ public abstract class AbstractMotor extends ShipConnectorBlockEntity implements 
             new ShipTransformImpl(
                 comp_at_wc,
                 comp.getInertiaData().getCenterOfMassInShip(),
-                getSelfShipQuaternion(),
+                readSelf().quaternion(),
                 new Vector3d(1, 1, 1)
         ));
 

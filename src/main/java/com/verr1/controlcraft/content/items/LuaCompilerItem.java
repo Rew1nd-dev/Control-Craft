@@ -83,19 +83,37 @@ public class LuaCompilerItem extends Item {
 
 
     public static void load(String loader, String saveName, ItemStack stack) throws IOException{
-        Path file = LUALINKS.resolve(saveName + ".lua").toAbsolutePath();
-
-        if(!Files.exists(file)){
-            file = LUALINKS.resolve(loader).resolve(saveName + ".lua").toAbsolutePath();
-        }
-
         try{
-            String code = loadLua(file.toString());
+            String code = loadCode(loader, saveName);
             LuacuitScript ls = LuacuitScript.fromCode(code);
             stack.getOrCreateTag().put("luaNbt", ls.serialize());
         } catch (LuaOvertimeException | LuaError e){
             throw new IllegalArgumentException("Failed to compile Lua script: " + e.getMessage());
         }
+    }
+
+    public static Path resolveLuaPath(String loader, String saveName) throws IOException {
+        Path directFile = LUALINKS.resolve(saveName + ".lua").toAbsolutePath();
+        if (Files.exists(directFile)) {
+            return directFile;
+        }
+
+        Path scopedFile = null;
+        if (loader != null && !loader.isBlank()) {
+            scopedFile = LUALINKS.resolve(loader).resolve(saveName + ".lua").toAbsolutePath();
+            if (Files.exists(scopedFile)) {
+                return scopedFile;
+            }
+        }
+
+        if (scopedFile == null) {
+            throw new FileNotFoundException("Lua script not found: " + directFile);
+        }
+        throw new FileNotFoundException("Lua script not found: " + directFile + " or " + scopedFile);
+    }
+
+    public static String loadCode(String loader, String saveName) throws IOException {
+        return loadLua(resolveLuaPath(loader, saveName).toString());
     }
 
     public static CompoundTag loadTag(String saveName){

@@ -29,21 +29,21 @@ public class ExposedFieldSyncClientPacket extends SimplePacketBase {
     private final BlockPos pos;
     private final int size;
 
-    public static void syncClient(ITerminalDevice device, BlockPos pos, Level world){
-        var availableFields =
-                device.fields()
-                        .stream()
-                        .map(e -> new ExposedFieldMessage(
-                                        e.type,
-                                        e.min_max.get(true),
-                                        e.min_max.get(false),
-                                        e.directionOptional
-                                )
-                        )
-                        .toList();
-        var p = new ExposedFieldSyncClientPacket(availableFields, pos);
-        ControlCraftPackets.sendToNear(world, pos, 16, p);
-    }
+//    public static void syncClient(ITerminalDevice device, BlockPos pos, Level world){
+//        var availableFields =
+//                device.fields()
+//                        .stream()
+//                        .map(e -> new ExposedFieldMessage(
+//                                        e.type,
+//                                        e.min_max.get(true),
+//                                        e.min_max.get(false),
+//                                        e.directionOptional
+//                                )
+//                        )
+//                        .toList();
+//        var p = new ExposedFieldSyncClientPacket(availableFields, pos);
+//        ControlCraftPackets.sendToNear(world, pos, 16, p);
+//    }
 
     public ExposedFieldSyncClientPacket(List<ExposedFieldMessage> messages, BlockPos pos) {
         this.messages = messages;

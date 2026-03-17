@@ -185,7 +185,7 @@ public class PropellerControllerBlockEntity extends OnShipBlockEntity implements
         if(!isOnShip())return null;
         return new LogicalPropeller(
                 canDrive(),
-                getDirectionJOML(),
+                frontLocal(),
                 getTargetSpeed(),
                 attachedPropellerThrustRatio,
                 attachedPropellerTorqueRatio,

@@ -40,11 +40,14 @@ public class PlantProxyLinkPort extends BlockLinkPort {
         // this.be = be;
     }
 
-    public void setPlant(@Nullable NamedComponent plant){
+    public void setPlant(@Nullable NamedComponent plant, boolean refreshInput){
         if(this.plant == plant)return;
         // ControlCraft.LOGGER.debug("Setting plant in PlantProxyLinkPort: {} at: {}", plant, be.getBlockPos());
 
         this.plant = plant == null ? EMPTY : plant;
+        if(!refreshInput){
+            return;
+        }
         enabledInput.clear();
         enabledOutput.clear();
 

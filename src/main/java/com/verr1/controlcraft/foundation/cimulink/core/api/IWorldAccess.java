@@ -3,7 +3,6 @@ package com.verr1.controlcraft.foundation.cimulink.core.api;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
-import com.verr1.controlcraft.content.links.integration.LuaBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -50,7 +49,7 @@ public interface IWorldAccess {
             public void yell(float distance, String msg) {
                 Runnable task = () -> {
                     Level level = be.getLevel();
-                    Vec3 pos = toMinecraft(be.getBasePosition());
+                    Vec3 pos = toMinecraft(be.position());
                     if (level != null && !level.isClientSide) {
                         List<ServerPlayer> players = level.getEntitiesOfClass(
                             ServerPlayer.class,
@@ -72,7 +71,7 @@ public interface IWorldAccess {
             public void beep(float distance, float volume, float pitch) {
                 Runnable task = () -> {
                     Level level = be.getLevel();
-                    Vec3 pos = toMinecraft(be.getBasePosition());
+                    Vec3 pos = toMinecraft(be.position());
                     if (level != null && !level.isClientSide) {
                         List<ServerPlayer> players = level.getEntitiesOfClass(
                             ServerPlayer.class,
@@ -102,7 +101,7 @@ public interface IWorldAccess {
             public void yell(float distance, String msg) {
                 Runnable task = () -> {
                     Level level = be.getLevel();
-                    Vec3 pos = toMinecraft(be.getBasePosition());
+                    Vec3 pos = toMinecraft(be.position());
                     if (level != null && !level.isClientSide) {
                         List<ServerPlayer> players = level.getEntitiesOfClass(
                             ServerPlayer.class,
@@ -124,7 +123,7 @@ public interface IWorldAccess {
             public void beep(float distance, float volume, float pitch) {
                 Runnable task = () -> {
                     Level level = be.getLevel();
-                    Vec3 pos = toMinecraft(be.getBasePosition());
+                    Vec3 pos = toMinecraft(be.position());
                     if (level != null && !level.isClientSide) {
                         List<ServerPlayer> players = level.getEntitiesOfClass(
                             ServerPlayer.class,

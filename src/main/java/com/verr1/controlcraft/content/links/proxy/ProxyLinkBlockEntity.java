@@ -37,10 +37,10 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
     }
 
     // no need to call this at initialize(), since it will be called at linkPort()
-    public void updateAttachedPlant(){
+    public void updateAttachedPlant(boolean refreshInput){
         if(!(level instanceof ServerLevel serverLevel))return;
         NamedComponent plant = PlantGetter.get(serverLevel, getBlockPos().relative(getDirection().getOpposite()));
-        linkPort().setPlant(plant);
+        linkPort().setPlant(plant, refreshInput);
         linkPort().recreate();
     }
 
@@ -48,7 +48,7 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
     @Override
     protected void initializeExtra() {
         super.initializeExtra();
-        updateAttachedPlant();
+        updateAttachedPlant(false);
     }
 
     @Override

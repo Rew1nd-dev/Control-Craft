@@ -3,15 +3,17 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.verr1.controlcraft.content.links.screen_base.ComputerBaseBlockEntity;
-import com.verr1.controlcraft.content.links.screen_base.lua.render.RenderCmd;
+import com.verr1.controlcraft.content.links.computer.ComputerBlockEntity;
+import com.verr1.controlcraft.content.links.computer.ComputerDisplayMetrics;
+import com.verr1.controlcraft.content.links.computer.lua.render.RenderCmd;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 
 import java.util.List;
 
-public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<ComputerBaseBlockEntity> {
+public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<ComputerBlockEntity> {
 
     public ComputerBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         super();
@@ -19,7 +21,7 @@ public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<Compute
 
     @Override
     protected void renderSafe(
-            ComputerBaseBlockEntity be,
+            ComputerBlockEntity be,
             float partialTicks,
             PoseStack ms,
             MultiBufferSource bufferSource,
@@ -32,17 +34,17 @@ public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<Compute
             return;
 
         Direction facing = be.getDirection().getOpposite();
+        ComputerDisplayMetrics metrics = be.displayMetrics();
 
         ms.pushPose();
 
-        // Standard ComputerCraft screen scaling. Assume canvas size 256x256 maps to 1
-        // Block.
-        float scale = 1.0f / 256.0f;
-
-        // Origin matches OscilloscopeBlockEntityRenderer logic (raw coordinates mapping
-        // to top-left of the block face)
-        // Move to the center to apply initial rotation
+        // Move to block center first.
         ms.translate(0.5, 0.5, 0.5);
+
+        // Hologram anchor: from the original face, move +1 block in world up and
+        // 0.5 block toward the back of the screen facing direction.
+        ms.translate(0.0, 1.0, 0.0);
+        ms.translate(-facing.getStepX() * 0.5, -facing.getStepY() * 0.5, -facing.getStepZ() * 0.5);
 
         // Rotate to match the block face
         if (facing == Direction.NORTH) {
@@ -62,15 +64,25 @@ public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<Compute
         // Translate to the active face (slightly hovering above to avoid Z-fighting)
         ms.translate(0, 0, 0.501);
 
-        // Now move coordinate origin to top-left of the face, and invert Y for 2D
-        // graphics
-        ms.translate(-0.5, 0.5, 0);
+        // Move origin to top-left of the virtual surface, then map pixel coordinates
+        // into the configured world-space surface size.
+        ms.translate(-metrics.surfaceWidth() * 0.5f, metrics.surfaceHeight() * 0.5f, 0);
+        ms.scale(
+                metrics.surfaceWidth() / metrics.pixelWidth(),
+                -metrics.surfaceHeight() / metrics.pixelHeight(),
+                1.0f
+        );
 
-        // Scale coordinates logic
-        ms.scale(scale, -scale, scale);
-
+        final float layerStep = 0.0005f;
+        final float orderStep = 0.00001f;
+        int drawOrder = 0;
         for (RenderCmd cmd : cmds) {
-            cmd.execute(ms, bufferSource, light, overlay, partialTicks);
+            ms.pushPose();
+            float zOffset = cmd.layer() * layerStep + drawOrder * orderStep;
+            ms.translate(0, 0, zOffset);
+            cmd.execute(ms, bufferSource, LightTexture.FULL_BRIGHT, overlay, partialTicks);
+            ms.popPose();
+            drawOrder++;
         }
 
         ms.popPose();

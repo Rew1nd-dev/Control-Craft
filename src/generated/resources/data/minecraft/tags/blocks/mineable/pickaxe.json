@@ -25,6 +25,7 @@
     "vscontrolcraft:kinetic_proxy",
     "vscontrolcraft:kinetic_resistor",
     "vscontrolcraft:compact_flap",
+    "vscontrolcraft:computer",
     "vscontrolcraft:logic_gates",
     "vscontrolcraft:flexible_gate",
     "vscontrolcraft:ff",
