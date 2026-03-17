@@ -82,13 +82,17 @@ public class CompactFlapBlock extends DirectionalAxisKineticBlock implements
         Direction facing = state.getValue(FACING);
         boolean axis = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
         if(!facing.getAxis().equals(Direction.Axis.Y)){
-            return Direction.UP;
+            boolean vertical = axis && facing.getAxis() == Direction.Axis.X || !axis && facing.getAxis() == Direction.Axis.Z;
+            Direction left =  facing.getClockWise(Direction.Axis.Y);
+            return vertical ? left : Direction.UP;
         }
-
+        Direction dir0 = axis ? Direction.NORTH : Direction.EAST;
+        return facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? dir0 : dir0.getOpposite();
     }
 
     public static double getVerticalOffset(BlockState state){
-        return 0.0;
+        int off = state.getValue(OFFSET);
+        return off == 0 ? 0 : off == 2 ? (8 - 2.5) / 16 : -(8 - 2.5) / 16;
     }
 
     @Override

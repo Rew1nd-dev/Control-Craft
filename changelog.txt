@@ -1,3 +1,11 @@
+Control Craft Changelog
+2.24.2 - 2026-03-17
+====================
+- Added a zh-CN Lua links usage guide for computer blocks.
+- Added `ComputerDisplayMetrics` and a Lua `Block` library (`front/left/up` in local and world space).
+- Added compact flap model variants (`n/p` x `u/m/d`) and client render offset/axis updates for flap rendering.
+- Added jet rudder flame model + texture for translucent exhaust rendering.
+
 1.20.1 Changelog
 47.3
 ====
@@ -1003,4 +1011,3 @@
             * Make "Potentially dangerous alternative prefix" a debug warning, not info.
             Co-authored-by: Curle <curle@gemwire.uk>
             Co-authored-by: sciwhiz12 <arnoldnunag12@gmail.com>
-

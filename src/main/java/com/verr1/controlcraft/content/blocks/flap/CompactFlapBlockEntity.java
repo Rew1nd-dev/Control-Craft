@@ -88,6 +88,9 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
 
 
+    private double clientRenderOffset = 0.0f;
+    private Direction clientRenderVertical = Direction.UP;
+
     private int clientContraptionId = 0;
 
     @Override
@@ -401,6 +404,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public void tickClient() {
         super.tickClient();
         tickAnimationData();
+        refreshClientRenderOffset();
         // db_renderNormal();
     }
 
@@ -589,4 +593,18 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public @NotNull NamedComponent plant() {
         return plant;
     }
+
+    public double clientRenderOffset() {
+        return clientRenderOffset;
+    }
+
+    public Direction clientRenderVertical() {
+        return clientRenderVertical;
+    }
+
+    public void refreshClientRenderOffset(){
+        clientRenderOffset = CompactFlapBlock.getVerticalOffset(getBlockState());
+        clientRenderVertical = CompactFlapBlock.getVerticalAxis(getBlockState());
+    }
+
 }

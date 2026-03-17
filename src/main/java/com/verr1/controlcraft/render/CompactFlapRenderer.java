@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class CompactFlapRenderer extends SafeBlockEntityRenderer<CompactFlapBlockEntity> {
     public CompactFlapRenderer(BlockEntityRendererProvider.Context context) {
@@ -23,13 +24,19 @@ public class CompactFlapRenderer extends SafeBlockEntityRenderer<CompactFlapBloc
         float angle = be.getClientAnimatedAngle().getValue(partialTicks);// + (float)be.getOffset();
         float tilt = be.getClientAnimatedTilt().getValue(partialTicks);
         Direction dir = be.getDirection();
+
+        Direction off = be.clientRenderVertical();
+        double off_o = be.clientRenderOffset();
+        Vec3 off_v = new Vec3(off.getStepX(), off.getStepY(), off.getStepZ()).scale(off_o);
+
         // int sign = (dir == Direction.UP || dir == Direction.SOUTH || dir == Direction.EAST) ? 1 : -1;
         BlockState state = be.getBlockState();
 
         VertexConsumer solid = bufferSource.getBuffer(RenderType.solid());
-        SuperByteBuffer propellerBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.WING_CONTROLLER_TOP, state);
+        SuperByteBuffer flapBuffer = CachedBufferer.partialFacing(ControlCraftPartialModels.WING_CONTROLLER_TOP, state);
 
-        propellerBuffer
+        flapBuffer
+                .translate(off_v)
                 .rotateCentered(be.leftDirection(), (float) Math.toRadians(tilt))
                 .rotateCentered(dir, (float) Math.toRadians(angle))
                 .light(light)
