@@ -46,6 +46,7 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
             new FlapContraptionEntity(ControlCraftEntities.FLAP.get(), world);
         entity.controllerPos = controller.getBlockPos();
         entity.setContraption(contraption);
+        entity.noCulling = true;
         return entity;
     }
 
