@@ -8,9 +8,13 @@ import java.util.List;
 
 public class ComputerScreen extends ComputerDelegateHandler {
 
-    // 存储当前需要绘制的命令集合，这里使用 volatile 或其他同步机制保证线程安全，
-    // 因为 Lua 线程 (Client Tick) 和渲染线程 (Render) 会并发访问。
-    private volatile List<RenderCmd> activeDisplayList = new ArrayList<>(); //List.of(new DrawRectCmd(64, 64, 16, 16, Color.RED.getRGB()))
+    private static final float MAX_OFFSET = 10.0f;
+
+    private volatile List<RenderCmd> activeDisplayList = new ArrayList<>();
+    private volatile ComputerDisplayMetrics displayMetrics = ComputerDisplayMetrics.DEFAULT;
+    private volatile float offsetX = 0.0f;
+    private volatile float offsetY = 0.0f;
+    private volatile float offsetZ = 0.0f;
 
     public ComputerScreen(ComputerBlockEntity delegate) {
         super(delegate);
@@ -24,4 +28,33 @@ public class ComputerScreen extends ComputerDelegateHandler {
         return activeDisplayList;
     }
 
+    public ComputerDisplayMetrics getDisplayMetrics() {
+        return displayMetrics;
+    }
+
+    public void setDisplayMetrics(ComputerDisplayMetrics displayMetrics) {
+        this.displayMetrics = displayMetrics == null ? ComputerDisplayMetrics.DEFAULT : displayMetrics;
+    }
+
+    public void setRenderOffset(float x, float y, float z) {
+        this.offsetX = clampOffset(x);
+        this.offsetY = clampOffset(y);
+        this.offsetZ = clampOffset(z);
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public float getOffsetZ() {
+        return offsetZ;
+    }
+
+    private float clampOffset(float v) {
+        return Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, v));
+    }
 }

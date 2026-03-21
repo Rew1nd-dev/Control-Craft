@@ -15,6 +15,7 @@
     "camera.MixinServerPlayer",
     "cbc.MixinCannonMountBlockEntity",
     "cbc.MixinFixedCannonMountBlockEntity",
+    "qol.MixinTrackedEntity",
     "tweak.MixinTweakedControllerClientHandler",
     "tweak.MixinTweakLinkedControllerButtonPacket"
   ],

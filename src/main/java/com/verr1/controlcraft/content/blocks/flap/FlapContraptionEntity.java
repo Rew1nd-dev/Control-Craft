@@ -32,9 +32,11 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
     protected double angle;
     protected double prevTilt;
     protected double tilt;
+    protected Vec3 localRotationCenter = new Vec3(.5, .5, .5);
 
     public FlapContraptionEntity(EntityType<?> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
+        noCulling = true;
     }
 
     public static FlapContraptionEntity create(
@@ -46,7 +48,7 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
             new FlapContraptionEntity(ControlCraftEntities.FLAP.get(), world);
         entity.controllerPos = controller.getBlockPos();
         entity.setContraption(contraption);
-        entity.noCulling = true;
+        // entity.noCulling = true;
         return entity;
     }
 
@@ -100,6 +102,23 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
             if (level().isClientSide)
                 setPos(getX(), getY(), getZ());
         }
+        updateRotationCenter(controller);
+    }
+
+    private void updateRotationCenter(CompactFlapBlockEntity controller) {
+        Direction offsetDirection = CompactFlapBlock.getVerticalAxis(controller.getBlockState());
+        double offsetDistance = CompactFlapBlock.getVerticalOffset(controller.getBlockState());
+        Vec3 desiredWorldCenter = Vec3.atCenterOf(controller.getBlockPos()).add(
+            offsetDirection.getStepX() * offsetDistance,
+            offsetDirection.getStepY() * offsetDistance,
+            offsetDirection.getStepZ() * offsetDistance
+        );
+
+        Vec3 anchor = getAnchorVec();
+        if (anchor == null) {
+            anchor = position();
+        }
+        localRotationCenter = desiredWorldCenter.subtract(anchor);
     }
 
     protected CompactFlapBlockEntity getFlap(){
@@ -127,9 +146,12 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
         Vector3d tiltAxis = getTiltAxis();
         double radians0 = Math.toRadians(MathUtils.angleReset(getAngle(partialTicks)));
         double radians1 = Math.toRadians(MathUtils.angleReset(getTilt(partialTicks)));
+        Vec3 center = localRotationCenter;
         Vector3d applied = ValkyrienSkies.toJOML(localPos)
+            .sub(center.x, center.y, center.z)
             .rotateAxis((radians0), rotateAxis.x(), rotateAxis.y(), rotateAxis.z())
-            .rotateAxis((radians1), tiltAxis.x(), tiltAxis.y(), tiltAxis.z());
+            .rotateAxis((radians1), tiltAxis.x(), tiltAxis.y(), tiltAxis.z())
+            .add(center.x, center.y, center.z);
         return ValkyrienSkies.toMinecraft(applied);
     }
 
@@ -139,9 +161,12 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
         Vector3d tiltAxis = getTiltAxis();
         double radians0 = -Math.toRadians(MathUtils.angleReset(angle));
         double radians1 = -Math.toRadians(MathUtils.angleReset(tilt));
+        Vec3 center = localRotationCenter;
         Vector3d applied = ValkyrienSkies.toJOML(localPos)
+            .sub(center.x, center.y, center.z)
             .rotateAxis((radians1), tiltAxis.x(), tiltAxis.y(), tiltAxis.z())
-            .rotateAxis((radians0), rotateAxis.x(), rotateAxis.y(), rotateAxis.z());
+            .rotateAxis((radians0), rotateAxis.x(), rotateAxis.y(), rotateAxis.z())
+            .add(center.x, center.y, center.z);
         return ValkyrienSkies.toMinecraft(applied);
     }
 
@@ -198,9 +223,10 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
 
     @Override
     public void applyLocalTransforms(PoseStack matrixStack, float partialTicks) {
-        TransformStack.cast(matrixStack)
-            .nudge(getId())
-            .rotateCentered(getRot(partialTicks).get(new Quaternionf()));
+        TransformStack.cast(matrixStack).nudge(getId());
+        matrixStack.translate(localRotationCenter.x, localRotationCenter.y, localRotationCenter.z);
+        matrixStack.mulPose(getRot(partialTicks).get(new Quaternionf()));
+        matrixStack.translate(-localRotationCenter.x, -localRotationCenter.y, -localRotationCenter.z);
     }
 
     public void setAngle(float v) {

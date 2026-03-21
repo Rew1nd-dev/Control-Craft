@@ -33,8 +33,12 @@ public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<Compute
         if (cmds == null || cmds.isEmpty())
             return;
 
+        var screen = be.getScreen();
         Direction facing = be.getDirection().getOpposite();
-        ComputerDisplayMetrics metrics = be.displayMetrics();
+        ComputerDisplayMetrics metrics = screen.getDisplayMetrics();
+        float offsetX = screen.getOffsetX();
+        float offsetY = screen.getOffsetY();
+        float offsetZ = screen.getOffsetZ();
 
         ms.pushPose();
 
@@ -60,6 +64,9 @@ public class ComputerBlockEntityRenderer extends SafeBlockEntityRenderer<Compute
         } else if (facing == Direction.DOWN) {
             ms.mulPose(Axis.XP.rotationDegrees(-90));
         }
+
+        // Local offset configurable from client Lua script.
+        ms.translate(offsetX, offsetY, offsetZ);
 
         // Translate to the active face (slightly hovering above to avoid Z-fighting)
         ms.translate(0, 0, 0.501);

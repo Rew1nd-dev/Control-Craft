@@ -21,6 +21,10 @@ import static com.verr1.controlcraft.foundation.cimulink.core.components.lua.Cim
 
 public class ComputerServerLua extends ComputerCommonLua{
 
+    public static int MAX_ALLOCATED_BYTES = 128 * 1024;
+    public static int MAX_INSTRUCTIONS = 1_000_0;
+    public static int MAX_TIME_MILLIS = 2;
+
     private final IComputerServerContext context;
 
     protected final @Nullable LuaValue loopFunction;
@@ -73,7 +77,7 @@ public class ComputerServerLua extends ComputerCommonLua{
             "y", y
         ));
 
-        runWithProtection(() -> playerEventHandler.call(event));
+        runWithProtection(() -> playerEventHandler.call(event), MAX_INSTRUCTIONS, MAX_TIME_MILLIS, MAX_ALLOCATED_BYTES);
     }
 
 
@@ -85,13 +89,13 @@ public class ComputerServerLua extends ComputerCommonLua{
             "y", y
         ));
 
-        runWithProtection(() -> playerEventHandler.call(event));
+        runWithProtection(() -> playerEventHandler.call(event), MAX_INSTRUCTIONS, MAX_TIME_MILLIS, MAX_ALLOCATED_BYTES);
     }
 
 
     public void onServerTick() {
         if(loopFunction == null)return;
-        runWithProtection(loopFunction::call);
+        runWithProtection(loopFunction::call, MAX_INSTRUCTIONS, MAX_TIME_MILLIS, MAX_ALLOCATED_BYTES);
     }
 
 

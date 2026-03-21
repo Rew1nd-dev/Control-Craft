@@ -4,6 +4,7 @@ import com.verr1.controlcraft.content.links.computer.lua.IComputerClientContext;
 import com.verr1.controlcraft.content.links.computer.lua.LuaUtils;
 import com.verr1.controlcraft.content.links.computer.lua.libs.BlockLib;
 import com.verr1.controlcraft.content.links.computer.lua.libs.ClientNetworkLib;
+import com.verr1.controlcraft.content.links.computer.lua.libs.ClientPlayerLib;
 import com.verr1.controlcraft.content.links.computer.lua.libs.RenderLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
@@ -38,9 +39,10 @@ public class ComputerClientLua extends ComputerCommonLua {
         Globals luaGlobal = createStandardGlobals();
 
         luaGlobal.load(new PhysLib(context.getPhysAccess()));
-        luaGlobal.load(new RenderLib(context.getScreen(), context.pixelWidth(), context.pixelHeight()));
+        luaGlobal.load(new RenderLib(context.getScreen()));
         luaGlobal.load(new BlockLib(context));
-        luaGlobal.load(new ClientNetworkLib(context.getNetworkHandler()));
+        luaGlobal.load(new ClientPlayerLib());
+        luaGlobal.load(new ClientNetworkLib(context));
         loadLuaML(luaGlobal);
         LuaValue loopFunc = LuaUtils.safeLoadValue(code, "onClientTick", luaGlobal).filter(LuaValue::isfunction).orElse(null);
 
@@ -50,6 +52,6 @@ public class ComputerClientLua extends ComputerCommonLua {
     public void onClientTick() {
         if (loopFunction == null)
             return;
-        runWithProtection(loopFunction::call);
+        runWithProtection(loopFunction::call, 450000, 20 * 4, 1024 * 1024);
     }
 }

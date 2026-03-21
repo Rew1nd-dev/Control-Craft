@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.lua;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitConstructor;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitScript;
@@ -42,13 +43,16 @@ public class CimulinkLua {
     }
 
     public static void loadLuaML(Globals globals){
-        String luaMl = LuaScriptLoader.LUA_SCRIPTS.get("luaml.lua");
-        if(luaMl != null){
-            LuaValue module = globals.load(luaMl, "luaml.lua").call();
-            if (module.istable()) {
-                globals.set("Vector3d", module.get("Vector3d"));
-                globals.set("Quaterniond", module.get("Quaterniond"));
-            }
+        String luaMl = LuaScriptLoader.getScript("luaml.lua");
+        if (luaMl == null || luaMl.isBlank()) {
+            ControlCraft.LOGGER.warn("luaml.lua is unavailable, Vector3d/Quaterniond will not be registered.");
+            return;
+        }
+
+        LuaValue module = globals.load(luaMl, "luaml.lua").call();
+        if (module.istable()) {
+            globals.set("Vector3d", module.get("Vector3d"));
+            globals.set("Quaterniond", module.get("Quaterniond"));
         }
 
     }

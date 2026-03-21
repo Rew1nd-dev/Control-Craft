@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.links.computer;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.blocks.OnShipBlockEntity;
 import com.verr1.controlcraft.content.links.computer.lua.*;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
@@ -86,10 +87,13 @@ public class ComputerBlockEntity extends OnShipBlockEntity
     private void loadLua(String code) {
         if (level == null)
             return;
+        String partOfCode = code.substring(0, Math.min(code.length(), 100));
         if (level.isClientSide) {
+            ControlCraft.LOGGER.info("Loaded With Lua Code On Client: {}", partOfCode);
             serverLua = null;
             clientLua = ComputerClientLua.fromCode(this, code);
         } else {
+            ControlCraft.LOGGER.info("Loaded With Lua Code On Server: {}", partOfCode);
             serverLua = ComputerServerLua.fromCode(this, code);
             clientLua = null;
         }
@@ -112,8 +116,7 @@ public class ComputerBlockEntity extends OnShipBlockEntity
     @Override
     public void initializeClient() {
         super.initializeClient();
-        handler().request(true, CODE);
-        handler().request(true, DATA_INITIAL_SYNC);
+        handler().request(true, CODE, DATA_INITIAL_SYNC);
     }
 
     public void sendPatchedUpdate(boolean fullUpdate){
@@ -159,9 +162,16 @@ public class ComputerBlockEntity extends OnShipBlockEntity
         clientEventHandler.onClientTick();
     }
 
+    private long lastErrorTimeStamp = 0L;
     @Override
     public void onError(LuaError error) {
-
+        if(System.currentTimeMillis() - lastErrorTimeStamp < 1000 * 4)return;
+        lastErrorTimeStamp = System.currentTimeMillis();
+        ControlCraft.LOGGER.error(
+                "Computer Lua error at {}: {}",
+                getBlockPos().toShortString(),
+                LuaUtils.sanitizeLuaError(error)
+        );
     }
 
     public ComputerServerEventHandler getServerEventHandler() {
@@ -187,11 +197,6 @@ public class ComputerBlockEntity extends OnShipBlockEntity
 
     public IWorldAccess getWorldAccess() {
         return IWorldAccess.ofImmediate(this);
-    }
-
-    @Override
-    public ComputerDisplayMetrics displayMetrics() {
-        return ComputerDisplayMetrics.DEFAULT;
     }
 
 }

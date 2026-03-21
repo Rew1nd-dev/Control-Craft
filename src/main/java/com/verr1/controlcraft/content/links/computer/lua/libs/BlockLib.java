@@ -25,6 +25,7 @@ public class BlockLib extends TwoArgFunction {
         library.set("left", vectorGetter(env, context::left));
         library.set("upLocal", vectorGetter(env, context::upLocal));
         library.set("up", vectorGetter(env, context::up));
+        library.set("yardPosition", vectorGetter(env, context::positionModel));
 
         env.set("Block", library);
         return library;

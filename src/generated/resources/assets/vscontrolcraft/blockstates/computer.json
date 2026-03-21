@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "vscontrolcraft:block/computer/block",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "vscontrolcraft:block/computer/block"
+    },
+    "facing=south": {
+      "model": "vscontrolcraft:block/computer/block",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "vscontrolcraft:block/computer/block",
+      "y": 270
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.content.links.computer;
 
+import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.links.computer.lua.libs.ComputerWatcherLib;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
@@ -12,13 +13,13 @@ public class ComputerCommonLua {
         this.luaGlobals = luaGlobals;
     }
 
-    protected void runWithProtection(Runnable luaTask) {
+    protected void runWithProtection(Runnable luaTask, int maxInstructions, int maxTimeMillis, int maxAllocatedBytes) {
         // 从 Globals 里提取我们刚塞进去的 ScreenWatcherLib 实例
         ComputerWatcherLib watcher = (ComputerWatcherLib) luaGlobals.debuglib;
 
         if (watcher != null) {
             // 设置当前这次能跑多久、多少步
-            watcher.setLimits(10000, 2, 10 * 1024 * 1024);
+            watcher.setLimits(maxInstructions, maxTimeMillis, maxAllocatedBytes);
             // 必须在开始前重置计数器！
             watcher.resetForNewExecution();
         }

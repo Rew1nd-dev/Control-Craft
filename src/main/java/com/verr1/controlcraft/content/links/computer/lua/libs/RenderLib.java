@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.links.computer.lua.libs;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.verr1.controlcraft.content.links.computer.ComputerDisplayMetrics;
 import com.verr1.controlcraft.content.links.computer.ComputerScreen;
 import com.verr1.controlcraft.content.links.computer.lua.render.DrawRectCmd;
 import com.verr1.controlcraft.content.links.computer.lua.render.DrawTextCmd;
@@ -19,6 +20,11 @@ import java.util.function.Function;
 
 public class RenderLib extends TwoArgFunction {
 
+    private static final int MIN_RESOLUTION = 1;
+    private static final int MAX_RESOLUTION = 4096;
+    private static final float MIN_SURFACE_SIZE = 0.05f;
+    private static final float MAX_SURFACE_SIZE = 64.0f;
+
     private final List<RenderCmd> tempBuffer = new ArrayList<>();
     private final List<DrawCommandBinding> drawCommandBindings = new ArrayList<>();
 
@@ -26,13 +32,21 @@ public class RenderLib extends TwoArgFunction {
     private int currentLayer = 0;
 
     private final ComputerScreen screen;
-    private final int canvasWidth;
-    private final int canvasHeight;
+    private int canvasWidth;
+    private int canvasHeight;
+    private float surfaceWidth;
+    private float surfaceHeight;
 
-    public RenderLib(ComputerScreen screen, int canvasWidth, int canvasHeight) {
+    public RenderLib(ComputerScreen screen) {
         this.screen = screen;
-        this.canvasWidth = Math.max(1, canvasWidth);
-        this.canvasHeight = Math.max(1, canvasHeight);
+
+        ComputerDisplayMetrics metrics = screen == null ? ComputerDisplayMetrics.DEFAULT : screen.getDisplayMetrics();
+        this.canvasWidth = clampResolution(metrics.pixelWidth());
+        this.canvasHeight = clampResolution(metrics.pixelHeight());
+        this.surfaceWidth = clampSurface((float) metrics.surfaceWidth());
+        this.surfaceHeight = clampSurface((float) metrics.surfaceHeight());
+
+        applyMetricsToScreen();
         registerBuiltinDrawCommands();
     }
 
@@ -94,10 +108,10 @@ public class RenderLib extends TwoArgFunction {
         library.set("setColor", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                int r = clamp(args.checkint(1));
-                int g = clamp(args.checkint(2));
-                int b = clamp(args.checkint(3));
-                int a = args.narg() >= 4 ? clamp(args.checkint(4)) : 255;
+                int r = clampColor(args.checkint(1));
+                int g = clampColor(args.checkint(2));
+                int b = clampColor(args.checkint(3));
+                int a = args.narg() >= 4 ? clampColor(args.checkint(4)) : 255;
                 currentColor = (a << 24) | (r << 16) | (g << 8) | b;
                 return NIL;
             }
@@ -106,7 +120,7 @@ public class RenderLib extends TwoArgFunction {
         library.set("setAlpha", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue alpha) {
-                int a = clamp(alpha.checkint());
+                int a = clampColor(alpha.checkint());
                 currentColor = (currentColor & 0x00FFFFFF) | (a << 24);
                 return NIL;
             }
@@ -118,6 +132,40 @@ public class RenderLib extends TwoArgFunction {
                 double op = Math.max(0.0, Math.min(1.0, opacity.checkdouble()));
                 int a = (int) Math.round(op * 255.0);
                 currentColor = (currentColor & 0x00FFFFFF) | (a << 24);
+                return NIL;
+            }
+        });
+
+        library.set("setResolution", new TwoArgFunction() {
+            @Override
+            public LuaValue call(LuaValue w, LuaValue h) {
+                canvasWidth = clampResolution(w.checkint());
+                canvasHeight = clampResolution(h.checkint());
+                applyMetricsToScreen();
+                updateSizeExports(library);
+                return NIL;
+            }
+        });
+
+        library.set("setSurfaceSize", new TwoArgFunction() {
+            @Override
+            public LuaValue call(LuaValue w, LuaValue h) {
+                surfaceWidth = clampSurface((float) w.checkdouble());
+                surfaceHeight = clampSurface((float) h.checkdouble());
+                applyMetricsToScreen();
+                return NIL;
+            }
+        });
+
+        library.set("setOffset", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                float x = args.narg() >= 1 ? (float) args.checkdouble(1) : 0.0f;
+                float y = args.narg() >= 2 ? (float) args.checkdouble(2) : 0.0f;
+                float z = args.narg() >= 3 ? (float) args.checkdouble(3) : 0.0f;
+                if (screen != null) {
+                    screen.setRenderOffset(x, y, z);
+                }
                 return NIL;
             }
         });
@@ -134,9 +182,8 @@ public class RenderLib extends TwoArgFunction {
         });
 
         bindDrawCommands(library);
+        updateSizeExports(library);
 
-        library.set("width", LuaValue.valueOf(canvasWidth));
-        library.set("height", LuaValue.valueOf(canvasHeight));
         library.set("getWidth", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
@@ -147,6 +194,18 @@ public class RenderLib extends TwoArgFunction {
             @Override
             public LuaValue call() {
                 return LuaValue.valueOf(canvasHeight);
+            }
+        });
+        library.set("getSurfaceWidth", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return LuaValue.valueOf(surfaceWidth);
+            }
+        });
+        library.set("getSurfaceHeight", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return LuaValue.valueOf(surfaceHeight);
             }
         });
 
@@ -173,8 +232,28 @@ public class RenderLib extends TwoArgFunction {
         return library;
     }
 
-    private int clamp(int val) {
+    private void updateSizeExports(LuaValue library) {
+        library.set("width", LuaValue.valueOf(canvasWidth));
+        library.set("height", LuaValue.valueOf(canvasHeight));
+    }
+
+    private void applyMetricsToScreen() {
+        if (screen == null) {
+            return;
+        }
+        screen.setDisplayMetrics(new ComputerDisplayMetrics(canvasWidth, canvasHeight, surfaceWidth, surfaceHeight));
+    }
+
+    private int clampColor(int val) {
         return Math.max(0, Math.min(255, val));
+    }
+
+    private int clampResolution(int val) {
+        return Math.max(MIN_RESOLUTION, Math.min(MAX_RESOLUTION, val));
+    }
+
+    private float clampSurface(float val) {
+        return Math.max(MIN_SURFACE_SIZE, Math.min(MAX_SURFACE_SIZE, val));
     }
 
     private RenderCmd withCurrentLayer(RenderCmd cmd) {

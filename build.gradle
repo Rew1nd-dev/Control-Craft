@@ -169,7 +169,7 @@ dependencies {
     implementation fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-    implementation fg.deobf("libs:architectury-forge:9.2.14")
+    implementation fg.deobf("libs:architectury-forge:${architectury_forge_version}")
 
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_mod_version}")
     compileOnly("org.valkyrienskies.core:api:${vs_core_version}")
@@ -182,30 +182,30 @@ dependencies {
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
 
-    implementation fg.deobf("libs:spark-1.10.53:forge")
+    implementation fg.deobf("libs:spark-${spark_version}:forge")
 
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation "thedarkcolour:kotlinforforge:$forge_kotlin_version"
 
-    implementation fg.deobf("libs:tau:2.0.1")
-    compileOnly fg.deobf("libs:valkyrien_space_war:0.6.13")
-    implementation fg.deobf("libs:cbcmodernwarfare:0.0.6c")
-    implementation fg.deobf("libs:createbigcannons:5.8.3")
-    implementation fg.deobf("libs:trackwork:1.1.1")
-    implementation fg.deobf("libs:vmod:1.3.0")
-    implementation fg.deobf("libs:we-7.2.15:forge")
-    implementation fg.deobf("libs:shaolib:1.4.7")
+    implementation fg.deobf("libs:tau:${tau_version}")
+    compileOnly fg.deobf("libs:valkyrien_space_war:${valkyrien_space_war_version}")
+    implementation fg.deobf("libs:cbcmodernwarfare:${cbc_modern_warfare_version}")
+    implementation fg.deobf("libs:createbigcannons:${create_big_cannons_version}")
+    implementation fg.deobf("libs:trackwork:${trackwork_version}")
+    implementation fg.deobf("libs:vmod:${vmod_version}")
+    implementation fg.deobf("libs:we-${worldedit_forge_version}:forge")
+    implementation fg.deobf("libs:shaolib:${shaolib_version}")
     implementation fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
     implementation fg.deobf("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:1.0.47") { transitive = false }
     // Fuck JarInJar
-    minecraftLibrary(jarJar("libs:luaj:3.0.2"){
+    minecraftLibrary(jarJar("libs:luaj:${luaj_version}"){
         jarJar.ranged(it, "[0.0.2,)")
     })
 
-//    implementation ("libs:luaj:3.0.2")
-//    shadowInclude("libs:luaj:3.0.2")
+//    implementation ("libs:luaj:${luaj_version}")
+//    shadowInclude("libs:luaj:${luaj_version}")
 
-    implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:1.2")){
+    implementation fg.deobf(jarJar("libs:valkyrien-ship-schematics-forge:${valkyrien_ship_schematics_version}")){
         jarJar.ranged(it, "[0.0,)")
     }
 

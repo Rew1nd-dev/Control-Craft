@@ -21,14 +21,29 @@ import net.minecraft.world.entity.MobCategory;
 
 public class ControlCraftEntities {
 
-    public static final EntityEntry<FlapContraptionEntity> FLAP = contraption("flap_contraption",
-        FlapContraptionEntity::new, () -> FlapContraptionEntityRenderer::new, 5, 3, true).register();
+    public static final EntityEntry<FlapContraptionEntity> FLAP = contraption(
+        "flap_contraption",
+        FlapContraptionEntity::new,
+        () -> FlapContraptionEntityRenderer::new,
+        50,
+        3,
+        true
+    ).register();
 
     private static <T extends Entity> CreateEntityBuilder<T, ?> contraption(String name, EntityType.EntityFactory<T> factory,
                                                                             NonNullSupplier<NonNullFunction<EntityRendererProvider.Context, EntityRenderer<? super T>>> renderer, int range,
                                                                             int updateFrequency, boolean sendVelocity) {
-        return register(name, factory, renderer, MobCategory.MISC, range, updateFrequency, sendVelocity, true,
-            AbstractContraptionEntity::build);
+        return register(
+            name,
+            factory,
+            renderer,
+            MobCategory.MISC,
+            range,
+            updateFrequency,
+            sendVelocity,
+            true,
+            AbstractContraptionEntity::build
+        );
     }
 
     private static <T extends Entity> CreateEntityBuilder<T, ?> register(String name, EntityType.EntityFactory<T> factory,

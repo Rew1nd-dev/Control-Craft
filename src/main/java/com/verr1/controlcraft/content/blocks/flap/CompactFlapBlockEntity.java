@@ -535,6 +535,9 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         if (!isAssembled()) return;
         visualAngle = 0;
         running = false;
+        // Force a neutral pose before blockification to avoid overlap/ejection on disassemble.
+        physicalWing.setAngle(0);
+        physicalWing.setTilt(0);
         physicalWing.disassemble();
         AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(level, worldPosition);
         physicalWing = null;
@@ -562,6 +565,11 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         return contraption == physicalWing;
     }
 
+    @Override
+    public void initializeClient() {
+        super.initializeClient();
+        handler().request(true, ANGLE, TILT);
+    }
 
     public void attach(FlapContraptionEntity contraption) {
         BlockState blockState = getBlockState();

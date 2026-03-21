@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import static com.verr1.controlcraft.ControlCraft.MODID;
@@ -23,7 +24,7 @@ public class LuaScriptLoader extends SimplePreparableReloadListener<Map<String, 
     private static final Predicate<ResourceLocation> LUA_FILTER = rl -> rl.getPath().endsWith(".lua");
 
     // 存储 Map 的静态变量（或注入到你的控制器类中）
-    public static final Map<String, String> LUA_SCRIPTS = new HashMap<>();
+    public static final Map<String, String> LUA_SCRIPTS = new ConcurrentHashMap<>();
 
     @Override
     protected @NotNull Map<String, String> prepare(ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
@@ -55,5 +56,36 @@ public class LuaScriptLoader extends SimplePreparableReloadListener<Map<String, 
         LUA_SCRIPTS.putAll(scripts);
         // 可选：日志或通知加载完成
         ControlCraft.LOGGER.info("Loaded {} Lua scripts.", LUA_SCRIPTS.size());
+    }
+
+    /**
+     * Retrieve a Lua script from the reloaded cache first.
+     * Falls back to bundled resources when the reload listener hasn't run
+     * (e.g. pure client side before joining a local world).
+     */
+    public static String getScript(String fileName) {
+        String cached = LUA_SCRIPTS.get(fileName);
+        if (cached != null) {
+            return cached;
+        }
+
+        String bundled = loadBundledScript(fileName);
+        if (bundled != null) {
+            LUA_SCRIPTS.put(fileName, bundled);
+        }
+        return bundled;
+    }
+
+    private static String loadBundledScript(String fileName) {
+        String resourcePath = "data/" + MODID + "/" + LUA_PATH + "/" + fileName;
+        try (InputStream is = LuaScriptLoader.class.getClassLoader().getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                return null;
+            }
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            ControlCraft.LOGGER.warn("Failed to read bundled Lua script {}: {}", resourcePath, e.getMessage());
+            return null;
+        }
     }
 }

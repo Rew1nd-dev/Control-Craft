@@ -9,6 +9,7 @@ import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.content.compact.vmod.version.VSchematicCompactCimulinkV1;
 import com.verr1.controlcraft.content.links.CimulinkBlockEntity;
+import com.verr1.controlcraft.content.links.computer.lua.LuaUtils;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -290,12 +291,7 @@ public abstract class BlockLinkPort {
     }
 
     private static String sanitizeLuaError(String message, String code) {
-        if (message == null) return "";
-        String sanitized = message.replaceAll("\\[string \".*?\"\\]", "[script]");
-        if (code != null && !code.isEmpty()) {
-            sanitized = sanitized.replace(code, "[script]");
-        }
-        return sanitized;
+        return LuaUtils.sanitizeLuaError(message);
     }
 
     private static String getSuspectedLuaCode(BlockLinkPort raw){

@@ -34,6 +34,7 @@ public enum ControlCraftPackets {
     COMPUTER_SYNC(ComputerSyncPacket.class, ComputerSyncPacket::new, NetworkDirection.PLAY_TO_CLIENT),
 
     GENERIC_SERVER(GenericServerPacket.class, GenericServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    COMPUTER_CLIENT_NETWORK(ComputerClientNetworkPacket.class, ComputerClientNetworkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     BLOCK_BOUND_SERVER(BlockBoundServerPacket.class, BlockBoundServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
     // SETTING_EXPOSED_FIELD(ExposedFieldSettingsPacket.class, ExposedFieldSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),
     TERMINAL_SETTINGS_(TerminalSettingsPacket.class, TerminalSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),

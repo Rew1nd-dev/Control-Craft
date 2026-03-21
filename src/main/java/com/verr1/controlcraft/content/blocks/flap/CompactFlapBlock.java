@@ -1,9 +1,13 @@
 package com.verr1.controlcraft.content.blocks.flap;
 
+import com.simibubi.create.content.contraptions.ITransformableBlock;
+import com.simibubi.create.content.contraptions.StructureTransform;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
+import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.gui.ScreenOpener;
+import com.simibubi.create.foundation.utility.Iterate;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
@@ -20,8 +24,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -36,13 +42,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
+import static com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
 import static com.simibubi.create.foundation.data.BlockStateGen.directionalAxisBlock;
 
-public class CompactFlapBlock extends DirectionalAxisKineticBlock implements
-        ISignalAcceptor, IBE<CompactFlapBlockEntity>
+public class CompactFlapBlock extends BearingBlock implements
+        ISignalAcceptor, IBE<CompactFlapBlockEntity> , ITransformableBlock
 {
-
-
 
     public static final String ID = "compact_flap";
     public static final IntegerProperty OFFSET = IntegerProperty.create("offset_mode", 0, 2);
@@ -51,9 +56,117 @@ public class CompactFlapBlock extends DirectionalAxisKineticBlock implements
         super(p_52591_);
     }
 
+    protected Direction getFacingForPlacement(BlockPlaceContext context) {
+        Direction facing = context.getNearestLookingDirection()
+            .getOpposite();
+        if (context.getPlayer() != null && context.getPlayer()
+            .isShiftKeyDown())
+            facing = facing.getOpposite();
+        return facing;
+    }
+
+    protected boolean getAxisAlignmentForPlacement(BlockPlaceContext context) {
+        return context.getHorizontalDirection()
+            .getAxis() == Direction.Axis.X;
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction facing = getFacingForPlacement(context);
+        BlockPos pos = context.getClickedPos();
+        Level world = context.getLevel();
+        boolean alongFirst = false;
+        Direction.Axis faceAxis = facing.getAxis();
+
+        if (faceAxis.isHorizontal()) {
+            alongFirst = faceAxis == Direction.Axis.Z;
+            Direction positivePerpendicular = faceAxis == Direction.Axis.X ? Direction.SOUTH : Direction.EAST;
+
+            boolean shaftAbove = prefersConnectionTo(world, pos, Direction.UP, true);
+            boolean shaftBelow = prefersConnectionTo(world, pos, Direction.DOWN, true);
+            boolean preferLeft = prefersConnectionTo(world, pos, positivePerpendicular, false);
+            boolean preferRight = prefersConnectionTo(world, pos, positivePerpendicular.getOpposite(), false);
+
+            if (shaftAbove || shaftBelow || preferLeft || preferRight)
+                alongFirst = faceAxis == Direction.Axis.X;
+        }
+
+        if (faceAxis.isVertical()) {
+            alongFirst = getAxisAlignmentForPlacement(context);
+            Direction prefferedSide = null;
+
+            for (Direction side : Iterate.horizontalDirections) {
+                if (!prefersConnectionTo(world, pos, side, true)
+                    && !prefersConnectionTo(world, pos, side.getClockWise(), false))
+                    continue;
+                if (prefferedSide != null && prefferedSide.getAxis() != side.getAxis()) {
+                    prefferedSide = null;
+                    break;
+                }
+                prefferedSide = side;
+            }
+
+            if (prefferedSide != null)
+                alongFirst = prefferedSide.getAxis() == Direction.Axis.X;
+        }
+
+        return this.defaultBlockState()
+            .setValue(FACING, facing)
+            .setValue(AXIS_ALONG_FIRST_COORDINATE, alongFirst);
+    }
+
+    protected boolean prefersConnectionTo(LevelReader reader, BlockPos pos, Direction facing, boolean shaftAxis) {
+        if (!shaftAxis)
+            return false;
+        BlockPos neighbourPos = pos.relative(facing);
+        BlockState blockState = reader.getBlockState(neighbourPos);
+        Block block = blockState.getBlock();
+        return block instanceof IRotate
+            && ((IRotate) block).hasShaftTowards(reader, neighbourPos, blockState, facing.getOpposite());
+    }
+
+    @Override
+    public Direction.Axis getRotationAxis(BlockState state) {
+        Direction.Axis pistonAxis = state.getValue(FACING)
+            .getAxis();
+        boolean alongFirst = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
+
+        if (pistonAxis == Direction.Axis.X)
+            return alongFirst ? Direction.Axis.Y : Direction.Axis.Z;
+        if (pistonAxis == Direction.Axis.Y)
+            return alongFirst ? Direction.Axis.X : Direction.Axis.Z;
+        if (pistonAxis == Direction.Axis.Z)
+            return alongFirst ? Direction.Axis.X : Direction.Axis.Y;
+
+        throw new IllegalStateException("Unknown axis??");
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, Rotation rot) {
+        if (rot.ordinal() % 2 == 1)
+            state = state.cycle(AXIS_ALONG_FIRST_COORDINATE);
+        return super.rotate(state, rot);
+    }
+
+    public BlockState transform(BlockState state, StructureTransform transform) {
+        if (transform.mirror != null) {
+            state = mirror(state, transform.mirror);
+        }
+
+        if (transform.rotationAxis == Direction.Axis.Y) {
+            return rotate(state, transform.rotation);
+        }
+
+        Direction newFacing = transform.rotateFacing(state.getValue(FACING));
+        if (transform.rotationAxis == newFacing.getAxis() && transform.rotation.ordinal() % 2 == 1) {
+            state = state.cycle(AXIS_ALONG_FIRST_COORDINATE);
+        }
+        return state.setValue(FACING, newFacing);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(OFFSET);
+        builder.add(OFFSET, AXIS_ALONG_FIRST_COORDINATE);
         super.createBlockStateDefinition(builder);
     }
 
@@ -123,12 +236,12 @@ public class CompactFlapBlock extends DirectionalAxisKineticBlock implements
     }
 
     public static class CompactFlapDataGenerator {
-        public static <T extends DirectionalAxisKineticBlock> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> generate(){
+        public static NonNullBiConsumer<DataGenContext<Block, CompactFlapBlock>, RegistrateBlockstateProvider> generate(){
             return
                 (c, p) -> directionalAxisBlock(c, p, modelFunc(c, p));
         }
 
-        private static <T extends DirectionalAxisKineticBlock> BiFunction<BlockState, Boolean, ModelFile> modelFunc(DataGenContext<Block, T> c, RegistrateBlockstateProvider p){
+        private static <T extends CompactFlapBlock> BiFunction<BlockState, Boolean, ModelFile> modelFunc(DataGenContext<Block, T> c, RegistrateBlockstateProvider p){
             return (state, vertical) -> {
                 int off = state.getValue(OFFSET);
                 String verticalFix = vertical ? "_n" : "_p";
@@ -136,6 +249,27 @@ public class CompactFlapBlock extends DirectionalAxisKineticBlock implements
                 String name = c.getName();
                 return p.models().getExistingFile(p.modLoc("block/" + name + "/" + "block" + verticalFix + flippedFix));
             };
+        }
+
+        public static void directionalAxisBlock(DataGenContext<Block, CompactFlapBlock> ctx,
+                                                                                        RegistrateBlockstateProvider prov, BiFunction<BlockState, Boolean, ModelFile> modelFunc) {
+            prov.getVariantBuilder(ctx.getEntry())
+                .forAllStates(state -> {
+
+                    boolean alongFirst = state.getValue(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE);
+                    Direction direction = state.getValue(DirectionalAxisKineticBlock.FACING);
+                    boolean vertical = direction.getAxis()
+                        .isHorizontal() && (direction.getAxis() == Direction.Axis.X) == alongFirst;
+                    int xRot = direction == Direction.DOWN ? 270 : direction == Direction.UP ? 90 : 0;
+                    int yRot = direction.getAxis()
+                        .isVertical() ? alongFirst ? 0 : 90 : (int) direction.toYRot();
+
+                    return ConfiguredModel.builder()
+                        .modelFile(modelFunc.apply(state, vertical))
+                        .rotationX(xRot)
+                        .rotationY(yRot)
+                        .build();
+                });
         }
 
     }
