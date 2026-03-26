@@ -14,9 +14,11 @@ out
 *.cimulinks
 .idea
 
+.tmp*
 # gradle
 build
 .gradle
+.gradle-user
 
 # other
 eclipse

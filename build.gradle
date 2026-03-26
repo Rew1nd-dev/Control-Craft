@@ -195,6 +195,7 @@ dependencies {
     implementation fg.deobf("libs:vmod:${vmod_version}")
     implementation fg.deobf("libs:we-${worldedit_forge_version}:forge")
     implementation fg.deobf("libs:shaolib:${shaolib_version}")
+    implementation fg.deobf("libs:gearwork:${gearwork_version}")
     implementation fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
     implementation fg.deobf("com.lowdragmc.ldlib:ldlib-forge-${minecraft_version}:1.0.47") { transitive = false }
     // Fuck JarInJar

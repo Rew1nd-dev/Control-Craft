@@ -73,6 +73,8 @@ public enum UIContents implements Descriptive<UIContents> {
     FLAP_LIFT(Component.literal("Lift"), literals("Lift Ratio")),
     FLAP_DRAG(Component.literal("Drag"), literals("Drag Ratio")),
     FLAP_BIAS(Component.literal("Bias"), literals("Attack Angle Bias")),
+    FLAP_WIDTH(Component.literal("Width"), literals("Flap Width")),
+    FLAP_DUMP(Component.literal("Dump Material"), literals("Clear current camouflage material")),
 
     GATE_TYPES(Component.literal("Type"), literals("Logic Gate Types")),
     FF_TYPES(Component.literal("Type"), literals("Flip Flop Types")),

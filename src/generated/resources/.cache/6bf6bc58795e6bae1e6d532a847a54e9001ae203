@@ -1,10 +1,10 @@
-// 1.20.1	2026-03-17T16:07:30.3368304	Registrate Provider for vscontrolcraft [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-03-24T09:15:39.0234635	Registrate Provider for vscontrolcraft [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 d6c339bb0c08d89e20a4b407b5ff3efcafb8bdb6 assets/vscontrolcraft/blockstates/anchor.json
 4464630cc1168b2a11025d419a09a6053060cc77 assets/vscontrolcraft/blockstates/camera.json
 9b852aa66cb54a2dd9102948d618f300a67e95a3 assets/vscontrolcraft/blockstates/cc_bridge.json
 fe4d8d4be2dbcfa63ffd817a4501a8b5e334a3c1 assets/vscontrolcraft/blockstates/chunk_loader.json
 fb6f44ce6c38ddb33b265df52658721592faaded assets/vscontrolcraft/blockstates/circuit.json
-f02cb79c3d18c71a0689d541e7723cdeae17f0a3 assets/vscontrolcraft/blockstates/compact_flap.json
+6fdc745e4bd4db1aa0b0e3f39b228f5428ee8003 assets/vscontrolcraft/blockstates/compact_flap.json
 16dbd323bd3dbbba52dd1e21e9a3b7e2e137639d assets/vscontrolcraft/blockstates/comparator.json
 cc622f793a831d1be33d927725c6031505fa6b41 assets/vscontrolcraft/blockstates/computer.json
 4b2d49761c68a33f82298e018343e2b1742621e7 assets/vscontrolcraft/blockstates/constraint_joint.json
@@ -45,8 +45,8 @@ b850cd7eb72711c5abfd2c4e5263bbaa996b8f8e assets/vscontrolcraft/blockstates/termi
 7f6e4e9d5a3ce7151a929eb7a1f8d47edf506d07 assets/vscontrolcraft/blockstates/transmitter.json
 07151f33b461ff0cf59403b3c3bd5237e67ff793 assets/vscontrolcraft/blockstates/tweakerminal.json
 2a6f2c9efcc11cfdf2ab3b9866ce7f4ce2695e3e assets/vscontrolcraft/blockstates/wing_controller.json
-9e428321cdddfbb2c91bf1934e7d51e3fc1a2605 assets/vscontrolcraft/lang/en_ud.json
-fbe548d0d9300fdb8977e8cd0106f29ff42f6602 assets/vscontrolcraft/lang/en_us.json
+467b2d48aba3125ba6b4f919072d98c3d26b8e54 assets/vscontrolcraft/lang/en_ud.json
+b4d73347decddb7a42d3261eb9127e18a553bc70 assets/vscontrolcraft/lang/en_us.json
 cf769d5e18f7c425bfbcd0ae1f7c402c14f93460 assets/vscontrolcraft/models/item/anchor.json
 b4ecc8aab3e454266f797788c7657e1a5f82a7ec assets/vscontrolcraft/models/item/camera.json
 99a1f694616587afe82157d9053f9e21b02c3748 assets/vscontrolcraft/models/item/cc_bridge.json

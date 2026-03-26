@@ -2,6 +2,7 @@ package com.verr1.controlcraft.content.blocks;
 
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
@@ -27,6 +28,7 @@ import org.joml.primitives.AABBdc;
 import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
 import org.valkyrienskies.core.impl.game.ships.DummyShipWorldServer;
@@ -239,7 +241,6 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
                     .map(CimulinkBus::getOrCreate)
                     .ifPresent(bus -> bus.activate(getWorldBlockPos(), device, device.name()));
         }
-
     }
 
     public String getDimensionID(){
@@ -271,6 +272,10 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
 
     }
 
-
+    public @Nullable Vector3dc[] debug_lastTickFlapControls(){
+        ServerShip ship = getLoadedServerShip();
+        if(ship == null)return null;
+        return FlapForceInducer.getOrCreate(ship).lastTickControl();
+    }
 
 }

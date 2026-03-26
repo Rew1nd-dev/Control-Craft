@@ -1,4 +1,25 @@
 Control Craft Changelog
+2.24.8 - 2026-03-26
+====================
+- Added bundled `gearwork-1.1.0` support, including new Gradle version wiring, local jar loading, and Create-side mixins to let ControlCraft interact directly with Gearwork landing gear blocks.
+- Added landing gear naming and control integration: landing gear screens now open the ControlCraft name-only UI, synced names are stored through the ControlCraft network layer, and the new `GearworkPlant` exposes `steer`, `brake`, and edge-triggered `fold` inputs for automation.
+- Expanded computer-block Lua on both sides: server environments now load `Bus` and `LuaToComputer`, client environments now load `Ship` plus upgraded `Player` helpers, and computer blocks now keep a synchronized per-computer numeric key/value store addressable by device name.
+- Added cross-computer scripting helpers so Lua scripts can `set`, `get`, `clear`, and presence-check values on other same-name computers mounted on the same ship/constraint cluster.
+- Reworked player/screen projection APIs for computer scripts with `Player.getPlayerWatch(...)` and `Player.projectWorldPoint(...)`, returning pixel coordinates, hit positions, screen centers, distance, and `onScreen` state for HUD and targeting scripts.
+- Added asynchronous Lua debug/logging utilities through `World.debugLog`, `World.resetDebugLog`, `World.getDebugLogPath`, `World.gameClock`, `World.physClock`, and `World.dbf`, backed by async file logging plus new global game/physics tick clocks initialized from server lifecycle events.
+- Added `/cimulink god-lua-mode [true|false]` to toggle privileged Lua libraries for newly created environments, plus `/cimulink debug-looked-ship-cluster` to inspect the currently looked-at ship id and resolved constraint cluster.
+- Improved Lua loading and diagnostics by stripping UTF-8 BOM from uploaded scripts, truncating long computer-block Lua errors before logging, and refreshing the zh-CN LuaLinks manual into a fuller API guide with updated examples and network timing notes.
+- Centralized constraint-cluster bus resolution in `ConstraintClusterBusResolver`, then switched bus blocks, Lua blocks, and computer bus handlers over to the shared `access`, `allNames`, `retrieve`, and `propagate` path for more consistent multi-ship behavior.
+- Extended ship attachment bookkeeping so `CimulinkPorts` now tracks active computer blocks by world position/name, periodically cleans removed entries, and supports same-ship computer discovery for Lua-to-computer messaging.
+- Updated compact flap behavior and rendering substantially: flaps gained configurable width, optional camouflage/render material assignment by right-clicking with a block, a remote dump-material action, wrench-toggleable invisible bases, and new generated blockstates/models for visible and invisible variants.
+- Refined compact flap transforms and assembly flow so offset modes use centered half-block offsets, flap entities keep contraption anchors refreshed, Lua/peripheral code can queue assembly through the new `asm` input, and blockification restores neutral transforms instead of preserving live rotated states.
+- Reworked compact flap rendering to support widened/invisible-top partials, direct textured box rendering for custom materials, better width scaling, and new language/UI labels for flap width, dump-material actions, and the secondary tilt angle.
+- Recorded per-tick flap force and torque output from `FlapForceInducer`, returned those debug vectors from inducer control code, and exposed the latest six-axis values to ship-bound Lua scripts through `World.dbf()` for aerodynamic debugging.
+- Tightened ship-bound block entity plumbing by standardizing `IOnShipBlockEntity` on `level()` and `blockPos()`, updating implementations such as the kinetic resistor, and exposing loaded ships/flap debug state through world access helpers.
+- Changed async lazy synchronization to broadcast affected updates to all players instead of only nearby viewers, reducing desync risk for remotely observed computers and linked devices.
+- Increased constraint-cluster cache size, switched cluster traversal storage to concurrent sets, and adjusted cache expiry strategy to make repeated cluster lookups safer under concurrent access.
+- Refreshed computer block assets with a new block/item model set and matching textures, added the wider wing-controller-top partial for flap rendering, and removed obsolete `gui_o` texture assets that are no longer referenced.
+
 2.24.4 - 2026-03-21
 ====================
 - Expanded computer Lua with player data access, client-to-server `Network.send`, server-side network reads, configurable screen resolution/surface size/offset, and clearer error logging.

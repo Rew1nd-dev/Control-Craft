@@ -15,6 +15,7 @@
     "camera.MixinServerPlayer",
     "cbc.MixinCannonMountBlockEntity",
     "cbc.MixinFixedCannonMountBlockEntity",
+    "qol.MixinGearBlockEntity",
     "qol.MixinTrackedEntity",
     "tweak.MixinTweakedControllerClientHandler",
     "tweak.MixinTweakLinkedControllerButtonPacket"
@@ -24,6 +25,7 @@
     "defaultRequire": 1
   },
   "client": [
+    "qol.MixinGearBlock",
     "camera.MixinCamera",
     "camera.MixinClientChunkCache",
     "camera.MixinGameRenderer",

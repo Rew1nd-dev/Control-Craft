@@ -5,6 +5,7 @@ import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftDelegation;
 import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
@@ -13,6 +14,8 @@ import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
 import com.verr1.controlcraft.foundation.type.descriptive.MiscDescription;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
+import com.verr1.controlcraft.utils.AsyncDebugFileLogger;
+import com.verr1.controlcraft.utils.GlobalTickClock;
 import com.verr1.controlcraft.utils.TimeCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -45,6 +48,8 @@ public class ControlCraftEvents {
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftServer.LUA_THREAD = Executors.newSingleThreadExecutor();
+        GlobalTickClock.reset();
+        AsyncDebugFileLogger.start();
         ControlCraftAttachments.register();
 
         // AIServer.init(event.getServer());
@@ -62,6 +67,7 @@ public class ControlCraftEvents {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         // ControlCraftServer.SERVER_INTERVAL_EXECUTOR.tick();
         if(event.phase == TickEvent.Phase.START){
+            GlobalTickClock.tickGame();
             ControlCraftServer.SERVER_EXECUTOR.tick();
             SpatialLinkManager.tick();
             ChunkManager.tick();
@@ -69,6 +75,7 @@ public class ControlCraftEvents {
             BlockLinkPort.preMainTick();
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
             CimulinkBus.tickAll();
+            CimulinkPorts.tick();
             TimeCache.tick();
             ConstraintCenter.tick();
         } else if (event.phase == TickEvent.Phase.END) {
@@ -118,9 +125,12 @@ public class ControlCraftEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         ConstraintCenter.onServerStopping(event.getServer());
         BlockLinkPort.onClose();
+        AsyncDebugFileLogger.stop();
+        GlobalTickClock.reset();
     }
 
     public static void onPhysicsTickStart(){
+        GlobalTickClock.tickPhys();
         ComputerCraftDelegation.lockDelegateThread();
         BlockLinkPort.prePhysicsTick();
     }

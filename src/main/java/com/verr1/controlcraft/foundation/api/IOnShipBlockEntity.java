@@ -18,20 +18,20 @@ import java.util.Optional;
 
 public interface IOnShipBlockEntity {
 
-    Level getLevel();
+    Level level();
 
-    BlockPos getBlockPos();
+    BlockPos blockPos();
 
     default String getDimensionID(){
         return Optional
-                .ofNullable(getLevel())
+                .ofNullable(level())
                 .map(ValkyrienSkies::getDimensionId)
                 .orElse("");
     }
 
     default long getGroundBodyID(){
         return Optional
-                .ofNullable(getLevel())
+                .ofNullable(level())
                 .filter(ServerLevel.class::isInstance)
                 .map(ServerLevel.class::cast)
                 .map(ValkyrienSkies::getShipWorld)
@@ -52,11 +52,11 @@ public interface IOnShipBlockEntity {
     }
 
     default WorldBlockPos getWorldBlockPos(){
-        return WorldBlockPos.of(getLevel(), getBlockPos());
+        return WorldBlockPos.of(level(), blockPos());
     }
 
     default @Nullable Ship getShipOn(){
-        return ValkyrienSkies.getShipManagingBlock(getLevel(), getBlockPos());
+        return ValkyrienSkies.getShipManagingBlock(level(), blockPos());
     }
 
     default long getShipOrGroundID(){
@@ -68,9 +68,9 @@ public interface IOnShipBlockEntity {
     }
 
     default @Nullable LoadedServerShip getLoadedServerShip(){
-        if(getLevel() == null || getLevel().isClientSide)return null;
+        if(level() == null || level().isClientSide)return null;
         return Optional
-                .of(ValkyrienSkies.getShipWorld(getLevel().getServer()))
+                .of(ValkyrienSkies.getShipWorld(level().getServer()))
                 .map((shipWorld -> shipWorld.getLoadedShips().getById(getShipOrGroundID()))).orElse(null);
     }
 

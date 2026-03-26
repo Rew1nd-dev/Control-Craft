@@ -106,19 +106,13 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
     }
 
     private void updateRotationCenter(CompactFlapBlockEntity controller) {
-        Direction offsetDirection = CompactFlapBlock.getVerticalAxis(controller.getBlockState());
-        double offsetDistance = CompactFlapBlock.getVerticalOffset(controller.getBlockState());
-        Vec3 desiredWorldCenter = Vec3.atCenterOf(controller.getBlockPos()).add(
-            offsetDirection.getStepX() * offsetDistance,
-            offsetDirection.getStepY() * offsetDistance,
-            offsetDirection.getStepZ() * offsetDistance
-        );
+        Vec3 desiredWorldCenter = Vec3.atCenterOf(controller.getBlockPos());
 
         Vec3 anchor = getAnchorVec();
         if (anchor == null) {
             anchor = position();
         }
-        localRotationCenter = desiredWorldCenter.subtract(anchor);
+        localRotationCenter = desiredWorldCenter.subtract(anchor.add(.5, .5, .5));
     }
 
     protected CompactFlapBlockEntity getFlap(){
@@ -173,9 +167,7 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
     @Override
     protected StructureTransform makeStructureTransform() {
         BlockPos offset = BlockPos.containing(getAnchorVec().add(.5, .5, .5));
-        Vector3f xyz = getRotZYX().get(new Vector3f());
-
-        return new StructureTransform(offset, xyz.x, xyz.y, xyz.z);
+        return new StructureTransform(offset, 0, 0, 0);
     }
 
     public Vector3d getRotZYX(){
@@ -223,10 +215,14 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
 
     @Override
     public void applyLocalTransforms(PoseStack matrixStack, float partialTicks) {
-        TransformStack.cast(matrixStack).nudge(getId());
+        TransformStack.cast(matrixStack)
+            .nudge(getId())
+            .centre();
         matrixStack.translate(localRotationCenter.x, localRotationCenter.y, localRotationCenter.z);
         matrixStack.mulPose(getRot(partialTicks).get(new Quaternionf()));
         matrixStack.translate(-localRotationCenter.x, -localRotationCenter.y, -localRotationCenter.z);
+        TransformStack.cast(matrixStack)
+            .unCentre();
     }
 
     public void setAngle(float v) {
@@ -236,6 +232,13 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
 
     public void setTilt(float v) {
         tilt = v;
+    }
+
+    public void resetRotationForBlockification() {
+        prevAngle = 0;
+        angle = 0;
+        prevTilt = 0;
+        tilt = 0;
     }
 
     public void setAngleDirection(Direction rotationAxis) {
@@ -259,6 +262,6 @@ public class FlapContraptionEntity extends AbstractContraptionEntity {
     }
 
     public Direction getTiltDirection() {
-        return angleDirection;
+        return tiltDirection;
     }
 }

@@ -4,7 +4,9 @@ import com.verr1.controlcraft.content.links.computer.lua.IComputerServerContext;
 import com.verr1.controlcraft.content.links.computer.lua.libs.BlockLib;
 import com.verr1.controlcraft.content.links.computer.lua.LuaUtils;
 import com.verr1.controlcraft.content.links.computer.lua.libs.ComputerWatcherLib;
+import com.verr1.controlcraft.content.links.computer.lua.libs.LuaToComputerLib;
 import com.verr1.controlcraft.content.links.computer.lua.libs.ServerNetworkLib;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.BusLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.UtilLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
@@ -53,6 +55,8 @@ public class ComputerServerLua extends ComputerCommonLua{
         luaGlobal.load(new PhysLib(context.getPhysAccess()));
         luaGlobal.load(new UtilLib(context.getWorldAccess()));
         luaGlobal.load(new BlockLib(context));
+        luaGlobal.load(new BusLib(context.getCimulinkBus()));
+        luaGlobal.load(new LuaToComputerLib(context.getWorldAccess()));
         luaGlobal.load(new ServerNetworkLib(context.getNetworkHandler()));
         loadLuaML(luaGlobal);
         LuaValue loopFunc  = LuaUtils.safeLoadValue(code, "onServerTick",  luaGlobal).filter(LuaValue::isfunction).orElse(null);

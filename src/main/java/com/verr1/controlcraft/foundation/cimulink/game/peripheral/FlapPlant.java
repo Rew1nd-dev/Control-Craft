@@ -9,7 +9,10 @@ public class FlapPlant extends Plant {
 
     public FlapPlant(CompactFlapBlockEntity cfb) {
         super(
-                new builder().in("angle", cfb::setAngle)
+                new builder()
+                    .in("angle", cfb::setAngle)
+                    .in("tilt", cfb::setTilt)
+                    .in("asm", v -> cfb.requestAssemble(v > 0.5))
         );
         this.cfb = cfb;
     }

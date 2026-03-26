@@ -33,9 +33,12 @@ import dan200.computercraft.shared.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +68,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public static final NetworkKey BIAS = NetworkKey.create("bias");
     public static final NetworkKey LEGACY = NetworkKey.create("legacy");
     public static final NetworkKey ASM = NetworkKey.create("c_asm");
+    public static final NetworkKey C_WIDTH = NetworkKey.create("c_width");
+    public static final NetworkKey DUMP_MATERIAL = NetworkKey.create("dump_material");
 
     private final DirectReceiver receiver = new DirectReceiver();
 
@@ -86,10 +91,15 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     private CompactFlapPeripheral peripheral;
     private LazyOptional<IPeripheral> peripheralCap;
 
-
+    private int assembleNextTickSign = 0;
 
     private double clientRenderOffset = 0.0f;
     private Direction clientRenderVertical = Direction.UP;
+
+
+
+    private double clientFlapWidth = 1.0;
+    private BlockState renderMaterial = Blocks.AIR.defaultBlockState();
 
     private int clientContraptionId = 0;
 
@@ -169,6 +179,16 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 .dispatchToSync()
                 .register();
 
+        buildRegistry(C_WIDTH)
+            .withBasic(SerializePort.of(
+                this::clientFlapWidth,
+                this::setClientFlapWidth,
+                SerializeUtils.DOUBLE
+            ))
+            .withClient(ClientBuffer.DOUBLE.get())
+            .dispatchToSync()
+            .register();
+
         buildRegistry(DRAG)
                 .withBasic(SerializePort.of(
                         this::getResistRatio,
@@ -203,6 +223,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         panel().registerUnit(SharedKeys.ASSEMBLE, this::assemble);
 
         panel().registerUnit(SharedKeys.DISASSEMBLE, this::disassemble);
+
+        panel().registerUnit(DUMP_MATERIAL, this::dumpMaterial);
 
         receiver().register(
                 new NumericField(
@@ -245,6 +267,40 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                 physicalWing = flap;
             }
         }
+    }
+
+    public double clientFlapWidth() {
+        return clientFlapWidth;
+    }
+
+    public void setClientFlapWidth(double clientFlapWidth) {
+        this.clientFlapWidth = MathUtils.clamp(clientFlapWidth, 0.25, 1);
+        queueUpdate(C_WIDTH);
+    }
+
+    public BlockState renderMaterial() {
+        return renderMaterial;
+    }
+
+    public boolean hasRenderMaterial() {
+        return renderMaterial != null && !renderMaterial.isAir();
+    }
+
+    public void setRenderMaterial(BlockState renderMaterial) {
+        BlockState sanitized = renderMaterial == null ? Blocks.AIR.defaultBlockState() : renderMaterial;
+        if (this.renderMaterial == sanitized || this.renderMaterial.equals(sanitized)) {
+            return;
+        }
+
+        this.renderMaterial = sanitized;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            sendData();
+        }
+    }
+
+    public void dumpMaterial() {
+        setRenderMaterial(Blocks.AIR.defaultBlockState());
     }
 
     public boolean legacyAeroDynamic() {
@@ -333,6 +389,20 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         );
     }
 
+    public void checkAssembleRequest(){
+        if(assembleNextTickSign == 1){
+            assemble();
+        }
+        if(assembleNextTickSign == -1){
+            disassemble();
+        }
+        assembleNextTickSign = 0;
+    }
+
+    public void requestAssemble(boolean toAssemble){
+        assembleNextTickSign = toAssemble ? 1 : -1;
+    }
+
     private void db_renderNormal(){
         Vector3dc n = getNormal();
         Vector3dc start = toJOML(getBlockPos().getCenter());
@@ -384,6 +454,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public void tickServer() {
         super.tickServer();
         syncAttachInducer();
+        checkAssembleRequest();
         // syncForNear(true, ANGLE, OFFSET);
     }
 
@@ -516,8 +587,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         running = true;
         wingContraption.removeBlocksFromWorld(level, BlockPos.ZERO);
         physicalWing = FlapContraptionEntity.create(level, this, wingContraption);
-        BlockPos anchor = worldPosition.relative(direction);
-        physicalWing.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+        setContraptionAnchor(physicalWing);
         physicalWing.setAngleDirection(direction);
         physicalWing.setTiltDirection(left);
         level.addFreshEntity(physicalWing);
@@ -535,9 +605,6 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         if (!isAssembled()) return;
         visualAngle = 0;
         running = false;
-        // Force a neutral pose before blockification to avoid overlap/ejection on disassemble.
-        physicalWing.setAngle(0);
-        physicalWing.setTilt(0);
         physicalWing.disassemble();
         AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(level, worldPosition);
         physicalWing = null;
@@ -548,6 +615,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     protected void applyRotation() {
         if(level == null)return;
         if (physicalWing == null) return;
+        setContraptionAnchor(physicalWing);
         float wingAngle = level.isClientSide ? clientAnimatedAngle.getValue() : (float) (angle.read().floatValue() + offset);
         float wingTilt = level.isClientSide ? clientAnimatedTilt.getValue() : tilt.read().floatValue();
 
@@ -568,7 +636,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     @Override
     public void initializeClient() {
         super.initializeClient();
-        handler().request(true, ANGLE, TILT);
+        handler().request(true, ANGLE, TILT, C_WIDTH);
     }
 
     public void attach(FlapContraptionEntity contraption) {
@@ -580,11 +648,25 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
 
         this.physicalWing = contraption;
         setChanged();
-        BlockPos anchor = worldPosition.relative(blockState.getValue(BearingBlock.FACING));
-        physicalWing.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+        setContraptionAnchor(physicalWing);
         if (level != null && !level.isClientSide) {
             sendData();
         }
+    }
+
+    private Vec3 getContraptionAnchor() {
+        BlockPos anchor = worldPosition.relative(getDirection());
+        return Vec3.atLowerCornerOf(anchor);
+    }
+
+    private void setContraptionAnchor(FlapContraptionEntity contraption) {
+        Vec3 anchor = getContraptionAnchor();
+        if (Math.abs(contraption.getX() - anchor.x) < 1e-6
+            && Math.abs(contraption.getY() - anchor.y) < 1e-6
+            && Math.abs(contraption.getZ() - anchor.z) < 1e-6) {
+            return;
+        }
+        contraption.setPos(anchor.x, anchor.y, anchor.z);
     }
 
 
@@ -613,6 +695,22 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     public void refreshClientRenderOffset(){
         clientRenderOffset = CompactFlapBlock.getVerticalOffset(getBlockState());
         clientRenderVertical = CompactFlapBlock.getVerticalAxis(getBlockState());
+    }
+
+    @Override
+    protected void writeExtra(CompoundTag compound) {
+        super.writeExtra(compound);
+        if (renderMaterial != null && !renderMaterial.isAir()) {
+            compound.put("RenderMaterial", NbtUtils.writeBlockState(renderMaterial));
+        }
+    }
+
+    @Override
+    protected void readExtra(CompoundTag compound) {
+        super.readExtra(compound);
+        renderMaterial = compound.contains("RenderMaterial")
+            ? NbtUtils.readBlockState(blockHolderGetter(), compound.getCompound("RenderMaterial"))
+            : Blocks.AIR.defaultBlockState();
     }
 
 }

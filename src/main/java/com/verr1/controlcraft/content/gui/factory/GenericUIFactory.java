@@ -313,6 +313,12 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.FLAP_BIAS, Converter::titleStyle)
         );
 
+        DoubleUIField width = new DoubleUIField(
+            boundPos,
+            CompactFlapBlockEntity.C_WIDTH,
+            Converter.convert(UIContents.FLAP_WIDTH, Converter::titleStyle)
+        );
+
         BooleanUIField legacy = new BooleanUIField(
                 boundPos,
                 CompactFlapBlockEntity.LEGACY,
@@ -333,10 +339,17 @@ public class GenericUIFactory {
                 Converter.convert(UIContents.DISASSEMBLY, Converter::titleStyle)
         );
 
+        UnitUIPanel dumpMaterial = new UnitUIPanel(
+                boundPos,
+                CompactFlapBlockEntity.DUMP_MATERIAL,
+                0.0,
+                Converter.convert(UIContents.FLAP_DUMP, Converter::titleStyle)
+        );
+
         Runnable alignLabels = () -> {
             Converter.alignLabel(name, angle, offset, tilt);
-            Converter.alignLabel(lift, drag, bias, legacy);
-            Converter.alignLabel(assemble, disassemble);
+            Converter.alignLabel(lift, drag, bias, width, legacy);
+            Converter.alignLabel(assemble, disassemble, dumpMaterial);
         };
 
         return new GenericSettingScreen.builder(boundPos)
@@ -353,7 +366,7 @@ public class GenericUIFactory {
                 .withTab(
                         ADVANCE_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(lift, drag, bias, legacy)
+                                .withPort(lift, drag, bias, width, legacy)
                                 .build()
                 )
                 .withTab(
@@ -363,7 +376,7 @@ public class GenericUIFactory {
                 .withTab(
                         REMOTE_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(assemble, disassemble)
+                                .withPort(assemble, disassemble, dumpMaterial)
                                 .build()
                 )
                 .withTickTask(createSyncTasks(boundPos, CompactFlapBlockEntity.ANGLE))

@@ -20,7 +20,7 @@ public class AsyncLazySynchronizer {
     }
 
     public void doSynchronization(){
-        delegate.syncForNear(true, toUpdate());
+        delegate.syncForAllPlayers(true, toUpdate());
     }
 
     private NetworkKey[] toUpdate(){

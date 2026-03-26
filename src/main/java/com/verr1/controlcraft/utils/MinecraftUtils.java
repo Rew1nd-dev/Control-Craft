@@ -30,6 +30,7 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -62,6 +63,13 @@ public class MinecraftUtils {
                 .map(hitResult -> (BlockHitResult) hitResult)
                 .map(BlockHitResult::getDirection)
                 .orElse(null);
+    }
+
+    public static <T extends Comparable<T>> Optional<T> getValueOptional(BlockState state, Property<T> property){
+        if(state.hasProperty(property)){
+            return Optional.of(state.getValue(property));
+        }
+        return Optional.empty();
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -258,7 +258,9 @@ public enum SlotType implements Descriptive<SlotType> {
     THRUST_RATIO(false),
     TORQUE_RATIO(false),
 
-    TILT(false),
+    TILT(false, Component.literal("Tilt"), literals(
+        "Second Rotation Angle"
+    )),
 
     LEGACY(true, Component.literal("Legacy"), // in order to hide min and max
             literals(

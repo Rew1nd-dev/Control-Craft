@@ -169,14 +169,11 @@ public class LuaCompilerItem extends Item {
     }
 
     public static String loadLua(String path) throws IOException {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-            return content.toString();
+        String content = Files.readString(Path.of(path), StandardCharsets.UTF_8);
+        if (!content.isEmpty() && content.charAt(0) == '\uFEFF') {
+            return content.substring(1);
         }
+        return content;
     }
 
 }

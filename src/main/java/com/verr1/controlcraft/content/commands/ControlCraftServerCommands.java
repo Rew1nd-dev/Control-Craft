@@ -14,6 +14,7 @@ import com.verr1.controlcraft.content.links.computer.ComputerBlockEntity;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.Circuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.circuit.CircuitDebugger;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.PlantProxy;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.CircuitLinkPort;
@@ -25,14 +26,18 @@ import com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies;
 import com.verr1.controlcraft.registry.ControlCraftAttachments;
 import com.verr1.controlcraft.registry.ControlCraftItems;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
+import com.verr1.controlcraft.utils.ClipUtils;
+import com.verr1.controlcraft.utils.ConstraintClusterUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -44,6 +49,8 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
@@ -424,6 +431,68 @@ public class ControlCraftServerCommands {
         return 1;
     }
 
+    public static int getGodLuaMode(CommandContext<CommandSourceStack> context){
+        context.getSource().sendSuccess(
+                () -> Component.literal("Cimulink god lua mode is currently " + (CimulinkLua.GOD_LUA_MODE ? "enabled" : "disabled")),
+                false
+        );
+        return 1;
+    }
+
+    public static int setGodLuaMode(CommandContext<CommandSourceStack> context){
+        boolean on = context.getArgument("on", Boolean.class);
+        CimulinkLua.GOD_LUA_MODE = on;
+        context.getSource().sendSuccess(
+                () -> Component.literal(
+                        "Cimulink god lua mode is now " + (on ? "enabled" : "disabled")
+                                + ". Reload lua scripts to apply the change to newly created environments."
+                ),
+                true
+        );
+        return 1;
+    }
+
+    public static int debugLookedShipClusterCommand(CommandContext<CommandSourceStack> context){
+        CommandSourceStack source = context.getSource();
+        if(source.getPlayer() == null){
+            source.sendFailure(Component.literal("You must be a player to inspect a ship cluster!"));
+            return 0;
+        }
+
+        ServerPlayer player = source.getPlayer();
+        Vec3 from = player.getEyePosition();
+        Vec3 to = from.add(player.getViewVector(1.0F).scale(256.0));
+        AABB clipBox = new AABB(from, to).inflate(1.0);
+
+        var hit = ClipUtils.clipShip(from, to, clipBox, 0.1, player.serverLevel(), ship -> true);
+        if(hit == null){
+            source.sendFailure(Component.literal("No ship found in your sight."));
+            return 0;
+        }
+
+        long shipId = hit.ship().getId();
+        boolean cachedBeforeQuery = ConstraintClusterUtil.CLUSTER_CACHE.asMap().containsKey(shipId);
+        Set<Long> cluster = ConstraintClusterUtil.cachedClusterOf(shipId);
+        String clusterText = cluster.stream()
+                .sorted()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+
+        source.sendSuccess(
+                () -> Component.literal(
+                        "Looked ship id=" + shipId
+                                + ", cachedBefore=" + cachedBeforeQuery
+                                + ", clusterSize=" + cluster.size()
+                ),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal("Cluster: [" + clusterText + "]"),
+                false
+        );
+        return 1;
+    }
+
     public static int enableCameraTrack(CommandContext<CommandSourceStack> context){
         boolean on = context.getArgument("on", Boolean.class);
         BlockPropertyConfig._CAMERA_TRACK_CHUNKS = on;
@@ -498,6 +567,14 @@ public class ControlCraftServerCommands {
                             .executes(ControlCraftServerCommands::stepCimulinkCommand)
                         ).then(lt("toggle-debug-mode")
                             .executes(ControlCraftServerCommands::toggleCimulinkDebugMode)
+                        ).then(lt("god-lua-mode")
+                            .requires(source -> source.hasPermission(2))
+                            .executes(ControlCraftServerCommands::getGodLuaMode)
+                            .then(arg("on", BoolArgumentType.bool())
+                            .executes(ControlCraftServerCommands::setGodLuaMode))
+                        ).then(lt("debug-looked-ship-cluster")
+                            .requires(source -> source.hasPermission(2))
+                            .executes(ControlCraftServerCommands::debugLookedShipClusterCommand)
                         ).then(lt("load-lua")
                                 .then(arg("saveName", StringArgumentType.string())
                                         .executes(ControlCraftServerCommands::loadLuaCommand))

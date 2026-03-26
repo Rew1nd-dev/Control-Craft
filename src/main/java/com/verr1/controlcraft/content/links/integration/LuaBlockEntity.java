@@ -10,19 +10,15 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacui
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitScript;
 import com.verr1.controlcraft.foundation.cimulink.game.port.bus.IBusContext;
 import com.verr1.controlcraft.foundation.cimulink.game.port.packaged.LuacuitLinkPort;
-import com.verr1.controlcraft.utils.ConstraintClusterUtil;
+import com.verr1.controlcraft.utils.ConstraintClusterBusResolver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, LuacuitLinkPort> implements
     IBusContext
@@ -44,6 +40,7 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
         linkPort().setWorldAccess(IWorldAccess.of(this));
         linkPort().setBusAccess(IBusAccess.of(this));
     }
+
 
     @Override
     public void lazyTickServer() {
@@ -75,42 +72,12 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
         setChanged();
     }
 
-    protected Optional<CimulinkBus> bus(){
-        return Optional.ofNullable(getLoadedServerShip())
-            .map(CimulinkBus::getOrCreate);
-    }
-
-    protected Stream<CimulinkBus> buses(){
-        return ConstraintClusterUtil.clusterOf(getShipOrGroundID())
-            .stream()
-            .map(ConstraintClusterUtil::getShipOf)
-            .filter(Optional::isPresent)
-            .flatMap(Optional::stream)
-            .map(CimulinkBus::getOrCreate)
-            ;
-    }
-
     public void propagateTo(String name, String port, double value){
-        cache.getOrDefault(name, Set.of()).forEach(component -> {
-            if(component.hasInput(port)){
-                component.input(port, value);
-            }
-        });
+        ConstraintClusterBusResolver.propagate(getShipOrGroundID(), name, port, value);
     }
 
     public double retrieveFrom(String name, String port){
-        return
-            cache.getOrDefault(name, Set.of()).stream()
-            .filter(nc -> nc.hasOutput(port))
-            .findFirst()
-            .map(nc -> {
-                // double check
-                if(nc.hasOutput(port)){
-                    return nc.peekOutput(port);
-                }
-                return 0.0;
-            })
-            .orElse(0.0);
+        return ConstraintClusterBusResolver.retrieve(getShipOrGroundID(), name, port);
     }
 
     // just like what BusBlockEntity does
@@ -133,11 +100,11 @@ public class LuaBlockEntity extends WirelessIntegrationBlockEntity<Luacuit, Luac
 
     @Override
     public @NotNull Set<NamedComponent> access(String name) {
-        return buses().flatMap(b -> b.access(name).stream()).collect(Collectors.toSet());
+        return ConstraintClusterBusResolver.access(getShipOrGroundID(), name);
     }
 
     @Override
     public @NotNull Set<String> allNames() {
-        return buses().flatMap(b -> b.allNames().stream()).collect(Collectors.toSet());
+        return ConstraintClusterBusResolver.allNames(getShipOrGroundID());
     }
 }

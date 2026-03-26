@@ -22,6 +22,7 @@ import org.luaj.vm2.LuaError;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ComputerBlockEntity extends OnShipBlockEntity
         implements IComputerServerContext, IComputerClientContext {
@@ -56,6 +57,7 @@ public class ComputerBlockEntity extends OnShipBlockEntity
     private final ComputerServerEventHandler serverEventHandler = new ComputerServerEventHandler(this);
     private final ComputerClientEventHandler clientEventHandler = new ComputerClientEventHandler(this);
     private final ComputerBusHandler computerBus = new ComputerBusHandler(this);
+    private final ConcurrentHashMap<String, Double> luaValueMap = new ConcurrentHashMap<>();
     ComputerServerLua serverLua;
     ComputerClientLua clientLua;
     ComputerScreen screen;
@@ -119,6 +121,19 @@ public class ComputerBlockEntity extends OnShipBlockEntity
         handler().request(true, CODE, DATA_INITIAL_SYNC);
     }
 
+    @Override
+    public void initializeServer() {
+        super.initializeServer();
+        linkStorage().ifPresent(storage -> storage.putComputer(getWorldBlockPos(), this));
+    }
+
+    @Override
+    public void removeServer() {
+        super.removeServer();
+        luaValueMap.clear();
+        linkStorage().ifPresent(storage -> storage.removeComputer(getWorldBlockPos()));
+    }
+
     public void sendPatchedUpdate(boolean fullUpdate){
         if(level == null)return;
         CompoundTag tag = LUA_OBJ_MAP_SER.serialize(collectData(fullUpdate));
@@ -162,15 +177,12 @@ public class ComputerBlockEntity extends OnShipBlockEntity
         clientEventHandler.onClientTick();
     }
 
-    private long lastErrorTimeStamp = 0L;
     @Override
     public void onError(LuaError error) {
-        if(System.currentTimeMillis() - lastErrorTimeStamp < 1000 * 4)return;
-        lastErrorTimeStamp = System.currentTimeMillis();
         ControlCraft.LOGGER.error(
                 "Computer Lua error at {}: {}",
                 getBlockPos().toShortString(),
-                LuaUtils.sanitizeLuaError(error)
+                LuaUtils.sanitizeLuaError(error, 400)
         );
     }
 
@@ -197,6 +209,22 @@ public class ComputerBlockEntity extends OnShipBlockEntity
 
     public IWorldAccess getWorldAccess() {
         return IWorldAccess.ofImmediate(this);
+    }
+
+    public void setLuaValue(String key, double value) {
+        luaValueMap.put(key, value);
+    }
+
+    public boolean hasLuaValue(String key) {
+        return luaValueMap.containsKey(key);
+    }
+
+    public void clearLuaValue(String key) {
+        luaValueMap.remove(key);
+    }
+
+    public @Nullable Double getLuaValue(String key) {
+        return luaValueMap.get(key);
     }
 
 }

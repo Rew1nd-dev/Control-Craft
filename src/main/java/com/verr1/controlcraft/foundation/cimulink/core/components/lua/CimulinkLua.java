@@ -12,7 +12,7 @@ import org.luaj.vm2.lib.*;
 import org.luaj.vm2.lib.jse.*;
 
 public class CimulinkLua {
-
+    public static boolean GOD_LUA_MODE = false;
 
 
     public static final Luacuit EMPTY_LUACUIT = new LuacuitConstructor(LuacuitScript.EMPTY).build();
@@ -37,9 +37,18 @@ public class CimulinkLua {
         var0.load(new StringLib());
         var0.load(new CoroutineLib());
         var0.load(new JseMathLib());
+        if(GOD_LUA_MODE){
+            loadGodLuaLibs(var0);
+        }
         LoadState.install(var0);
         LuaC.install(var0);
         return var0;
+    }
+
+    public static void loadGodLuaLibs(Globals var0){
+        var0.load(new JseIoLib());
+        var0.load(new JseOsLib());
+        var0.load(new LuajavaLib());
     }
 
     public static void loadLuaML(Globals globals){

@@ -1,45 +1,54 @@
-# Lua 电脑方块使用方法
+﻿# LuaLinks 电脑脚本文档（中文）
 
-## 简介
-- 电脑方块会把同一份 Lua 脚本分别运行在服务端和客户端。
-- 服务端负责逻辑与状态生产，客户端负责渲染。
-- 两端 Lua 状态互不共享；跨端通信请使用 `Network`。
+## 1. 概览
+- 同一份 Lua 脚本会在服务端与客户端分别运行。
+- 服务端主要负责逻辑、总线访问、跨电脑通信与网络数据生产。
+- 客户端主要负责渲染，以及读取客户端玩家/船只信息。
+- 两端 Lua 状态互不共享；跨端同步请使用 `Network`。
+- 以下回调均为可选：
+  - `onServerTick()`
+  - `onClientTick()`
+  - `onPlayerEvent(event)`
 
-## Lua 文件结构
-### 基本回调
 ```lua
 function onServerTick()
-    -- 服务端逻辑（可选）
-end
-
-function onPlayerEvent(event)
-    -- 服务端玩家交互事件（可选）
 end
 
 function onClientTick()
-    -- 客户端渲染逻辑（可选）
+end
+
+function onPlayerEvent(event)
 end
 ```
 
-- 三个回调都可选；缺失时该阶段不会执行。
-- 推荐分工：
-  - `onServerTick`：计算并 `Network.set(...)`
-  - `onClientTick`：读取 `Network.peek/retrieve(...)` 并绘制
+### 1.1 `onPlayerEvent(event)`
+目前电脑服务端会向 `onPlayerEvent(event)` 传入两类事件：
 
-### `onPlayerEvent` 事件结构
 ```lua
--- 触摸事件
-local touch_event = { type = "touch", x = 123, y = 45 }
-
--- 注视事件
-local watch = { type = "watch", x = 123, y = 45 }
+{
+    type = "touch",
+    x = <number>,
+    y = <number>
+}
 ```
 
-- `x/y` 为屏幕像素坐标。
-- 事件触发由交互层负责，脚本中按上面结构处理即可。
+```lua
+{
+    type = "watch",
+    x = <number>,
+    y = <number>
+}
+```
 
-## 可用库
-### 双端可用
+说明：
+- `x/y` 为当前屏幕分辨率下的像素坐标。
+- `touch` 表示玩家与屏幕交互。
+- `watch` 表示玩家视线落到屏幕上的位置。
+
+## 2. 可用 API 总览
+
+### 2.1 双端可用
+
 #### `Phys`
 - `Phys.position() -> Vector3d`
 - `Phys.velocity() -> Vector3d`
@@ -55,99 +64,267 @@ local watch = { type = "watch", x = 123, y = 45 }
 - `Block.front() -> Vector3d`
 - `Block.left() -> Vector3d`
 - `Block.up() -> Vector3d`
+- `Block.yardPosition() -> Vector3d`
 
-#### 向量/四元数
-- 全局可用 `Vector3d` 与 `Quaterniond`：
-```lua
-local v = Vector3d:new(1, 2, 3)
-local q = Quaterniond:new(0, 0, 0, 1)
-```
-- 详细方法见：`src/main/resources/data/vscontrolcraft/lua/luaml.lua`
+说明：
+- `Local` 版本返回方块在自身局部坐标中的方向。
+- 非 `Local` 版本返回转到世界/yard 坐标后的方向。
+- `Block.yardPosition()` 返回当前电脑所在位置的 yard/world 坐标。
 
-### 仅服务端可用
-#### `Network`（写）
-- `Network.set(slotName, value)`
+#### 向量与四元数类型
+- 全局提供 `Vector3d` 与 `Quaterniond`，来自 `luaml`。
+- 详细成员方法可参考 `src/main/resources/data/vscontrolcraft/lua/luaml.lua`。
+
+### 2.2 仅服务端可用
 
 #### `World`
 - `World.yell(distance, message)`
 - `World.log(message)`
 - `World.beep(distance, volume, pitch)`
+- `World.debugLog(message) -> boolean`
+- `World.debugLog(fileName, message) -> boolean`
+- `World.resetDebugLog() -> boolean`
+- `World.resetDebugLog(fileName) -> boolean`
+- `World.getDebugLogPath() -> string`
+- `World.getDebugLogPath(fileName) -> string`
+- `World.gameClock() -> number`
+- `World.physClock() -> number`
+- `World.dbf() -> table`
 
-### 仅客户端可用
-#### `Network`（读）
-- `Network.peek(slotName) -> value | nil`
-- `Network.retrieve(slotName) -> value | nil`（读取后清除该 slot 的 dirty 标记）
+`World.dbf()` 返回结构：
+```lua
+{
+    fx = <number>,
+    fy = <number>,
+    fz = <number>,
+    tx = <number>,
+    ty = <number>,
+    tz = <number>
+}
+```
+
+说明：
+- `World.debugLog(...)` 使用 Java 侧异步日志线程写盘，比 Lua `io` 更适合物理线程环境。
+- 调试日志默认写到 `<游戏目录>/controlcraft-debug/lua/`。
+- 不传 `fileName` 时，会使用当前设备的默认日志文件名。
+- `World.gameClock()` 为统一的服务器游戏 tick 计数。
+- `World.physClock()` 为统一的物理 tick 计数。
+- `World.dbf()` 是调试接口，用于读取上一 tick 的 flap 调试量。
+
+#### `Bus`
+- `Bus.retrieve(componentName, outputPortName) -> number`
+- `Bus.propagate(componentName, inputPortName, value)`
+
+说明：
+- 电脑通过所在约束簇访问 `NamedComponent`。
+- `Bus.retrieve(...)` 在组件不存在或端口不匹配时返回 `0.0`。
+- `Bus.propagate(...)` 在组件不存在或端口不匹配时会直接忽略。
+
+#### `LuaToComputer`
+- `LuaToComputer.set(computerName, key, value)`
+- `LuaToComputer.isPresent(computerName, key) -> boolean`
+- `LuaToComputer.clear(computerName, key)`
+- `LuaToComputer.get(computerName, key) -> number | nil`
+
+说明：
+- 按“电脑设备名称”访问同船上的电脑。
+- `set/clear` 会对当前船上所有同名电脑生效。
+- `isPresent` 只要任意同名电脑有该键就返回 `true`。
+- `get` 返回第一个存在该键值的同名电脑的数据；若不存在则返回 `nil`。
+
+#### 服务端 `Network`
+- `Network.set(slotName, value)`
 - `Network.isDirty(slotName) -> boolean`
+- `Network.peek(slotName) -> value | nil`
+- `Network.retrieve(slotName) -> value | nil`
+
+### 2.3 仅客户端可用
+
+#### 客户端 `Network`
+- `Network.isDirty(slotName) -> boolean`
+- `Network.peek(slotName) -> value | nil`
+- `Network.retrieve(slotName) -> value | nil`
+- `Network.send(slotName, value) -> true`
 
 #### `render`
-- `render.setColor(r, g, b [, a])`（每项 0-255）
-- `render.setAlpha(a)`（0-255）
-- `render.setOpacity(opacity)`（0.0-1.0）
+- `render.setColor(r, g, b [, a])`
+- `render.setAlpha(a)`
+- `render.setOpacity(opacity)`
+- `render.setResolution(width, height)`
+- `render.setSurfaceSize(width, height)`
+- `render.setOffset(x, y, z)`
 - `render.drawRect(x, y, w, h)`
 - `render.drawText(text, x, y [, scale])`
-- `render.pushLayer()`（后续命令层级 +1）
-- `render.clear()`（清空当前帧命令并重置层级）
-- `render.submit()`（提交到屏幕；不调用则不会刷新显示）
-- `render.getWidth()` / `render.getHeight()`
-- `render.width` / `render.height`
+- `render.pushLayer()`
+- `render.clear()`
+- `render.submit()`
+- `render.getWidth() -> number`
+- `render.getHeight() -> number`
+- `render.getSurfaceWidth() -> number`
+- `render.getSurfaceHeight() -> number`
+- `render.width`
+- `render.height`
 
-## 同步与时序
-- 服务端通过 `Network.set(...)` 写入数据，客户端通过 `peek/retrieve` 读取。
-- 客户端可用 `isDirty + retrieve` 实现“只在更新时处理”。
-- 同步数据会序列化为 NBT；单次补丁超过约 `1024` 字节时会被丢弃（发送空补丁）。
+参数范围：
+- `render.setColor(...)` / `render.setAlpha(...)`：颜色分量范围 `0 ~ 255`
+- `render.setOpacity(opacity)`：范围 `0.0 ~ 1.0`
+- `render.setResolution(width, height)`：范围 `1 ~ 4096`
+- `render.setSurfaceSize(width, height)`：范围 `0.05 ~ 64.0`
+- `render.setOffset(x, y, z)`：每轴范围 `-10 ~ 10`
 
-## 运行限制与异常
-- 每次回调有执行保护：约 `10000` 指令、`2ms`、`10MB` 临时分配。
-- 超限或运行错误会抛 `LuaError`，本次回调会被中断。
-- Lua 环境禁用了 `dofile/loadfile/load`。
+说明：
+- 渲染分辨率、屏幕物理尺寸、屏幕偏移均由客户端脚本决定。
+- `render.width` / `render.height` 是当前分辨率的便捷字段。
+- `render.pushLayer()` 只会让之后发出的绘制命令层级加一，没有 `popLayer()`。
+- `render.clear()` 会清空当前帧命令，并把层级重置为 `0`。
+- 只有调用 `render.submit()` 后，本帧内容才会提交到屏幕。
 
-## 加载脚本
-- 脚本目录：`<游戏目录>/lualinks`
-- 允许两种位置：
-  - `<游戏目录>/lualinks/<name>.lua`
-  - `<游戏目录>/lualinks/<玩家名>/<name>.lua`
-- 常用命令：
-  - `/cimulink upload-lua <name>`：上传本地脚本到服务器
-  - `/cimulink load-computer-lua <name>`：把脚本加载到你正在看的电脑方块
+#### `Player`
+- `Player.yaw([partialTicks]) -> number`
+- `Player.pitch([partialTicks]) -> number`
+- `Player.getShipMountedToData([partialTicks]) -> table | nil`
+- `Player.getPlayerWatch([partialTicks]) -> table | nil`
+- `Player.projectWorldPoint(worldPos [, partialTicks]) -> table | nil`
+- `Player.projectWorldPoint(x, y, z [, partialTicks]) -> table | nil`
 
-## 注意事项
-- 电脑方块模式下不提供 `Bus` 库（与 Lua 电路板不同）。
-- 客户端渲染必须调用 `render.submit()` 才会更新到屏幕。
-- `render.pushLayer()` 只有递增，没有 `popLayer()`；通过 `clear()`/`submit()` 重置层级。
-- 脚本加载阶段会为不同入口函数解析代码；不建议在顶层执行有副作用的逻辑。
-
-## 示例脚本
-- 渲染管线示例：`run/lualinks/test/render_demo.lua`
-  - 服务端写入 `tick/pulse`
-  - 客户端读取并绘制动画
-- 姿态 HUD 示例：`run/lualinks/test/attitude_hud_demo.lua`
-  - 客户端结合 `Phys` 与 `Block` 计算地平线并绘制 HUD
-
-## 最小模板
+`Player.getShipMountedToData()` 返回结构：
 ```lua
-local tick = 0
+{
+    shipMountedTo = <LoadedShip userdata>,
+    shipMountedToId = <number>,
+    mountPosInShip = <Vector3d>
+}
+```
 
-function onServerTick()
-    tick = tick + 1
-    Network.set("tick", tick)
-end
+`Player.getPlayerWatch()` 与 `Player.projectWorldPoint()` 返回结构一致：
+```lua
+{
+    x = <number>,
+    y = <number>,
+    distance = <number>,
+    onScreen = <boolean>,
+    hitPosInWorld = <Vector3d>,
+    screenCenterInWorld = <Vector3d>,
 
-function onPlayerEvent(event)
-    if type(event) == "table" and event.type == "touch" then
-        Network.set("touchX", event.x)
-        Network.set("touchY", event.y)
-    end
-end
+    -- 兼容旧脚本保留的别名
+    hitPosInShip = <Vector3d>,
+    screenCenterInShip = <Vector3d>
+}
+```
+
+说明：
+- `x/y` 是当前屏幕分辨率下的像素坐标。
+- `distance` 是从玩家眼睛到“屏幕平面交点”的距离，不是到目标世界点本身的距离。
+- `onScreen` 表示交点是否落在屏幕范围内。
+- `Player.getPlayerWatch()` 使用玩家真实眼睛位置和视线方向，计算视线与屏幕的交点。
+- 若玩家 mount 在船上，会先结合该船姿态把 `yaw/pitch` 对应的本地方向转到世界中；若未 mount，则使用单位变换。
+- `Player.projectWorldPoint(...)` 取“玩家眼睛到目标世界点”的连线，并计算这条射线打到屏幕平面后的像素位置。
+- `projectWorldPoint(...)` 的第一个参数可以是 `Vector3d`，也可以是含 `x/y/z` 的 Lua table。
+- 若射线与屏幕平面平行、交点在眼睛后方、或输入无效，则返回 `nil`。
+
+#### `Ship`
+- `Ship.getAllShips() -> { id1, id2, ... }`
+- `Ship.getPositionOf(id) -> Vector3d | nil`
+- `Ship.getVelocityOf(id) -> Vector3d | nil`
+- `Ship.getQuaternionOf(id) -> Quaterniond | nil`
+- `Ship.getAngularVelocityOf(id) -> Vector3d | nil`
+
+说明：
+- `Ship.getAllShips()` 返回客户端当前已加载的船 id 列表。
+- 查不到对应 `id` 时，其余 `get...Of(id)` 返回 `nil`。
+
+## 3. 屏幕配置与最小示例
+
+### 3.1 推荐初始化方式
+```lua
+local init = false
 
 function onClientTick()
-    local w = (render.getWidth and render.getWidth()) or render.width or 256
-    local h = (render.getHeight and render.getHeight()) or render.height or 256
-    local t = Network.peek("tick") or 0
+    if not init then
+        render.setResolution(320, 180)
+        render.setSurfaceSize(1.8, 1.0)
+        render.setOffset(0.0, 1.0, -0.5)
+        init = true
+    end
 
     render.clear()
     render.setColor(255, 255, 255, 255)
-    render.drawText("tick: " .. tostring(t), 8, 8, 1.0)
-    render.drawRect(8, h - 12, math.min(w - 16, t % math.max(1, w - 16)), 6)
+    render.drawText("Hello", 8, 8, 1.0)
+    render.submit()
+end
+```
+
+### 3.2 透明度与层级
+- `render.setAlpha(a)` 使用 `0 ~ 255`
+- `render.setOpacity(opacity)` 使用 `0.0 ~ 1.0`
+- 多个重叠图元建议在后绘制内容前调用 `render.pushLayer()`，减少同层 z-fighting
+
+## 4. 网络同步与限制
+
+### 4.1 服务端到客户端
+- 服务端 `Network.set(...)` 后，会通过每 tick 同步下发。
+- 客户端使用 `peek/retrieve/isDirty` 读取。
+
+### 4.2 客户端到服务端
+- 客户端使用 `Network.send(slotName, value)` 上行。
+- 服务端通过 `peek/retrieve/isDirty` 读取。
+- 单次上行消息大于 `1024 Byte` 会被服务端拒收。
+
+### 4.3 支持的数据类型
+- 基础类型：`string`、`number`、`boolean`
+- 复合类型：普通 `table`
+- 不建议发送：函数、线程、复杂 userdata 等对象
+
+## 5. 运行限制与错误
+- 每次回调执行都受指令数、执行时间与内存分配保护。
+- 超限或运行时错误会抛出 `LuaError`，并中断本次回调。
+- Lua 环境禁用了 `dofile`、`loadfile`、`load`。
+
+## 6. 脚本加载位置与命令
+- 脚本目录：`<游戏目录>/lualinks`
+- 支持两种路径：
+  - `<游戏目录>/lualinks/<name>.lua`
+  - `<游戏目录>/lualinks/<玩家名>/<name>.lua`
+- 常用命令：
+  - `/cimulink upload-lua <name>`
+  - `/cimulink load-computer-lua <name>`
+
+## 7. 示例脚本
+- `run/lualinks/api_demo.lua`：渲染、网络、Player、Block API 总览
+- `run/lualinks/render_demo.lua`：基础渲染示例
+- `run/lualinks/hud.lua`：姿态 HUD 示例
+- `run/lualinks/player_watch_demo.lua`：显示玩家视线在屏幕上的落点
+- `run/lualinks/bus_angle_demo.lua`：服务端读取总线 `angle` 并显示到屏幕
+- `run/lualinks/bus_angle_write_demo.lua`：服务端周期性写入总线 `angle`
+- `run/lualinks/tick_clock_demo.lua`：输出 `gameClock/physClock`
+- `run/lualinks/api_demo.lua`：包含 `Network.send`、`Player`、`Block`、屏幕配置等新接口示例
+
+## 8. `Player.projectWorldPoint()` 最小示例
+```lua
+local init = false
+
+function onClientTick()
+    if not init then
+        render.setResolution(320, 180)
+        render.setSurfaceSize(1.8, 1.0)
+        render.setOffset(0.0, 1.0, -0.5)
+        init = true
+    end
+
+    local pos = Block.yardPosition():add(Block.front():mul(10.0))
+    local p = Player.projectWorldPoint(pos, 0.0)
+
+    render.clear()
+    render.setColor(15, 30, 55, 255)
+    render.setOpacity(0.5)
+    render.drawRect(0, 0, render.getWidth(), render.getHeight())
+    render.setOpacity(1.0)
+
+    if p then
+        render.setColor(255, 220, 90, 255)
+        render.drawRect(p.x - 2, p.y - 2, 5, 5)
+    end
+
     render.submit()
 end
 ```

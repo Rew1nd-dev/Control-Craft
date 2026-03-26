@@ -3,6 +3,7 @@ package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
+import com.verr1.controlcraft.content.links.computer.lua.libs.LuaToComputerLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.BusLib;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
@@ -64,6 +65,7 @@ public record LuacuitScript(String code, List<String> definedInputs, List<Double
         defineGlobal.load(new PhysLib(IPhysAccess.EMPTY));
         defineGlobal.load(new UtilLib(IWorldAccess.EMPTY));
         defineGlobal.load(new BusLib(IBusAccess.EMPTY));
+        defineGlobal.load(new LuaToComputerLib(IWorldAccess.EMPTY));
 
         List<String> definedInputs = new ArrayList<>();
         List<Double> defaultInputs = new ArrayList<>();

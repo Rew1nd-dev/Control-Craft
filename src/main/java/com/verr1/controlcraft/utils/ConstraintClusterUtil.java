@@ -3,6 +3,7 @@ package com.verr1.controlcraft.utils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Sets;
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.ControlCraftServer;
 import com.verr1.controlcraft.mixin.accessor.ShipObjectServerWorldAccessor;
@@ -20,7 +21,7 @@ import java.util.function.Predicate;
 public class ConstraintClusterUtil {
 
     public final static LoadingCache<Long, Set<Long>> CLUSTER_CACHE =
-        CacheBuilder.newBuilder().maximumSize(32L).concurrencyLevel(4).expireAfterAccess(2L, TimeUnit.SECONDS).build(
+        CacheBuilder.newBuilder().maximumSize(256L).concurrencyLevel(4).expireAfterWrite(2L, TimeUnit.SECONDS).build(
             new CacheLoader<>() {
                 @Override
                 public @NotNull Set<Long> load(@NotNull Long key) throws Exception {
@@ -96,7 +97,7 @@ public class ConstraintClusterUtil {
 
         int max_depth = 1024;
         Long GROUND_BODY_ID = vsWorld().getDimensionToGroundBodyIdImmutable().get(dimensionOf(id));
-        HashSet<Long> clusterSet = new HashSet<>();
+        Set<Long> clusterSet = Sets.newConcurrentHashSet();
         Queue<Long> unvisited = new ArrayDeque<>(List.of(id));
         while (!unvisited.isEmpty() && max_depth > 0){
             long current = unvisited.poll();

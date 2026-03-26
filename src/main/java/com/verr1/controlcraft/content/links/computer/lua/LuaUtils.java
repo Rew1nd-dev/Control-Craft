@@ -79,6 +79,11 @@ public class LuaUtils {
         return sanitizeLuaError(message.getMessage());
     }
 
+    public static String sanitizeLuaError(LuaError message, int maxLen){
+        String err = sanitizeLuaError(message.getMessage());
+        return err.substring(0, Math.min(err.length(), maxLen));
+    }
+
     /**
      * Keep the misspelled name for compatibility with existing callers/user expectation.
      */

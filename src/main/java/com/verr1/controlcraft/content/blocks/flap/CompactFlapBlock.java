@@ -21,6 +21,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -31,6 +33,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
@@ -51,9 +54,14 @@ public class CompactFlapBlock extends BearingBlock implements
 
     public static final String ID = "compact_flap";
     public static final IntegerProperty OFFSET = IntegerProperty.create("offset_mode", 0, 2);
+    public static final BooleanProperty INVISIBLE = BooleanProperty.create("invisible");
 
     public CompactFlapBlock(Properties p_52591_) {
         super(p_52591_);
+        registerDefaultState(defaultBlockState()
+            .setValue(INVISIBLE, false)
+            .setValue(OFFSET, 0)
+        );
     }
 
     protected Direction getFacingForPlacement(BlockPlaceContext context) {
@@ -68,6 +76,14 @@ public class CompactFlapBlock extends BearingBlock implements
     protected boolean getAxisAlignmentForPlacement(BlockPlaceContext context) {
         return context.getHorizontalDirection()
             .getAxis() == Direction.Axis.X;
+    }
+
+    @Override
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        world.setBlock(pos, state.cycle(INVISIBLE), 3);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -166,7 +182,7 @@ public class CompactFlapBlock extends BearingBlock implements
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(OFFSET, AXIS_ALONG_FIRST_COORDINATE);
+        builder.add(OFFSET, AXIS_ALONG_FIRST_COORDINATE, INVISIBLE);
         super.createBlockStateDefinition(builder);
     }
 
@@ -205,14 +221,27 @@ public class CompactFlapBlock extends BearingBlock implements
 
     public static double getVerticalOffset(BlockState state){
         int off = state.getValue(OFFSET);
-        return off == 0 ? 0 : off == 2 ? (8 - 2.5) / 16 : -(8 - 2.5) / 16;
+        return off == 0 ? 0 : off == 2 ? 0.5 : -0.5;
     }
 
     @Override
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit){
+        ItemStack heldItem = player.getItemInHand(handIn);
+        if (!heldItem.isEmpty() && heldItem.getItem() instanceof BlockItem blockItem) {
+            if (!(worldIn.getBlockEntity(pos) instanceof CompactFlapBlockEntity be)) {
+                return InteractionResult.PASS;
+            }
+            if (worldIn.isClientSide) {
+                return InteractionResult.SUCCESS;
+            }
+
+            be.setRenderMaterial(blockItem.getBlock().defaultBlockState());
+            return InteractionResult.SUCCESS;
+        }
+
         if(     worldIn.isClientSide
                 && handIn == InteractionHand.MAIN_HAND
-                && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()
+                && heldItem.isEmpty()
                 && !player.isShiftKeyDown()
         ){
             displayScreen(pos);
@@ -243,13 +272,20 @@ public class CompactFlapBlock extends BearingBlock implements
 
         private static <T extends CompactFlapBlock> BiFunction<BlockState, Boolean, ModelFile> modelFunc(DataGenContext<Block, T> c, RegistrateBlockstateProvider p){
             return (state, vertical) -> {
+                String name = c.getName();
                 int off = state.getValue(OFFSET);
+                boolean invisible = state.getValue(INVISIBLE);
+                if(invisible){
+                    return p.models().getExistingFile(p.modLoc("block/" + name + "/" + "block_invisible"));
+                }
                 String verticalFix = vertical ? "_n" : "_p";
                 String flippedFix = off == 0 ? "_m" : off == 1 ? "_u" : "_d";
-                String name = c.getName();
+
                 return p.models().getExistingFile(p.modLoc("block/" + name + "/" + "block" + verticalFix + flippedFix));
             };
         }
+
+
 
         public static void directionalAxisBlock(DataGenContext<Block, CompactFlapBlock> ctx,
                                                                                         RegistrateBlockstateProvider prov, BiFunction<BlockState, Boolean, ModelFile> modelFunc) {

@@ -1,5 +1,6 @@
 package com.verr1.controlcraft.foundation.cimulink.core.components.luacuit;
 
+import com.verr1.controlcraft.content.links.computer.lua.libs.LuaToComputerLib;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
@@ -71,6 +72,7 @@ public class Luacuit extends NamedComponent {
         this.worldAccess = utilAccess;
         LUA_THREAD.submit(() -> {
             luaGlobals.load(new UtilLib(this.worldAccess));
+            luaGlobals.load(new LuaToComputerLib(this.worldAccess));
         });
     }
 

@@ -17,6 +17,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.physics_api.PoseVel;
 
 import java.lang.Math;
+import java.util.function.Consumer;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
@@ -293,7 +294,10 @@ public class InducerControls {
 
 
 
-    public static void flapTickControls(LogicalFlap flap, PhysShipWrapper ship){
+    public static Vector3dc[] flapTickControls(
+        LogicalFlap flap,
+        PhysShipWrapper ship
+    ){
         double lift = flap.lift();
         double drag = flap.drag();
         boolean legacy = flap.legacyAerodynamics();
@@ -310,7 +314,7 @@ public class InducerControls {
                 n_wc.mul(n_wc.dot(rv_wc), new Vector3d()), new Vector3d()
         );
 
-        if(pj_wc.lengthSquared() < 1.0E-12 || rv_wc.lengthSquared() < 1.0E-12)return;
+        if(pj_wc.lengthSquared() < 1.0E-12 || rv_wc.lengthSquared() < 1.0E-12)return null;
 
         Vector3dc lift_d_wc = legacy ? n_wc : MathUtils.tangent(n_wc, rv_wc).normalize();
 
@@ -334,6 +338,8 @@ public class InducerControls {
 
         ship.applyInvariantForce(combine_wc);
         ship.applyInvariantTorque(torque_wc);
+
+        return new Vector3dc[]{combine_wc, torque_wc};
     }
 
 }
