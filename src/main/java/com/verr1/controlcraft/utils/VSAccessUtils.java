@@ -101,9 +101,8 @@ public class VSAccessUtils {
 
 
     // VSGameUtilsKt::getShipMountedToData is mixin by control craft to always return null
-    // when player is using camera, in order to stop vs from doing camera transformation
-    // but we need shipMountedToData to decide whether a player is on a ship and to render
-    // ccip crosshair, this is same for players using camera and mounted to a ship.
+    // when player is using camera, in order to stop vs from doing camera transformation,
+    // but we need shipMountedToData for players using camera and mounted to a ship.
     // so we can't call shipMountedToData directly from VSGameUtilsKt here.
     // instead, we copy the original getShipMountedToData from VSGameUtilsKt
     // @Rw1nd 2025-11-21
