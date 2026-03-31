@@ -31,6 +31,8 @@
     "camera.MixinGameRenderer",
     "camera.MixinLevelRenderer",
     "camera.MixinStorage",
-    "camera.MixinVSGameUtilsKt"
+    "camera.MixinVSGameUtilsKt",
+    "tweak.MixinLocalPlayerMouseLockView",
+    "tweak.MixinMouseCursorHandler"
   ]
 }

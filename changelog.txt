@@ -1,4 +1,16 @@
 Control Craft Changelog
+2.24.11 - 2026-03-31
+====================
+- Bumped mod version to 2.24.11 in gradle properties.
+- Added tweaked-controller mouse lock integration: track locked yaw/pitch in a new TweakMouseLockState, capture lock state on activation, clear on deactivation, and stabilize player view while locked and mounted.
+- Added client mixins to apply locked yaw/pitch to LocalPlayer view getters so ship-mounted mouse lock keeps camera orientation stable.
+- Reworked tweaked controller full-axis upload to compute axes directly from the profile and clamp values, avoiding temporary precision toggles.
+- Added VSAccessUtils helpers to detect mounted ships even when VS camera mixins bypass getShipMountedToData, restoring ship-mounted checks for crosshair and view logic.
+- Extended UI language entries with the new flap dump material label in en_us and en_ud.
+- Updated Lua error trace test to use the shared sanitizeLuaError helper instead of a local implementation.
+- Cleaned small API noise by removing unused imports and stale commented-out bus access hooks.
+- Refreshed generated cache metadata for updated resources.
+
 2.24.8 - 2026-03-26
 ====================
 - Added bundled `gearwork-1.1.0` support, including new Gradle version wiring, local jar loading, and Create-side mixins to let ControlCraft interact directly with Gearwork landing gear blocks.

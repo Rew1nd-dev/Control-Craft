@@ -4,6 +4,8 @@ import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacui
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitConstructor;
 import org.luaj.vm2.LuaError;
 
+import static com.verr1.controlcraft.content.links.computer.lua.LuaUtils.sanitizeLuaError;
+
 public class LuaErrorTraceTest {
     public static void main(String[] args) {
         String longLuaScript = "function loop()\n" +
@@ -18,7 +20,7 @@ public class LuaErrorTraceTest {
             luacuit.onPositiveEdge();
         } catch (LuaError e) {
             String originalMessage = e.getMessage();
-            String sanitizedMessage = sanitizeLuaError(originalMessage, longLuaScript);
+            String sanitizedMessage = sanitizeLuaError(originalMessage);
             System.out.println("Original LuaError Message:");
             System.out.println(originalMessage);
             System.out.println("Sanitized LuaError Message:");
@@ -37,12 +39,5 @@ public class LuaErrorTraceTest {
         }
     }
 
-    private static String sanitizeLuaError(String message, String code) {
-        if (message == null) return "";
-        String sanitized = message.replaceAll("\\[string \".*?\"\\]", "[script]");
-        if (code != null && !code.isEmpty()) {
-            sanitized = sanitized.replace(code, "[script]");
-        }
-        return sanitized;
-    }
+
 }

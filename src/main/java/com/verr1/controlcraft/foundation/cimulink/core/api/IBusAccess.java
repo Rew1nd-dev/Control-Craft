@@ -15,10 +15,6 @@ public interface IBusAccess {
 
         }
 
-//        @Override
-//        public void onPositiveEdge() {
-//
-//        }
     };
 
 
@@ -40,10 +36,6 @@ public interface IBusAccess {
                 be.propagateTo(componentName, port, value);
             }
 
-//            @Override
-//            public void onPositiveEdge() {
-//                be.onPositiveEdge();
-//            }
         };
     }
 

@@ -2,15 +2,12 @@ package com.verr1.controlcraft.mixin.tweak;
 
 import com.getitemfromblock.create_tweaked_controllers.controller.TweakedControlsUtil;
 import com.getitemfromblock.create_tweaked_controllers.controller.TweakedLinkedControllerClientHandler;
-import com.getitemfromblock.create_tweaked_controllers.packet.TweakedLinkedControllerAxisPacket;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.verr1.controlcraft.foundation.network.packets.specific.tweak.TweakControllerFullAxisPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(TweakedLinkedControllerClientHandler.class)
 public class MixinTweakedControllerClientHandler {
@@ -24,10 +21,21 @@ public class MixinTweakedControllerClientHandler {
             ),
             remap = false
     )
-    private static void sendFullPrecision(CallbackInfo ci, @Local boolean useFullPrec){
-        TweakedControlsUtil.Update(true);
-        ControlCraftPackets.getChannel().sendToServer(new TweakControllerFullAxisPacket(TweakedControlsUtil.output.fullAxis));
-        TweakedControlsUtil.Update(useFullPrec);
+    private static void sendFullPrecision(CallbackInfo ci) {
+        ControlCraftPackets.getChannel().sendToServer(new TweakControllerFullAxisPacket(controlCraft$collectFullAxis()));
+    }
+
+    private static float[] controlCraft$collectFullAxis() {
+        float[] fullAxis = new float[6];
+        for (int i = 0; i < fullAxis.length; i++) {
+            float axisValue = TweakedControlsUtil.profile.GetAxis(i);
+            if (i >= 4) {
+                fullAxis[i] = Math.max(0.0F, Math.min((axisValue + 1.0F) * 0.5F, 1.0F));
+            } else {
+                fullAxis[i] = Math.max(-1.0F, Math.min(axisValue, 1.0F));
+            }
+        }
+        return fullAxis;
     }
 
 }

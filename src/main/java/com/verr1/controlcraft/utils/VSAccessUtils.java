@@ -5,17 +5,22 @@ import com.verr1.controlcraft.foundation.data.WorldBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.entity.ShipMountedToData;
+import org.valkyrienskies.mod.common.entity.ShipMountedToDataProvider;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toMinecraft;
 
 public class VSAccessUtils {
@@ -92,5 +97,30 @@ public class VSAccessUtils {
 
         // 计算目标在命中时刻的位置: p_t + v_t * t_hit
         return new Vector3d(v_t).mul(t_hit).add(p_t);
+    }
+
+
+    // VSGameUtilsKt::getShipMountedToData is mixin by control craft to always return null
+    // when player is using camera, in order to stop vs from doing camera transformation
+    // but we need shipMountedToData to decide whether a player is on a ship and to render
+    // ccip crosshair, this is same for players using camera and mounted to a ship.
+    // so we can't call shipMountedToData directly from VSGameUtilsKt here.
+    // instead, we copy the original getShipMountedToData from VSGameUtilsKt
+    // @Rw1nd 2025-11-21
+    public static ShipMountedToData getShipMountedToData(Entity entity, float partialTicks){
+        var vehicle = entity.getVehicle();
+        if(vehicle == null)return null;
+        if (vehicle instanceof ShipMountedToDataProvider ve) {
+            return ve.provideShipMountedToData(entity, partialTicks);
+        }
+        var shipObjectEntityMountedTo = VSGameUtilsKt.getShipObjectManagingPos(entity.level(), toJOML(vehicle.position()));//entity.level().getShipObjectManagingPos(vehicle.position().toJOML()) ?: return null;
+        if(shipObjectEntityMountedTo == null)return null;
+        var mountedPosInShip = toJOML(vehicle.getPosition(partialTicks).add(0.0, vehicle.getPassengersRidingOffset() + entity.getMyRidingOffset(), 0.0));
+
+        return new ShipMountedToData(shipObjectEntityMountedTo, mountedPosInShip);
+    }
+
+    public static LoadedShip getShipMountedTo(Entity entity){
+        return Optional.ofNullable(getShipMountedToData(entity, 1)).map(ShipMountedToData::getShipMountedTo).orElse(null);
     }
 }

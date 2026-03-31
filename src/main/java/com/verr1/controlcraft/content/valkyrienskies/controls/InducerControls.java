@@ -22,9 +22,10 @@ import java.util.function.Consumer;
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 
 /*
-*   This is what makes Control Craft to be Control Craft :)
-*
-* */
+ *   This is what makes Control Craft to be Control Craft :)
+ *
+ *
+ */
 
 public class InducerControls {
 
