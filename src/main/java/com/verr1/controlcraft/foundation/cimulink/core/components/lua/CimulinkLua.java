@@ -14,7 +14,6 @@ import org.luaj.vm2.lib.jse.*;
 public class CimulinkLua {
     public static boolean GOD_LUA_MODE = false;
 
-
     public static final Luacuit EMPTY_LUACUIT = new LuacuitConstructor(LuacuitScript.EMPTY).build();
 
     public static Globals createStandardGlobals(){
@@ -27,19 +26,20 @@ public class CimulinkLua {
     public static Globals createJseStandardGlobals(){
         Globals var0 = new Globals();
         var0.load(new BaseLib());
-        var0.set("dofile", LuaValue.NIL);
-        var0.set("loadfile", LuaValue.NIL);
-        var0.set("load", LuaValue.NIL);
-
+        if(GOD_LUA_MODE){
+            loadGodLuaLibs(var0);
+        }else{
+            var0.set("dofile", LuaValue.NIL);
+            var0.set("loadfile", LuaValue.NIL);
+            var0.set("load", LuaValue.NIL);
+        }
         var0.load(new PackageLib());
         var0.load(new Bit32Lib());
         var0.load(new TableLib());
         var0.load(new StringLib());
         var0.load(new CoroutineLib());
         var0.load(new JseMathLib());
-        if(GOD_LUA_MODE){
-            loadGodLuaLibs(var0);
-        }
+
         LoadState.install(var0);
         LuaC.install(var0);
         return var0;

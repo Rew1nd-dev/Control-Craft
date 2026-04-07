@@ -11,7 +11,7 @@ public class SliderPlant extends Plant {
 
         super(new builder()
                 .in("deploy", plant::setTarget)
-                .in("lock", l -> plant.tryLock(l > 0.5))
+                .in("lock", l -> plant.lockAsync(l > 0.5))
                 .in("force", plant::setOutputForce)
                 .out("current", () -> plant.getController().getValue())
                 .out("distance", plant::getSlideDistance)

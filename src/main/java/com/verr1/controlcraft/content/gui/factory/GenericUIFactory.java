@@ -895,6 +895,7 @@ public class GenericUIFactory {
         var toggle_cheat = new OptionUIField<>(boundPos, SharedKeys.CHEAT_MODE, CheatMode.class, new CheatMode[]{CheatMode.NONE, CheatMode.NO_REPULSE} , Converter.convert(UIContents.CHEAT, Converter::titleStyle));
 
         var toggle_lock_mode = new OptionUIField<>(boundPos, SharedKeys.LOCK_MODE, LockMode.class, Converter.convert(UIContents.AUTO_LOCK, Converter::titleStyle));
+        var collision = new BooleanUIField(boundPos, ShipConnectorBlockEntity.COLLISION, Converter.convert(UIContents.COLLISION, Converter::titleStyle));
 
         var asm = new UnitUIPanel(
                 boundPos,
@@ -952,7 +953,7 @@ public class GenericUIFactory {
                 .withTab(
                         CONTROLLER_TAB,
                         new VerticalFlow.builder(boundPos)
-                                .withPort(pid)
+                                .withPort(pid, collision)
                                 .build()
                 )
                 .withTab(

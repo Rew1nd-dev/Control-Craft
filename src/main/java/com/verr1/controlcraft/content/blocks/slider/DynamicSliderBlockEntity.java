@@ -83,7 +83,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
 
     private CheatMode cheatMode = CheatMode.NONE;
 
-
+    private int lockNextSign = 0;
 
 
 
@@ -181,6 +181,24 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
     public void setCheatMode(boolean cheatMode) {
         this.cheatMode = cheatMode ? CheatMode.NO_REPULSE : CheatMode.NONE;
         setChanged();
+    }
+
+    public void lockAsync(boolean toLock){
+        if(toLock){
+            lockNextSign = 1;
+        }else{
+            lockNextSign = 0;
+        }
+    }
+
+    private void lockIfRequested(){
+        if(lockNextSign == 1){
+            tryLock();
+        }
+        if(lockNextSign == -1){
+            tryUnlock();
+        }
+        lockNextSign = 0;
     }
 
     public void tryLock(boolean toLock){
@@ -409,6 +427,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         lockCheck();
         syncAttachInducer();
         syncForNear(true, FIELD);
+        lockIfRequested();
         kineticPeripheral.tick();
     }
 

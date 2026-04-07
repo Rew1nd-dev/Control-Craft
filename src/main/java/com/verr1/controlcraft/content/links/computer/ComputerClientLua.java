@@ -7,6 +7,8 @@ import com.verr1.controlcraft.content.links.computer.lua.libs.ClientNetworkLib;
 import com.verr1.controlcraft.content.links.computer.lua.libs.ClientPlayerLib;
 import com.verr1.controlcraft.content.links.computer.lua.libs.ClientShipLib;
 import com.verr1.controlcraft.content.links.computer.lua.libs.RenderLib;
+import com.verr1.controlcraft.content.links.computer.lua.libs.TextUtilLib;
+import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.PhysLib;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.UndefineMethodException;
@@ -37,7 +39,7 @@ public class ComputerClientLua extends ComputerCommonLua {
             IComputerClientContext context,
             String code)
             throws UndefineMethodException, LuaError, LuaOvertimeException {
-        Globals luaGlobal = createStandardGlobals();
+        Globals luaGlobal = CimulinkLua.createJseStandardGlobals();
 
         luaGlobal.load(new PhysLib(context.getPhysAccess()));
         luaGlobal.load(new RenderLib(context.getScreen()));
@@ -45,6 +47,7 @@ public class ComputerClientLua extends ComputerCommonLua {
         luaGlobal.load(new ClientPlayerLib(context));
         luaGlobal.load(new ClientShipLib());
         luaGlobal.load(new ClientNetworkLib(context));
+        luaGlobal.load(new TextUtilLib());
         loadLuaML(luaGlobal);
         LuaValue loopFunc = LuaUtils.safeLoadValue(code, "onClientTick", luaGlobal).filter(LuaValue::isfunction).orElse(null);
 

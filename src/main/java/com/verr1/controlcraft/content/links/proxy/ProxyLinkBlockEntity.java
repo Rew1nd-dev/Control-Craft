@@ -40,6 +40,10 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
     public void updateAttachedPlant(boolean refreshInput){
         if(!(level instanceof ServerLevel serverLevel))return;
         NamedComponent plant = PlantGetter.get(serverLevel, getBlockPos().relative(getDirection().getOpposite()));
+        if(plant == null){
+            linkPort().setPlant(null, refreshInput);
+            return;
+        }
         linkPort().setPlant(plant, refreshInput);
         linkPort().recreate();
     }
@@ -49,6 +53,17 @@ public class ProxyLinkBlockEntity extends CimulinkBlockEntity<PlantProxyLinkPort
     protected void initializeExtra() {
         super.initializeExtra();
         updateAttachedPlant(false);
+    }
+
+    @Override
+    public void lazyTickServer() {
+        if(linkPort().isPlantMissing()){
+            updateAttachedPlant(false);
+            if(linkPort().isPlantMissing()){
+                return;
+            }
+        }
+        super.lazyTickServer();
     }
 
     @Override

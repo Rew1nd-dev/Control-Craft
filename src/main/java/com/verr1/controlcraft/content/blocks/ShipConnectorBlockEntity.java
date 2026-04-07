@@ -103,6 +103,12 @@ public abstract class ShipConnectorBlockEntity extends OnShipBlockEntity
         });
     }
 
+    @Override
+    public void removeServer() {
+        super.removeServer();
+        setCollisionWithCompanion(true);
+    }
+
     public void updateConstraint(String id, VSConstraint newConstraint){
         Optional.ofNullable(getConstraintKey(id))
                 .ifPresent(key -> ConstraintCenter.updateOrCreateConstraint(key, newConstraint));

@@ -26,6 +26,20 @@ public class PhysLib extends TwoArgFunction {
             }
         });
 
+        phys.set("positionCenterModel", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return toLuaVec(source.positionCenterModel(), env);
+            }
+        });
+
+        phys.set("positionCenter", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return toLuaVec(source.positionCenter(), env);
+            }
+        });
+
         phys.set("velocity", new ZeroArgFunction() {
             @Override
             public LuaValue call() {

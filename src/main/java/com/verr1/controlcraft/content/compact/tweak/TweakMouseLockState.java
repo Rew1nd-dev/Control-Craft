@@ -1,4 +1,4 @@
-package com.verr1.controlcraft.foundation.compat.tweak;
+package com.verr1.controlcraft.content.compact.tweak;
 
 public final class TweakMouseLockState {
 

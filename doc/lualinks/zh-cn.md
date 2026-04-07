@@ -51,11 +51,18 @@ end
 
 #### `Phys`
 - `Phys.position() -> Vector3d`
+- `Phys.positionCenterModel() -> Vector3d`
+- `Phys.positionCenter() -> Vector3d`
 - `Phys.velocity() -> Vector3d`
 - `Phys.angularVelocity() -> Vector3d`
 - `Phys.quaternionToWorld() -> Quaterniond`
 - `Phys.mass() -> number`
 - `Phys.inertia() -> number`
+
+说明：
+- `Phys.position()` 表示当前方块自身的位置。
+- `Phys.positionCenterModel()` 表示当前物理结构质心在 ship/model 坐标中的位置。
+- `Phys.positionCenter()` 表示当前物理结构质心在世界坐标中的位置。
 
 #### `Block`
 - `Block.frontLocal() -> Vector3d`
@@ -70,6 +77,28 @@ end
 - `Local` 版本返回方块在自身局部坐标中的方向。
 - 非 `Local` 版本返回转到世界/yard 坐标后的方向。
 - `Block.yardPosition()` 返回当前电脑所在位置的 yard/world 坐标。
+
+#### `TextUtil`
+- `TextUtil.serialize(value) -> string`
+- `TextUtil.serialize(value, compact) -> string`
+- `TextUtil.serialize(value, options) -> string`
+
+`options` 支持：
+```lua
+{
+    compact = true,   -- 是否单行输出，默认 true
+    pretty = false,   -- 为 true 时等价于 compact = false
+    sortKeys = true,  -- 是否排序 table 键，默认 true
+    maxDepth = 16     -- 最大递归深度，默认 16
+}
+```
+
+说明：
+- 这是一个调试序列化工具，风格接近 CC:Tweaked 的 `textutils.serialize(...)`。
+- 适合直接把 `table`、向量对象、网络数据、事件对象拼到日志或屏幕文本里。
+- 遇到循环引用时会输出 `"<cycle>"`。
+- 超过最大深度时会输出 `"<max-depth>"`。
+- `function`、`thread`、复杂 `userdata` 等无法安全展开的对象，会退化为可读字符串。
 
 #### 向量与四元数类型
 - 全局提供 `Vector3d` 与 `Quaterniond`，来自 `luaml`。
@@ -154,6 +183,10 @@ end
 - `render.setSurfaceSize(width, height)`
 - `render.setOffset(x, y, z)`
 - `render.drawRect(x, y, w, h)`
+- `render.drawRectOutline(x, y, w, h [, thickness])`
+- `render.drawLine(x0, y0, x1, y1 [, thickness])`
+- `render.drawCircle(cx, cy, radius [, segments])`
+- `render.drawCircleOutline(cx, cy, radius [, thickness [, segments]])`
 - `render.drawText(text, x, y [, scale])`
 - `render.pushLayer()`
 - `render.clear()`
@@ -175,6 +208,8 @@ end
 说明：
 - 渲染分辨率、屏幕物理尺寸、屏幕偏移均由客户端脚本决定。
 - `render.width` / `render.height` 是当前分辨率的便捷字段。
+- `drawLine(...)` 与各类 `Outline` 方法的默认线宽为 `1.0` 像素。
+- `drawCircle(...)` 与 `drawCircleOutline(...)` 默认使用 `32` 段近似圆形。
 - `render.pushLayer()` 只会让之后发出的绘制命令层级加一，没有 `popLayer()`。
 - `render.clear()` 会清空当前帧命令，并把层级重置为 `0`。
 - 只有调用 `render.submit()` 后，本帧内容才会提交到屏幕。

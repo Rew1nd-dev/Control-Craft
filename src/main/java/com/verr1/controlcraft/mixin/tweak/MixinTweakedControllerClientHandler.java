@@ -5,6 +5,7 @@ import com.getitemfromblock.create_tweaked_controllers.controller.TweakedLinkedC
 import com.verr1.controlcraft.foundation.network.packets.specific.tweak.TweakControllerFullAxisPacket;
 import com.verr1.controlcraft.registry.ControlCraftPackets;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,6 +26,7 @@ public class MixinTweakedControllerClientHandler {
         ControlCraftPackets.getChannel().sendToServer(new TweakControllerFullAxisPacket(controlCraft$collectFullAxis()));
     }
 
+    @Unique
     private static float[] controlCraft$collectFullAxis() {
         float[] fullAxis = new float[6];
         for (int i = 0; i < fullAxis.length; i++) {

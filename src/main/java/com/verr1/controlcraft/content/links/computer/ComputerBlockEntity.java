@@ -91,11 +91,11 @@ public class ComputerBlockEntity extends OnShipBlockEntity
             return;
         String partOfCode = code.substring(0, Math.min(code.length(), 100));
         if (level.isClientSide) {
-            ControlCraft.LOGGER.info("Loaded With Lua Code On Client: {}", partOfCode);
+            // ControlCraft.LOGGER.info("Loaded With Lua Code On Client: {}", partOfCode);
             serverLua = null;
             clientLua = ComputerClientLua.fromCode(this, code);
         } else {
-            ControlCraft.LOGGER.info("Loaded With Lua Code On Server: {}", partOfCode);
+            // ControlCraft.LOGGER.info("Loaded With Lua Code On Server: {}", partOfCode);
             serverLua = ComputerServerLua.fromCode(this, code);
             clientLua = null;
         }

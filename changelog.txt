@@ -1,4 +1,21 @@
 Control Craft Changelog
+2.24.13 - 2026-04-07
+====================
+- Bumped mod version to 2.24.13.
+- Added TextUtil Lua library with a CC:Tweaked-style `serialize(...)` helper, supporting compact/pretty output, key sorting, recursion limits, and safe handling of cycles, userdata, and vectors.
+- Added new render primitives for Lua screens: `drawLine`, `drawRectOutline`, `drawCircle`, and `drawCircleOutline`, plus shared shape emitters for lines, rectangles, triangles, and outline thickness control.
+- Switched computer client Lua to use the shared JSE-standard globals initializer so god-lua-mode rules are applied consistently across client and server.
+- Added physics helpers for structure center positions with `Phys.positionCenterModel()` and `Phys.positionCenter()`, wired through the new `IPhysAccess` accessors.
+- Adjusted OnShipBlockEntity center position helpers to read current ship transform data directly from VS self state.
+- Added async lock requests for dynamic motors and sliders so Lua/plant locks can be queued safely instead of immediately toggling during tick.
+- Fixed PlantProxyLinkPort enable-output deserialization, trimmed invalid enable settings, and added plant-missing detection to avoid building proxies with invalid indexes.
+- Improved proxy link resilience by clearing missing plants, retrying on lazy ticks, and bailing out early when the attachment is still absent.
+- Restored collision defaults on ship connectors when removed server-side and exposed the collision toggle in the connector UI.
+- Moved tweaked-controller mouse lock state into the compact package and updated mixins to use the new location.
+- Reduced noise by silencing client/server Lua load log spam on computer blocks.
+- Updated zh-CN LuaLinks docs with the new Phys center APIs, TextUtil usage, and render primitive references.
+- Refined Luaj JShell test packaging and script flow to match the luaj test namespace.
+
 2.24.11 - 2026-03-31
 ====================
 - Bumped mod version to 2.24.11 in gradle properties.

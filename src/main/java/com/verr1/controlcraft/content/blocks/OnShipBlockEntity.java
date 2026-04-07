@@ -61,11 +61,11 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
     }
 
     public Vector3d positionCenterModel(){
-        return Optional.ofNullable(getShipOn()).map(s -> new Vector3d(s.getTransform().getPositionInShip())).orElse(positionModel());
+        return new Vector3d(readSelf().positionInShip());
     }
 
     public Vector3d positionCenter(){
-        return Optional.ofNullable(getShipOn()).map(s -> new Vector3d(s.getTransform().getPositionInWorld())).orElse(positionModel());
+        return new Vector3d(readSelf().position());
     }
 
     public double mass() {
@@ -143,6 +143,8 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity
     public Vector3d geometricPosition() {
         return readSelf().s2wTransform().transformPosition(geometricPositionModel());
     }
+
+
 
     public @Nullable AABBic aabbModel() {
         return Optional.ofNullable(getShipOn()).map(Ship::getShipAABB).orElse(null);

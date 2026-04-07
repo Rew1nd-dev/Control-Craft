@@ -41,10 +41,11 @@ public class PlantProxyLinkPort extends BlockLinkPort {
     }
 
     public void setPlant(@Nullable NamedComponent plant, boolean refreshInput){
-        if(this.plant == plant)return;
+        NamedComponent nextPlant = plant == null ? EMPTY : plant;
+        if(this.plant == nextPlant)return;
         // ControlCraft.LOGGER.debug("Setting plant in PlantProxyLinkPort: {} at: {}", plant, be.getBlockPos());
 
-        this.plant = plant == null ? EMPTY : plant;
+        this.plant = nextPlant;
         if(!refreshInput){
             return;
         }
@@ -171,12 +172,22 @@ public class PlantProxyLinkPort extends BlockLinkPort {
             && enabledOutput.stream().allMatch(i -> i >= 0 && i < plant.m());
     }
 
+    public boolean isPlantMissing() {
+        return plant == EMPTY;
+    }
+
+    private void trimInvalidEnableSettings() {
+        enabledInput.removeIf(i -> i < 0 || i >= plant.n());
+        enabledOutput.removeIf(i -> i < 0 || i >= plant.m());
+    }
+
     @Override
     public NamedComponent create() {
-        if(!isEnableSettingsValid()){
-            enabledInput.clear();
-            enabledOutput.clear();
+        if(isPlantMissing()){
             return __raw();
+        }
+        if(!isEnableSettingsValid()){
+            trimInvalidEnableSettings();
         }
         return new PlantProxy(
                 plant,
@@ -201,8 +212,8 @@ public class PlantProxyLinkPort extends BlockLinkPort {
             enabledInput.addAll(INT_SET_SER.deserialize(tag.getCompound("enabledInput")));
         }
         if(tag.contains("enabledOutput")){
-            enabledInput.clear();
-            enabledInput.addAll(INT_SET_SER.deserialize(tag.getCompound("enabledOutput")));
+            enabledOutput.clear();
+            enabledOutput.addAll(INT_SET_SER.deserialize(tag.getCompound("enabledOutput")));
         }
         super.deserialize(tag.getCompound("blp"));
     }

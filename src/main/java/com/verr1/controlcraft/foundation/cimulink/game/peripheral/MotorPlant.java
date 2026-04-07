@@ -14,7 +14,7 @@ public class MotorPlant extends Plant {
         super(
                 new builder()
                         .in("target", plant::setTargetAccordingly)
-                        .in("lock", l -> plant.tryLock(l > 0.5))
+                        .in("lock", l -> plant.lockAsync(l > 0.5))
                         .in("torque", plant::setOutputTorque)
                         .out("current", () -> plant.getController().getValue())
                         .out("angle", plant::getCachedServoAngle)

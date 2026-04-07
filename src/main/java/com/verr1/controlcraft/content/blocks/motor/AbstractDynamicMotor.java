@@ -68,7 +68,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     private LazyOptional<IPeripheral> peripheralCap;
     private final DMotorKineticPeripheral kineticPeripheral = new DMotorKineticPeripheral(this);
 
-
+    private int lockNextSign = 1;
 
     @Override
     public @NotNull MotorPlant plant() {
@@ -138,6 +138,24 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         if(isLocked)return;
         isLocked = true;
         lock();
+    }
+
+    private void lockIfRequested(){
+        if(lockNextSign == 1){
+            tryLock();
+        }
+        if(lockNextSign == -1){
+            tryUnlock();
+        }
+        lockNextSign = 0;
+    }
+
+    public void lockAsync(boolean toLock){
+        if(toLock){
+            lockNextSign = 1;
+        }else{
+            lockNextSign = 0;
+        }
     }
 
     public void tryLock(boolean toLock){
@@ -245,6 +263,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         super.tickServer();
         syncAttachInducer();
         lockCheck();
+        lockIfRequested();
         kineticPeripheral.tick();
         // ExposedFieldSyncClientPacket.syncClient(this, getBlockPos(), level);
     }

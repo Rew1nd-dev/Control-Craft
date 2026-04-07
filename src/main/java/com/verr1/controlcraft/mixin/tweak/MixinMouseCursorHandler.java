@@ -1,7 +1,7 @@
 package com.verr1.controlcraft.mixin.tweak;
 
 import com.getitemfromblock.create_tweaked_controllers.input.MouseCursorHandler;
-import com.verr1.controlcraft.foundation.compat.tweak.TweakMouseLockState;
+import com.verr1.controlcraft.content.compact.tweak.TweakMouseLockState;
 import com.verr1.controlcraft.utils.VSAccessUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 @Mixin(MouseCursorHandler.class)
 public class MixinMouseCursorHandler {

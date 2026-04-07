@@ -1,6 +1,6 @@
 package com.verr1.controlcraft.mixin.tweak;
 
-import com.verr1.controlcraft.foundation.compat.tweak.TweakMouseLockState;
+import com.verr1.controlcraft.content.compact.tweak.TweakMouseLockState;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;

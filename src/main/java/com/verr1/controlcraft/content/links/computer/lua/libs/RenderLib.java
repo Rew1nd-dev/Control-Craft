@@ -3,7 +3,11 @@ package com.verr1.controlcraft.content.links.computer.lua.libs;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.verr1.controlcraft.content.links.computer.ComputerDisplayMetrics;
 import com.verr1.controlcraft.content.links.computer.ComputerScreen;
+import com.verr1.controlcraft.content.links.computer.lua.render.DrawCircleCmd;
+import com.verr1.controlcraft.content.links.computer.lua.render.DrawCircleOutlineCmd;
+import com.verr1.controlcraft.content.links.computer.lua.render.DrawLineCmd;
 import com.verr1.controlcraft.content.links.computer.lua.render.DrawRectCmd;
+import com.verr1.controlcraft.content.links.computer.lua.render.DrawRectOutlineCmd;
 import com.verr1.controlcraft.content.links.computer.lua.render.DrawTextCmd;
 import com.verr1.controlcraft.content.links.computer.lua.render.RenderCmd;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,6 +28,8 @@ public class RenderLib extends TwoArgFunction {
     private static final int MAX_RESOLUTION = 4096;
     private static final float MIN_SURFACE_SIZE = 0.05f;
     private static final float MAX_SURFACE_SIZE = 64.0f;
+    private static final float DEFAULT_LINE_THICKNESS = 1.0f;
+    private static final int DEFAULT_CIRCLE_SEGMENTS = 32;
 
     private final List<RenderCmd> tempBuffer = new ArrayList<>();
     private final List<DrawCommandBinding> drawCommandBindings = new ArrayList<>();
@@ -65,6 +71,41 @@ public class RenderLib extends TwoArgFunction {
             float y = (float) args.checkdouble(3);
             float scale = args.narg() >= 4 ? (float) args.checkdouble(4) : 1.0f;
             return new DrawTextCmd(text, x, y, scale, currentColor);
+        });
+
+        registerDrawCommand("drawLine", args -> {
+            float x0 = (float) args.checkdouble(1);
+            float y0 = (float) args.checkdouble(2);
+            float x1 = (float) args.checkdouble(3);
+            float y1 = (float) args.checkdouble(4);
+            float thickness = args.narg() >= 5 ? (float) args.checkdouble(5) : DEFAULT_LINE_THICKNESS;
+            return new DrawLineCmd(x0, y0, x1, y1, thickness, currentColor);
+        });
+
+        registerDrawCommand("drawRectOutline", args -> {
+            float x = (float) args.checkdouble(1);
+            float y = (float) args.checkdouble(2);
+            float w = (float) args.checkdouble(3);
+            float h = (float) args.checkdouble(4);
+            float thickness = args.narg() >= 5 ? (float) args.checkdouble(5) : DEFAULT_LINE_THICKNESS;
+            return new DrawRectOutlineCmd(x, y, w, h, thickness, currentColor);
+        });
+
+        registerDrawCommand("drawCircle", args -> {
+            float cx = (float) args.checkdouble(1);
+            float cy = (float) args.checkdouble(2);
+            float radius = (float) args.checkdouble(3);
+            int segments = args.narg() >= 4 ? args.checkint(4) : DEFAULT_CIRCLE_SEGMENTS;
+            return new DrawCircleCmd(cx, cy, radius, segments, currentColor);
+        });
+
+        registerDrawCommand("drawCircleOutline", args -> {
+            float cx = (float) args.checkdouble(1);
+            float cy = (float) args.checkdouble(2);
+            float radius = (float) args.checkdouble(3);
+            float thickness = args.narg() >= 4 ? (float) args.checkdouble(4) : DEFAULT_LINE_THICKNESS;
+            int segments = args.narg() >= 5 ? args.checkint(5) : DEFAULT_CIRCLE_SEGMENTS;
+            return new DrawCircleOutlineCmd(cx, cy, radius, thickness, segments, currentColor);
         });
     }
 

@@ -26,6 +26,16 @@ public interface IPhysAccess {
         }
 
         @Override
+        public Vector3dc positionCenterModel() {
+            return new Vector3d();
+        }
+
+        @Override
+        public Vector3dc positionCenter() {
+            return new Vector3d();
+        }
+
+        @Override
         public Vector3dc velocity() {
             return new Vector3d();
         }
@@ -52,6 +62,10 @@ public interface IPhysAccess {
 
     Vector3dc position();
 
+    Vector3dc positionCenterModel();
+
+    Vector3dc positionCenter();
+
     Vector3dc velocity();
 
     Vector3dc angularVelocity();
@@ -71,6 +85,16 @@ public interface IPhysAccess {
             public Vector3dc position() {
                 Vector3d p_sc = ValkyrienSkies.set(new Vector3d(), be.getBlockPos().getCenter());
                 return be.readSelf().s2wTransform().transformPosition(p_sc);
+            }
+
+            @Override
+            public Vector3dc positionCenterModel() {
+                return be.positionCenterModel();
+            }
+
+            @Override
+            public Vector3dc positionCenter() {
+                return be.positionCenter();
             }
 
             @Override
@@ -110,6 +134,16 @@ public interface IPhysAccess {
                     .map(Ship::getShipToWorld)
                     .orElse(EMPTY_M4);
                 return trans.transformPosition(p_sc);
+            }
+
+            @Override
+            public Vector3dc positionCenterModel() {
+                return be.positionCenterModel();
+            }
+
+            @Override
+            public Vector3dc positionCenter() {
+                return be.positionCenter();
             }
 
             @Override
