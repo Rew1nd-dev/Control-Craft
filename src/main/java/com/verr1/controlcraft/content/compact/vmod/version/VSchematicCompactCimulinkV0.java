@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ public class VSchematicCompactCimulinkV0 {
     public static CompoundTag PreCimulinkReadVModCompact(
             @NotNull ServerLevel serverLevel,
             @NotNull Map<Long, Long> map,
-            @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> offsetMap,
+            @NotNull Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> offsetMap,
             @Nullable CompoundTag tagToModify
     ){
 
@@ -48,8 +49,8 @@ public class VSchematicCompactCimulinkV0 {
 
         ControlCraft.LOGGER.debug("link has new ship {}", n_self_id);
 
-        Vector3d oldCenter = offsetMap.get(o_self_id).getFirst();
-        Vector3d newCenter = offsetMap.get(o_self_id).getSecond();
+        Vector3d oldCenter = new Vector3d(offsetMap.get(o_self_id).getFirst());
+        Vector3d newCenter = new Vector3d(offsetMap.get(o_self_id).getSecond());
         compact.putLong("offset", BlockPos.containing(
                         toMinecraft(
                                 newCenter.sub(oldCenter, new Vector3d()))

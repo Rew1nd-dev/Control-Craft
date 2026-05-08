@@ -32,9 +32,9 @@ public class VSchematicCompactCimulinkV1 {
         return new BlockPos(((x / 16 / 256 - 1) * 256 + 128) * 16, 0, ((z / 16 / 256) * 256 + 128) * 16);
     }
 
-    private static Map<Long, Pair<Vector3d, Vector3d>> cast(Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> m){
+    private static Map<Long, Pair<Vector3d, Vector3d>> cast(Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> m){
         Map<Long, Pair<Vector3d, Vector3d>> result = new HashMap<>();
-        m.forEach((k, v) -> result.put(k, new Pair<>(v.getFirst(), v.getSecond())));
+        m.forEach((k, v) -> result.put(k, new Pair<>(new Vector3d(v.getFirst()), new Vector3d(v.getSecond()))));
         return result;
     }
 
@@ -62,7 +62,7 @@ public class VSchematicCompactCimulinkV1 {
     public static CompoundTag PreCimulinkReadVModCompact(
             @NotNull ServerLevel serverLevel,
             @NotNull Map<Long, Long> map,
-            @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> offsetMap,
+            @NotNull Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> offsetMap,
             @Nullable CompoundTag tagToModify
     ){
         if(tagToModify == null || !tagToModify.contains("compact"))return null;
