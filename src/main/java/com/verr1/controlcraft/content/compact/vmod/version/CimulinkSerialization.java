@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public abstract class CimulinkSerialization implements ICimulinkSerialization {
             @NotNull BlockState blockState,
             @Nullable BlockEntity blockEntity,
             @NotNull List<? extends ServerShip> list,
-            @NotNull Map<Long, ? extends Vector3d> map
+            @NotNull Map<Long, ? extends Vector3dc> map
     ) {
         CompoundTag tag = onCopyImpl(serverLevel, blockPos, blockState, blockEntity, list, map);
         if(tag != null){
@@ -45,7 +46,7 @@ public abstract class CimulinkSerialization implements ICimulinkSerialization {
             @NotNull BlockState blockState,
             @Nullable BlockEntity blockEntity,
             @NotNull List<? extends ServerShip> list,
-            @NotNull Map<Long, ? extends Vector3d> map
+            @NotNull Map<Long, ? extends Vector3dc> map
     );
 
 
@@ -56,7 +57,7 @@ public abstract class CimulinkSerialization implements ICimulinkSerialization {
         }
 
         @Override
-        public @Nullable CompoundTag onCopyImpl(@NotNull ServerLevel serverLevel, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @Nullable BlockEntity blockEntity, @NotNull List<? extends ServerShip> list, @NotNull Map<Long, ? extends Vector3d> map) {
+        public @Nullable CompoundTag onCopyImpl(@NotNull ServerLevel serverLevel, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @Nullable BlockEntity blockEntity, @NotNull List<? extends ServerShip> list, @NotNull Map<Long, ? extends Vector3dc> map) {
             if(blockEntity instanceof CimulinkBlockEntity<?> cimulink){
                 return VSchematicCompactCimulinkV0.PreWriteCimulinkVModCompact(cimulink);
             }
@@ -69,7 +70,7 @@ public abstract class CimulinkSerialization implements ICimulinkSerialization {
                 @NotNull BlockPos blockPos,
                 @NotNull BlockState blockState,
                 @NotNull Map<Long, Long> map,
-                @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> map1,
+                @NotNull Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> map1,
                 @Nullable CompoundTag compoundTag
         ) {
             return VSchematicCompactCimulinkV0.PreCimulinkReadVModCompact(
@@ -94,7 +95,7 @@ public abstract class CimulinkSerialization implements ICimulinkSerialization {
         }
 
         @Override
-        public @Nullable CompoundTag onCopyImpl(@NotNull ServerLevel serverLevel, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @Nullable BlockEntity blockEntity, @NotNull List<? extends ServerShip> list, @NotNull Map<Long, ? extends Vector3d> map) {
+        public @Nullable CompoundTag onCopyImpl(@NotNull ServerLevel serverLevel, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @Nullable BlockEntity blockEntity, @NotNull List<? extends ServerShip> list, @NotNull Map<Long, ? extends Vector3dc> map) {
             if(blockEntity instanceof CimulinkBlockEntity<?> cimulink){
                 return VSchematicCompactCimulinkV1.PreWriteCimulinkVModCompact(cimulink);
             }
@@ -107,7 +108,7 @@ public abstract class CimulinkSerialization implements ICimulinkSerialization {
                 @NotNull BlockPos blockPos,
                 @NotNull BlockState blockState,
                 @NotNull Map<Long, Long> map,
-                @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> map1,
+                @NotNull Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> map1,
                 @Nullable CompoundTag compoundTag
         ) {
             return VSchematicCompactCimulinkV1.PreCimulinkReadVModCompact(

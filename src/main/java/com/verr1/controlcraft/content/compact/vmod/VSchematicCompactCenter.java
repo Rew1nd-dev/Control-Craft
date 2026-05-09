@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.Ship;
 
 import java.util.Map;
@@ -35,7 +36,7 @@ public class VSchematicCompactCenter {
     public static CompoundTag PreMotorReadVModCompact(
             @NotNull ServerLevel serverLevel,
             @NotNull Map<Long, Long> map,
-            @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> offsetMap,
+            @NotNull Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> offsetMap,
             @Nullable CompoundTag tagToModify
     ){
 
@@ -54,8 +55,8 @@ public class VSchematicCompactCenter {
 
         // Ship n_comp = ValkyrienSkies.getShipWorld(serverLevel).getAllShips().getById(n_comp_id);
 
-        Vector3d oldCenter = offsetMap.get(o_comp_id).getFirst();
-        Vector3d newCenter = offsetMap.get(o_comp_id).getSecond();
+        Vector3d oldCenter = new Vector3d(offsetMap.get(o_comp_id).getFirst());
+        Vector3d newCenter = new Vector3d(offsetMap.get(o_comp_id).getSecond());
 
 
 

@@ -19,7 +19,6 @@ import net.minecraft.world.phys.AABB;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockItem;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockPaletteHashMapV1;
 import net.spaceeye.valkyrien_ship_schematics.containers.v1.ChunkyBlockData;
-import net.spaceeye.valkyrien_ship_schematics.interfaces.ICopyableBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
@@ -29,6 +28,7 @@ import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.assembly.ICopyableBlock;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

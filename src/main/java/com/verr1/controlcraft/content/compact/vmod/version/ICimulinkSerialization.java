@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface ICimulinkSerialization {
             @NotNull BlockState blockState,
             @Nullable BlockEntity blockEntity,
             @NotNull List<? extends ServerShip> list,
-            @NotNull Map<Long, ? extends Vector3d> map
+            @NotNull Map<Long, ? extends Vector3dc> map
     );
 
     CompoundTag onPaste(
@@ -31,7 +32,7 @@ public interface ICimulinkSerialization {
             @NotNull BlockPos blockPos,
             @NotNull BlockState blockState,
             @NotNull Map<Long, Long> map,
-            @NotNull Map<Long, ? extends Pair<? extends Vector3d, ? extends Vector3d>> map1,
+            @NotNull Map<Long, ? extends Pair<? extends Vector3dc, ? extends Vector3dc>> map1,
             @Nullable CompoundTag compoundTag
     );
 
