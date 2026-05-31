@@ -20,6 +20,7 @@ import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 public class GroundBodyShip implements Ship {
     public static final ShipTransform EMPTY_TRANSFORM = ShipTransformImpl.Companion.createEmpty();
 
+    private @Nullable Long bodyId;
 
     @Override
     public long getId() {
@@ -90,5 +91,15 @@ public class GroundBodyShip implements Ship {
     @Override
     public @NotNull BodyKinematics getKinematics() {
         return new BodyKinematicsBuilderImpl().build();
+    }
+
+    @Override
+    public @Nullable Long getBodyId() {
+        return bodyId;
+    }
+
+    @Override
+    public void setBodyId(@Nullable Long bodyId) {
+        this.bodyId = bodyId;
     }
 }
