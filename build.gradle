@@ -202,7 +202,6 @@ dependencies {
     implementation fg.deobf("libs:tweakcontroller-1.2.5:forge")
     implementation fg.deobf("libs:we-7.2.15:forge")
     implementation fg.deobf("libs:fcs-8.0.2:forge")
-    implementation fg.deobf("libs:cct-1.116.2:forge")
     // compileOnly fg.deobf("libs:shaolib:1.4.3")
     compileOnly fg.deobf("curse.maven:cbc-more-shells-1222164:6866093")
 
@@ -224,8 +223,8 @@ dependencies {
     implementation("org.joml:joml-primitives:1.10.0") { transitive = false }
 
     // cc:t dependencies
-    // implementation fg.deobf("curse.maven:cc-tweaked-282001:5379173")
-    // implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:1.113.0")
+//     implementation fg.deobf("curse.maven:cc-tweaked-282001:5379173")
+     implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:1.115.1")
 
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))

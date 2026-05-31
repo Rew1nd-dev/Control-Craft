@@ -361,4 +361,22 @@ public class VSMathUtils {
         return xFace_sc;
     }
 
+    public static Direction left(Direction direction){
+        if(direction.getAxis().isHorizontal()){
+            return direction.getCounterClockWise(Direction.Axis.Y);
+        }
+        return direction.getCounterClockWise(Direction.Axis.X);
+    }
+
+    public static Vector3d toJOML(Direction direction){
+        return switch (direction)
+        {
+            case NORTH -> new Vector3d(0, 0, -1);
+            case SOUTH -> new Vector3d(0, 0, 1);
+            case WEST -> new Vector3d(-1, 0, 0);
+            case EAST -> new Vector3d(1, 0, 0);
+            case UP -> new Vector3d(0, 1, 0);
+            case DOWN -> new Vector3d(0, -1, 0);
+        };
+    }
 }
