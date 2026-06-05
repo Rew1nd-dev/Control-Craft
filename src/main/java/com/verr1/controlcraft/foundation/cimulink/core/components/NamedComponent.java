@@ -32,8 +32,8 @@ public abstract class NamedComponent extends Component {
     ) {
         super(inputs.size(), outputs.size());
 
-        this.inputs = Collections.unmodifiableList(inputs);
-        this.outputs = Collections.unmodifiableList(outputs);
+        this.inputs = List.copyOf(inputs);
+        this.outputs = List.copyOf(outputs);
 
         Map<String, Integer> namedInputs = new HashMap<>();
         Map<String, Integer> namedOutputs = new HashMap<>();

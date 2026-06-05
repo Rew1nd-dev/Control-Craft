@@ -3,6 +3,7 @@ package com.verr1.controlcraft.content.blocks;
 import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.FlapForceInducer;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.Observer;
 import com.verr1.controlcraft.foundation.cimulink.core.components.NamedComponent;
 import com.verr1.controlcraft.foundation.cimulink.game.IPlant;
@@ -10,6 +11,7 @@ import com.verr1.controlcraft.foundation.data.ShipPhysics;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
 import com.verr1.controlcraft.utils.SerializeUtils;
+import com.verr1.controlcraft.utils.VSMathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,12 +30,18 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.impl.game.ships.ShipData;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toJOML;
+
+import static com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
+import static com.simibubi.create.content.kinetics.saw.SawBlock.FLIPPED;
 import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toJOML;
 
 public abstract class OnShipBlockEntity extends NetworkBlockEntity implements ClipboardCloneable
@@ -48,6 +56,53 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
                 .register();
     }
 
+    public Vector3d positionModel() {
+        return ValkyrienSkies.toJOML(getBlockPos().getCenter());
+    }
+
+    public Vector3d position() {
+        return readSelf().s2wTransform().transformPosition(positionModel());
+    }
+
+    public Vector3d positionCenterModel(){
+        return new Vector3d(readSelf().positionInShip());
+    }
+
+    public Vector3d positionCenter(){
+        return new Vector3d(readSelf().position());
+    }
+
+    public double mass() {
+        return Optional
+                .ofNullable(getLoadedServerShip())
+                .map(s -> s.getInertiaData().getMass())
+                .orElse(readSelf().mass());
+    }
+
+    public Vector3d frontLocal() {
+        return ValkyrienSkies.set(new Vector3d(), getDirection().getNormal());
+    }
+
+    public Vector3d front() {
+        return readSelf().s2wTransform().transformDirection(frontLocal());
+    }
+
+    public Vector3dc leftLocal() {
+        return VSMathUtils.toJOML(leftDirection());
+    }
+
+    public Vector3d left() {
+        return readSelf().s2wTransform().transformDirection(leftLocal(), new Vector3d());
+    }
+
+    public Vector3d upLocal(){
+        return frontLocal().cross(leftLocal()).normalize();
+    }
+
+    public Vector3d up(){
+        return readSelf().s2wTransform().transformDirection(upLocal());
+    }
+
     public Vector3d getDirectionJOML() {
         return ValkyrienSkies.set(new Vector3d(), getDirection().getNormal());
     }
@@ -55,6 +110,32 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
     public @NotNull Direction getDirection(){
         if(getBlockState().hasProperty(BlockStateProperties.FACING)) return getBlockState().getValue(BlockStateProperties.FACING);
         return Direction.UP;
+    }
+
+    public Direction leftDirection() {
+        BlockState state = getBlockState();
+        if (state.hasProperty(AXIS_ALONG_FIRST_COORDINATE)) {
+            Direction direction = getDirection();
+            boolean alignFirst = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
+
+            boolean flipped = false;
+            if (state.hasProperty(FLIPPED)) {
+                flipped = state.getValue(FLIPPED);
+            }
+
+            Direction d0 = switch (direction) {
+                case SOUTH, NORTH -> alignFirst ? Direction.WEST : Direction.UP;
+                case EAST -> alignFirst ? Direction.UP : Direction.SOUTH;
+                case WEST -> alignFirst ? Direction.UP : Direction.NORTH;
+                case UP, DOWN -> alignFirst ? Direction.WEST : Direction.NORTH;
+            };
+
+            return flipped ? d0.getOpposite() : d0;
+
+        } else {
+            return VSMathUtils.left(getDirection());
+        }
+
     }
 
     public void setDeviceName(String name){
@@ -210,6 +291,10 @@ public abstract class OnShipBlockEntity extends NetworkBlockEntity implements Cl
 
     public @Nullable Long getShipOrGroundIDNullable(){
         return Optional.of(getShipOrGroundID()).filter(id -> id != -1L).orElse(null);
+    }
+
+    public @Nullable Vector3dc[] debug_lastTickFlapControls(){
+        return new Vector3d[0];
     }
 
 }

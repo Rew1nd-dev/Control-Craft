@@ -5,6 +5,7 @@ import com.verr1.controlcraft.config.BlockPropertyConfig;
 import com.verr1.controlcraft.content.cctweaked.delegation.ComputerCraftAsyncDelegation;
 import com.verr1.controlcraft.content.compact.tweak.impl.TweakedLinkedControllerServerHandlerExtension;
 import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkBus;
+import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
@@ -73,6 +74,7 @@ public class ControlCraftEvents {
             SpeedControllerPlant.ASYNC_SCHEDULER.tick();
             AIServer.MANAGER.tick();
             CimulinkBus.tickAll();
+            CimulinkPorts.tick();
             TimeCache.tick();
         } else if (event.phase == TickEvent.Phase.END) {
             BlockLinkPort.postMainTick();

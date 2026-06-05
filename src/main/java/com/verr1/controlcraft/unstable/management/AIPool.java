@@ -36,7 +36,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
+import org.valkyrienskies.core.api.ships.ShipTeleportData;
 import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.BlockStateInfo;
@@ -134,8 +134,8 @@ public class AIPool extends SavedData {
             .ofNullable(VSGameUtilsKt.getLoadedShipManagingPos(pos.level(server()), pos.pos()));
     }
 
-    public static ShipTeleportDataImpl withPosition(Vector3dc newPosition){
-        return new ShipTeleportDataImpl(newPosition, new Quaterniond(), new Vector3d(), new Vector3d(), null, null, null);
+    public static ShipTeleportData withPosition(Vector3dc newPosition){
+        return VSGameUtilsKt.getVsCore().newShipTeleportData(newPosition, new Quaterniond(), new Vector3d(), new Vector3d(), null, null, null);
     }
 
     public List<Long> listAvailableAI(){
@@ -331,13 +331,13 @@ public class AIPool extends SavedData {
 
 
 
-    public static ShipTeleportDataImpl withPose(
+    public static ShipTeleportData withPose(
         Vector3dc newPosition,
         Quaterniondc newRotation,
         Vector3dc vel,
         Vector3dc omg
     ){
-        return new ShipTeleportDataImpl(newPosition, newRotation.normalize(new Quaterniond()), vel, omg, null, null, null);
+        return VSGameUtilsKt.getVsCore().newShipTeleportData(newPosition, newRotation.normalize(new Quaterniond()), vel, omg, null, null, null);
     }
 
     private Optional<Long> pollPool(){

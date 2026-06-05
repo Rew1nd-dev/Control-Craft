@@ -2,14 +2,15 @@ package com.verr1.controlcraft.foundation.cimulink.game.port.packaged;
 
 import com.verr1.controlcraft.ControlCraft;
 import com.verr1.controlcraft.content.links.integration.CircuitBlockEntity;
-import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysWorldAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IBusAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IPhysAccess;
+import com.verr1.controlcraft.foundation.cimulink.core.api.IWorldAccess;
 import com.verr1.controlcraft.foundation.cimulink.core.components.lua.CimulinkLua;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.Luacuit;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitConstructor;
 import com.verr1.controlcraft.foundation.cimulink.core.components.luacuit.LuacuitScript;
 import com.verr1.controlcraft.foundation.cimulink.core.registry.CimulinkFactory;
 import com.verr1.controlcraft.foundation.cimulink.core.registry.Factory;
-import com.verr1.controlcraft.foundation.cimulink.game.circuit.CircuitNbt;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.LuaOvertimeException;
 import com.verr1.controlcraft.foundation.cimulink.game.exceptions.UndefineMethodException;
 import com.verr1.controlcraft.utils.CompoundTagBuilder;
@@ -56,8 +57,16 @@ public class LuacuitLinkPort extends WrappedLinkPort<Luacuit>{
         }
     }
 
-    public void setWorldAccess(IPhysWorldAccess access){
-        component().setWorldAccess(access);
+    public void setPhysAccess(IPhysAccess access) {
+        component().setPhysAccess(access);
+    }
+
+    public void setWorldAccess(IWorldAccess access) {
+        component().setUtilAccess(access);
+    }
+
+    public void setBusAccess(IBusAccess access) {
+        component().setBusAccess(access);
     }
 
     public boolean isEmpty(){
