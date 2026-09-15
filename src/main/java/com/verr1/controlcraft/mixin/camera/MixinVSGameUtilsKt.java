@@ -1,6 +1,8 @@
 package com.verr1.controlcraft.mixin.camera;
 
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
+import com.verr1.controlcraft.foundation.managers.ClientControlChairManager;
+import com.verr1.controlcraft.hooks.NoVSCameraRotationHooks;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +19,14 @@ public abstract class MixinVSGameUtilsKt {
 
     @Inject(method = "getShipMountedToData", at = @At("RETURN"), remap = false, cancellable = true)
     private static void controlCraft$getShipMountedToData(Entity passenger, Float partialTicks, CallbackInfoReturnable<ShipMountedToData> cir){
-        if(passenger instanceof LocalPlayer && passenger.level().isClientSide && ClientCameraManager.getLinkedCamera() != null){
+        if (passenger instanceof LocalPlayer
+                && passenger.level().isClientSide
+                && (
+                       ClientCameraManager.shouldOverrideMountedCamera()
+                    || ClientControlChairManager.shouldOverrideMountedCamera()
+                    || NoVSCameraRotationHooks.shouldDisable()
+                )
+        ) {
             cir.setReturnValue(null);
         }
     }

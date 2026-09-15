@@ -16,7 +16,7 @@ public class CannonMountPlant extends MutablePlant {
     protected CannonMountPlant(@NotNull ICannonDuck cannon) {
         super(new builder()
                 .out("pitch", ($) -> (double)cannon.controlCraft$getPitch())
-                .out("yaw", ($) -> (double)cannon.controlCraft$getYaw())
+                .out("roll", ($) -> (double)cannon.controlCraft$getYaw())
                 .in("fire", (self, v) -> ((CannonMountPlant) self).handleSample(v))
         );
         this.cached = cannon;

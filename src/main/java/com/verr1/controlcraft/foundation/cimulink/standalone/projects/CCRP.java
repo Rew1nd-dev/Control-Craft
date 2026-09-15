@@ -83,7 +83,7 @@ public class CCRP {
         Val yaw = eval.atan(delta_pin_sc.x(), delta_pin_sc.z());
         Val pitch = eval.clamp(dot, m_pitch);
 
-        eval.asOut("yaw", yaw).asOut("pitch", pitch);
+        eval.asOut("roll", yaw).asOut("pitch", pitch);
 
         return eval;
     }

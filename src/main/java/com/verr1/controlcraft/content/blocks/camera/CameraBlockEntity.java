@@ -108,7 +108,7 @@ public class CameraBlockEntity extends OnShipBlockEntity
     public static NetworkKey TR = NetworkKey.create("transform_rotation");
 
     public static NetworkKey PITCH = NetworkKey.create("pitch");
-    public static NetworkKey YAW = NetworkKey.create("yaw");
+    public static NetworkKey YAW = NetworkKey.create("roll");
     public static NetworkKey IS_ACTIVE_SENSOR = NetworkKey.create("sensor");
 
     public static NetworkKey RAY_TYPE = NetworkKey.create("ray_type");

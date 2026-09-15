@@ -55,7 +55,7 @@ public class ComputerWatcherLib extends DebugLib {
      */
     public void setLimits(int maxInstructions, long maxTimeMillis, long maxMemoryBytes) {
         this.maxInstructions = maxInstructions;
-        this.maxNanos = maxTimeMillis * 1_000_000L;
+        this.maxNanos = maxTimeMillis >= Long.MAX_VALUE / 1_000_000L ? Long.MAX_VALUE : maxTimeMillis * 1_000_000L;
         this.maxAllocatedBytes = maxMemoryBytes;
     }
 

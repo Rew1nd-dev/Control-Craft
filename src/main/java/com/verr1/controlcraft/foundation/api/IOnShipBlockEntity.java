@@ -46,7 +46,13 @@ public interface IOnShipBlockEntity {
             NamedComponent device = plant.plant();
             Optional.ofNullable(getLoadedServerShip())
                     .map(CimulinkBus::getOrCreate)
-                    .ifPresent(bus -> bus.activate(getWorldBlockPos(), device, device.name()));
+                    .ifPresent(bus -> bus.activate(
+                            getWorldBlockPos(),
+                            device,
+                            device.name(),
+                            plant.plantType(),
+                            plant.plantMetadata()
+                    ));
         }
 
     }

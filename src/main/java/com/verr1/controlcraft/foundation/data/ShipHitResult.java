@@ -15,7 +15,7 @@ public record ShipHitResult(
 
     public Vector3dc getPosition(){
         Vector3dc p = ship.getTransform().getPositionInWorld();
-        if(!ControlCraftServer.onMainThread()){
+        if(ControlCraftServer.onMainThread()){
             return p;
         }
         long id = ship().getId();
@@ -28,7 +28,7 @@ public record ShipHitResult(
 
     public Vector3dc getVelocity(){
         Vector3dc p = ship.getVelocity();
-        if(!ControlCraftServer.onMainThread()){
+        if(ControlCraftServer.onMainThread()){
             return p;
         }
         long id = ship().getId();

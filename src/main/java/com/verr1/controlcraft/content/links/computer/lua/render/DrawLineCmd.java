@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.links.computer.lua.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4f;
 
 public record DrawLineCmd(float x0, float y0, float x1, float y1, float thickness, int rgba) implements RenderCmd {
@@ -17,7 +16,7 @@ public record DrawLineCmd(float x0, float y0, float x1, float y1, float thicknes
         float length = (float) Math.sqrt(dx * dx + dy * dy);
         float half = Math.max(thickness, 0.0f) * 0.5f;
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.gui());
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderShapeEmitter.coloredQuadRenderType());
         Matrix4f matrix4f = ms.last().pose();
 
         if (length < EPSILON) {

@@ -47,7 +47,7 @@ public class OldFPV {
 
         constructor
                 .defineInput("pitch", input.__in("pitch"))
-                .defineInput("yaw", input.__in("yaw"))
+                .defineInput("roll", input.__in("roll"))
                 .defineInput("roll", input.__in("roll"))
                 .defineInput("thrust", input.__in("thrust"))
                 .defineInput("G_pitch", input.__in("G_pitch"))
@@ -110,7 +110,7 @@ public class OldFPV {
 
         constructor
                 .defineInput("pitch", pitch_yaw_roll[0].__in(0))
-                .defineInput("yaw", pitch_yaw_roll[1].__in(0))
+                .defineInput("roll", pitch_yaw_roll[1].__in(0))
                 .defineInput("roll", pitch_yaw_roll[2].__in(0))
                 .connect(pow.__out(0), pitch_yaw_roll[0].__in(1), pitch_yaw_roll[1].__in(1), pitch_yaw_roll[2].__in(1))
                 .defineInput("G_pitch", g_pitch_yaw_roll[0].__in(1))
@@ -234,7 +234,7 @@ public class OldFPV {
                 .input("G_pitch", 1).input("G_yaw", 1).input("G_roll", 1).input("G_thrust", 1)
                 .input("thrust", 0)
                 .input("pitch", 0)
-                .input("yaw", 0)
+                .input("roll", 0)
                 .input("roll", 1);
 
         db_input.track(input.__out(0), input.__out(1), input.__out(2), input.__out(3));

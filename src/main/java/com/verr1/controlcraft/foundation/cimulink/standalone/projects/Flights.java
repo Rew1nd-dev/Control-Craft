@@ -12,7 +12,7 @@ public class Flights {
         Val one = eval.newVal(1);
 
         Val pitch = eval.newVal("pitch");
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val roll = eval.newVal("roll");
         Val vt = eval.newVal("vel");
         Val vf = eval.newVal("velFeed");
@@ -79,7 +79,7 @@ public class Flights {
         Val one = eval.newVal(1);
 
         Val pitch = eval.newVal("pitch");
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val roll = eval.newVal("roll");
         Val vt = eval.newVal("vel");
         Val vf = eval.newVal("velFeed");

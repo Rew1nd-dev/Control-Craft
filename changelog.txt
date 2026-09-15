@@ -1,4 +1,36 @@
 Control Craft Changelog
+2.25.4 - 2026-04-16
+====================
+- Bumped mod version to 2.25.4 and protocol/network version to 1.5.
+- Added the new Control Chair block, block entity, item/model assets, loot table, mineable tags, VS mass entry, renderer, partial handle model, generated blockstates, and localization entries.
+- Added Control Chair as a Cimulink plant with outputs for yaw, pitch, roll, thrust, button states, input availability, third-person state, absolute view yaw/pitch, absolute view vector, and occupied state.
+- Added pilot binding for Control Chairs using Create seat passengers, including server-side session ownership, cleanup on removal/server stop, and per-chair player tracking by world position.
+- Added Control Chair client input capture with dedicated keybinds for input capture, view lock, view reset, and binding-screen access.
+- Added keyboard, mouse, and gamepad input support for Control Chair control, including configurable axes/buttons, sensitivity/gain, periodic delta packets, full snapshots, heartbeats, and reset packets when input capture ends.
+- Added the Control Chair bindings screen with paged axis/button bindings, primary/secondary slots, gamepad capture, mouse-axis capture, key/mouse-button capture, clear/default actions, and persistent client-side binding storage.
+- Added Control Chair camera/view integration with ship-relative and absolute rotation modes, first-person/third-person rotation settings, view lock, chair-facing reset, mounted camera override, and camera/frustum handling while seated on ships.
+- Added Control Chair input networking through `ControlChairInputPacket` and a single-threaded server worker so input deltas are applied off the packet handler path.
+- Added client mixins for keyboard and mouse capture while piloting a Control Chair, plus a mouse handler accessor for clearing stuck button state when capture mode changes.
+- Expanded the computer `Network` Lua API from flat slots into `Network.state`, `Network.event`, and `Network.authority` namespaces while keeping compatibility helpers such as `Network.peek`, `Network.retrieve`, `Network.send`, and `Network.isDirty`.
+- Reworked computer network storage around state revisions, delete markers, full/delta sync tags, event queues, per-event sequence numbers, sender metadata, and bounded event backlogs.
+- Added client network authority for computer Lua, including leased authority requests, forced authority owners, release packets, authority tokens, cooldown reporting, and periodic authority sync to nearby clients.
+- Added server-side authority controls to Lua through `Network.authority.force`, `Network.authority.clearForced`, and `Network.authority.get`, allowing scripts to explicitly grant or revoke client write authority.
+- Added event-oriented computer networking with `Network.event.emit`, `peek`, `poll`, `backlog`, and `clear` on both client and server, plus client packet support for state set, state clear, and event emit operations.
+- Increased computer client network payload limit to 5 KiB and added structured return info for payload-too-large, awaiting-authority, cooldown, denied, owned, requested, and released states.
+- Added `Plants` Lua library on computer server scripts with `Plants.list()` and `Plants.find(type)` for discovering named Cimulink plants across the current constraint cluster.
+- Added plant discovery metadata to Cimulink buses, including plant type keys, block/block-entity metadata, facing/axis metadata, input/output port lists, and type-name matching with or without namespace.
+- Added reusable Lua conversion helpers in `LuaUtils` for Java-to-Lua and Lua-to-Java values, including arrays, collections, maps, enum names, nested tables, cycle handling, and table key normalization.
+- Added Lua load-time protection for computers and Luacuit scripts, with configurable instruction, time, and allocation limits plus watcher reset hooks before script initialization.
+- Updated WatcherLib to enforce instruction count, elapsed time, memory allocation limits, and explicit interruption during script execution.
+- Added generic clientbound field synchronization support with `BufCodec`, `BufCodecs`, `ClientboundFieldSyncHandler`, request packets, and clientbound field sync packets for block entities.
+- Updated `NetworkBlockEntity` to expose clientbound field registration, queued clientbound sync, request handling, and server ticking for the new sync path.
+- Added clientbound field syncing to compact flaps and adjusted flap client/server synchronization and UI behavior around the new sync system.
+- Added more port status UI capacity by raising the visible status list limit and fixing page-count/current-size handling.
+- Updated LuaLinks zh-CN documentation and added new Lua/Luacuit docs and examples covering the expanded network API, plant discovery, examples, and Luacuit plant/tutorial material.
+- Added generated language/default localization for Control Chair names, keybinds, rotation modes, and UI contents in English, upside-down English, and zh_cn resources.
+- Added Control Chair resource assets, including chair block/item models, handle partial model, seat textures, generated item/blockstate data, and mass/tag data.
+- Refined camera mixins so linked cameras and Control Chair mounted camera overrides share the same mounted-camera setup path, third-person zoom behavior, and VS mounted-data suppression logic.
+
 2.24.13 - 2026-04-07
 ====================
 - Bumped mod version to 2.24.13.

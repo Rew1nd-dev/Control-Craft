@@ -7,6 +7,8 @@ import com.simibubi.create.foundation.render.SuperRenderTypeBuffer;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.ControlCraftClient;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
+import com.verr1.controlcraft.foundation.managers.ClientControlChairManager;
+import com.verr1.controlcraft.foundation.input.ControlChairGamepadManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,7 +34,9 @@ public class ControlCraftClientEvents {
             ControlCraftClient.CLIENT_LERPED_OUTLINER.tickOutlines();
             ControlCraftClient.CLIENT_CURVE_OUTLINER.tickOutlines();
             ControlCraftClient.CLIENT_WAND_HANDLER.tick();
+            ControlChairGamepadManager.poll();
             ClientCameraManager.tick();
+            ClientControlChairManager.captureViewFromMainCamera();
             // DebugTester.clientTick();
         }
 
@@ -44,6 +48,7 @@ public class ControlCraftClientEvents {
             while (LINK_LAST_CAMERA.get().consumeClick()) {
                 ClientCameraManager.linkLast();
             }
+            ClientControlChairManager.tick();
         }
 
     }
@@ -60,6 +65,7 @@ public class ControlCraftClientEvents {
         float partialTicks = AnimationTickHolder.getPartialTicks();
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
                 .getPosition();
+        ClientControlChairManager.captureViewFromMainCamera();
 
         ControlCraftClient.CLIENT_LERPED_OUTLINER.renderOutlines(ms, buffer, camera, partialTicks);
         ControlCraftClient.CLIENT_CURVE_OUTLINER.renderOutlines(ms, buffer, camera, partialTicks);

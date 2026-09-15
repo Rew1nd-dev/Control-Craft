@@ -25,6 +25,7 @@
     "defaultRequire": 1
   },
   "client": [
+    "accessor.MouseHandlerAccessor",
     "qol.MixinGearBlock",
     "camera.MixinCamera",
     "camera.MixinClientChunkCache",
@@ -32,6 +33,8 @@
     "camera.MixinLevelRenderer",
     "camera.MixinStorage",
     "camera.MixinVSGameUtilsKt",
+    "controlchair.MixinKeyboardHandler",
+    "controlchair.MixinMouseHandler",
     "tweak.MixinLocalPlayerMouseLockView",
     "tweak.MixinMouseCursorHandler"
   ]

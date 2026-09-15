@@ -22,10 +22,11 @@ public class MixinTrackedEntity {
     private boolean controlCraft$shouldNoCull;
 
     @Inject(
-        method = "<init>(Lnet/minecraft/world/entity/Entity;IIZ)V",
+        method = "<init>",
         at = @At("TAIL")
     )
     private void adjustTrackingRangeForContraption(
+        ChunkMap map,
         Entity entity,
         int range,
         int updateInterval,

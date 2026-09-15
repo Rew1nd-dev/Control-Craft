@@ -115,7 +115,7 @@ public class AimPredict {
         Val yaw = eval.atan(aim_sc.x(), aim_sc.z());
         Val pitch = eval.asin(aim_sc.y());
 
-        eval.asOut("yaw", yaw).asOut("pitch", pitch);
+        eval.asOut("roll", yaw).asOut("pitch", pitch);
 
         return eval.evaluate().buildContext();
     }

@@ -13,7 +13,7 @@ public class EulerSensor extends NamedComponent {
     private final SensorBlockEntity sp;
 
     public EulerSensor(SensorBlockEntity sp) {
-        super(List.of(), List.of("yaw", "pitch", "roll"));
+        super(List.of(), List.of("roll", "pitch", "roll"));
         this.sp = sp;
     }
 
@@ -27,7 +27,7 @@ public class EulerSensor extends NamedComponent {
 
     }
     // x -- pitch
-    // y -- yaw
+    // y -- roll
     // z -- roll
     @Override
     public void onPositiveEdge() {

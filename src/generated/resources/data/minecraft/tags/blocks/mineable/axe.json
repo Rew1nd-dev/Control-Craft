@@ -1,6 +1,7 @@
 {
   "values": [
     "vscontrolcraft:chunk_loader",
+    "vscontrolcraft:control_chair",
     "vscontrolcraft:propeller_controller",
     "vscontrolcraft:logic_gates",
     "vscontrolcraft:flexible_gate",

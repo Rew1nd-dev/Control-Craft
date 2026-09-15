@@ -47,7 +47,7 @@ public class Missile {
         Val yaw = eval.atan(v_sc.x(), v_sc.z());
         Val pitch = eval.asin(v_sc.y());
 
-        eval.asOut("yaw", yaw).asOut("pitch", pitch);
+        eval.asOut("roll", yaw).asOut("pitch", pitch);
 
         return eval;
     }
@@ -96,7 +96,7 @@ public class Missile {
 
         eval.asLoop("cdx", "pdx").asLoop("cdy", "pdy").asLoop("cdz", "pdz");
 
-        eval.asOut("yaw", yaw).asOut("pitch", pitch);
+        eval.asOut("roll", yaw).asOut("pitch", pitch);
 
         return eval;
     }
@@ -136,7 +136,7 @@ public class Missile {
     public static Evaluator control(){
         Evaluator eval = new Evaluator();
 
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val pitch = eval.newVal("pitch");
 
         Val g_yaw = eval.newVal("g_yaw");
@@ -227,7 +227,7 @@ public class Missile {
 
 
         Map<String, Val> args = new HashMap<>();
-        args.putAll(Map.of("yaw", cyp_out.get("yaw"),
+        args.putAll(Map.of("roll", cyp_out.get("roll"),
                 "pitch", cyp_out.get("pitch"),
                 "g_yaw", g_yaw,
                 "g_pitch", g_pitch,
@@ -315,7 +315,7 @@ public class Missile {
 
         Map<String, Val> args = new HashMap<>();
         args.putAll(Map.of(
-                "yaw", cyp_out.get("yaw"),
+                "roll", cyp_out.get("roll"),
                 "pitch", cyp_out.get("pitch"),
                 "g_yaw", g_yaw,
                 "g_pitch", g_pitch,

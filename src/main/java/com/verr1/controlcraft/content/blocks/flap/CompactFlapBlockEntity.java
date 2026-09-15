@@ -22,6 +22,7 @@ import com.verr1.controlcraft.foundation.data.logical.LogicalFlap;
 import com.verr1.controlcraft.foundation.network.executors.ClientBuffer;
 import com.verr1.controlcraft.foundation.network.executors.CompoundTagPort;
 import com.verr1.controlcraft.foundation.network.executors.SerializePort;
+import com.verr1.controlcraft.foundation.network.sync.BufCodecs;
 import com.verr1.controlcraft.foundation.redstone.DirectReceiver;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
 import com.verr1.controlcraft.foundation.type.descriptive.SlotType;
@@ -137,7 +138,11 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
-                .dispatchToSync()
+                .register();
+
+        buildClientboundField(ANGLE, BufCodecs.DOUBLE)
+                .withServerGetter(this::angle)
+                .withClientApplier(this::setAngle)
                 .register();
 
         buildRegistry(TILT)
@@ -147,7 +152,11 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
                         SerializeUtils.DOUBLE
                 ))
                 .withClient(ClientBuffer.DOUBLE.get())
-                .dispatchToSync()
+                .register();
+
+        buildClientboundField(TILT, BufCodecs.DOUBLE)
+                .withServerGetter(this::tilt)
+                .withClientApplier(this::setTilt)
                 .register();
 
         buildRegistry(LEGACY)
@@ -229,10 +238,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         receiver().register(
                 new NumericField(
                         () -> angle.read(),
-                        a -> {
-                            angle.write(a);
-                            queueUpdate(ANGLE);
-                        },
+                        this::setAngle,
                         "angle"
                 ),
                 new DirectReceiver.InitContext(SlotType.DEGREE, Couple.create(0.0, 1.0)),
@@ -240,10 +246,7 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         ).register(
                 new NumericField(
                         () -> tilt.read(),
-                        a -> {
-                            tilt.write(a);
-                            queueUpdate(TILT);
-                        },
+                        this::setTilt,
                         "tilt"
                 ),
                 new DirectReceiver.InitContext(SlotType.TILT, Couple.create(0.0, 1.0)),
@@ -494,18 +497,26 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
         return angle.read();
     }
 
-    public void setAngle(double angle){
+    private void applyAngle(double angle) {
         this.angle.write(angle);
-        queueUpdate(ANGLE);
+    }
+
+    public void setAngle(double angle){
+        applyAngle(angle);
+        queueClientboundSync(ANGLE);
     }
 
     public double tilt(){
         return tilt.read();
     }
 
-    public void setTilt(double tilt){
+    private void applyTilt(double tilt) {
         this.tilt.write(tilt);
-        queueUpdate(TILT);
+    }
+
+    public void setTilt(double tilt){
+        applyTilt(tilt);
+        queueClientboundSync(TILT);
     }
 
     @Override
@@ -636,7 +647,8 @@ public class CompactFlapBlockEntity extends OnShipBlockEntity implements
     @Override
     public void initializeClient() {
         super.initializeClient();
-        handler().request(true, ANGLE, TILT, C_WIDTH);
+        requestClientboundSync(ANGLE, TILT);
+        handler().request(true, C_WIDTH);
     }
 
     public void attach(FlapContraptionEntity contraption) {

@@ -21,7 +21,7 @@ public class JetMissile {
         Val g_drot_y = eval.newVal("g_droty");
 
 
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val pitch = eval.newVal("pitch");
         Val tvz = eval.newVal("vel");
         Val vz = eval.newVal("velFeed");
@@ -67,7 +67,7 @@ public class JetMissile {
         Val yaw = eval.atan(v_sc.x(), v_sc.z());
         Val pitch = eval.asin(v_sc.y());
 
-        eval.asOut("yaw", yaw).asOut("pitch", pitch);
+        eval.asOut("roll", yaw).asOut("pitch", pitch);
 
         return eval;
     }

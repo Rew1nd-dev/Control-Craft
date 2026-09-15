@@ -3,7 +3,9 @@ package com.verr1.controlcraft.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
+import com.simibubi.create.foundation.render.RenderTypes;
 import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.verr1.controlcraft.content.blocks.jet.JetRudderBlockEntity;
@@ -13,8 +15,10 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3dc;
@@ -83,7 +87,7 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
 //                .renderInto(ms, translucent);
 
         // Add additive glow layers to approximate volumetric engine plume.
-        VertexConsumer glow = bufferSource.getBuffer(RenderType.lightning());
+        VertexConsumer glow = bufferSource.getBuffer(RenderTypes.getOutlineTranslucent(AllSpecialTextures.BLANK.getLocation(), false));
         float time = AnimationTickHolder.getRenderTime(be.getLevel()) + partialTicks;
         float flickerSeed = (float) (be.getBlockPos().asLong() & 31L);
         float flicker = 0.94f + 0.06f * Mth.sin(time * 0.45f + flickerSeed);
@@ -149,6 +153,7 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
             int alphaEnd
     ) {
         Matrix4f pose = ms.last().pose();
+        Matrix3f normal = ms.last().normal();
 
         float sx0 = -startRadius;
         float sx1 = startRadius;
@@ -161,19 +166,20 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
         float ey1 = endRadius;
 
         // Side quads around +Z axis.
-        addQuadGradient(vc, pose, sx0, sy0, 0f, sx1, sy0, 0f, ex1, ey0, length, ex0, ey0, length, r, g, b, alphaStart, alphaEnd);
-        addQuadGradient(vc, pose, sx1, sy0, 0f, sx1, sy1, 0f, ex1, ey1, length, ex1, ey0, length, r, g, b, alphaStart, alphaEnd);
-        addQuadGradient(vc, pose, sx1, sy1, 0f, sx0, sy1, 0f, ex0, ey1, length, ex1, ey1, length, r, g, b, alphaStart, alphaEnd);
-        addQuadGradient(vc, pose, sx0, sy1, 0f, sx0, sy0, 0f, ex0, ey0, length, ex0, ey1, length, r, g, b, alphaStart, alphaEnd);
+        addQuadGradient(vc, pose, normal, sx0, sy0, 0f, sx1, sy0, 0f, ex1, ey0, length, ex0, ey0, length, r, g, b, alphaStart, alphaEnd);
+        addQuadGradient(vc, pose, normal, sx1, sy0, 0f, sx1, sy1, 0f, ex1, ey1, length, ex1, ey0, length, r, g, b, alphaStart, alphaEnd);
+        addQuadGradient(vc, pose, normal, sx1, sy1, 0f, sx0, sy1, 0f, ex0, ey1, length, ex1, ey1, length, r, g, b, alphaStart, alphaEnd);
+        addQuadGradient(vc, pose, normal, sx0, sy1, 0f, sx0, sy0, 0f, ex0, ey0, length, ex0, ey1, length, r, g, b, alphaStart, alphaEnd);
 
         // Cross quads to soften silhouette from more camera angles.
-        addQuadGradient(vc, pose, 0f, sy0, 0f, 0f, sy1, 0f, 0f, ey1, length, 0f, ey0, length, r, g, b, alphaStart, alphaEnd);
-        addQuadGradient(vc, pose, sx0, 0f, 0f, sx1, 0f, 0f, ex1, 0f, length, ex0, 0f, length, r, g, b, alphaStart, alphaEnd);
+        addQuadGradient(vc, pose, normal, 0f, sy0, 0f, 0f, sy1, 0f, 0f, ey1, length, 0f, ey0, length, r, g, b, alphaStart, alphaEnd);
+        addQuadGradient(vc, pose, normal, sx0, 0f, 0f, sx1, 0f, 0f, ex1, 0f, length, ex0, 0f, length, r, g, b, alphaStart, alphaEnd);
     }
 
     private static void addQuadGradient(
             VertexConsumer vc,
             Matrix4f pose,
+            Matrix3f normal,
             float x0, float y0, float z0,
             float x1, float y1, float z1,
             float x2, float y2, float z2,
@@ -182,10 +188,55 @@ public class JetRudderRenderer extends SafeBlockEntityRenderer<JetRudderBlockEnt
             int alphaNear,
             int alphaFar
     ) {
-        vc.vertex(pose, x0, y0, z0).color(r, g, b, alphaNear).endVertex();
-        vc.vertex(pose, x1, y1, z1).color(r, g, b, alphaNear).endVertex();
-        vc.vertex(pose, x2, y2, z2).color(r, g, b, alphaFar).endVertex();
-        vc.vertex(pose, x3, y3, z3).color(r, g, b, alphaFar).endVertex();
+        float ax = x1 - x0;
+        float ay = y1 - y0;
+        float az = z1 - z0;
+        float bx = x2 - x1;
+        float by = y2 - y1;
+        float bz = z2 - z1;
+
+        float nx = ay * bz - az * by;
+        float ny = az * bx - ax * bz;
+        float nz = ax * by - ay * bx;
+        float normalLength = Mth.sqrt(nx * nx + ny * ny + nz * nz);
+        if (normalLength > 1.0E-6f) {
+            nx /= normalLength;
+            ny /= normalLength;
+            nz /= normalLength;
+        } else {
+            nx = 0.0f;
+            ny = 1.0f;
+            nz = 0.0f;
+        }
+
+        putVertex(vc, pose, normal, x0, y0, z0, r, g, b, alphaNear, nx, ny, nz);
+        putVertex(vc, pose, normal, x1, y1, z1, r, g, b, alphaNear, nx, ny, nz);
+        putVertex(vc, pose, normal, x2, y2, z2, r, g, b, alphaFar, nx, ny, nz);
+        putVertex(vc, pose, normal, x3, y3, z3, r, g, b, alphaFar, nx, ny, nz);
+    }
+
+    private static void putVertex(
+            VertexConsumer vc,
+            Matrix4f pose,
+            Matrix3f normal,
+            float x,
+            float y,
+            float z,
+            int r,
+            int g,
+            int b,
+            int alpha,
+            float nx,
+            float ny,
+            float nz
+    ) {
+        vc.vertex(pose, x, y, z)
+                .color(r, g, b, alpha)
+                .uv(0.0f, 0.0f)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .normal(normal, nx, ny, nz)
+                .endVertex();
     }
 
     private static int lerpColor(float t, int start, int end) {

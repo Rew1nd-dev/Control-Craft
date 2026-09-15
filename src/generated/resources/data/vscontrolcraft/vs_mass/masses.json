@@ -8,6 +8,10 @@
     "mass": 5.0
   },
   {
+    "block": "vscontrolcraft:control_chair",
+    "mass": 20.0
+  },
+  {
     "block": "vscontrolcraft:wing_controller",
     "mass": 100.0
   },

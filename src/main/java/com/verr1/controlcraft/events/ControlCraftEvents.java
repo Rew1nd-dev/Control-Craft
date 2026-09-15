@@ -9,6 +9,8 @@ import com.verr1.controlcraft.content.valkyrienskies.attachments.CimulinkPorts;
 import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.cimulink.game.peripheral.SpeedControllerPlant;
 import com.verr1.controlcraft.foundation.cimulink.game.port.BlockLinkPort;
+import com.verr1.controlcraft.foundation.input.ControlChairInputManager;
+import com.verr1.controlcraft.foundation.input.ControlChairInputServerWorker;
 import com.verr1.controlcraft.foundation.managers.ChunkManager;
 import com.verr1.controlcraft.foundation.managers.ConstraintCenter;
 import com.verr1.controlcraft.foundation.managers.SpatialLinkManager;
@@ -48,6 +50,8 @@ public class ControlCraftEvents {
         ControlCraftServer.INSTANCE = event.getServer();
         ControlCraftServer.OVERWORLD = event.getServer().overworld();
         ControlCraftServer.LUA_THREAD = Executors.newSingleThreadExecutor();
+        ControlChairInputManager.clear();
+        ControlChairInputServerWorker.start();
         GlobalTickClock.reset();
         AsyncDebugFileLogger.start();
         ControlCraftAttachments.register();
@@ -125,6 +129,8 @@ public class ControlCraftEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         ConstraintCenter.onServerStopping(event.getServer());
         BlockLinkPort.onClose();
+        ControlChairInputServerWorker.stop();
+        ControlChairInputManager.clear();
         AsyncDebugFileLogger.stop();
         GlobalTickClock.reset();
     }

@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlock;
+import com.verr1.controlcraft.content.blocks.controlchair.ControlChairBlock;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlock;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlock;
 import com.verr1.controlcraft.content.blocks.jet.JetBlock;
@@ -70,6 +71,21 @@ public class ControlCraftBlocks {
             .properties(p -> p.rarity(Rarity.EPIC))
             .transform(customItemModel())
             .lang("Gravitational Anchor")
+            .register();
+
+    public static final BlockEntry<ControlChairBlock> CONTROL_CHAIR = REGISTRATE
+            .block(ControlChairBlock.ID, ControlChairBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.explosionResistance(EXPLOSIVE_RESISTANCE))
+            .properties(p -> p.noOcclusion().mapColor(MapColor.COLOR_GRAY))
+            .blockstate(
+                BlockStateGen.horizontalBlockProvider(true)
+            )
+            .transform(TagGen.axeOrPickaxe())
+            .item()
+            .properties(p -> p.rarity(Rarity.EPIC))
+            .transform(customItemModel())
+            .lang("Control Chair")
             .register();
 
     public static final BlockEntry<DynamicRevoluteMotorBlock> SERVO_MOTOR_BLOCK = REGISTRATE

@@ -101,48 +101,44 @@ public abstract class MixinCamera implements ICameraDuck {
         this.level = level;
         this.entity = renderViewEntity;
         this.detached = thirdPerson;
-        if(transformRotation){
+        if (transformRotation) {
             this.controlCraft$setRotationWithShipTransform(
                     renderViewEntity.getViewYRot(partialTicks),
                     renderViewEntity.getViewXRot(partialTicks),
                     renderTransform
             );
-        }else{
+        } else {
             this.controlCraft$setRotationWithoutShipTransform(
                     renderViewEntity.getViewYRot(partialTicks),
                     renderViewEntity.getViewXRot(partialTicks)
             );
-
-            if(thirdPerson && shipMountedTo != null){
-
-                final AABBi boundingBox = Optional.ofNullable((AABBi)shipMountedTo.getShipVoxelAABB()).orElse(new AABBi());
-
-                double dist = ((boundingBox.lengthX() + boundingBox.lengthY() + boundingBox.lengthZ()) / 3.0) * 1.5;
-
-                dist = dist > 4 ? dist : 4;
-
-                // inShipPlayerPosition = shipMountedTo.getRenderTransform().getPositionInShip();
-                playerBasePos = renderTransform.getShipToWorld().transformPosition(inShipPlayerPosition, new Vector3d());
-                this.setPosition(playerBasePos.x(), playerBasePos.y(), playerBasePos.z());
-
-                if (this.level instanceof Level) {
-                    double zom = this.controlCraft$getMaxZoomIgnoringMountedShip((Level) this.level, 4.0 * (dist / 4.0), shipMountedTo);
-                    this.move(-zom, zom / 3, 0.0);
-                } else {
-                    this.move(-this.getMaxZoom(4.0 * (dist / 4.0)), 0.0, 0.0);
-                }
-            }
         }
 
+        if (thirdPerson && shipMountedTo != null) {
+            final double targetDistance = controlCraft$thirdPersonDistance(shipMountedTo);
 
+            playerBasePos = renderTransform.getShipToWorld().transformPosition(inShipPlayerPosition, new Vector3d());
+            this.setPosition(playerBasePos.x(), playerBasePos.y(), playerBasePos.z());
 
+            double zoom = this.level instanceof Level
+                    ? this.controlCraft$getVanillaZoom((Level) this.level, targetDistance)
+                    : this.getMaxZoom(targetDistance);
 
+            double backward = thirdPersonReverse ? zoom : -zoom;
+            this.move(backward, zoom / 3.0, 0.0);
+        }
 
     }
 
     @Unique
-    private double controlCraft$getMaxZoomIgnoringMountedShip(final Level level, double maxZoom,
-                                                 final @NotNull ClientShip toIgnore) {
+    private double controlCraft$thirdPersonDistance(final @NotNull ClientShip shipMountedTo) {
+        final AABBi boundingBox = Optional.ofNullable((AABBi) shipMountedTo.getShipVoxelAABB()).orElse(new AABBi());
+        double distance = ((boundingBox.lengthX() + boundingBox.lengthY() + boundingBox.lengthZ()) / 3.0) * 1.5;
+        return Math.max(distance, 4.0);
+    }
+
+    @Unique
+    private double controlCraft$getVanillaZoom(final Level level, double maxZoom) {
         for (int i = 0; i < 8; ++i) {
             float f = (float) ((i & 1) * 2 - 1);
             float g = (float) ((i >> 1 & 1) * 2 - 1);
@@ -159,8 +155,6 @@ public abstract class MixinCamera implements ICameraDuck {
                     level,
                     new ClipContext(vec3, vec32, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, this.entity)
             );
-            //true,
-            //toIgnore.getId()
             if (hitResult.getType() != HitResult.Type.MISS) {
                 final double e = hitResult.getLocation().distanceTo(this.position);
                 if (e < maxZoom) {

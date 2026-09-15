@@ -68,7 +68,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
     private LazyOptional<IPeripheral> peripheralCap;
     private final DMotorKineticPeripheral kineticPeripheral = new DMotorKineticPeripheral(this);
 
-    private int lockNextSign = 1;
+    private int lockNextSign = 0;
 
     @Override
     public @NotNull MotorPlant plant() {
@@ -154,7 +154,7 @@ public abstract class AbstractDynamicMotor extends AbstractMotor implements
         if(toLock){
             lockNextSign = 1;
         }else{
-            lockNextSign = 0;
+            lockNextSign = -1;
         }
     }
 

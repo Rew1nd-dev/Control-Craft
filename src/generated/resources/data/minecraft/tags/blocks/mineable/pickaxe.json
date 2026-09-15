@@ -2,6 +2,7 @@
   "values": [
     "vscontrolcraft:chunk_loader",
     "vscontrolcraft:anchor",
+    "vscontrolcraft:control_chair",
     "vscontrolcraft:servo",
     "vscontrolcraft:joint",
     "vscontrolcraft:slider",

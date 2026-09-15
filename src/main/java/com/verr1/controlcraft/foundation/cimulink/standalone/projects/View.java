@@ -12,7 +12,7 @@ public class View {
         Val degIn = eval.newVal("isDegIn");
         Val deg2rad = eval.newVal(Math.PI / 180);
         Val convertIn = eval.orElse(degIn, eval.newVal(1), deg2rad);
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val pitch = eval.newVal("pitch");
         Val g_yaw = eval.newVal("g_yaw");
         Val o_yaw = eval.newVal("o_yaw");

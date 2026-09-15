@@ -41,6 +41,9 @@ public class ClientCameraManager {
 
     private static boolean lastBobViewOption = false;
 
+    public static boolean shouldOverrideMountedCamera(){
+        return getLinkedCamera() != null;
+    }
 
     public static @Nullable CameraBlockEntity getLinkedCamera(){
         return Optional

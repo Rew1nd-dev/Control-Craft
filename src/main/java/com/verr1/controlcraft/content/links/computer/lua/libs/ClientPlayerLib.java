@@ -3,10 +3,10 @@ package com.verr1.controlcraft.content.links.computer.lua.libs;
 import com.verr1.controlcraft.content.links.computer.ComputerDisplayMetrics;
 import com.verr1.controlcraft.content.links.computer.ComputerScreen;
 import com.verr1.controlcraft.content.links.computer.lua.IComputerClientContext;
+import com.verr1.controlcraft.utils.VSAccessUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4d;
 import org.joml.Matrix4dc;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
@@ -17,7 +17,6 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.entity.ShipMountedToData;
 
 import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
@@ -25,7 +24,6 @@ import static com.verr1.controlcraft.foundation.vsapi.ValkyrienSkies.toJOML;
 public class ClientPlayerLib extends TwoArgFunction {
 
     private static final double EPSILON = 1.0e-6;
-    private static final Matrix4dc IDENTITY = new Matrix4d();
 
     private final IComputerClientContext context;
 
@@ -37,7 +35,7 @@ public class ClientPlayerLib extends TwoArgFunction {
     public LuaValue call(LuaValue modname, LuaValue env) {
         LuaValue library = tableOf();
 
-        library.set("yaw", new VarArgFunction() {
+        library.set("roll", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
                 LocalPlayer player = Minecraft.getInstance().player;
@@ -69,8 +67,8 @@ public class ClientPlayerLib extends TwoArgFunction {
                     return NIL;
                 }
 
-                Float partialTicks = args.narg() >= 1 ? (float) args.checkdouble(1) : null;
-                ShipMountedToData data = VSGameUtilsKt.getShipMountedToData(player, partialTicks);
+                float partialTicks = args.narg() >= 1 ? (float) args.checkdouble(1) : 0.0f;
+                ShipMountedToData data = VSAccessUtils.getShipMountedToData(player, partialTicks);
                 if (data == null) {
                     return NIL;
                 }
@@ -93,9 +91,10 @@ public class ClientPlayerLib extends TwoArgFunction {
 
                 float partialTicks = args.narg() >= 1 ? (float) args.checkdouble(1) : 0.0f;
                 ScreenProjectionPlane plane = getScreenProjectionPlane();
+                PlayerRay ray = getPlayerViewRay(player, partialTicks);
                 ScreenProjectionResult result = projectRayToScreen(
-                        getPlayerEyePosition(player, partialTicks),
-                        getPlayerViewDirectionWorld(player, partialTicks),
+                        ray.originWorld(),
+                        ray.directionWorld(),
                         plane
                 );
                 return toLuaProjection(result, env);
@@ -115,10 +114,10 @@ public class ClientPlayerLib extends TwoArgFunction {
                     return NIL;
                 }
 
-                Vector3d eyePosition = getPlayerEyePosition(player, parsed.partialTicks());
+                PlayerRay ray = getPlayerViewRay(player, parsed.partialTicks());
                 ScreenProjectionResult result = projectRayToScreen(
-                        eyePosition,
-                        new Vector3d(parsed.worldPosition()).sub(eyePosition),
+                        ray.originWorld(),
+                        new Vector3d(parsed.worldPosition()).sub(ray.originWorld()),
                         getScreenProjectionPlane()
                 );
                 return toLuaProjection(result, env);
@@ -185,14 +184,6 @@ public class ClientPlayerLib extends TwoArgFunction {
         );
     }
 
-    private static Matrix4dc getPlayerShipToWorld(LocalPlayer player, float partialTicks) {
-        ShipMountedToData data = VSGameUtilsKt.getShipMountedToData(player, partialTicks);
-        if (data == null || data.getShipMountedTo() == null) {
-            return IDENTITY;
-        }
-        return data.getShipMountedTo().getShipToWorld();
-    }
-
     private static Vector3d viewDirectionInShip(float yawDeg, float pitchDeg) {
         double yaw = Math.toRadians(yawDeg);
         double pitch = Math.toRadians(pitchDeg);
@@ -204,13 +195,22 @@ public class ClientPlayerLib extends TwoArgFunction {
         ).normalize();
     }
 
-    private static Vector3d getPlayerEyePosition(LocalPlayer player, float partialTicks) {
-        return toJOML(player.getEyePosition(partialTicks));
-    }
-
-    private static Vector3d getPlayerViewDirectionWorld(LocalPlayer player, float partialTicks) {
+    private static PlayerRay getPlayerViewRay(LocalPlayer player, float partialTicks) {
         Vector3d rayDirectionLocal = viewDirectionInShip(player.getViewYRot(partialTicks), player.getViewXRot(partialTicks));
-        return safeNormalize(getPlayerShipToWorld(player, partialTicks).transformDirection(rayDirectionLocal, new Vector3d()));
+        ShipMountedToData data = VSAccessUtils.getShipMountedToData(player, partialTicks);
+        if (data == null || data.getShipMountedTo() == null || data.getMountPosInShip() == null) {
+            return new PlayerRay(
+                    toJOML(player.getEyePosition(partialTicks)),
+                    safeNormalize(rayDirectionLocal)
+            );
+        }
+
+        Matrix4dc shipToWorld = data.getShipMountedTo().getShipToWorld();
+        Vector3d eyePositionInShip = new Vector3d(data.getMountPosInShip()).add(0.0, player.getEyeHeight(), 0.0);
+        return new PlayerRay(
+                shipToWorld.transformPosition(eyePositionInShip, new Vector3d()),
+                safeNormalize(shipToWorld.transformDirection(rayDirectionLocal, new Vector3d()))
+        );
     }
 
     private static @Nullable ScreenProjectionResult projectRayToScreen(
@@ -375,5 +375,8 @@ public class ClientPlayerLib extends TwoArgFunction {
     }
 
     private record ProjectWorldPointArgs(Vector3d worldPosition, float partialTicks) {
+    }
+
+    private record PlayerRay(Vector3d originWorld, @Nullable Vector3d directionWorld) {
     }
 }

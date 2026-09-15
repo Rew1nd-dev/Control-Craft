@@ -45,6 +45,7 @@ public enum UIContents implements Descriptive<UIContents> {
     TYPE(Component.literal("Type"), literals("Type Of The Peripheral")),
     PROTOCOL(Component.literal("protocol"), literals("Unique Channel")),
     NAME(Component.literal("Name"), literals("Unique Name Under A Same protocol")),
+    COMPUTER_RELOAD_CODE(Component.literal("Reload Code"), literals("Reload Stored Code On Server", "CODE sync refreshes clients automatically")),
     SPATIAL_OFFSET(Component.literal("Spatial Offset"), literals("Offset Distance In Space")),
 
     ANCHOR_RESISTANCE_AT_POS(Component.literal("Resist At Pos"), literals("Resistance Apply To Block Instead Of COM")),
@@ -58,6 +59,8 @@ public enum UIContents implements Descriptive<UIContents> {
     CAMERA_VIEW_RESET(Component.literal("Camera View Reset"), literals("Reset Camera Ray")),
     CAMERA_STAB(Component.literal("Stabilizer"), literals("")),
     CAMERA_3(Component.literal("F5 Stab"), literals("")),
+    CONTROL_CHAIR_FIRST_PERSON(Component.literal("First Person"), literals("Rotation Mode Used While Seated In First Person")),
+    CONTROL_CHAIR_THIRD_PERSON(Component.literal("Third Person"), literals("Rotation Mode Used While Seated In Third Person")),
 
     ASSEMBLY(Component.literal("Assembly"), literals("Assemble Contraption or Ship")),
     DISASSEMBLY(Component.literal("Dis Assembly"), literals("Disassemble Contraption or Ship")),

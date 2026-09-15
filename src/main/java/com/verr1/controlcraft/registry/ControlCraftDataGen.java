@@ -100,6 +100,7 @@ public class ControlCraftDataGen {
         TargetMode.register();
         CameraClipType.register();
         CameraViewType.register();
+        ControlChairRotationMode.register();
         TabType.register();
         GroupPolicy.register();
         LerpType.register();

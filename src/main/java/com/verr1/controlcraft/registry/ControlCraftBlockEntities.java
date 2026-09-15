@@ -7,6 +7,8 @@ import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlockEntity;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlock;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.content.blocks.controlchair.ControlChairBlock;
+import com.verr1.controlcraft.content.blocks.controlchair.ControlChairBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlock;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlock;
@@ -57,6 +59,12 @@ public class ControlCraftBlockEntities {
     public static final BlockEntityEntry<AnchorBlockEntity> ANCHOR_BLOCKENTITY = REGISTRATE
             .blockEntity(AnchorBlock.ID, AnchorBlockEntity::new)
             .validBlock(ControlCraftBlocks.ANCHOR_BLOCK)
+            .register();
+
+    public static final BlockEntityEntry<ControlChairBlockEntity> CONTROL_CHAIR_BLOCKENTITY = REGISTRATE
+            .blockEntity(ControlChairBlock.ID, ControlChairBlockEntity::new)
+            .validBlock(ControlCraftBlocks.CONTROL_CHAIR)
+            .renderer(() -> ControlChairRenderer::new)
             .register();
 
     public static final BlockEntityEntry<DynamicRevoluteMotorBlockEntity> SERVO_MOTOR_BLOCKENTITY = REGISTRATE

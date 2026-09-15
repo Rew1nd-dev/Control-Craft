@@ -2,7 +2,9 @@ package com.verr1.controlcraft;
 
 import com.simibubi.create.foundation.render.SuperByteBufferCache;
 import com.verr1.controlcraft.content.gui.wand.WandGUI;
+import com.verr1.controlcraft.foundation.input.ControlChairBindingsStore;
 import com.verr1.controlcraft.foundation.executor.Executor;
+import com.verr1.controlcraft.foundation.input.ControlChairClientInput;
 import com.verr1.controlcraft.foundation.managers.render.BezierOutliner;
 import com.verr1.controlcraft.foundation.managers.render.DynamicOutliner;
 import com.verr1.controlcraft.registry.ControlCraftPartialModels;
@@ -27,6 +29,8 @@ public class ControlCraftClient {
         ControlCraft.LOGGER.info("Try CC Directional Partial");
         BUFFER_CACHE.registerCompartment(CachedBufferer.CC_DIRECTIONAL_PARTIAL);
         ControlCraftPartialModels.init();
+        ControlChairBindingsStore.load();
+        ControlChairClientInput.init();
 
     }
 

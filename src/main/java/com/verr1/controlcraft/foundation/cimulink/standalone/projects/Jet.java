@@ -66,7 +66,7 @@ public class Jet {
 
         Val roll = eval.newVal("roll");
         Val pitch = eval.newVal("pitch");
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val speed = eval.newVal("speed");
 
         Val G_roll = eval.newVal("G_roll");
@@ -151,7 +151,7 @@ public class Jet {
 
         Val roll = eval.newVal("roll");
         Val pitch = eval.newVal("pitch");
-        Val yaw = eval.newVal("yaw");
+        Val yaw = eval.newVal("roll");
         Val speed = eval.newVal("speed");
         Val G_speed = eval.newVal("G_speed");
         Val G_roll = eval.newVal("G_roll");
@@ -173,7 +173,7 @@ public class Jet {
         Map<String, Val> tw_xyz = eval.invoke("input", Map.of(
                 "roll", roll,
                 "pitch", pitch,
-                "yaw", yaw,
+                "roll", yaw,
                 "speed", speed,
                 "G_roll", G_roll,
                 "G_pitch", G_pitch,

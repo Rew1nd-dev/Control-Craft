@@ -3,7 +3,6 @@ package com.verr1.controlcraft.content.links.computer.lua.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4f;
 
 public record DrawCircleCmd(float cx, float cy, float radius, int segments, int rgba) implements RenderCmd {
@@ -14,7 +13,7 @@ public record DrawCircleCmd(float cx, float cy, float radius, int segments, int 
             return;
         }
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.gui());
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderShapeEmitter.coloredQuadRenderType());
         Matrix4f matrix4f = ms.last().pose();
         int clampedSegments = Math.max(8, Math.min(256, segments));
 

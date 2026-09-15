@@ -10,50 +10,39 @@ import org.luaj.vm2.LuaValue;
 
 public class LuacuitConstructor {
 
+    public static int LOAD_MAX_INSTRUCTIONS = LuaUtils.DEFAULT_LOAD_MAX_INSTRUCTIONS;
+    public static long LOAD_MAX_TIME_MILLIS = LuaUtils.DEFAULT_LOAD_MAX_TIME_MILLIS;
+    public static long LOAD_MAX_ALLOCATED_BYTES = LuaUtils.DEFAULT_LOAD_MAX_ALLOCATED_BYTES;
+
     private final LuacuitScript script;
 
-    public LuacuitConstructor(LuacuitScript script){
+    public LuacuitConstructor(LuacuitScript script) {
         this.script = script;
     }
 
-    public LuacuitConstructor(String code) throws LuaOvertimeException, LuaError{
+    public LuacuitConstructor(String code) throws LuaOvertimeException, LuaError {
         this.script = LuacuitScript.fromCode(code);
     }
 
+    public Luacuit build() throws UndefineMethodException, LuaError, LuaOvertimeException {
+        return build(LOAD_MAX_INSTRUCTIONS, LOAD_MAX_TIME_MILLIS, LOAD_MAX_ALLOCATED_BYTES);
+    }
 
-
-    public Luacuit build() throws UndefineMethodException, LuaError, LuaOvertimeException{
-
+    public Luacuit build(
+            int loadMaxInstructions,
+            long loadMaxTimeMillis,
+            long loadMaxAllocatedBytes
+    ) throws UndefineMethodException, LuaError, LuaOvertimeException {
         Globals luaGlobal = CimulinkLua.createStandardGlobals();
-//        CompletableFuture<LuaValue> future = CompletableFuture.supplyAsync(() -> {
-//            LuaValue chunk = luaGlobal.load(script.code());
-//            chunk.call();
-//            return luaGlobal.get("loop");
-//
-//        })
-//            .completeOnTimeout(LuaValue.NIL, 1000, TimeUnit.MILLISECONDS);
-//
-//        LuaValue loopFunc;
-//        try{
-//            loopFunc = future.join();
-//            if(loopFunc == LuaValue.NIL){
-//                if(future.isDone()){
-//                    throw new UndefineMethodException("loop() is not present!");
-//                }else{
-//                    throw new LuaOvertimeException("Compiling Lua script overtime!");
-//                }
-//            }
-//        } catch (CompletionException e) {
-//            Throwable e0 = e.getCause();
-//            if(e0 instanceof LuaError luaError){
-//                throw luaError;
-//            }
-//            throw new RuntimeException(e);
-//        }
-        LuaValue loopFunc = LuaUtils.loadFunctionBlock(script.code(), "loop", luaGlobal);
-
+        LuaValue loopFunc = LuaUtils.loadFunctionBlock(
+                script.code(),
+                "loop",
+                luaGlobal,
+                loadMaxInstructions,
+                loadMaxTimeMillis,
+                loadMaxAllocatedBytes
+        );
 
         return new Luacuit(this.script.definedInputs(), this.script.definedOutputs(), luaGlobal, loopFunc, script);
     }
-
 }

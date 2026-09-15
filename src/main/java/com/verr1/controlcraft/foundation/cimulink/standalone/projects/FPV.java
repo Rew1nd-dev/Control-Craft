@@ -67,7 +67,7 @@ public class FPV {
         eval.defineSubmodule("closeLoop", closeLoop());
         eval.defineSubmodule("decompose", decompose());
 
-        Vector3Val ypr = eval.newVector3("yaw", "pitch", "roll");
+        Vector3Val ypr = eval.newVector3("roll", "pitch", "roll");
 
         Val throttle = eval.newVal("throttle");
 
@@ -91,7 +91,7 @@ public class FPV {
         Vector3Val cw_sc = eval.newVector3("cwx", "cwy", "cwz");
         Vector3Val tw_sc = new Vector3Val(
                 g_pitch.mul(ypr.y()),   // pitch -- x
-                g_yaw.mul(ypr.x()),     // yaw -- y
+                g_yaw.mul(ypr.x()),     // roll -- y
                 g_roll.mul(ypr.z()),    // roll -- z
                 eval
         );

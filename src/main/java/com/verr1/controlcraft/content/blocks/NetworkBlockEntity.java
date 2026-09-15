@@ -4,6 +4,8 @@ import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.api.delegate.IRemoteDevice;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.network.executors.AsyncLazySynchronizer;
+import com.verr1.controlcraft.foundation.network.sync.BufCodec;
+import com.verr1.controlcraft.foundation.network.sync.ClientboundFieldSyncHandler;
 import com.verr1.controlcraft.foundation.network.remote.RemotePanel;
 import com.verr1.controlcraft.foundation.network.handler.NetworkHandler;
 import com.verr1.controlcraft.utils.LazyTicker;
@@ -20,6 +22,7 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
     private final RemotePanel panel = new RemotePanel();
 
     private final NetworkHandler handler = new NetworkHandler(this);
+    private final ClientboundFieldSyncHandler clientboundFieldSync = new ClientboundFieldSyncHandler(this);
     private final AsyncLazySynchronizer lazySynchronizer = new AsyncLazySynchronizer(this);
     private final LazyTicker lazyLazySynchronizer = new LazyTicker(20 * 5, this::syncOnce);
 
@@ -32,9 +35,17 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
         return handler.buildRegistry(key);
     }
 
+    protected <T> ClientboundFieldSyncHandler.Registry<T> buildClientboundField(NetworkKey key, BufCodec<T> codec) {
+        return clientboundFieldSync.buildRegistry(key, codec);
+    }
+
 
     protected void queueUpdate(NetworkKey... keys){
         lazySynchronizer.queueUpdate(keys);
+    }
+
+    protected void queueClientboundSync(NetworkKey... keys) {
+        clientboundFieldSync.queue(keys);
     }
 
     protected void syncOnce(){
@@ -45,6 +56,7 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
     public void initializeServer() {
         super.initializeServer();
         handler.onInit();
+        clientboundFieldSync.initializeServer();
     }
 
     @Override
@@ -66,6 +78,7 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
         super.tickServer();
         lazySynchronizer.tick();
         lazyLazySynchronizer.tick();
+        clientboundFieldSync.tickServer();
     }
 
 
@@ -92,6 +105,14 @@ public class NetworkBlockEntity extends SidedTickedBlockEntity implements
     @Override
     public NetworkHandler handler() {
         return handler;
+    }
+
+    public ClientboundFieldSyncHandler clientboundFieldSync() {
+        return clientboundFieldSync;
+    }
+
+    public void requestClientboundSync(NetworkKey... key) {
+        clientboundFieldSync.request(key);
     }
 
 

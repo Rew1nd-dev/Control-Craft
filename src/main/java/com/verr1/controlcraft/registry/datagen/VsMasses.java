@@ -2,6 +2,7 @@ package com.verr1.controlcraft.registry.datagen;
 
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlock;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlock;
+import com.verr1.controlcraft.content.blocks.controlchair.ControlChairBlock;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlock;
 import com.verr1.controlcraft.content.blocks.flap.FlapBearingBlock;
 import com.verr1.controlcraft.content.blocks.jet.JetBlock;
@@ -45,6 +46,7 @@ public enum VsMasses {
 
     ANCHOR(AnchorBlock.ID),
     CAMERA(CameraBlock.ID, 5),
+    CONTROL_CHAIR(ControlChairBlock.ID, 20),
     FLAP_BEARING(FlapBearingBlock.ID),
     JET_ENGINE(JetBlock.ID, 500),
     JET_RUDDER(JetRudderBlock.ID, 5),

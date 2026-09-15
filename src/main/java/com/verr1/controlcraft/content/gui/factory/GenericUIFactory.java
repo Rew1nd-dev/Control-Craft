@@ -4,12 +4,14 @@ import com.verr1.controlcraft.content.blocks.SharedKeys;
 import com.verr1.controlcraft.content.blocks.ShipConnectorBlockEntity;
 import com.verr1.controlcraft.content.blocks.anchor.AnchorBlockEntity;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.content.blocks.controlchair.ControlChairBlockEntity;
 import com.verr1.controlcraft.content.blocks.flap.CompactFlapBlockEntity;
 import com.verr1.controlcraft.content.blocks.jet.JetBlockEntity;
 import com.verr1.controlcraft.content.blocks.kinetic.resistor.KineticResistorBlockEntity;
 import com.verr1.controlcraft.content.blocks.motor.AbstractDynamicMotor;
 import com.verr1.controlcraft.content.blocks.propeller.PropellerBlockEntity;
 import com.verr1.controlcraft.content.blocks.receiver.PeripheralInterfaceBlockEntity;
+import com.verr1.controlcraft.content.links.computer.ComputerBlockEntity;
 import com.verr1.controlcraft.content.gui.layouts.element.general.*;
 import com.verr1.controlcraft.content.blocks.spatial.SpatialAnchorBlockEntity;
 import com.verr1.controlcraft.content.gui.layouts.element.*;
@@ -24,6 +26,7 @@ import com.verr1.controlcraft.foundation.BlockEntityGetter;
 import com.verr1.controlcraft.foundation.api.delegate.INetworkHandle;
 import com.verr1.controlcraft.foundation.data.NetworkKey;
 import com.verr1.controlcraft.foundation.redstone.IReceiver;
+import com.verr1.controlcraft.foundation.type.descriptive.ControlChairRotationMode;
 import com.verr1.controlcraft.foundation.type.descriptive.*;
 import com.verr1.controlcraft.registry.ControlCraftBlocks;
 import com.verr1.controlcraft.utils.MathUtils;
@@ -194,6 +197,73 @@ public class GenericUIFactory {
                         REMOTE_TAB,
                         new VerticalFlow.builder(boundAnchorPos)
                                 .withPort(reset)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createControlChairScreen(BlockPos boundChairPos) {
+
+        StringUIField name = new StringUIField(
+            boundChairPos,
+            SharedKeys.COMPONENT_NAME,
+            convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+        OptionUIField<ControlChairRotationMode> firstPerson = new OptionUIField<>(
+                boundChairPos,
+                ControlChairBlockEntity.FIRST_PERSON_ROTATION_MODE,
+                ControlChairRotationMode.class,
+                Converter.convert(UIContents.CONTROL_CHAIR_FIRST_PERSON, Converter::titleStyle)
+        );
+
+        OptionUIField<ControlChairRotationMode> thirdPerson = new OptionUIField<>(
+                boundChairPos,
+                ControlChairBlockEntity.THIRD_PERSON_ROTATION_MODE,
+                ControlChairRotationMode.class,
+                Converter.convert(UIContents.CONTROL_CHAIR_THIRD_PERSON, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> {
+            Converter.alignLabel(firstPerson, thirdPerson);
+            Converter.alignLabel(firstPerson.valueLabel(), thirdPerson.valueLabel());
+        };
+
+        return new GenericSettingScreen.builder(boundChairPos)
+                .withRenderedStack(ControlCraftBlocks.CONTROL_CHAIR.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundChairPos)
+                                .withPort(name, firstPerson, thirdPerson)
+                                .withPreDoLayout(alignLabels)
+                                .build()
+                )
+                .build();
+    }
+
+    public static GenericSettingScreen createComputerScreen(BlockPos boundComputerPos) {
+        StringUIField name = new StringUIField(
+                boundComputerPos,
+                SharedKeys.COMPONENT_NAME,
+                convert(UIContents.NAME, Converter::titleStyle)
+        );
+
+        UnitUIPanel reloadCode = new UnitUIPanel(
+                boundComputerPos,
+                ComputerBlockEntity.RELOAD_CODE,
+                Converter.convert(UIContents.COMPUTER_RELOAD_CODE, Converter::titleStyle)
+        );
+
+        Runnable alignLabels = () -> Converter.alignLabel(name, reloadCode);
+
+        return new GenericSettingScreen.builder(boundComputerPos)
+                .withRenderedStack(ControlCraftBlocks.COMPUTER.asStack())
+                .withTab(
+                        GENERIC_SETTING_TAB,
+                        new VerticalFlow.builder(boundComputerPos)
+                                .withPort(name)
+                                .withPort(reloadCode)
+                                .withPreDoLayout(alignLabels)
                                 .build()
                 )
                 .build();

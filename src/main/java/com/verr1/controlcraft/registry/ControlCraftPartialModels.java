@@ -24,7 +24,11 @@ public class ControlCraftPartialModels {
 
         SLIDER_TOP = block("slider_top"),
         CONSTRAINT_SLIDER_TOP = block("constraint_slider_top"),
-        SLIDER_PILLAR = block("slider_pillar");
+        SLIDER_PILLAR = block("slider_pillar"),
+        CHAIR_HANDLE = block("chair_handle"),
+        CHAIR_GRIP = CHAIR_HANDLE
+                ;
+
 
 
 

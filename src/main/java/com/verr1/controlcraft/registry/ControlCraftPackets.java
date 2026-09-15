@@ -7,6 +7,7 @@ import com.verr1.controlcraft.foundation.network.packets.BlockBoundServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.GenericClientPacket;
 import com.verr1.controlcraft.foundation.network.packets.GenericServerPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.*;
+import com.verr1.controlcraft.foundation.network.packets.specific.ControlChairInputPacket;
 import com.verr1.controlcraft.foundation.network.packets.specific.tweak.TweakControllerFullAxisPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -32,8 +33,13 @@ public enum ControlCraftPackets {
     RECEIVE_LATEST_WORLD_POS(ReceiveLatestWorldPosPacket.class, ReceiveLatestWorldPosPacket::new, NetworkDirection.PLAY_TO_CLIENT),
     CODE_UPLOAD_REQUEST(CodeUploadRequestPacket.class, CodeUploadRequestPacket::new, NetworkDirection.PLAY_TO_CLIENT),
     COMPUTER_SYNC(ComputerSyncPacket.class, ComputerSyncPacket::new, NetworkDirection.PLAY_TO_CLIENT),
+    COMPUTER_AUTHORITY_SYNC(ComputerAuthoritySyncPacket.class, ComputerAuthoritySyncPacket::new, NetworkDirection.PLAY_TO_CLIENT),
+    CLIENTBOUND_FIELD_SYNC(ClientboundFieldSyncPacket.class, ClientboundFieldSyncPacket::new, NetworkDirection.PLAY_TO_CLIENT),
 
     GENERIC_SERVER(GenericServerPacket.class, GenericServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    REQUEST_CLIENTBOUND_FIELD_SYNC(RequestClientboundFieldSyncPacket.class, RequestClientboundFieldSyncPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    COMPUTER_AUTHORITY_REQUEST(ComputerAuthorityRequestPacket.class, ComputerAuthorityRequestPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    COMPUTER_AUTHORITY_RELEASE(ComputerAuthorityReleasePacket.class, ComputerAuthorityReleasePacket::new, NetworkDirection.PLAY_TO_SERVER),
     COMPUTER_CLIENT_NETWORK(ComputerClientNetworkPacket.class, ComputerClientNetworkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     BLOCK_BOUND_SERVER(BlockBoundServerPacket.class, BlockBoundServerPacket::new, NetworkDirection.PLAY_TO_SERVER),
     // SETTING_EXPOSED_FIELD(ExposedFieldSettingsPacket.class, ExposedFieldSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),
@@ -44,13 +50,14 @@ public enum ControlCraftPackets {
     CIMULINK_LINK(CimulinkLinkPacket.class, CimulinkLinkPacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIMULINK_COMPILE(CimulinkCompilePacket.class, CimulinkCompilePacket::new, NetworkDirection.PLAY_TO_SERVER),
     CIRCUIT_SETTINGS(CircuitSettingsPacket.class, CircuitSettingsPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    CONTROL_CHAIR_INPUT(ControlChairInputPacket.class, ControlChairInputPacket::new, NetworkDirection.PLAY_TO_SERVER),
     TWEAK_FULL_PRECISION(TweakControllerFullAxisPacket.class, TweakControllerFullAxisPacket::new, NetworkDirection.PLAY_TO_SERVER),
     CODE_UPLOAD(CodeUploadPacket.class, CodeUploadPacket::new, NetworkDirection.PLAY_TO_SERVER)
     ;
 
 
 
-    public static final String NETWORK_VERSION = "1.2";
+    public static final String NETWORK_VERSION = "1.5";
     private static SimpleChannel channel;
     private final PacketType<?> packetType;
     <T extends SimplePacketBase> ControlCraftPackets(Class<T> type, Function<FriendlyByteBuf, T> factory,

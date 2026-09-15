@@ -4,29 +4,32 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.verr1.controlcraft.ControlCraftServer;
+import com.verr1.controlcraft.content.blocks.controlchair.ControlChairBlockEntity;
 import com.verr1.controlcraft.content.blocks.camera.CameraBlockEntity;
+import com.verr1.controlcraft.foundation.input.MountedCameraOverride;
 import com.verr1.controlcraft.foundation.managers.ClientCameraManager;
+import com.verr1.controlcraft.foundation.managers.ClientControlChairManager;
 import com.verr1.controlcraft.mixinducks.ICameraDuck;
-import com.verr1.controlcraft.utils.MinecraftUtils;
 import net.minecraft.client.Camera;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.Unique;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
+import org.valkyrienskies.mod.common.entity.ShipMountedToData;
 
 import java.lang.Math;
-import java.util.Objects;
 import java.util.Optional;
 
 @Mixin(value = GameRenderer.class)
@@ -62,36 +65,30 @@ abstract class MixinGameRenderer {
         // Player player = Objects.requireNonNull(this.minecraft.player);
 
         // player.sendSystemMessage(Component.literal("stage_1"));
-        final CameraBlockEntity linkedCamera = ClientCameraManager.getLinkedCamera();
-        if (linkedCamera == null) {
+        MountedCameraOverride mountedOverride = controlCraft$mountedOverride(partialTicks);
+        if (mountedOverride == null) {
             prepareCullFrustum.call(instance, matrixStack, vec3, matrix4f);
             return;
         }
-        // player.sendSystemMessage(Component.literal("stage_2"));
-        ClientShip cameraClientShip = linkedCamera.getClientShip();
-        Vector3dc cameraPosOnShip = linkedCamera.getCameraPositionShip();
-        // player.sendSystemMessage(Component.literal("stage_3"));
+
         if(this.minecraft.player == null) {
             prepareCullFrustum.call(instance, matrixStack, vec3, matrix4f);
             return;
         }
-        // player.sendSystemMessage(Component.literal("stage_4"));
-        boolean transformRotation = linkedCamera.transformRotation();
-        boolean third = linkedCamera.thirdPerson();
 
         ((ICameraDuck) mainCamera).controlCraft$setupWithShipMounted(
                 this.minecraft.level,
                 this.minecraft.getCameraEntity() == null ? this.minecraft.player : this.minecraft.getCameraEntity(),
-                third,
+                mountedOverride.thirdPerson(),
                 false,
                 partialTicks,
-                cameraClientShip,
-                cameraPosOnShip,
-                transformRotation
+                mountedOverride.clientShip(),
+                mountedOverride.positionInShip(),
+                mountedOverride.transformRotation()
         );
-        // player.sendSystemMessage(Component.literal("stage_5"));
+
         // Apply the ship render transform to [matrixStack]
-        ShipTransform renderTransform = Optional.ofNullable(cameraClientShip).map(ClientShip::getRenderTransform).orElse(
+        ShipTransform renderTransform = Optional.ofNullable(mountedOverride.clientShip()).map(ClientShip::getRenderTransform).orElse(
                 new ShipTransformImpl(
                         new Vector3d(),
                         new Vector3d(),
@@ -99,13 +96,12 @@ abstract class MixinGameRenderer {
                         new Vector3d(1, 1, 1)
                 )
         );
-        // player.sendSystemMessage(Component.literal("stage_6"));
 
 
         final Quaternionf invShipRenderRotation = new Quaternionf(
                 renderTransform.getShipToWorldRotation().conjugate(new Quaterniond())
         );
-        matrixStack.mulPose(transformRotation ? invShipRenderRotation : new Quaternionf());
+        matrixStack.mulPose(mountedOverride.transformRotation() ? invShipRenderRotation : new Quaternionf());
 
         // We also need to recompute [inverseViewRotationMatrix] after updating [matrixStack]
         final Matrix3f matrix3f = new Matrix3f(matrixStack.last().normal());
@@ -121,4 +117,43 @@ abstract class MixinGameRenderer {
         prepareCullFrustum.call(instance, matrixStack, mainCamera.getPosition(),
                 this.getProjectionMatrix(Math.max(fov, this.minecraft.options.fov().get())));
     }
+
+    @Unique
+    private @Nullable MountedCameraOverride controlCraft$mountedOverride(float partialTicks) {
+        CameraBlockEntity linkedCamera = ClientCameraManager.getLinkedCamera();
+        if (linkedCamera != null) {
+            return new MountedCameraOverride(
+                    linkedCamera.getClientShip(),
+                    linkedCamera.getCameraPositionShip(),
+                    linkedCamera.thirdPerson(),
+                    linkedCamera.transformRotation()
+            );
+        }
+
+        if (!ClientControlChairManager.shouldOverrideMountedCamera()) {
+            return null;
+        }
+
+        ShipMountedToData mountedData = ClientControlChairManager.mountedData(partialTicks);
+        if (mountedData == null) {
+            return null;
+        }
+
+        CameraType cameraType = this.minecraft.options.getCameraType();
+        boolean thirdPerson = !cameraType.isFirstPerson();
+        ControlChairBlockEntity chair = ClientControlChairManager.getActiveChairBlockEntity();
+        ClientShip clientShip = mountedData.getShipMountedTo() instanceof ClientShip ship ? ship : null;
+        Vector3dc cameraPositionInShip = new Vector3d(mountedData.getMountPosInShip());
+        Entity cameraEntity = this.minecraft.getCameraEntity() == null ? this.minecraft.player : this.minecraft.getCameraEntity();
+        if (cameraEntity != null) {
+            cameraPositionInShip = new Vector3d(cameraPositionInShip).add(0.0, cameraEntity.getEyeHeight(), 0.0);
+        }
+        return new MountedCameraOverride(
+                clientShip,
+                cameraPositionInShip,
+                thirdPerson,
+                chair != null && chair.transformRotation(thirdPerson)
+        );
+    }
+
 }

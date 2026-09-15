@@ -187,7 +187,7 @@ public class DynamicSliderBlockEntity extends AbstractSlider implements
         if(toLock){
             lockNextSign = 1;
         }else{
-            lockNextSign = 0;
+            lockNextSign = -1;
         }
     }
 

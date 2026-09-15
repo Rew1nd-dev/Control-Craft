@@ -9,6 +9,10 @@
   "tooltip.forthisoption": "For This Option",
 
   "key.controlcraft.link": "link last camera",
+  "key.controlcraft.toggle_control_chair_input": "toggle control chair input",
+  "key.controlcraft.toggle_control_chair_view_lock": "toggle control chair view lock",
+  "key.controlcraft.reset_control_chair_view": "reset control chair view",
+  "key.controlcraft.open_control_chair_bindings": "open control chair bindings",
   "key.categories.controlcraft" : "Control Craft",
 
   "vscontrolcraft.ponder.cimulink/base.header": "What's Cimulink"

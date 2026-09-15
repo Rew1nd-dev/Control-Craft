@@ -25,7 +25,7 @@ import static com.verr1.controlcraft.content.gui.factory.CimulinkUIFactory.title
 import static com.verr1.controlcraft.content.gui.factory.Converter.alignLabel;
 
 public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
-    private final int max_size = 28;
+    private final int max_size = 64;
     private final int max_page_size = 14;
     private final IconSelectionScrollInput pager = new IconSelectionScrollInput(ControlCraftGuiTextures.SMALL_BUTTON_SELECTION, ControlCraftGuiTextures.SMALL_BUTTON_SELECTION_PRESSED);
     private int currentSize = 0;
@@ -47,7 +47,7 @@ public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
                 StringBooleans::new
         );
         label = title(UIContents.STATUS).toDescriptiveLabel();
-        List<Component> pageComponents = IntStream.range(0, max_size / max_page_size)
+        List<Component> pageComponents = IntStream.range(0, (max_size + max_page_size - 1) / max_page_size)
                 .mapToObj(i -> (Component)Component.literal(String.valueOf(i + 1))).toList();
         pager.forOptions(pageComponents)
                 .calling(i -> {
@@ -63,8 +63,8 @@ public class PortStatusUIPort extends ListUIPort<StringBoolean, StringBooleans>{
 
     @Override
     protected void writeList(List<StringBoolean> value) {
-        currentSize = value.size();
         int size = Math.min(max_size, value.size());
+        currentSize = size;
         IntStream.range(0, size).forEach(i -> widgets.get(i).write(value.get(i)));
         redoLayout();
     }

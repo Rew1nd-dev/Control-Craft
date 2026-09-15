@@ -1,6 +1,7 @@
 package com.verr1.controlcraft.content.links.computer.lua.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4f;
 
 final class RenderShapeEmitter {
@@ -22,6 +23,11 @@ final class RenderShapeEmitter {
 
     static int blue(int rgba) {
         return rgba & 255;
+    }
+
+    static RenderType coloredQuadRenderType() {
+        // GUI render types are not reliably handled when used from world-space BE renderers.
+        return RenderType.debugQuads();
     }
 
     static void emitAxisAlignedQuad(
@@ -79,7 +85,7 @@ final class RenderShapeEmitter {
             float y2,
             int rgba
     ) {
-        // RenderType.gui() batches quads, so we use a degenerate quad to represent one triangle.
+        // The backing render type batches quads, so we use a degenerate quad to represent one triangle.
         emitQuad(vertexConsumer, matrix4f, x0, y0, x1, y1, x2, y2, x0, y0, rgba);
     }
 }

@@ -11,43 +11,84 @@ public class WatcherLib extends DebugLib {
 
     private volatile boolean interrupted = false;
     private final ThreadMXBean threadMXBean;
-    private long startAllocatedBytes = -1;
-    // 假设设定每个被执行的脚本最多只能临时分配 10MB 的内存
-    private final long maxAllocatedBytes = 10 * 1024 * 1024L;
+    private int maxInstructions = Integer.MAX_VALUE;
+    private int instructionCount = 0;
+    private long maxNanos = Long.MAX_VALUE;
+    private long startTime = 0L;
+    private long startAllocatedBytes = -1L;
+    private long maxAllocatedBytes = 10 * 1024 * 1024L;
 
     public WatcherLib() {
         this.threadMXBean = (ThreadMXBean) ManagementFactory.getThreadMXBean();
-        // 如果环境支持，开启线程内存分配统计
         if (threadMXBean != null && threadMXBean.isThreadAllocatedMemorySupported()) {
             threadMXBean.setThreadAllocatedMemoryEnabled(true);
         }
     }
-    // 在 Luacuit doTask 时调用，记录起始分配内存
+
     public void startMonitor() {
+        resetForNewExecution();
+    }
+
+    public void resetForNewExecution() {
+        this.instructionCount = 0;
+        this.startTime = System.nanoTime();
         if (threadMXBean != null && threadMXBean.isThreadAllocatedMemoryEnabled()) {
             this.startAllocatedBytes = threadMXBean.getThreadAllocatedBytes(Thread.currentThread().getId());
+        } else {
+            this.startAllocatedBytes = -1L;
         }
-        this.interrupted = false; // 重置中断标志
+        this.interrupted = false;
     }
+
+    public void setLimits(int maxInstructions, long maxTimeMillis, long maxAllocatedBytes) {
+        this.maxInstructions = maxInstructions;
+        this.maxNanos = maxTimeMillis >= Long.MAX_VALUE / 1_000_000L ? Long.MAX_VALUE : maxTimeMillis * 1_000_000L;
+        this.maxAllocatedBytes = maxAllocatedBytes;
+    }
+
     @Override
-    public void onInstruction(int i, Varargs varargs, int i1) {
+    public void onInstruction(int pc, Varargs varargs, int top) {
         if (interrupted) {
             interrupted = false;
-            throw new LuaError("Execution interrupted due to timeout!"); // 超时导致的强制中断
+            throw new LuaError("Execution interrupted due to timeout!");
         }
 
-        // 性能优化：无需每执行 1 条指令看一次内存，每执行 1000 条检查一次即可
-        if (threadMXBean != null && startAllocatedBytes != -1 && (i % 1000 == 0)) {
+        instructionCount++;
+        if (instructionCount > maxInstructions) {
+            throw new LuaError(
+                    String.format(
+                            "Execution Timeout: Script exceeded the maximum allowed instructions (%d steps).",
+                            maxInstructions
+                    )
+            );
+        }
+
+        if (instructionCount % 100 == 0) {
+            long elapsed = System.nanoTime() - startTime;
+            if (elapsed > maxNanos) {
+                throw new LuaError(
+                        String.format(
+                                "Execution Timeout: Script took too long to execute (limit is %.1f ms).",
+                                maxNanos / 1000000.0
+                        )
+                );
+            }
+        }
+
+        if (threadMXBean != null && startAllocatedBytes != -1L && instructionCount % 1000 == 0) {
             long currentAllocatedBytes = threadMXBean.getThreadAllocatedBytes(Thread.currentThread().getId());
             long allocatedDuringTask = currentAllocatedBytes - startAllocatedBytes;
-            // 检查本次脚本运行是否瞬间分配了巨量对象（例如恶意死循环拼接字符串）
             if (allocatedDuringTask > maxAllocatedBytes) {
-                throw new LuaError("OOM Exception: Script exceeded memory allocation limit (" + (maxAllocatedBytes / 1024 / 1024) + "MB).");
+                throw new LuaError(
+                        "OOM Exception: Script exceeded memory allocation limit ("
+                                + (maxAllocatedBytes / 1024 / 1024)
+                                + "MB)."
+                );
             }
         }
     }
+
     public void interrupt() {
         interrupted = true;
     }
-
 }

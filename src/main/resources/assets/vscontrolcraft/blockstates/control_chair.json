@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "vscontrolcraft:block/control_chair"
+    },
+    "waterlogged=true": {
+      "model": "vscontrolcraft:block/control_chair"
+    }
+  }
+}
