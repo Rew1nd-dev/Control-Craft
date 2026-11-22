@@ -26,6 +26,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -305,6 +306,8 @@ public class CimulinkRenderer implements IRenderer{
     }
 
     public Vec3 transformIfIncludeShip(Vec3 wc){
+        // Newer VS versions report ship hits in shipyard space already.
+        if (cbe.getLevel() != null && VSGameUtilsKt.isBlockInShipyard(cbe.getLevel(), wc.x, wc.y, wc.z)) return wc;
         Ship s = cbe.getShipOn();
         return Optional.ofNullable(s)
                 .map(Ship::getWorldToShip)
